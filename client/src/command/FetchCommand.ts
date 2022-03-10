@@ -10,6 +10,8 @@ export class FetchArguments {
     sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
+    repository?: string;
+    credentials?: string;
 }
 
 export class FetchCommand implements Command {
@@ -45,6 +47,12 @@ export class FetchCommand implements Command {
                     .option("sinkCredentialsConfig", {
                         type: "string"
                     })
+                    .option("repository", {
+                        type: "string"
+                    })
+                    .option("credentials", {
+                        type: "string"
+                    })
                     .help();
             },
             handler: fetchPackage
@@ -55,7 +63,11 @@ export async function fetchPackage(args: FetchArguments): Promise<void> {
     try {
         const fetchCommand = await import("./FetchCommandModule");
 
-        await fetchCommand.fetchPackage(args);
+        await fetchCommand.fetchPackage({
+            ...args,
+            repositoryIdentifier: args.repository,
+            credentialsIdentifier: args.credentials
+        });
     } catch (e) {
         console.error(e);
         // TODO print full error message in debug mode

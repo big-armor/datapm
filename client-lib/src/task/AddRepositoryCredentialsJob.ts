@@ -95,7 +95,7 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
             throw new Error("Repository configuration for " + this.args.repositoryIdentifier + " not found.");
         }
 
-        const repository = await connectorDescription.getRepository();
+        const repository = await connectorDescription.getConnector();
 
         if (!repository.requiresCredentialsConfiguration()) {
             this.jobContext.print(

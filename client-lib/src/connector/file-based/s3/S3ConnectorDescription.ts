@@ -14,7 +14,7 @@ export class S3ConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./S3Repository");
         return new repository.S3Repository();
     }

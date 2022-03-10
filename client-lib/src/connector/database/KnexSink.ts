@@ -154,7 +154,7 @@ export abstract class KnexSink implements Sink {
 
                 const formats = (property.format || "").split(",").filter((type) => type !== "null");
 
-                let dbKey = key;
+                let dbKey = this.getSafeTableName(key);
 
                 let valueType = discoverValueType(value);
                 if (formats.length === 1) {
@@ -186,6 +186,10 @@ export abstract class KnexSink implements Sink {
         }
     }
 
+    getSafeColumnName(schemaPropertyName: string): string {
+        return schemaPropertyName.replace(".","_");
+    }
+
     getSafeTableName(name: string): string {
         return name.replace(/\./g, "-");
     }
@@ -193,10 +197,12 @@ export abstract class KnexSink implements Sink {
     buildTableFromSchema(tableBuilder: CreateTableBuilder, schema: Schema): void {
         if (schema.properties == null) throw new Error("Schema properties are required for " + tableBuilder);
 
-        const keys = Object.keys(schema.properties);
+        const propertyTitles = Object.keys(schema.properties);
 
-        for (const key of keys) {
-            const property = schema.properties[key];
+        for (const propertyTitle of propertyTitles) {
+            const property = schema.properties[propertyTitle];
+
+            const key = this.getSafeTableName(propertyTitle);
 
             if (property.type === undefined) {
                 // Log a warning
@@ -232,6 +238,7 @@ export abstract class KnexSink implements Sink {
                         tableBuilder.dateTime(key + typeAppend, { useTz: false });
                     } else if (format === "string") {
                         tableBuilder.text(key + typeAppend);
+                        // TODO use string length determine if it should be an indexable varchar
                     }
                 }
             } else {

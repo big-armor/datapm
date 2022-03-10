@@ -70,6 +70,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
                 connectionConfiguration,
                 {},
                 true,
+                repositoryIdentifier,
                 false,
                 {}
             );
@@ -132,7 +133,7 @@ export async function promptForRepositoryType(
 
     const connectorDescription = maybeConnectorDescription;
 
-    const connector = await connectorDescription.getRepository();
+    const connector = await connectorDescription.getConnector();
 
     if (!connector.requiresConnectionConfiguration()) {
         jobContext.print("WARN", connectorDescription.getDisplayName() + " does not require connection configuration");

@@ -22,7 +22,7 @@ export class BigQueryConnectorDescription implements ConnectorDescription {
         return true;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./BigQueryRepository");
         return new repository.BigQueryRepository();
     }

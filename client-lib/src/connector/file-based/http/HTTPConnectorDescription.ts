@@ -22,7 +22,7 @@ export class HTTPConnectorDescription implements ConnectorDescription {
         return false;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./HTTPRepository");
         return new repository.HTTPRepository();
     }

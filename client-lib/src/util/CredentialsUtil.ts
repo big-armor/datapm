@@ -4,24 +4,25 @@ import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { JobContext } from "../task/Task";
 
+/** Requests from the user credentials for each source - without saving those credentials to any configuration file */
 export async function obtainCredentials(jobContext: JobContext, source: Source): Promise<DPMConfiguration> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
     if (connectorDescription === undefined) {
         throw new Error(`Could not find repository description for type ${source.type}`);
     }
-    const repository = await connectorDescription?.getRepository();
+    const repository = await connectorDescription?.getConnector();
 
     if (repository === undefined) {
         throw new Error(`Could not find repository implementation for type ${source.type}`);
     }
 
-    /* const connectionIdentifier = await repository.getConnectionIdentifierFromConfiguration(
+    const connectionIdentifier = await repository.getRepositoryIdentifierFromConfiguration(
         source.connectionConfiguration
     );
 
-    // console.log(`For the ${connectorDescription.getDisplayName()} repository ${connectionIdentifier}`);
-        */
+    console.log(`For the ${connectorDescription.getDisplayName()} repository ${connectionIdentifier}`);
+
     const credentialsPromptResponse = await promptForCredentials(
         jobContext,
         repository,
@@ -43,14 +44,18 @@ export async function obtainCredentialsConfiguration(
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
     allowDontSelect: boolean,
+    credentialsIdentifier: string | undefined,
     defaults: boolean | undefined,
     overrideDefaultValues: DPMConfiguration = {}
-): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
+): Promise<{ credentialsIdentifier:string | undefined, credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
     if (!connector.requiresCredentialsConfiguration()) {
-        return { credentialsConfiguration, parameterCount: 0 };
+        return { credentialsIdentifier: undefined, credentialsConfiguration, parameterCount: 0 };
     }
 
     const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration);
+
+    if(repositoryIdentifier == null)
+        throw new Error("Could not find repository identifier");
 
     let repositoryConfig = jobContext
         .getRepositoryConfigsByType(connector.getType())
@@ -64,17 +69,35 @@ export async function obtainCredentialsConfiguration(
         };
     }
 
+
+    let parameterCount = 0;
+
+
+    if(credentialsIdentifier != null) {
+
+        const savedCredentials = await jobContext.getRepositoryCredential(connector.getType(), repositoryIdentifier, credentialsIdentifier);
+        
+        // purposefully prioritized the credentialsConfiguration over the savedCredentials
+        credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration }
+
+        jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
+    } 
+
     const pendingParameters = await connector.getCredentialsParameters(
         connectionConfiguration,
         credentialsConfiguration
     );
 
     if (
+        !credentialsIdentifier &&
         Object.keys(credentialsConfiguration).length === 0 &&
         pendingParameters.length > 0 &&
         repositoryConfig.credentials &&
         repositoryConfig.credentials.length > 0
     ) {
+
+        parameterCount++;
+        
         const options:ParameterOption[] = [
             ...repositoryConfig.credentials.map((c) => {
                 return { value: c.identifier, title: c.identifier };
@@ -127,8 +150,11 @@ export async function obtainCredentialsConfiguration(
         overrideDefaultValues
     );
 
+    parameterCount += credentialsPromptResponse.parameterCount;
+
+
     if (Object.keys(credentialsConfiguration).length > 0) {
-        const credentialsIdentifier = await connector.getCredentialsIdentifierFromConfiguration(
+        credentialsIdentifier = await connector.getCredentialsIdentifierFromConfiguration(
             connectionConfiguration,
             credentialsConfiguration
         );
@@ -143,7 +169,7 @@ export async function obtainCredentialsConfiguration(
         );
     }
 
-    return { credentialsConfiguration, parameterCount: credentialsPromptResponse.parameterCount };
+    return { credentialsIdentifier, credentialsConfiguration, parameterCount };
 }
 
 export async function promptForCredentials(

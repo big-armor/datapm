@@ -13,7 +13,7 @@ export class MongoRepositoryDescripton implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const module = await import("./MongoRepository");
         return new module.MongoRepository();
     }

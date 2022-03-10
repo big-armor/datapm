@@ -21,6 +21,8 @@ export interface JobContext {
     /** Should return all of the repository configs for a given repository type */
     getRepositoryConfigsByType(type: string): RepositoryConfig[];
 
+    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined
+
     /** Should save a repository credential */
     saveRepositoryCredential(
         connectorType: string,

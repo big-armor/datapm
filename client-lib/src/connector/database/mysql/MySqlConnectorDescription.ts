@@ -14,7 +14,7 @@ export class MySqlConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./MySqlRepository");
         return new repository.MySqlRepository();
     }

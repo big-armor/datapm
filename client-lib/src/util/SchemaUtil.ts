@@ -64,7 +64,7 @@ export async function inspectSourceConnection(
 
     if (connectorDescription == null) throw new Error(`Unable to find connector for type ${source.type}`);
 
-    const connector = await connectorDescription.getRepository();
+    const connector = await connectorDescription.getConnector();
 
     const connectionParameters = await connector.getConnectionParameters(source.connectionConfiguration);
 
@@ -74,7 +74,7 @@ export async function inspectSourceConnection(
         );
     }
 
-    const connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+    const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
         source.connectionConfiguration
     );
 
@@ -84,7 +84,7 @@ export async function inspectSourceConnection(
         try {
             credentialsConfiguration = await jobContext.getRepositoryCredential(
                 connector.getType(),
-                connectionIdentifier,
+                repositoryIdentifier,
                 source.credentialsIdentifier
             );
         } catch (error) {
@@ -98,6 +98,7 @@ export async function inspectSourceConnection(
         source.connectionConfiguration,
         credentialsConfiguration,
         false,
+        undefined,
         defaults
     );
 

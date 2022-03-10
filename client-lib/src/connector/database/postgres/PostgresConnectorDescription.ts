@@ -22,7 +22,7 @@ export class PostgresConnectorDescription implements ConnectorDescription {
         return true;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./PostgresRepository");
         return new repository.PostgresRepository();
     }

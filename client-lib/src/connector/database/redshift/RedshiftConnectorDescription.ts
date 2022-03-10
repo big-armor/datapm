@@ -14,7 +14,7 @@ export class RedshiftConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./RedshiftRepository");
         return new repository.RedshiftRepository();
     }

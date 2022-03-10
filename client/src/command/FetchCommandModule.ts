@@ -45,9 +45,14 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         if (jobResult.result.sink.getType() === STANDARD_OUT_SINK_TYPE) {
             command += "--quiet ";
         }
-        command += `--sink ${jobResult.result.sink.getType()} --sinkConfig '${JSON.stringify(
-            defaultRemovedParameterValues
-        )}' --defaults`;
+        command += `--sink ${jobResult.result.sink.getType()}`;
+
+        if (jobResult.result.repositoryIdentifier) command += " --repository " + jobResult.result.repositoryIdentifier;
+
+        if (jobResult.result.credentialsIdentifier)
+            command += " --credentials " + jobResult.result.credentialsIdentifier;
+
+        command += ` --sinkConfig '${JSON.stringify(defaultRemovedParameterValues)}' --defaults`;
 
         console.log(chalk.green(command));
     }

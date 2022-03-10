@@ -30,6 +30,8 @@ export interface FetchPackageJobResult {
     sink: Sink;
     sinkConfiguration: DPMConfiguration;
     packageFileWithContext: PackageFileWithContext;
+    credentialsIdentifier: string | undefined;
+    repositoryIdentifier: string | undefined;
 }
 
 export class FetchArguments {
@@ -37,6 +39,8 @@ export class FetchArguments {
     sink?: string;
     defaults?: boolean;
     sinkConfig?: string;
+    repositoryIdentifier?: string;
+    credentialsIdentifier?: string;
     sinkConnectionConfig?: string;
     sinkCredentialsConfig?: string;
     quiet?: boolean;
@@ -49,6 +53,15 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
     }
 
     async _execute(): Promise<JobResult<FetchPackageJobResult>> {
+
+        if(this.args.repositoryIdentifier != undefined && this.args.sinkConnectionConfig != undefined) {
+            throw new Error("Cannot specify both repositoryIdentifier and sinkConnectionConfig");
+        }
+
+        if(this.args.credentialsIdentifier != undefined && this.args.sinkCredentialsConfig != null) {
+            throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
+        }
+
         if (this.args.reference == null) {
             const referencePromptResult = await this.jobContext.parameterPrompt([
                 {
@@ -178,16 +191,20 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         if (sinkConnectorDescription == null) throw new Error("Could not find repository description for " + sinkType);
 
-        const sinkRepository = await sinkConnectorDescription?.getRepository();
+        const sinkConnector = await sinkConnectorDescription?.getConnector();
 
-        if (sinkRepository == null) throw new Error("Could not find repository for " + sinkType);
+        if (sinkConnector == null) throw new Error("Could not find repository for " + sinkType);
 
-        await task.end("SUCCESS", `Found the sink named ${sinkType}`);
+        await task.end("SUCCESS", `Found the connector named ${sinkType}`);
+
+
+        let parameterCount = 0
 
         const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
-            sinkRepository,
+            sinkConnector,
             sinkConnectionConfiguration,
+            this.args.repositoryIdentifier,
             this.args.defaults
         );
 
@@ -200,12 +217,15 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         sinkConnectionConfiguration = obtainConnectionConfigurationResult.connectionConfiguration;
 
+        parameterCount += obtainConnectionConfigurationResult.parameterCount;
+        
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
-            sinkRepository,
+            sinkConnector,
             sinkConnectionConfiguration,
             sinkCredentialsConfiguration,
             false,
+            this.args.credentialsIdentifier, 
             this.args.defaults
         );
 
@@ -218,9 +238,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         sinkCredentialsConfiguration = obtainCredentialsConfigurationResult.credentialsConfiguration;
 
-        let parameterCount =
-            obtainConnectionConfigurationResult.parameterCount + obtainCredentialsConfigurationResult.parameterCount;
 
+        parameterCount += obtainCredentialsConfigurationResult.parameterCount
+    
+
+        
         const sinkDescription = await sinkConnectorDescription.getSinkDescription();
 
         if (sinkDescription == null) {
@@ -299,7 +321,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 packageFileWithContext,
                 parameterCount,
                 sink,
-                sinkConfiguration
+                sinkConfiguration,
+                repositoryIdentifier: obtainConnectionConfigurationResult.repositoryIdentifier,
+                credentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier
             }
         };
     }

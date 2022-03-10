@@ -12,7 +12,7 @@ export interface ConnectorDescription {
 
     /** returns the connector implementation. This should be implemented as a module loading
      * pattern, so that dependency imports are delayed until this method is called. */
-    getRepository(): Promise<Connector>;
+    getConnector(): Promise<Connector>;
 
     /** returns the source implementation for this connector. */
     getSourceDescription(): Promise<SourceDescription | null>;

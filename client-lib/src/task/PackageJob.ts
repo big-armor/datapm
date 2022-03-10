@@ -52,6 +52,8 @@ export class PackageJobArguments {
     configuration?: string;
     references?: string[];
     catalogSlug?: string;
+    repositoryIdentifier?: string;
+    credentialsIdentifier?: string;
 }
 
 export class PackageJob extends Job<PackageJobResult> {
@@ -142,7 +144,7 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        const repository = await maybeConnectorDescription.getRepository();
+        const repository = await maybeConnectorDescription.getConnector();
         const sourceDescription = await maybeConnectorDescription.getSourceDescription();
 
         if (sourceDescription == null) {
@@ -157,6 +159,7 @@ export class PackageJob extends Job<PackageJobResult> {
             this.jobContext,
             repository,
             connectionConfiguration,
+            this.args.repositoryIdentifier,
             this.args.defaults
         );
 
@@ -171,6 +174,7 @@ export class PackageJob extends Job<PackageJobResult> {
             connectionConfiguration,
             credentialsConfiguration,
             false,
+            this.args.credentialsIdentifier,
             this.args.defaults
         );
 

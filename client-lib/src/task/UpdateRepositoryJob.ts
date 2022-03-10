@@ -114,6 +114,7 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
                 newConnectionConfiguration,
                 {},
                 true,
+                undefined,
                 false,
                 {}
             );

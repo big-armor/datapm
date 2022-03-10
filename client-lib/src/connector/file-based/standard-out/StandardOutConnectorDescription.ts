@@ -14,7 +14,7 @@ export class StandardOutConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./StandardOutRepository");
         return new repository.StandardOutRepository();
     }

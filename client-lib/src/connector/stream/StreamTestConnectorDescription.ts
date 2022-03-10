@@ -14,7 +14,7 @@ export class StreamTestConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const source = await import("./StreamTestRepository");
         return new source.StreamTestRepository();
     }

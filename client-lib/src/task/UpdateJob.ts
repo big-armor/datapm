@@ -182,7 +182,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 };
             }
 
-            const connector = await connectorDescription.getRepository();
+            const connector = await connectorDescription.getConnector();
 
             const sourceDescription = getSourceByType(sourceObject.type);
             const source = await (await sourceDescription)?.getSource();
@@ -201,6 +201,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 this.jobContext,
                 connector,
                 sourceObject.connectionConfiguration,
+                undefined,
                 this.argv.defaults
             );
 
@@ -238,6 +239,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 connectionConfiguration,
                 credentialsConfiguration,
                 false,
+                sourceObject.credentialsIdentifier,
                 this.argv.defaults
             );
 

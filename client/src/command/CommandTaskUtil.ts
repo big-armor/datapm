@@ -9,6 +9,7 @@ import { DPMConfiguration, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
 import {
     getRegistryConfigs,
+    getRepositoryConfig,
     getRepositoryConfigs,
     getRepositoryCredential,
     removeRepositoryConfig,
@@ -20,6 +21,9 @@ export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
 
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
+    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
+        return getRepositoryConfig(type, identifier);
+    }
 
     async getPackageFileWritable(
         catalogSlug: string | undefined,

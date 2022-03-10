@@ -16,7 +16,7 @@ export class LocalFileConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const repository = await import("./LocalFileRepository");
         return new repository.LocalFileRepository();
     }

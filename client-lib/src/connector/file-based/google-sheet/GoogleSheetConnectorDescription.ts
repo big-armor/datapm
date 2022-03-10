@@ -14,7 +14,7 @@ export class GoogleSheetConnectorDescription implements ConnectorDescription {
         return TYPE;
     }
 
-    async getRepository(): Promise<Connector> {
+    async getConnector(): Promise<Connector> {
         const module = await import("./GoogleSheetRepository");
         return new module.GoogleSheetRepository();
     }
