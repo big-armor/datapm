@@ -78,7 +78,7 @@ cp -R ./pkg-macos-intel64/. ./installers/macos/macOS-x64/application/x86_64
 echo ""
 echo "###   Creating installer"
 cd installers/macos/macOS-x64
-./build-macos-x64.sh DataPM $DATAPM_VERSION
+./build-macos-x64.sh DataPM $DATAPM_VERSION $BUILD_NUMBER
 cd ../../../
 
 # Submit the installer for notarization by Apple

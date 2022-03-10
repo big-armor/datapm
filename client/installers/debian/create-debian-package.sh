@@ -34,4 +34,4 @@ sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/changelog
 dpkg-deb --build build
 
 # Rename package file
-mv build.deb datapm-client_${DATAPM_VERSION}_x64.deb
+mv build.deb datapm-client_${DATAPM_VERSION}_x64_${BUILD_NUMBER}.deb

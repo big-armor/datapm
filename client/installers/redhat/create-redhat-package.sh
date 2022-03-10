@@ -20,7 +20,7 @@ mkdir -p build/SRPMS
 
 echo "Creating source file..."
 cd ../../
-tar --exclude-from=.gitignore -czvf installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}-source.tar.gz ./
+tar --exclude-from=.gitignore -czvf installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}-${BUILD_NUMBER}-source.tar.gz ./
 cd installers/redhat
 
 # echo "Linting spec file..."
@@ -31,6 +31,9 @@ cp datapm-client-x64.spec build/SPECS/datapm-client-x64.spec
 
 echo "Updating Spec file version..."
 sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/SPECS/datapm-client-x64.spec
+
+echo "Updating Spec file version..."
+sed -i "s/BUILD_NUMBER/$BUILD_NUMBER/g" build/SPECS/datapm-client-x64.spec
 
 echo "Copying build files..."
 cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}/

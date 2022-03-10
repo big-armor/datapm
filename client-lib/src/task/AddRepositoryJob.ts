@@ -70,7 +70,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
                 connectionConfiguration,
                 {},
                 true,
-                repositoryIdentifier,
+                undefined,
                 false,
                 {}
             );
@@ -81,12 +81,8 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
                 };
             }
 
-            const credentialsConfiguration = credentialsResult.credentialsConfiguration;
-
-            await connector.getCredentialsIdentifierFromConfiguration(
-                connectionConfiguration,
-                credentialsConfiguration
-            );
+            this.jobContext.print("INFO", "Saved " + credentialsResult.credentialsIdentifier + " credentials for " + repositoryIdentifier);
+            
         }
 
         return {
