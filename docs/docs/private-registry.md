@@ -16,7 +16,7 @@ DataPM registry server is a simple NodeJS application that can be deployed in mo
 
 Our [instructions for Docker Compose](private-docker-compose.md) are great for test and small private deployments.
 
-Our [instructions for Google Cloud Run](private-cloud-run.md) are great for production deployments at extremely low cost and high scalability.
+Our [instructions for Google Cloud Run](private-google-cloud-run.md) are great for production deployments at extremely low cost and high scalability.
 
 ## Why Host A Private Registry?
 
