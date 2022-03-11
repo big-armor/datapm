@@ -1,6 +1,6 @@
 {
   "name": "datapm-client-lib",
-  "version": "1.0.0",
+  "version": "0.8.85",
   "description": "DataPM Client library, which includes all logic used by the the command line and server to generate, manage, and fetch packages. ",
   "main": "src/main.ts",
   "scripts": {
