@@ -7,6 +7,8 @@ on:
     pull_request:
         branches:
             - master
+env:
+    BUILD_NUMBER: ${{ github.run_number }}
 
 jobs:
     test:
@@ -15,8 +17,7 @@ jobs:
         steps:
             - name: echo build number
               run: echo $BUILD_NUMBER
-        env:
-            BUILD_NUMBER: ${{ github.run_number }}
+
     lint:
         runs-on: ubuntu-latest
         timeout-minutes: 3
@@ -240,14 +241,10 @@ jobs:
             - name: Build Debian Intel64 Package
               run: ./create-debian-package.sh
               working-directory: client/installers/debian
-              env:
-                  BUILD_NUMBER: "${GITHUB_RUN_NUMBER}"
 
             - name: Build Redhat Intel64 Package
               run: ./create-redhat-package.sh
               working-directory: client/installers/redhat
-              env:
-                  BUILD_NUMBER: "${GITHUB_RUN_NUMBER}"
 
             - name: "Save Redhat Intell64 Package"
               uses: actions/upload-artifact@v2
@@ -307,7 +304,6 @@ jobs:
               env:
                   WINDOWS_CLIENT_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
                   WINDOWS_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
-                  BUILD_NUMBER: "${GITHUB_RUN_NUMBER}"
 
             - run: npm run package:windows:bundle
               working-directory: client
@@ -379,7 +375,6 @@ jobs:
                   APPLE_ID: ${{ secrets.APPLE_ID }}
                   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
                   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-                  BUILD_NUMBER: "${GITHUB_RUN_NUMBER}"
               run: ./installers/macos/sign-apps.sh
               working-directory: client
 
