@@ -7,6 +7,7 @@ SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 TARGET_DIRECTORY="$SCRIPTPATH/target"
 PRODUCT=${1}
 VERSION=${2}
+BUILD_NUMBER=${3}
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H:%M:%S`
 LOG_PREFIX="[$DATE $TIME]"
@@ -162,9 +163,9 @@ function signProduct() {
 function createInstaller() {
     log_info "Application installer generation process started.(3 Steps)"
     buildPackage
-    buildProduct ${PRODUCT}-macos-installer-${VERSION}.pkg
+    buildProduct ${PRODUCT}-macos-installer-${VERSION}-${BUILD_NUMBER}.pkg
     log_info "Signing the installer package"
-    signProduct ${PRODUCT}-macos-installer-${VERSION}.pkg
+    signProduct ${PRODUCT}-macos-installer-${VERSION}-${BUILD_NUMBER}.pkg
     log_info "Application installer generation steps finished."
 }
 

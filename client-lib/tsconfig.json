@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		"target": "es2019",
+		"module": "commonjs",
+		"outDir": "./dist",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"downlevelIteration": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"alwaysStrict": true,
+		"sourceMap": true,
+		"esModuleInterop": true,
+		"declaration": true,
+		"typeRoots": [
+			"src/types",
+			"node_modules/@types"
+		]
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"include": [
+		"src/**/*"	]
+}

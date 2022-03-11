@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { addRegistry, getRegistryConfigs, resetConfiguration } from "../../src/util/ConfigUtil";
-import { RegistryClient } from "../../src/util/RegistryClient";
+import { RegistryClient } from "datapm-client-lib";
 import { registryServerPort } from "./setup";
 import { createApiKey, createTestUser, testCmd, TestResults } from "./test-utils";
 
@@ -22,6 +22,7 @@ describe("Catalogs Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
+            console.log(line);
             if (line.includes("You are not logged in to any registries")) {
                 results.messageFound = true;
             }

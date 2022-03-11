@@ -3,7 +3,6 @@ const PROXY_CONFIG = [
         context: [
             "/assets",
             "/static",
-            "/docs",
             "/graphql",
             "/ws",
             "/images",
@@ -13,6 +12,14 @@ const PROXY_CONFIG = [
             "/robots.txt",
         ],
         target: "http://localhost:4000",
+        secure: false,
+        changeOrigin: true
+    },
+    {
+        context: [
+            "/docs"
+        ],
+        target: "http://localhost:3000",
         secure: false,
         changeOrigin: true
     },

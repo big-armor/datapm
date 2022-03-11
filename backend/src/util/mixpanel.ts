@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { Request } from "express";
 
 // grab the Mixpanel factory

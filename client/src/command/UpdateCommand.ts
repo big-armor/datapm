@@ -5,7 +5,6 @@ export class UpdateArguments {
     defaults?: boolean;
     forceUpdate?: boolean;
 }
-
 export class UpdateCommand implements Command {
     prepareCommand(argv: Argv): Argv {
         return argv.command({

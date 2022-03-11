@@ -5,6 +5,8 @@ import { Command } from "./Command";
 export class SearchArguments {
     registry?: string;
     query?: string;
+    defaults?: boolean;
+    quiet?: boolean;
 }
 
 export class SearchCommand implements Command {

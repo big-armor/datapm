@@ -9,7 +9,7 @@ import {
     SetUserCatalogPermissionDocument,
     UpdateCatalogDocument,
     UpdatePackageDocument
-} from "../../src/generated/graphql";
+} from "datapm-client-lib";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import {
@@ -368,7 +368,7 @@ describe("Update Package Command Tests", async () => {
         };
 
         const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], async (line: string) => {
-            if (line.includes("You are not logged in to the registry. Use the following command to login")) {
+            if (line.includes("You are not logged in to the registry.")) {
                 results.messageFound = true;
             }
         });

@@ -1,6 +1,7 @@
 import { UpdateMethod } from "./DataHandlingUtil";
 import { MajorVersionIdentifier, SchemaIdentifier } from "./main";
 import { DPMRecord } from "./PackageUtil";
+import { Parameter, ParameterAnswer } from "./Parameter";
 import { SinkState } from "./SinkState";
 
 /** This identifies a single stream instance during upload. It is the same structure as Source implementations, but here
@@ -43,7 +44,8 @@ export enum SocketEvent {
     START_DATA_UPLOAD = "startDataUpload",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesRequest",
     SCHEMA_INFO_REQUEST = "schemaInfoRequest",
-    PACKAGE_VERSION_SINK_STATE_REQUEST = "packageVersionSinkStateRequest"
+    PACKAGE_VERSION_SINK_STATE_REQUEST = "packageVersionSinkStateRequest",
+    START_PACKAGE_UPDATE = "startPackageUpdate"
 }
 
 export enum SocketError {
@@ -61,7 +63,8 @@ export enum SocketResponseType {
     START_DATA_UPLOAD_RESPONSE = "startDataUploadResponse",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
     OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse",
-    PACKAGE_VERSION_SINK_STATE_RESPONSE = "packageVersionSinkStateResponse"
+    PACKAGE_VERSION_SINK_STATE_RESPONSE = "packageVersionSinkStateResponse",
+    START_PACKAGE_UPDATE_RESPONSE = "startPackageUpdateResponse"
 }
 
 export interface Request {
@@ -282,4 +285,81 @@ export class DataStop implements FetchRequest {
 
 export class DataStopAcknowledge implements FetchResponse {
     responseType = FetchResponseType.STOP_ACKNOWLEDGE;
+}
+
+/** Sent by a client requesting that the schema contents of a package be updated.  */
+export class StartPackageUpdateRequest implements Request {
+    requestType: SocketEvent = SocketEvent.START_PACKAGE_UPDATE;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        public packageIdentifier: {
+            catalogSlug: string;
+            packageSlug: string;
+        }
+    ) {}
+}
+
+export class StartPackageUpdateResponse implements Response {
+    responseType: SocketResponseType = SocketResponseType.START_PACKAGE_UPDATE_RESPONSE;
+    channelName: string;
+
+    constructor(channelName: string) {
+        this.channelName = channelName;
+    }
+}
+
+export enum JobMessageType {
+    /** Sent by the client on the specified channel when the client is ready to begin */
+    START_JOB = "startJob",
+
+    /** Sent by the server when there is a message to print on the client */
+    PRINT = "print",
+
+    /** Sent by the server when there is a parameter to respond to  */
+    PROMPT = "prompt",
+
+    /** Sent by the server when there is a long running task being started  */
+    START_TASK = "startTask",
+
+    /** Sent by the server when there are updates to a long running task */
+    TASK_UPDATE = "taskUpdate",
+
+    /** Sent by the server when a long running task has ended */
+    END_TASK = "endTask",
+
+    /** Sent by the server when a new step of the job has begun */
+    SET_CURRENT_STEP = "setCurrentStep",
+
+    /** Sent by the server when all steps of a job are known */
+    SET_STEPS = "setSteps",
+
+    /** Sent by the client or the server when the job is done or should be abandoned */
+    EXIT = "exit"
+}
+
+/** Sent by the client or the server during a job */
+export class JobMessageRequest {
+    constructor(requestType: JobMessageType) {
+        this.requestType = requestType;
+    }
+
+    requestType: JobMessageType;
+    message?: string;
+    exitCode?: number;
+    taskId?: string;
+    steps?: string[];
+    prompts?: Parameter[];
+}
+
+/** A response to the request sent by the client or the server. The response type is always
+ * the same as the request type.
+ */
+export class JobMessageResponse {
+    constructor(responseType: JobMessageType) {
+        this.responseType = responseType;
+    }
+
+    responseType: JobMessageType;
+    answers?: ParameterAnswer<"something-not-valid">[];
 }

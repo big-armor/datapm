@@ -36,7 +36,7 @@
         "resolveJsonModule": true,
 
         "lib": ["es2019", "dom"],
-        "typeRoots": ["node_modules/@types", "src/types"]
+        "typeRoots": ["node_modules/@types", "node_modules/datapm-client-lib/src/types", "src/types"]
     },
 
     "include": ["src/**/*.ts", "test/*.ts"],

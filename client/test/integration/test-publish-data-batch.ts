@@ -13,7 +13,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 import fs from "fs";
-import { UpdateCatalogDocument, UpdatePackageDocument } from "../../src/generated/graphql";
+import { UpdateCatalogDocument, UpdatePackageDocument } from "datapm-client-lib";
 
 const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
 

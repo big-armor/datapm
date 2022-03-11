@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require("fs");
-const path = require("path");
+const { series } = require("gulp");
+
 const {
     cleanWin64,
     runPkgWin64,
@@ -44,8 +44,7 @@ const {
     copyAssetsLinuxIntel64
 } = require("./gulp/linux");
 
-const { cleanDist } = require("./gulp/common");
-const { series } = require("gulp");
+const { cleanDist, linkDataPMClientLib, linkDataPMLib } = require("./gulp/common");
 
 exports.buildWindowsIntel64 = series(
     cleanWin64,
@@ -90,11 +89,4 @@ exports.clean = series(
     cleanMacOSInstaller
 );
 
-exports.postCodegen = function () {
-    fs.copyFileSync(
-        path.join("src", "generated", "graphql.ts"),
-        path.join("test", "integration", "registry-client.ts")
-    );
-
-    return Promise.resolve();
-};
+exports.postbuild = series(linkDataPMClientLib, linkDataPMLib);

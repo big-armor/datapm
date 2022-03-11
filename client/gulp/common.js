@@ -9,15 +9,6 @@ const path = require("path");
 
 const NODE_VERSION = "node16";
 
-exports.postCodegen = function () {
-    fs.copyFileSync(
-        path.join("src", "generated", "graphql.ts"),
-        path.join("test", "integration", "registry-client.ts")
-    );
-
-    return Promise.resolve();
-};
-
 exports.readPackageVersion = function () {
     const fileContents = fs.readFileSync("package.json");
     const packageFile = JSON.parse(fileContents);
@@ -52,10 +43,47 @@ exports.renameBinary = function (binaryFile, destinationFile) {
     fs.renameSync(binaryFile, destinationFile);
 };
 
+exports.linkDataPMClientLib = function () {
+    const libPath = path.join(__dirname, "..", "dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
+
+    const targetPath = path.join(libPath, "datapm-client-lib");
+    if (!fs.existsSync(targetPath)) {
+        fs.symlinkSync(path.join(__dirname, "..", "..", "client-lib", "dist"), targetPath, "dir");
+    }
+
+    return Promise.resolve();
+};
+
+exports.linkDataPMLib = function () {
+    const libPath = path.join(__dirname, "..", "dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
+
+    const targetPath = path.join(libPath, "datapm-lib");
+    if (!fs.existsSync(targetPath)) {
+        fs.symlinkSync(path.join(__dirname, "..", "..", "lib", "dist"), targetPath, "dir");
+    }
+
+    return Promise.resolve();
+};
+
 exports.copyDeps = function (directory) {
-    return src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
-        base: "./node_modules/"
-    }).pipe(dest(path.join(directory, "node_modules")));
+    const destination = path.join(__dirname, "..", directory, "node_modules");
+    console.log(destination);
+    return src(
+        [
+            "../client-lib/node_modules/open",
+            "../client-lib/node_modules/mmmagic/**/*",
+            "../client-lib/node_modules/node-expat/**/*"
+        ],
+        {
+            base: "../client-lib/node_modules"
+        }
+    ).pipe(dest(destination));
 };
 
 exports.copyAssets = function (directory) {

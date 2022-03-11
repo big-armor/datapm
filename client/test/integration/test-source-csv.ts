@@ -100,7 +100,7 @@ describe("CSV Source Tests", function () {
 
         const prompts = getPromptInputs(generatePackageCommandPrompts, [
             "",
-            "6",
+            "7",
             "",
             "",
             "",

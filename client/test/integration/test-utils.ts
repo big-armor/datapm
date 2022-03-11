@@ -1,5 +1,4 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
-import fetch from "cross-fetch";
 import execa from "execa";
 import faker from "faker";
 import fs from "fs";
@@ -14,9 +13,10 @@ import {
     LoginDocument,
     Scope,
     VerifyEmailAddressDocument
-} from "./registry-client";
+} from "datapm-client-lib";
 import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
 import { createAPIKeyFromParts } from "datapm-lib";
+import fetch from "cross-fetch";
 
 export const KEYS = {
     ENTER: "\n",
@@ -280,15 +280,23 @@ export function testCmd(
         let promptIndex = 0;
         let line = "";
 
-        let conditionedArgs = ["dist/src/main.js", ...args];
+        let execCmd = "node";
+
+        let conditionedArgs = [...args];
 
         if (cmd) {
-            conditionedArgs = ["dist/src/main.js", cmd, ...args];
+            conditionedArgs = [cmd, ...args];
+        }
+
+        if (process.env.DATAPM_CLIENT_TEST_COMMAND) {
+            execCmd = process.env.DATAPM_CLIENT_TEST_COMMAND;
+        } else {
+            conditionedArgs = ["dist/src/main.js", ...conditionedArgs];
         }
 
         // console.log("Running: node " + conditionedArgs.join(" "));
 
-        cmdProcess = execa("node", conditionedArgs);
+        cmdProcess = execa(execCmd, conditionedArgs);
 
         // if (cmdProcess.stdout) cmdProcess.stdout.pipe(process.stdout, { end: false });
 

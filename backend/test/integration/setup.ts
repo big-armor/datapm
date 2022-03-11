@@ -59,7 +59,7 @@ export function findActivityLogLine(line: string, callback: (activityLogLine: Ac
 before(async function () {
     console.log("Starting postgres temporary container");
 
-    this.timeout(120000);
+    this.timeout(240000);
 
     container = await new GenericContainer("postgres", "13.3")
         .withEnv("POSTGRES_PASSWORD", "postgres")

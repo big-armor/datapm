@@ -1,6 +1,6 @@
 Name:           datapm-client
 Version:        x.x.x
-Release:        1%{?dist}
+Release:        BUILD_NUMBER%{?dist}
 Summary:        A simple hello world script
 BuildArch:      x86_64
 URL:            https://datapm.io

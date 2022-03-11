@@ -1,14 +1,14 @@
 import { Argv } from "yargs";
 import { Command } from "./Command";
-
-export class PackageArguments {
+export class PackageCommandArguments {
+    publish?: boolean;
     defaults?: boolean;
     connection?: string;
     credentials?: string;
     configuration?: string;
     references?: string[];
+    catalogSlug?: string;
 }
-
 export class PackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {
         return argv.command({
@@ -45,7 +45,7 @@ export class PackageCommand implements Command {
     }
 }
 
-export async function packageCommand(args: PackageArguments): Promise<void> {
+export async function packageCommand(args: PackageCommandArguments): Promise<void> {
     try {
         const command = await import("./PackageCommandModule");
 

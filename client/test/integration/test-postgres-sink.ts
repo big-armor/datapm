@@ -2,7 +2,7 @@ import { expect } from "chai";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
-import { SinkErrors } from "../../src/repository/Sink";
+import { SinkErrors } from "datapm-client-lib";
 import { resetConfiguration } from "../../src/util/ConfigUtil";
 import {
     createTestPackage,
@@ -18,6 +18,11 @@ const postgresSinkPrompts = ["Hostname or IP?", "Port?", "Username?", "Password?
 
 const getPostgresSinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(postgresSinkPrompts, inputs, skip, count);
+
+const postgresSinkPromptsWithRepository = ["Repository?", "Credentials?", "Database?", "Schema?"];
+
+const getPostgresSinkPromptInputsWithRepository = (inputs?: string[], skip = 0, count = 20) =>
+    getPromptInputs(postgresSinkPromptsWithRepository, inputs, skip, count);
 
 describe("Postgres Sink Test", function () {
     let postgresContainer: StartedTestContainer;
@@ -488,5 +493,65 @@ describe("Postgres Sink Test", function () {
         } finally {
             //
         }
+    });
+
+    it("Should use saved repository config to connect again", async function () {
+        const prompts = [
+            ...getPostgresSinkPromptInputsWithRepository([postgresHost, "postgres"]),
+            {
+                message: "facebook has integer and string values.",
+                input: `${KEYS.DOWN}${KEYS.ENTER}`
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageCFilePath, "--forceUpdate", "--sink", "postgres"],
+            prompts,
+            async (line: string, promptIndex: number) => {
+                if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+    });
+
+    it("Should allow refetch without any additional info", async function () {
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [
+                packageCFilePath,
+                "--forceUpdate",
+                "--sink",
+                "postgres",
+                "--repository",
+                postgresHost + ":" + postgresPort,
+                "--credentials",
+                "postgres",
+                "--sinkConfig",
+                '{"database":"postgres","schema":"undefined_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'
+            ],
+            [],
+            async (line: string) => {
+                if (line.includes("Finished writing 538 records")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
     });
 });

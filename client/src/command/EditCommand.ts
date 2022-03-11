@@ -2,6 +2,8 @@ import { Argv } from "yargs";
 import { Command } from "./Command";
 export class EditArguments {
     reference?: string;
+    defaults?: boolean | undefined;
+    quiet?: boolean | undefined;
 }
 
 export class EditCommand implements Command {

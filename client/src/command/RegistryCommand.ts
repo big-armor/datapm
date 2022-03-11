@@ -26,6 +26,8 @@ export class RegistryAuthenticateArguments {
 
 export class RegistryLogoutArguments {
     url?: string | undefined;
+    default?: boolean | undefined;
+    quiet?: boolean | undefined;
 }
 export class RegistryCommand implements Command {
     prepareCommand(argv: Argv): Argv {

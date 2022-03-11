@@ -3,7 +3,7 @@ import { passwordValid, validateUsernameOrEmail } from "datapm-lib";
 import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
-import * as fetch from "node-fetch";
+import fetch from "cross-fetch";
 
 import {
     CreateAPIKeyDocument,
@@ -12,12 +12,16 @@ import {
     MeDocument,
     MyAPIKeysDocument,
     RegistryStatusDocument,
-    Scope
-} from "../generated/graphql";
-import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry, RegistryConfig } from "../util/ConfigUtil";
-import { getRegistryClientWithConfig, RegistryClient } from "../util/RegistryClient";
+    Scope,
+    getRegistryClientWithConfig,
+    RegistryClient,
+    RegistryConfig,
+    APIKey
+} from "datapm-client-lib";
+import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry } from "../util/ConfigUtil";
+
 import os from "os";
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client/core";
 import {
     Commands,
     RegistryAddArguments,
@@ -25,8 +29,9 @@ import {
     RegistryLogoutArguments,
     RegistryRemoveArguments
 } from "./RegistryCommand";
-import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
+import { defaultPromptOptions } from "../util/DefaultParameterOptions";
+import { CLIJobContext } from "./CommandTaskUtil";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
@@ -86,6 +91,13 @@ export function listRegistries(args: unknown): void {
 export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise<void> {
     printDataPMVersion(args);
 
+    const oraRef = ora({
+        color: "yellow",
+        spinner: "dots"
+    });
+
+    const jobContext = new CLIJobContext(oraRef, args);
+
     await promptForRegistryUrl(args, true);
 
     if (!args.url) {
@@ -104,13 +116,8 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
         exit(1);
     }
 
-    const oraRef = ora({
-        color: "yellow",
-        spinner: "dots"
-    });
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const userRegistryClient = getRegistryClientWithConfig({ url: args.url! });
+    const userRegistryClient = getRegistryClientWithConfig(jobContext, { url: args.url! });
 
     oraRef.start("Deleting API Key from Registry");
 
@@ -119,7 +126,7 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
             query: MeDocument
         });
 
-        const apiKeysResponse = await userRegistryClient.getClient().query({
+        const apiKeysResponse = await userRegistryClient.getClient().query<{ myAPIKeys: APIKey[] }>({
             query: MyAPIKeysDocument
         });
 
@@ -256,6 +263,14 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
         args.password = passwordResponse.password;
     }
 
+    if (args.password == null) {
+        throw new Error("Password is required");
+    }
+
+    if (args.username == null) {
+        throw new Error("Username is required");
+    }
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots"
@@ -287,7 +302,7 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
 
     oraRef.start("Looking for existing API Key named " + hostname);
 
-    const getAPIKeysResponse = await userRegistryClient.query({
+    const getAPIKeysResponse = await userRegistryClient.query<{ myAPIKeys: APIKey[] }>({
         query: MyAPIKeysDocument
     });
 

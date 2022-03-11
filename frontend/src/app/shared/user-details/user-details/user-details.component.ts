@@ -4,7 +4,7 @@ import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-passwo
 import { AuthenticationService } from "../../../services/authentication.service";
 import { getRegistryURL } from "../../../helpers/RegistryAccessHelper";
 
-import { APIKey, User, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
+import { APIKey, User, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, Scope, UpdateCatalogGQL, Permission, GetCatalogGQL } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -15,6 +15,8 @@ import { SnackBarService } from "src/app/services/snackBar.service";
 import * as timeago from "timeago.js";
 import { ApiKeyService } from "src/app/services/api-key.service";
 import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 
 enum State {
     INIT,
@@ -34,6 +36,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     public State = State;
     public state = State.INIT;
 
+    public Permission = Permission;
+
     public deletionStatusByApiKeyId = new Map<string, boolean>();
 
     public currentUser: User;
@@ -44,17 +48,24 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
     public columnsToDisplay = ["label", "created", "lastUsed", "actions"];
 
-    public myCatalogs: Catalog[];
     public myAPIKeys: APIKey[];
     public dataSource = new MatTableDataSource<APIKey>();
     public createAPIKeyForm: FormGroup;
 
+    public catalogState = State.INIT;
+    public catalog:Catalog;
+    public isCatalogPublic:boolean = false;
+    public publicAccessSavingError:boolean = false;
+
     private subscription = new Subject();
 
     constructor(
-        public dialog: MatDialog,
+        private dialog: MatDialog,
+        private dialogService: DialogService,
         private authenticationService: AuthenticationService,
         private createAPIKeyGQL: CreateAPIKeyGQL,
+        private getCatalogGQL: GetCatalogGQL,
+        private updateCatalogGQL: UpdateCatalogGQL,
         private apiKeysService: ApiKeyService,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
         private clipboard: Clipboard,
@@ -68,6 +79,19 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             if (user) {
                 this.state = State.SUCCESS;
             }
+
+            this.getCatalogGQL.fetch({
+                identifier: {
+                    catalogSlug: user.username
+                }
+            }).subscribe(({ data, errors }) => {
+                if(errors && errors.length > 0) {
+                    this.catalogState = State.ERROR;
+                    return;
+                }
+
+                this.setCatalogVariables(data.catalog);
+            });
         });
 
         this.refreshAPIKeys(false, true);
@@ -96,6 +120,48 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
         this.dialog.open(EditPasswordDialogComponent, dialogConfig);
     }
+
+    public updatePublic(ev: MatSlideToggleChange): void {
+        this.isCatalogPublic = ev.checked;
+        this.openPackageVisibilityChangeDialog(ev.checked);
+    }
+
+    private openPackageVisibilityChangeDialog(isPublic: boolean): void {
+        this.dialogService.openCatalogVisibilityChangeConfirmationDialog(isPublic).subscribe((confirmed) => {
+            if (confirmed) {
+                this.updateCatalogVisibility(isPublic);
+            } else {
+                this.isCatalogPublic = !isPublic;
+            }
+        });
+    }
+
+
+    private updateCatalogVisibility(isPublic: boolean): void {
+        this.publicAccessSavingError = false;
+        this.updateCatalogGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.currentUser.username
+                },
+                value: {
+                    isPublic
+                }
+            })
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.publicAccessSavingError = true;
+                    } else {
+                        this.setCatalogVariables(data.updateCatalog as Catalog);
+                    }
+                },
+                (errors) => {
+                    this.publicAccessSavingError = true;
+                }
+            );
+    }
+
 
     openEditDialog() {
         const dialogConfig = new MatDialogConfig();
@@ -182,6 +248,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             },
             () => (this.apiKeysState = State.ERROR)
         );
+    }
+
+    private setCatalogVariables(catalog: Catalog): void {
+        this.catalog = catalog;
+        this.isCatalogPublic = catalog.isPublic;
     }
 
     apiKeyCommandString() {

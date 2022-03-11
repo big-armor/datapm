@@ -1,10 +1,9 @@
 import { ApolloQueryResult } from "@apollo/client";
 import chalk from "chalk";
 import ora from "ora";
-import { Catalog } from "../generated/graphql";
+import { Catalog, RegistryClient } from "datapm-client-lib";
 import { getRegistryConfigs } from "../util/ConfigUtil";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
-import { RegistryClient } from "../util/RegistryClient";
 
 export async function viewCatalogs(): Promise<void> {
     printDataPMVersion({});

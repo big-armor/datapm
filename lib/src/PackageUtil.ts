@@ -4,16 +4,15 @@ import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
 import { PackageFileV010 } from "./PackageFile-v0.1.0";
-import { PackageFileV020 } from "./PackageFile-v0.2.0";
+import { CountPrecisionV020, PackageFileV020, SchemaV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
 import { PackageFileV030, CountPrecisionV030 } from "./PackageFile-v0.3.0";
 import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
-import { PackageFile060 } from "./PackageFile-v0.6.0";
+import { PackageFile060, Source060 } from "./PackageFile-v0.6.0";
 import { PackageFile070 } from "./PackageFile-v0.7.0";
 import {
-    CountPrecision,
     PackageFile,
     PublishMethod,
     RegistryReference,
@@ -600,9 +599,9 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         const oldPackageFile = packageFileObject as PackageFileV010;
 
         for (const schema of oldPackageFile.schemas) {
-            (schema as Schema).recordsInspectedCount = schema.recordCount;
-            (schema as Schema).recordCountPrecision =
-                schema.recordCountApproximate === true ? CountPrecision.APPROXIMATE : CountPrecision.EXACT;
+            (schema as SchemaV020).recordsInspectedCount = schema.recordCount;
+            (schema as SchemaV020).recordCountPrecision =
+                schema.recordCountApproximate === true ? CountPrecisionV020.APPROXIMATE : CountPrecisionV020.EXACT;
             delete schema.recordCountApproximate;
         }
     }
@@ -719,7 +718,7 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         const oldPackageFile = packageFileObject as PackageFile050;
 
         for (const oldSource of oldPackageFile.sources) {
-            const newSource = oldSource as Source;
+            const newSource = (oldSource as unknown) as Source060;
             newSource.connectionConfiguration = oldSource.configuration || {};
         }
     }
@@ -740,8 +739,10 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
 
         const oldPackageFile = packageFileObject as PackageFile070;
 
-        if ((oldPackageFile as PackageFile).canonical == null) {
-            (oldPackageFile as PackageFile).canonical = true;
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+
+        if (newPackageFile.canonical == null) {
+            newPackageFile.canonical = true;
         }
     }
 

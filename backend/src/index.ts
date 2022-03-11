@@ -27,16 +27,14 @@ import { SessionCache } from "./session-cache";
 import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
-import { start } from "repl";
-import { url } from "inspector";
 import { parse } from "url";
+import { libPackageVersion } from "datapm-lib";
 import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex } from "./util/SiteMapUtil";
 
 console.log("DataPM Registry Server Starting...");
 
-const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
-const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
-const REGISTRY_API_VERSION = dataLibPackageJSON.version;
+
+const REGISTRY_API_VERSION = libPackageVersion();
 
 const REFERER_REGEX = /\/graphql\/?$/;
 

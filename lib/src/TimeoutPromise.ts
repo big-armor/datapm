@@ -1,22 +1,24 @@
+type CallBackType<T> = (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void;
+
 export class TimeoutPromise<T> extends Promise<T> {
     constructor(
         timeout: number,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callback: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void
+        callback: CallBackType<T>
     ) {
         // We need to support being called with no milliseconds
         // value, because the various Promise methods (`then` and
         // such) correctly call the subclass constructor when
         // building the new promises they return.
         const haveTimeout = typeof timeout === "number";
-        const init = haveTimeout ? callback : timeout;
+        const init = haveTimeout ? callback : ((timeout as unknown) as CallBackType<T>);
         super((resolve, reject) => {
             if (haveTimeout) {
                 const timer = setTimeout(() => {
                     reject(new Error(`Promise timed out after ${timeout}ms`));
                 }, timeout);
-                init(
-                    (value: T | PromiseLike<T>) => {
+                (init as CallBackType<T>)(
+                    (value) => {
                         clearTimeout(timer);
                         resolve(value);
                     },

@@ -17,7 +17,7 @@ export function printDataPMVersion(argv: any): void {
     }
 }
 
-export function readDataPMVersion(): string {
+function readDataPMVersion(): string {
     let currentDirectory = __dirname;
 
     let lastDirectory = "asdfas";

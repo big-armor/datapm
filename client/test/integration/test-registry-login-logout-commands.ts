@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { MeDocument } from "../../src/generated/graphql";
+import { MeDocument } from "datapm-client-lib";
 import { getRegistryConfigs, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import { createUser, testCmd } from "./test-utils";
