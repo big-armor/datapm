@@ -11,13 +11,6 @@ env:
     BUILD_NUMBER: ${{ github.run_number }}
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        name: Test build number
-        steps:
-            - name: echo build number
-              run: echo $BUILD_NUMBER
-
     lint:
         runs-on: ubuntu-latest
         timeout-minutes: 3
