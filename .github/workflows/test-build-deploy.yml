@@ -16,7 +16,7 @@ jobs:
             - name: echo build number
               run: echo $BUILD_NUMBER
         env:
-            BUILD_NUMBER: github.run_number
+            BUILD_NUMBER: ${{ github.run_number }}
     lint:
         runs-on: ubuntu-latest
         timeout-minutes: 3
