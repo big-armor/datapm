@@ -52,7 +52,9 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         if (jobResult.result.credentialsIdentifier)
             command += " --credentials " + jobResult.result.credentialsIdentifier;
 
-        command += ` --sinkConfig '${JSON.stringify(defaultRemovedParameterValues)}' --defaults`;
+        command += ` --sinkConfig '${JSON.stringify(defaultRemovedParameterValues)}'`;
+
+        if (argv.defaults) command += " --defaults";
 
         console.log(chalk.green(command));
     }

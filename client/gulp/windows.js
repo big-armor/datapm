@@ -19,8 +19,8 @@ exports.runPkgWin64 = function () {
 };
 
 exports.cleanWin64 = function () {
-    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-x64.msix"))
-        del("datapm-client-" + readPackageVersion() + "-x64.msix");
+    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-x64.msix"))
+        del("datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-x64.msix");
 
     return cleanDir("pkg-windows-intel64");
 };
@@ -47,7 +47,11 @@ exports.createMsiWin64 = function () {
             "/d",
             "pkg-windows-intel64",
             "/p",
-            "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x64.msix"
+            "installers/windows/dist/datapm-client-" +
+                readPackageVersion() +
+                "-" +
+                process.env.BUILD_NUMBER +
+                "-x64.msix"
         ]
     );
 };
@@ -66,7 +70,11 @@ exports.signMsiWin64 = function () {
             "signing-certificate.p12",
             "/p",
             process.env.WINDOWS_CLIENT_CERTIFICATE_PASSWORD,
-            "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x64.msix"
+            "installers/windows/dist/datapm-client-" +
+                readPackageVersion() +
+                "-" +
+                process.env.BUILD_NUMBER +
+                "-x64.msix"
         ]
     );
 };
@@ -78,8 +86,8 @@ exports.runPkgWindowsArm64 = function () {
 };
 
 exports.cleanWindowsArm64 = function () {
-    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-arm64.msix"))
-        del("datapm-client-" + readPackageVersion() + "-arm64.msix");
+    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-arm64.msix"))
+        del("datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-arm64.msix");
     return cleanDir("pkg-windows-arm64");
 };
 
@@ -115,7 +123,7 @@ exports.createMsiWindowsArm64 = function () {
         "/d",
         "pkg-windows-arm64",
         "/p",
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-arm64.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-arm64.msix"
     ]);
 };
 
@@ -129,7 +137,7 @@ exports.signMsiWindowsArm64 = function () {
         "signing-certificate.p12",
         "/p",
         process.env.WINDOWS_CLIENT_CERTIFICATE_PASSWORD,
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-arm64.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-" + process.env.BUILD_NUMBER + "-arm64.msix"
     ]);
 };
 
@@ -143,7 +151,11 @@ exports.bundleWinInstallers = function () {
             "/d",
             "installers/windows/dist",
             "/p",
-            "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
+            "installers/windows/dist/datapm-client-" +
+                readPackageVersion() +
+                "-" +
+                process.env.BUILD_NUMBER +
+                ".msixbundle"
         ]
     );
 };
@@ -161,7 +173,11 @@ exports.signWinBundle = function () {
             "signing-certificate.p12",
             "/p",
             process.env.WINDOWS_CLIENT_CERTIFICATE_PASSWORD,
-            "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
+            "installers/windows/dist/datapm-client-" +
+                readPackageVersion() +
+                "-" +
+                process.env.BUILD_NUMBER +
+                ".msixbundle"
         ]
     );
 };
