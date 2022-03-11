@@ -14,7 +14,9 @@ jobs:
         name: Test build number
         steps:
             - name: echo build number
-              run: echo $GITHUB_BUILD_NUMBER
+              run: echo $BUILD_NUMBER
+        env:
+            BUILD_NUMBER: github.run_number
     lint:
         runs-on: ubuntu-latest
         timeout-minutes: 3
