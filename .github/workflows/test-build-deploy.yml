@@ -9,7 +9,7 @@ on:
             - master
 
 env:
-    BUILD_NUMBER: "${ {GITHUB_RUN_NUMBER }}"
+    BUILD_NUMBER: "${{ GITHUB_RUN_NUMBER }}"
 
 jobs:
     test:
