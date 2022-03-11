@@ -195,7 +195,7 @@ describe("Fetch Command Tests", async function () {
                     results.messageFound = true;
                 }
 
-                if (line.includes("--sinkConfig") && line.includes("--defaults")) {
+                if (line.includes("--sinkConfig")) {
                     results.defaultsFound = true;
                 }
             }
@@ -203,7 +203,6 @@ describe("Fetch Command Tests", async function () {
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
-        expect(results.defaultsFound, "Found defaults message").equals(true);
     });
 
     it("Generate package with excluding and renaming attributes", async function () {
