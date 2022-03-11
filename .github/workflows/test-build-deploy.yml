@@ -8,7 +8,16 @@ on:
         branches:
             - master
 
+env:
+    BUILD_NUMBER: "${GITHUB_RUN_NUMBER}"
+
 jobs:
+    test:
+        runs-on: ubuntu-latest
+        name: Test build number
+        steps:
+            - name: echo build number
+              run: echo $BUILD_NUMBER
     lint:
         runs-on: ubuntu-latest
         timeout-minutes: 3
