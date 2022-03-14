@@ -6,7 +6,8 @@ import {
     CreatePackageDocument,
     CreateVersionDocument,
     LoginDocument,
-    ActivityLogEventType
+    ActivityLogEventType,
+    PackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
 import { loadPackageFileFromDisk, PublishMethod, StartPackageUpdateResponse, ErrorResponse, StartPackageUpdateRequest, SocketResponseType, SocketEvent, JobMessageResponse, JobMessageRequest, JobRequestType } from "datapm-lib";
@@ -247,6 +248,25 @@ describe("Package Tests", async () => {
 
 
     });
+
+    it("Package should be updated", async function() {
+        const response = await userAClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-ws-update",
+                    packageSlug: "test-update"
+                }
+            }
+        });
+
+        // console.log(JSON.stringify(JSON.parse(response.data.package.latestVersion?.packageFile),null,2));
+
+        expect(response.data.package.latestVersion?.identifier.versionMajor).to.equal(1);
+        expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(1);
+        expect(response.data.package.latestVersion?.identifier.versionPatch).to.equal(0);
+        
+    })
 
 
 });

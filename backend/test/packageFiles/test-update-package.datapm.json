@@ -6,10 +6,10 @@
             "slug": "file",
             "streamSets": [
                 {
-                    "slug": "update-test-original",
+                    "slug": "update-test",
                     "configuration": {},
                     "schemaTitles": [
-                        "update-test-original"
+                        "update-test"
                     ],
                     "streamStats": {
                         "inspectedCount": 1,
@@ -47,7 +47,7 @@
         {
             "$schema": "http://json-schema.org/draft-07/schema",
             "type": "object",
-            "title": "update-test-original",
+            "title": "update-test",
             "properties": {
                 "column1": {
                     "title": "column1",
