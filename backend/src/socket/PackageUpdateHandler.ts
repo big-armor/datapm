@@ -52,7 +52,7 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
             targetPackageVersionId: latestVersionEntity.id,
         });
 
-        this.socket.on(this.channelName,this.handleChannelEvents)
+        this.socket.on(this.channelName,this.handleChannelEvents);
 
 
         callback(new StartPackageUpdateResponse(this.channelName));
@@ -67,11 +67,13 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
             } else if(reason === "disconnect") {
 
             } else if(reason === "server") {
-                this.socket.emit(this.channelName, new JobMessageRequest(JobRequestType.EXIT),(response:JobMessageResponse) => {
-                    resolve();
-                });
-                return;
             }
+
+            this.socket.off(this.channelName,this.handleChannelEvents);
+
+            this.removeLock();
+
+            resolve();
         });
         
     }
@@ -106,17 +108,25 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
             defaults: true
         });
 
-        await job.execute();
+        const jobResult = await job.execute();
+
+        const exitMessage = new JobMessageRequest(JobRequestType.EXIT);
+        exitMessage.exitCode = jobResult.exitCode;
+
+        this.socket.emit(this.channelName, exitMessage)
+
+        this.stop("server");
+
     }
 
 
     async createLock():Promise<boolean> {
 
-        const lock = this.distributedLockingService.lock(PACKAGE_LOCK_PREFIX + "-" + this.channelName);
+        const lock = this.distributedLockingService.lock(this.getLockKey());
 
         if(!lock) {
             this.socket.emit(this.channelName, SocketError.STREAM_LOCKED, {
-                message: "Stream " + this.channelName + " is locked by another session: " + lock,
+                message: "Stream " + this.request.packageIdentifier.catalogSlug + "/" + this.request.packageIdentifier.packageSlug + " is locked by another session: " + lock,
                 errorType: SocketError.STREAM_LOCKED
             });
             return false;
@@ -125,7 +135,11 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         return true;
     }
 
-    async removeLock(channelName:string):Promise<void> {
-        this.distributedLockingService.unlock(PACKAGE_LOCK_PREFIX + "-" + channelName);
+    async removeLock():Promise<void> {
+        this.distributedLockingService.unlock(this.getLockKey());
+    }
+
+    getLockKey():string {
+        return PACKAGE_LOCK_PREFIX + "-" + this.request.packageIdentifier.catalogSlug + "/" + this.request.packageIdentifier.packageSlug;
     }
 }

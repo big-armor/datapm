@@ -4,10 +4,12 @@ import { SemVer } from "semver";
 import { Writable } from "stream";
 import { AuthenticatedContext, SocketContext } from "../context";
 import SocketIO from 'socket.io';
-import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
+import { hasPermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { PackageRepository } from "../repository/PackageRepository";
+import { createVersion } from "../resolvers/VersionResolver";
+import { createOrUpdateVersion } from "../business/CreateVersion";
 
 export class WebsocketJobContext implements JobContext {
 
@@ -181,7 +183,13 @@ export class WebsocketJobContext implements JobContext {
             packageFile: latestPackageFile,
             permitsSaving: true,
             save: async (packageFile: PackageFile): Promise<void> => {
-                throw new Error("Saving package files in web socket is not yet implemented");
+
+                await hasPermission(Permission.EDIT,this.socketContext,identifier);        
+
+                await createOrUpdateVersion(this.socketContext as AuthenticatedContext, identifier, {
+                    packageFile
+                },[]);
+
             },
             licenseFileUrl: process.env["REGISTRY_URL"] + "/" + identifier.catalogSlug + "/" + identifier.packageSlug + "#license",
             readmeFileUrl: process.env["REGISTRY_URL"] + "/" + identifier.catalogSlug + "/" + identifier.packageSlug + "#readme",

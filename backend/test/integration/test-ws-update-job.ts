@@ -32,6 +32,23 @@ describe("Package Tests", async () => {
 
     before(async () => {});
 
+    after(async () => {
+        if(userAStreamingClient
+            && userAStreamingClient.connected) {
+            userAStreamingClient.close();
+        }
+
+        if(userBStreamingClient
+            && userBStreamingClient.connected) {
+            userBStreamingClient.close();
+        }
+
+        if(anonymousStreamingClient
+            && anonymousStreamingClient.connected) {
+            anonymousStreamingClient.close();
+        }
+    });
+
     it("Create users A & B", async function () {
         userAClient = await createUser(
             "FirstA",
@@ -188,7 +205,7 @@ describe("Package Tests", async () => {
         
         userAStreamingClient.on(channelName, (message: JobMessageRequest, callback:(response:any) => void) => {
             messageCallback(message);
-            console.log(JSON.stringify(message));
+            // console.log(JSON.stringify(message));
 
             if(message.requestType === JobRequestType.END_TASK) {
                 callback(new JobMessageResponse(JobRequestType.END_TASK));
@@ -227,6 +244,7 @@ describe("Package Tests", async () => {
         expect(startResponse.responseType).equal(JobRequestType.START_JOB);
 
         await jobExitPromise;
+
 
     });
 

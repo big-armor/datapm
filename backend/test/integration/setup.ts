@@ -18,6 +18,7 @@ export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) 
 
 let container: StartedTestContainer;
 let serverProcess: ExecaChildProcess;
+let testDataServerProcess: execa.ExecaChildProcess<string>;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
@@ -141,7 +142,7 @@ before(async function () {
     });
 
     
-    await startServerProcess(
+    const serverStartResponse = await startServerProcess(
         "Test data",
         "npm",
         ["run", "start:test-data-server"],
@@ -152,6 +153,8 @@ before(async function () {
         [],
         []
     );
+
+    testDataServerProcess = serverStartResponse.serverProcess;
     
         
 
@@ -209,6 +212,31 @@ after(async function () {
 
     if(fs.existsSync(storageFolderPath)) {
             fs.rmSync(storageFolderPath, { recursive: true });
+    }
+
+    if(testDataServerProcess) {
+            testDataServerProcess.stdout?.destroy();
+        testDataServerProcess.stderr?.destroy();
+
+        if (testDataServerProcess.pid !== undefined) {
+            try {
+                const pids = pidtree(testDataServerProcess.pid, { root: true });
+
+                // recursively kill all child processes
+                (await pids).forEach((p) => {
+                    console.log("Killing process " + p);
+                    try {
+                        process.kill(p); // TODO Wait for process to actually exit, then kill it with sign 9 (SIGKILL) after a timeout
+                    } catch (error) {
+                        console.error("Error killing process " + p);
+                        console.error(error);
+                    }
+                });
+                console.log("test data server stopped normally");
+            } catch (error) {
+                console.log("error stopping processes " + error.message);
+            }
+        }
     }
 
     serverProcess.stdout!.destroy();
