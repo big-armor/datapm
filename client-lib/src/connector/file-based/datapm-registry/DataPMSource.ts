@@ -23,7 +23,7 @@ import { SemVer } from "semver";
 import { Socket } from "socket.io-client";
 import { PassThrough } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { getPackage } from "../../../util/PackageAccessUtil";
+import { getPackage } from "../../../util/PackageContext";
 import { InspectionResults, Source, SourceInspectionContext, StreamSetPreview, StreamSummary } from "../../Source";
 import { connectSocket } from "./DataPMRepository";
 import { TYPE } from "./DataPMConnectorDescription";

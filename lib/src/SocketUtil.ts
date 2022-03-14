@@ -309,7 +309,7 @@ export class StartPackageUpdateResponse implements Response {
     }
 }
 
-export enum JobMessageType {
+export enum JobRequestType {
     /** Sent by the client on the specified channel when the client is ready to begin */
     START_JOB = "startJob",
 
@@ -335,18 +335,31 @@ export enum JobMessageType {
     SET_STEPS = "setSteps",
 
     /** Sent by the client or the server when the job is done or should be abandoned */
-    EXIT = "exit"
+    EXIT = "exit",
+
+    /** When responding with an error */
+    ERROR = "error"
 }
+
+/** For certain JobMessages, they need a message type. This is really a copy and paste
+ * of the MessageType from datapm-client-lib.
+ */
+export type JobMessageType = "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START";
+
+/** For certain JobMessages, they need a task status. This is a copy of the TaskStatus from datpam-client-lib */
+export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
 
 /** Sent by the client or the server during a job */
 export class JobMessageRequest {
-    constructor(requestType: JobMessageType) {
+    constructor(requestType: JobRequestType) {
         this.requestType = requestType;
     }
 
-    requestType: JobMessageType;
+    requestType: JobRequestType;
     message?: string;
+    messageType?: JobMessageType;
     exitCode?: number;
+    taskStatus?: TaskStatus;
     taskId?: string;
     steps?: string[];
     prompts?: Parameter[];
@@ -355,11 +368,12 @@ export class JobMessageRequest {
 /** A response to the request sent by the client or the server. The response type is always
  * the same as the request type.
  */
-export class JobMessageResponse {
-    constructor(responseType: JobMessageType) {
+export class JobMessageResponse<T extends string = string> {
+    constructor(responseType: JobRequestType) {
         this.responseType = responseType;
     }
 
-    responseType: JobMessageType;
-    answers?: ParameterAnswer<"something-not-valid">[];
+    message?: string;
+    responseType: JobRequestType;
+    answers?: ParameterAnswer<T>;
 }

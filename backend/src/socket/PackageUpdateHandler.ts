@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { ErrorResponse, JobMessageRequest, JobMessageType, JobMessageResponse, Response, SocketError, StartPackageUpdateRequest, StartPackageUpdateResponse } from "datapm-lib";
+import { ErrorResponse, JobMessageRequest, JobRequestType, JobMessageResponse, Response, SocketError, StartPackageUpdateRequest, StartPackageUpdateResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
@@ -9,7 +9,7 @@ import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
-import { BackendContext } from "../job/BackendContext";
+import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { UpdatePackageJob } from "datapm-client-lib";
 
 const PACKAGE_LOCK_PREFIX = "package";
@@ -34,7 +34,6 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         if(!await this.createLock()) {
             return;
         }
-
         
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.request.packageIdentifier});
 
@@ -64,11 +63,11 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
 
         return new Promise<void>((resolve) => {
              if(reason === "client") {
-                this.socket.emit(this.channelName, new JobMessageResponse(JobMessageType.EXIT));
+                this.socket.emit(this.channelName, new JobMessageResponse(JobRequestType.EXIT));
             } else if(reason === "disconnect") {
 
             } else if(reason === "server") {
-                this.socket.emit(this.channelName, new JobMessageRequest(JobMessageType.EXIT),(response:JobMessageResponse) => {
+                this.socket.emit(this.channelName, new JobMessageRequest(JobRequestType.EXIT),(response:JobMessageResponse) => {
                     resolve();
                 });
                 return;
@@ -79,15 +78,15 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
 
     handleChannelEvents = async (request:JobMessageRequest, callback:(response:JobMessageResponse | ErrorResponse) => void) => {
 
-          if(request.requestType === JobMessageType.EXIT) {
+          if(request.requestType === JobRequestType.EXIT) {
             this.stop("client");
             return;
-        } else if(request.requestType === JobMessageType.START_JOB) {
+        } else if(request.requestType === JobRequestType.START_JOB) {
 
             try {
                 this.startJob();
 
-                callback(new JobMessageResponse(JobMessageType.START_JOB));
+                callback(new JobMessageResponse(JobRequestType.START_JOB));
             } catch(error) {
                 callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
             }
@@ -97,9 +96,13 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     }
 
     async startJob() {
-        const context = new BackendContext(this.socketContext);
+        const context = new WebsocketJobContext(this.socketContext, this.socket, this.channelName);
 
         const job = new UpdatePackageJob(context, {
+            reference: {
+                ...this.request.packageIdentifier,
+                registryURL: process.env["REGISTRY_URL"]!
+            },
             defaults: true
         });
 

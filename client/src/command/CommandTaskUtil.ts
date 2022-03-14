@@ -2,10 +2,19 @@ import chalk from "chalk";
 import ora from "ora";
 import fs from "fs";
 import path from "path";
-import { JobContext, Task, RepositoryConfig, RegistryConfig } from "datapm-client-lib";
+import {
+    JobContext,
+    Task,
+    RepositoryConfig,
+    RegistryConfig,
+    PackageFileWithContext,
+    PackageIdentifier,
+    getPackage,
+    writePackageFile
+} from "datapm-client-lib";
 import { Writable } from "stream";
 import { SemVer } from "semver";
-import { DPMConfiguration, Parameter, ParameterAnswer } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
 import {
     getRegistryConfigs,
@@ -21,6 +30,32 @@ export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
 
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
+
+    getPackageFile(
+        reference: string | PackageIdentifier,
+        modifiedOrCanonical: "modified" | "canonicalIfAvailable"
+    ): Promise<PackageFileWithContext> {
+        if (typeof reference !== "string") {
+            reference =
+                reference.registryURL +
+                (reference.registryURL ? "/" : "") +
+                reference.catalogSlug +
+                "/" +
+                reference.packageSlug;
+        }
+
+        return getPackage(this, reference, modifiedOrCanonical);
+    }
+
+    async saveNewPackageFile(
+        catalogSlug: string | undefined,
+        packagefile: PackageFile
+    ): Promise<PackageFileWithContext> {
+        const packageFileLocation = await writePackageFile(this, catalogSlug, packagefile);
+
+        return getPackage(this, packageFileLocation, "canonicalIfAvailable");
+    }
+
     getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
         return getRepositoryConfig(type, identifier);
     }
@@ -105,6 +140,8 @@ export class CLIJobContext implements JobContext {
                 } else {
                     this.currentOraSpinner.fail();
                 }
+
+                this.currentOraSpinner = undefined;
             },
             setMessage: (message) => {
                 if (!this.currentOraSpinner) return;

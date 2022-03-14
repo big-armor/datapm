@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { PackageFile, PublishMethod, RegistryReference, ParameterOption, ParameterType } from "datapm-lib";
 import { Catalog } from "../generated/graphql";
-import { getPackage, RegistryPackageFileContext } from "../util/PackageAccessUtil";
+import { RegistryPackageFileContext } from "../util/PackageContext";
 import { publishPackageFile } from "../util/PackageUtil";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { Job, JobContext, JobResult } from "./Task";
@@ -50,7 +50,7 @@ export class PublishJob extends Job<PublishJobResult> {
 
         let packageFileWithContext;
         try {
-            packageFileWithContext = await getPackage(this.jobContext, this.args.reference, "canonicalIfAvailable");
+            packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "canonicalIfAvailable");
         } catch (error) {
             await task.end("ERROR", error.message);
             return {
@@ -289,17 +289,17 @@ export class PublishJob extends Job<PublishJobResult> {
 
         if (packageFileWithContext.permitsSaving) {
             if (packageFileWithContext.hasPermissionToSave) {
-                await packageFileWithContext.save(this.jobContext, packageFile);
+                await packageFileWithContext.save(packageFile);
             } else {
                 this.jobContext.print(
                     "WARN",
-                    "You do not have edit permissions on the original package file, so these publish settings will not be saved. "
+                    packageFileWithContext.cantSaveReason || "You don't have permission to save this package file."
                 );
             }
         } else {
             this.jobContext.print(
                 "WARN",
-                "Can not save package the original package file, so these publish settings will not be saved."
+                "Can not save package the original package file via " + packageFileWithContext.contextType + ", so these publish settings will not be saved."
             );
             this.jobContext.print("WARN", "Use the new package location for future publishing.");
         }

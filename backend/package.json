@@ -15,6 +15,7 @@
         "start-nowatch": "TYPEORM_IS_DIST=false . ./env.sh && node --max-old-space-size=8192 -- node_modules/.bin/ts-node src/index.ts",
         "prestart:server": "npm run build",
         "start:server": ". ./env.sh && cd dist && node index.js",
+        "start:test-data-server": "node -r ts-node/register test/data-server/test-data-server.ts",
         "pretest": "npm run codegen",
         "test": "TYPEORM_IS_DIST=false mocha --max-old-space-size=8192 -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
         "test:debug": "TYPEORM_IS_DIST=false npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",

@@ -17,7 +17,7 @@ export class HTTPRepository implements Connector {
     }
 
     requiresCredentialsConfiguration(): boolean {
-        return true;
+        return false;
     }
 
     async getRepositoryIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string> {

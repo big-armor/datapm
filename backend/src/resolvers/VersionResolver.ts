@@ -38,7 +38,7 @@ import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
 import { saveVersionComparison } from "../repository/VersionComparisonRepository";
 import { Connection, EntityManager } from "typeorm";
-import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
+import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 
 export const versionEntityToGraphqlObject = async (

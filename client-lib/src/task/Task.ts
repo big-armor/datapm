@@ -1,9 +1,12 @@
-import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration } from "datapm-lib";
+import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration, PackageFile } from "datapm-lib";
 import { SemVer } from "semver";
 import { Writable } from "stream";
 import { RepositoryConfig, RegistryConfig } from "../config/Config";
+import { PackageFileWithContext, PackageIdentifier } from "../main";
 
 export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
+
+export type MessageType = "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START";
 export interface Task {
     setMessage(message?: string): void;
 
@@ -48,7 +51,7 @@ export interface JobContext {
     getRegistryConfig(url: string): RegistryConfig | undefined;
 
     /** Should prompt the user with the given parameter inputs */
-    parameterPrompt: <T extends string = string>(parameters: Array<Parameter<T>>) => Promise<ParameterAnswer<T>>;
+    parameterPrompt<T extends string = string>(parameters: Array<Parameter<T>>): Promise<ParameterAnswer<T>>;
 
     /** Sets the names of the steps to be performed during the task. Can be updated at any
      * time throughout the task lifecycle.
@@ -60,7 +63,7 @@ export interface JobContext {
 
     /** Sends a message to the user */
     print(
-        type: "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START",
+        type: MessageType,
         message: string
     ): void;
 
@@ -68,6 +71,20 @@ export interface JobContext {
 
     /** Outputs to the logs (not intended for the user console) */
     log(level: "ERROR" | "WARN" | "INFO" | "DEBUG", message: string): void;
+
+    /** Saves a given package file and returns the PackageFileWithContext */
+    saveNewPackageFile(
+        catalogSlug: string | undefined,
+        packagefile:PackageFile,
+    ): Promise<PackageFileWithContext>;
+
+    /** Returns a packageFileWithContext reference specific to the context in which
+     * the package is being requested. 
+     */
+    getPackageFile(
+        reference: string | PackageIdentifier,
+        modifiedOrCanonical: "modified" | "canonicalIfAvailable"
+    ): Promise<PackageFileWithContext>;
 
     /** Return a writable for a package file */
     getPackageFileWritable(

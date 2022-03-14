@@ -18,7 +18,7 @@ import { InspectionResults, StreamSetPreview } from "../connector/Source";
 import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { formatRemainingTime } from "../util/DateUtil";
-import { getPackage, PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageAccessUtil";
+import { PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageContext";
 import { repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, newRecordsAvailable } from "../util/StreamToSinkUtil";
@@ -86,7 +86,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         let packageFileWithContext: PackageFileWithContext;
 
         try {
-            packageFileWithContext = await getPackage(this.jobContext, this.args.reference, "modified");
+            packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
         } catch (error) {
             if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
                 await task.end("ERROR", "You are not authenticated to the registry.");

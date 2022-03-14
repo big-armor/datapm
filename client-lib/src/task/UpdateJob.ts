@@ -8,10 +8,9 @@ import {
     StreamSet,
     ParameterType
 } from "datapm-lib";
-import { Permission } from "../generated/graphql";
+import { PackageIdentifier } from "../generated/graphql";
 import { SourceInspectionContext } from "../connector/Source";
-import { getPackage, PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageAccessUtil";
-import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
+import { PackageFileWithContext } from "../util/PackageContext";
 import { JobContext, Job, JobResult } from "./Task";
 import clone from "rfdc";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
@@ -23,7 +22,7 @@ import { SemVer } from "semver";
 import { filterBadSchemaProperties, inspectSource, inspectStreamSet } from "./PackageJob";
 
 export class UpdateArguments {
-    reference?: string;
+    reference?: string | PackageIdentifier;
     defaults?: boolean;
     forceUpdate?: boolean;
 }
@@ -59,7 +58,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
         let packageFileWithContext: PackageFileWithContext;
 
         try {
-            packageFileWithContext = await getPackage(this.jobContext, this.argv.reference, "canonicalIfAvailable");
+            packageFileWithContext = await this.jobContext.getPackageFile(this.argv.reference, "canonicalIfAvailable"); // getPackage(this.jobContext, this.argv.reference, "canonicalIfAvailable");
         } catch (error) {
             await task.end("ERROR", error.message);
             return {
@@ -71,48 +70,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
         task = await this.jobContext.startTask("Checking edit permissions...");
 
-        // TODO Move this to packageFileWithContext object
-        if (packageFileWithContext.contextType === "registry") {
-            const registryPackageFileContext = packageFileWithContext as RegistryPackageFileContext;
-
-            try {
-                await checkPackagePermissionsOnRegistry(
-                    this.jobContext,
-                    {
-                        catalogSlug: packageFileWithContext.catalogSlug as string,
-                        packageSlug: packageFileWithContext.packageFile.packageSlug
-                    },
-                    registryPackageFileContext.registryUrl,
-                    Permission.EDIT
-                );
-            } catch (error) {
-                if (error.message === "NOT_AUTHORIZED") {
-                    await task.end(
-                        "ERROR",
-                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
-                    );
-                    return {
-                        exitCode: 1
-                    };
-                } else if (error.message === "NOT_AUTHENTICATED") {
-                    await task.end("ERROR", "You are not logged in to the registry.");
-                    this.jobContext.print("INFO", chalk.green("Use the following command to login"));
-                    this.jobContext.print(
-                        "INFO",
-                        chalk.green("datapm registry login " + registryPackageFileContext.registryUrl)
-                    );
-                    return {
-                        exitCode: 1
-                    };
-                }
-
-                await task.end("ERROR", "There was an error checking package permissions: " + error.message);
-                return {
-                    exitCode: 1
-                };
-            }
-        }
-
         const oldPackageFile = packageFileWithContext.packageFile;
 
         if (!packageFileWithContext.permitsSaving) {
@@ -122,14 +79,14 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             };
         }
 
-        if (!packageFileWithContext.hasPermissionToSave) {
+        if(!packageFileWithContext.hasPermissionToSave) {
             await task.end(
-                "ERROR",
-                "You do not have permission to save to " + packageFileWithContext.packageFileUrl.replace("file://", "")
-            );
-            return {
-                exitCode: 1
-            };
+                        "ERROR",
+                        packageFileWithContext.cantSaveReason
+                    );
+                    return {
+                        exitCode: 1
+                    };
         }
 
         await task.end("SUCCESS", "Edit permission found");
@@ -350,7 +307,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             version: minNextVersion.format()
         };
 
-        await packageFileWithContext.save(this.jobContext, newPackageFile);
+        await packageFileWithContext.save(newPackageFile);
 
         return {
             exitCode: 0,

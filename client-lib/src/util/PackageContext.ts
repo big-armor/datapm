@@ -21,12 +21,15 @@ export interface PackageFileWithContext {
     catalogSlug?: string;
     permitsSaving: boolean;
     hasPermissionToSave: boolean;
+    cantSaveReason?: string;
     packageFileUrl: string;
+    readmeFileUrl: string | undefined;
+    licenseFileUrl: string | undefined;
 
-    save(jobContext: JobContext, packageFile: PackageFile): Promise<void>;
+    save(packageFile: PackageFile): Promise<void>;
 }
 export class RegistryPackageFileContext implements PackageFileWithContext {
-    constructor(public packageFile: PackageFile, public packageObject: Package) {}
+    constructor(public jobContext:JobContext, public packageFile: PackageFile, public packageObject: Package) {}
 
     get contextType(): "registry" {
         return "registry";
@@ -39,6 +42,18 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
     get hasPermissionToSave(): boolean {
         return this.packageObject.myPermissions?.includes(Permission.EDIT) || false;
     }
+    
+    get cantSaveReason(): string | undefined {
+        if(this.packageObject.myPermissions == null) {
+            return "You are not logged-in to the registry.";
+        }
+
+        if(!this.packageObject.myPermissions.includes(Permission.EDIT)) {
+            return "You do not have edit permission for this package.";
+        }
+
+        return undefined;
+    }
 
     get packageFileUrl(): string {
         return (
@@ -50,6 +65,30 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         );
     }
 
+
+    get readmeFileUrl(): string | undefined {
+        return (
+            this.packageObject.identifier.registryURL +
+            "/" +
+            this.packageObject.identifier.catalogSlug +
+            "/" +
+            this.packageObject.identifier.packageSlug
+            + "#readme"
+        );
+    }
+
+
+    get licenseFileUrl(): string | undefined {
+        return (
+            this.packageObject.identifier.registryURL +
+            "/" +
+            this.packageObject.identifier.catalogSlug +
+            "/" +
+            this.packageObject.identifier.packageSlug
+            + "#license"
+        );
+    }
+
     get registryUrl(): string {
         return this.packageObject.identifier.registryURL;
     }
@@ -58,7 +97,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         return this.packageObject.identifier.catalogSlug;
     }
 
-    async save(jobContext: JobContext, packageFile: PackageFile): Promise<void> {
+    async save(packageFile: PackageFile): Promise<void> {
         const publishMethod = packageFile.registries?.find(
             (r) =>
                 r.url.toLowerCase() === this.registryUrl.toLowerCase() &&
@@ -78,12 +117,12 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
             }
         ];
 
-        await publishPackageFile(jobContext, packageFile, targetRegistries);
+        await publishPackageFile(this.jobContext, packageFile, targetRegistries);
     }
 }
 
 export class LocalPackageFileContext implements PackageFileWithContext {
-    constructor(public packageFile: PackageFile, public packageFilePath: string) {}
+    constructor(public jobContext: JobContext, public packageFile: PackageFile, public packageFilePath: string) {}
 
     get contextType(): "localFile" {
         return "localFile";
@@ -99,17 +138,33 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
     }
 
+    get cantSaveReason(): string | undefined {
+        if (!this.hasPermissionToSave) {
+            return "You do not have write permission on the package file.";
+        }
+
+        return undefined;
+    }
+
     get packageFileUrl(): string {
         return this.packageFilePath;
     }
 
-    async save(jobContext: JobContext, packageFile: PackageFile): Promise<void> {
+    get readmeFileUrl(): string | undefined { 
+        return this.packageFile.readmeFile ? "file://" + this.packageFile.readmeFile : undefined;
+    }
+
+    get licenseFileUrl(): string | undefined {
+        return this.packageFile.licenseFile ? "file://" + this.packageFile.licenseFile : undefined;
+    }
+
+    async save(packageFile: PackageFile): Promise<void> {
         // Write updates to the target package file in place
-        let task = await jobContext.startTask("Writing package file...");
+        let task = await this.jobContext.startTask("Writing package file...");
         let packageFileLocation;
 
         try {
-            packageFileLocation = await writePackageFile(jobContext, undefined, packageFile);
+            packageFileLocation = await writePackageFile(this.jobContext, undefined, packageFile);
 
             await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
         } catch (error) {
@@ -117,18 +172,18 @@ export class LocalPackageFileContext implements PackageFileWithContext {
             throw error;
         }
 
-        task = await jobContext.startTask("Writing README file...");
+        task = await this.jobContext.startTask("Writing README file...");
         try {
-            const readmeFileLocation = writeReadmeFile(jobContext, undefined, packageFile);
+            const readmeFileLocation = writeReadmeFile(this.jobContext, undefined, packageFile);
             await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
         } catch (error) {
             await task.end("ERROR", `Unable to write the README file: ${error.message}`);
             throw error;
         }
 
-        task = await jobContext.startTask("Writing LICENSE file...");
+        task = await this.jobContext.startTask("Writing LICENSE file...");
         try {
-            const licenseFileLocation = writeLicenseFile(jobContext, undefined, packageFile);
+            const licenseFileLocation = writeLicenseFile(this.jobContext, undefined, packageFile);
             await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
         } catch (error) {
             await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
@@ -154,6 +209,15 @@ export class HttpPackageFileContext implements PackageFileWithContext {
 
     get packageFileUrl(): string {
         return this.url;
+    }
+
+
+    get readmeFileUrl(): string | undefined {
+        return undefined;
+    }
+
+    get licenseFileUrl(): string | undefined {
+        return undefined;
     }
 
     save(): Promise<void> {
@@ -194,15 +258,15 @@ async function fetchPackage(
     validatePackageFile(packageFileJSON);
     const packageFile = parsePackageFileJSON(packageFileJSON);
 
-    return new RegistryPackageFileContext(packageFile, packageEntity);
+    return new RegistryPackageFileContext(jobContext, packageFile, packageEntity);
 }
 
 export async function getPackage(
     jobContext: JobContext,
-    identifier: string,
+    identifier: string | PackageIdentifierInput,
     modifiedOrCanonical: "modified" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
-    if (identifier.startsWith("http://") || identifier.startsWith("https://")) {
+    if (typeof identifier === "string" && (identifier.startsWith("http://") || identifier.startsWith("https://"))) {
         const http = await fetch(identifier, {
             method: "GET"
         });
@@ -226,7 +290,7 @@ export async function getPackage(
 
         const packageFile = parsePackageFileJSON(await http.text());
         return new HttpPackageFileContext(packageFile, identifier);
-    } else if (fs.existsSync(identifier)) {
+    } else if (typeof identifier === "string" && fs.existsSync(identifier)) {
         const packageFile = loadPackageFileFromDisk(identifier);
         let pathToPackageFile = path.dirname(identifier);
 
@@ -242,8 +306,8 @@ export async function getPackage(
 
         const filePAth = path.join(pathToPackageFile, packageFileName);
 
-        return new LocalPackageFileContext(packageFile, filePAth);
-    } else if (isValidPackageIdentifier(identifier) !== false) {
+        return new LocalPackageFileContext(jobContext, packageFile, filePAth);
+    } else if (typeof identifier === "string" && isValidPackageIdentifier(identifier) !== false) {
         const packageIdentifier: PackageIdentifierInput = {
             catalogSlug: identifier.split("/")[0],
             packageSlug: identifier.split("/")[1]
@@ -257,7 +321,7 @@ export async function getPackage(
     }
 }
 
-function parsePackageIdentifier(url: string): PackageIdentifierInput {
+export function parsePackageIdentifier(url: string): PackageIdentifierInput {
     const pathParts = url.split("/");
 
     return {
