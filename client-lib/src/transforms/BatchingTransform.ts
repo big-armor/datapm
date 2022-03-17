@@ -27,11 +27,12 @@ export class BatchingTransform extends Transform {
 
     _flush(callback: (error?: Error | null) => void): void {
         if (this.buffer.length > 0) {
-            try { 
-                this.push(this.buffer); 
-            } catch (e) { 
+            try {
+                this.push(this.buffer);
+            } catch (e) {
                 // console.log(e)
-                callback(e); return; 
+                callback(e);
+                return;
             }
         }
         this.buffer = [];

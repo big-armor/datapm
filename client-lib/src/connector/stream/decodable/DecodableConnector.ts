@@ -14,10 +14,10 @@ type DecodableAuthConfig = {
             access_token: string;
             refresh_token: string;
             id_token: string;
-        }
-    }
+        };
+    };
     version: string;
-}
+};
 
 export class DecodableConnector implements Connector {
     getType(): string {
@@ -48,10 +48,9 @@ export class DecodableConnector implements Connector {
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
+        const parameters: Parameter[] = [];
 
-        const parameters:Parameter[] = [];
-
-        if(connectionConfiguration.account == null) {
+        if (connectionConfiguration.account == null) {
             parameters.push({
                 name: "account",
                 type: ParameterType.Text,
@@ -69,16 +68,14 @@ export class DecodableConnector implements Connector {
         _authenticationConfiguration: DPMConfiguration,
         jobContext: JobContext
     ): Parameter[] | Promise<Parameter[]> {
-
         jobContext.print("INFO", "Use the Decodable CLI login command to authenticate first");
 
-       const authToken = getAuthToken();
+        const authToken = getAuthToken();
 
         return [];
     }
 
     async testConnection(connectionConfiguration: DPMConfiguration): Promise<string | true> {
-
         // TODO test basic HTTP connection to aPI
         return true;
     }
@@ -87,48 +84,46 @@ export class DecodableConnector implements Connector {
         connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {
-
         const authToken = getAuthToken();
 
-        const accountsResponse = await fetch(`https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/accounts`,{
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-                Accept: "application/json"
+        const accountsResponse = await fetch(
+            `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/accounts`,
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    Accept: "application/json"
+                }
             }
-        });
+        );
 
-
-        if(accountsResponse.status != 200) {
+        if (accountsResponse.status != 200) {
             return "Received status code " + accountsResponse.status + " from Decodable.";
         }
 
         const accounts = await accountsResponse.json();
 
-        if(accounts.length == 0) {
+        if (accounts.length == 0) {
             return "No accounts found in decodable.";
         }
 
-
         return true;
     }
-
-   
 }
 
-export function getAuthToken():string {
-         const decodableAuthFile = path.join(os.homedir(),".decodable","auth");
+export function getAuthToken(): string {
+    const decodableAuthFile = path.join(os.homedir(), ".decodable", "auth");
 
-        if(!fs.existsSync(decodableAuthFile)) {
-            throw new Error("You must login using the decodable CLI tool before using this connector.");
-        }
+    if (!fs.existsSync(decodableAuthFile)) {
+        throw new Error("You must login using the decodable CLI tool before using this connector.");
+    }
 
-        const authFile = yaml.load(fs.readFileSync(decodableAuthFile, "utf8")) as DecodableAuthConfig;
+    const authFile = yaml.load(fs.readFileSync(decodableAuthFile, "utf8")) as DecodableAuthConfig;
 
-        const accessToken = authFile.tokens.default.access_token as string;
+    const accessToken = authFile.tokens.default.access_token as string;
 
-        if(accessToken == null) {
-            throw new Error("Decodable access token is missing from " + decodableAuthFile);
-        }
-        
-        return accessToken;
+    if (accessToken == null) {
+        throw new Error("Decodable access token is missing from " + decodableAuthFile);
+    }
+
+    return accessToken;
 }

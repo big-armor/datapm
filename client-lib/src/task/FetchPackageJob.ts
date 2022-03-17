@@ -61,7 +61,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
         }
 
-        this.jobContext.setCurrentStep("Inspecting Package")
+        this.jobContext.setCurrentStep("Inspecting Package");
 
         if (this.args.reference == null) {
             const referencePromptResult = await this.jobContext.parameterPrompt([
@@ -272,7 +272,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.jobContext,
             async () => {
                 return sink.getParameters(
-                    (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug || "local",
+                    (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug ||
+                        "local",
                     packageFile,
                     sinkConfiguration
                 );
@@ -353,7 +354,6 @@ export async function fetchMultiple(
         const schemaUriInspectionResults = await inspectSourceConnection(jobContext, source, defaults);
 
         for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
-
             jobContext.setCurrentStep("Checking State of " + streamSetPreview.slug);
 
             let sinkState = await sink.getSinkState(
@@ -458,7 +458,7 @@ export async function fetchMultiple(
                         text += `   estimated ${remainingTimeString} seconds remaining`;
                     }
 
-                    if(task.getStatus() !== "RUNNING") {
+                    if (task.getStatus() !== "RUNNING") {
                         task = await jobContext.startTask(text);
                     }
 

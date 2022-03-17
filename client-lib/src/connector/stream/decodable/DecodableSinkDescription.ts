@@ -3,8 +3,9 @@ import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 
 export class DecodableSinkDescription implements SinkDescription {
     getType(): string {
-        return TYPE
+        return TYPE;
     }
+
     getDisplayName(): string {
         return DISPLAY_NAME;
     }
@@ -13,5 +14,4 @@ export class DecodableSinkDescription implements SinkDescription {
         const source = await import("./DecodableSink");
         return new source.DecodableSink();
     }
-    
 }

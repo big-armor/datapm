@@ -93,9 +93,10 @@ export async function obtainCredentialsConfiguration(
     const pendingParameters = await connector.getCredentialsParameters(
         connectionConfiguration,
         credentialsConfiguration,
-        {...jobContext,
-            print:(...args) => {}, // Eat these because we're about to do it for real in a moment
-            log:(...args) => {},
+        {
+            ...jobContext,
+            print: (...args) => {}, // Eat these because we're about to do it for real in a moment
+            log: (...args) => {}
         }
     );
 
@@ -194,7 +195,11 @@ export async function promptForCredentials(
         parameterCount += await repeatedlyPromptParameters(
             jobContext,
             async () => {
-                return connector.getCredentialsParameters(connectionConfiguration, credentialsConfiguration, jobContext);
+                return connector.getCredentialsParameters(
+                    connectionConfiguration,
+                    credentialsConfiguration,
+                    jobContext
+                );
             },
             defaults || false,
             overrideDefaultValues
