@@ -27,7 +27,12 @@ export class BatchingTransform extends Transform {
 
     _flush(callback: (error?: Error | null) => void): void {
         if (this.buffer.length > 0) {
-            this.push(this.buffer);
+            try { 
+                this.push(this.buffer); 
+            } catch (e) { 
+                // console.log(e)
+                callback(e); return; 
+            }
         }
         this.buffer = [];
         callback(null);

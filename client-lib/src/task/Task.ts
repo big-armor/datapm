@@ -5,6 +5,9 @@ import { RepositoryConfig, RegistryConfig } from "../config/Config";
 
 export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
 export interface Task {
+
+    getStatus(): TaskStatus;
+    
     setMessage(message?: string): void;
 
     /** After calling end, setStatus should never be called. */

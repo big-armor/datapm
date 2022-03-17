@@ -1,4 +1,4 @@
-import { SourceDescription, Source } from "../../connector/Source";
+import { SourceDescription, Source } from "../../../connector/Source";
 import { TYPE, DISPLAY_NAME } from "./StreamTestConnectorDescription";
 
 export class StreamTestSourceDescription implements SourceDescription {

@@ -129,7 +129,7 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Destination?",
+                    message: "Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {
@@ -172,7 +172,7 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Destination?",
+                    message: "Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {

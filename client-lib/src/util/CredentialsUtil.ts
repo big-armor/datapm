@@ -55,6 +55,10 @@ export async function obtainCredentialsConfiguration(
         return { credentialsIdentifier: undefined, credentialsConfiguration, parameterCount: 0 };
     }
 
+    const connectorDescription = getConnectorDescriptionByType(connector.getType());
+
+    jobContext.setCurrentStep(connectorDescription?.getDisplayName() + " Credentials");
+
     const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration);
 
     if (repositoryIdentifier == null) throw new Error("Could not find repository identifier");
@@ -88,7 +92,11 @@ export async function obtainCredentialsConfiguration(
 
     const pendingParameters = await connector.getCredentialsParameters(
         connectionConfiguration,
-        credentialsConfiguration
+        credentialsConfiguration,
+        {...jobContext,
+            print:(...args) => {}, // Eat these because we're about to do it for real in a moment
+            log:(...args) => {},
+        }
     );
 
     if (
@@ -186,11 +194,13 @@ export async function promptForCredentials(
         parameterCount += await repeatedlyPromptParameters(
             jobContext,
             async () => {
-                return connector.getCredentialsParameters(connectionConfiguration, credentialsConfiguration);
+                return connector.getCredentialsParameters(connectionConfiguration, credentialsConfiguration, jobContext);
             },
             defaults || false,
             overrideDefaultValues
         );
+
+        const task = await jobContext.startTask("Testing Credentials");
 
         const credentialsTestResult = await connector.testCredentials(
             connectionConfiguration,
@@ -198,12 +208,14 @@ export async function promptForCredentials(
         );
 
         if (typeof credentialsTestResult === "string") {
-            jobContext.print("FAIL", "Authentication failed: " + credentialsTestResult);
+            task.end("ERROR", "Authentication failed: " + credentialsTestResult);
             credentialsConfiguration = {};
             continue;
         } else {
             credentialsSuccess = true;
         }
+
+        task.end("SUCCESS", "Authentication succeeded");
     }
 
     return {

@@ -534,6 +534,16 @@ export async function fetch(
             });
         });
 
+        schemaSwitchingWritable.on("error", async (error) => {
+            context.finish(
+                `Error writing records. This puts the sink state in an inconsisent state with the reocrds written. You will need to delete the file/tables/records from the target sink and restart the full transfer`,
+                recordCount,
+                FetchOutcome.FAILURE
+            );
+
+            returnPromiseReject(error);
+        });
+
         const OFF_DEATH = ON_DEATH({})(() => {
             stoppedEarly = true;
             sourceStream.readable.unpipe();

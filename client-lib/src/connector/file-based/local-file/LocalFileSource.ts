@@ -109,7 +109,7 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
                     });
                 });
 
-                if (files.length === 0) throw new Error("FILE_NOT_FOUND - " + files);
+                if (files.length === 0) throw new Error("FILE_NOT_FOUND - " + filePath);
 
                 filePaths = filePaths.concat(files);
             }

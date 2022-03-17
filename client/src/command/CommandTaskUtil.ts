@@ -2,7 +2,7 @@ import chalk from "chalk";
 import ora from "ora";
 import fs from "fs";
 import path from "path";
-import { JobContext, Task, RepositoryConfig, RegistryConfig } from "datapm-client-lib";
+import { JobContext, Task, RepositoryConfig, RegistryConfig, TaskStatus } from "datapm-client-lib";
 import { Writable } from "stream";
 import { SemVer } from "semver";
 import { DPMConfiguration, Parameter, ParameterAnswer } from "datapm-lib";
@@ -79,10 +79,15 @@ export class CLIJobContext implements JobContext {
     }
 
     async startTask(taskTitle: string): Promise<Task> {
+        let taskStatus: TaskStatus = "RUNNING";
+
         if (this.argv.quiet) {
             return {
+                getStatus: () => taskStatus,
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                end: async () => {},
+                end: async (status) => {
+                    taskStatus = status;
+                },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setMessage: () => {}
             };
@@ -96,8 +101,11 @@ export class CLIJobContext implements JobContext {
         this.currentOraSpinner = this.oraRef.start(taskTitle);
 
         return {
+            getStatus: () => taskStatus,
             end: async (status, message) => {
                 if (!this.currentOraSpinner) return;
+
+                taskStatus = status;
 
                 this.currentOraSpinner.text = message || this.currentOraSpinner.text;
                 if (status === "SUCCESS") {

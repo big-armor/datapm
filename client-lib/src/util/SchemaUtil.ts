@@ -113,8 +113,8 @@ export async function inspectSourceConnection(
         credentialsConfiguration,
         source.configuration || {},
         {
-            defaults: true,
-            quiet: true,
+            defaults: defaults || false,
+            quiet: false,
             jobContext,
             print: (message: string) => {
                 jobContext.print("NONE", message);
@@ -549,7 +549,11 @@ export function updateSchemaWithDeconflictOptions(
         [DeconflictOptions.CAST_TO_STRING]: "string"
     };
     for (const title in deconflictOptions) {
-        const property = properties[title];
+        const property = Object.values(properties).find(p => p.title == title);
+
+        if(property == null)
+            throw new Error("Could not find property with title: " + title);
+
         const deconflictOption = deconflictOptions[title];
         if (deconflictOption === DeconflictOptions.ALL) {
             continue;
@@ -560,7 +564,7 @@ export function updateSchemaWithDeconflictOptions(
         } else {
             format = deconflictRules[deconflictOption];
         }
-        property.format = property.format?.includes("null") ? `null,${format}` : format;
+        property.format = (property.format && property.format?.includes("null")) ? `null,${format}` : format;
     }
 }
 

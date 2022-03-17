@@ -3,6 +3,7 @@ import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { JobContext } from "../task/Task";
 import { RepositoryConfig } from "../config/Config";
+import { getConnectorDescriptionByType } from "../main";
 
 export async function obtainConnectionConfiguration(
     jobContext: JobContext,
@@ -17,6 +18,10 @@ export async function obtainConnectionConfiguration(
 > {
     if (!connector.requiresConnectionConfiguration())
         return { repositoryIdentifier: undefined, connectionConfiguration, parameterCount: 0 };
+
+    const connectorDescription = getConnectorDescriptionByType(connector.getType());
+
+    jobContext.setCurrentStep(connectorDescription?.getDisplayName() + " Connection");
 
     if (repositoryIdentifier != null) {
         const repository = jobContext.getRepositoryConfig(connector.getType(), repositoryIdentifier);
@@ -127,14 +132,19 @@ export async function promptForConnectionConfiguration(
             overrideDefaultValues
         );
 
+        const task = await jobContext.startTask("Testing Connection");
+
         const connectionTestResults = await connector.testConnection(connectionConfiguration);
 
         if (typeof connectionTestResults === "string") {
-            jobContext.print("ERROR", "Connection failed: " + connectionTestResults);
+            task.end("ERROR", "Connection failed: " + connectionTestResults);
             connectionConfiguration = {};
+            continue;
         } else {
             connectionSuccess = true;
         }
+
+        task.end("SUCCESS", "Connection successful");
     }
 
     return { connectionConfiguration, parameterCount };

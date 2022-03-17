@@ -1,4 +1,5 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
+import { JobContext } from "../main";
 import { SinkDescription } from "./Sink";
 import { SourceDescription } from "./Source";
 
@@ -69,7 +70,8 @@ export interface Connector {
      */
     getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> | Parameter[];
 
     /** Called after getConnectionParameters, but BEFORE authentication parameters, to validate that the
