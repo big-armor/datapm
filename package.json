@@ -19,8 +19,8 @@
         "git-tag": "gulp gitTag",
         "git-commit-push": "gulp gitCommitPush",
         "deploy": "gulp deployAssets",
-        "lint": "eslint . && cd client && npm run lint && cd ../client-lib && npm run lint",
-        "lint:fix": "eslint --fix . && cd client && npm run lint:fix && cd ../client-lib && npm run lint:fix",
+        "lint": "eslint . && cd client && npm run lint",
+        "lint:fix": "eslint --fix . && cd client && npm run lint:fix",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "test:snyk": "snyk test",
         "checkLicense": "npx license-checker --onlyAllow \"BSD;MIT;Apache-2.0;ISC;Python-2.0;BSD-3-Clause;Unlicense;Custom: http: //github.com/substack/node-bufferlist;CC-BY-4.0;Custom: https://datapm.io;BSD-2-Clause;Apache 2.0;Public Domain;EUPL-1.1;CC-BY-3.0;CC0-1.0;0BSD;BSD*\""

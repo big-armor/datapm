@@ -15,7 +15,7 @@ function modifyPackagefile() {
     const packageJson = JSON.parse(fs.readFileSync(path.join("dist", "package.json"), "utf8"));
 
     packageJson.main = "main.js";
-    packageJson.dependencies["datapm-lib"] = "../../lib/dist"
+    packageJson.dependencies["datapm-lib"] = "../../lib/dist";
 
     // write the new package.json file
     fs.writeFileSync(path.join("dist", "package.json"), JSON.stringify(packageJson, null, 2));
@@ -24,7 +24,7 @@ function modifyPackagefile() {
 }
 
 function linkDataPMLib() {
-     const libPath = path.join(__dirname, "dist", "node_modules");
+    const libPath = path.join(__dirname, "dist", "node_modules");
     if (!fs.existsSync(libPath)) {
         fs.mkdirSync(libPath, { recursive: true });
     }

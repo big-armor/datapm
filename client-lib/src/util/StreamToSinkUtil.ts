@@ -288,7 +288,7 @@ export async function fetch(
 
     const recordCounterTransform = new Transform({
         objectMode: true,
-        transform: function (chunk: RecordStreamContext[], encoding, callback) {
+        transform: function (chunk: RecordStreamContext[], _encoding, callback) {
             recordCount += chunk.length;
             this.push(chunk);
             callback(null);
@@ -387,7 +387,7 @@ export async function fetch(
 
         const schemaSwitchingWritable: Writable = new Writable({
             objectMode: true,
-            write: async (chunks: RecordStreamContext[], encoding, callback) => {
+            write: async (chunks: RecordStreamContext[], _encoding, callback) => {
                 const writableBatches: Record<string, RecordStreamContext[]> = {};
 
                 for (const chunk of chunks) {

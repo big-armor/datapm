@@ -11,15 +11,13 @@ describe("JSON Sink", function () {
         getPromptInputs(jsonSinkPrompts, inputs, skip, count);
 
     before(async () => {
-        if (fs.existsSync("_no_catalog-covid-02-01-2020-1-state.json"))
-            fs.unlinkSync("_no_catalog-covid-02-01-2020-1-state.json");
+        if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE1, true);
     });
 
     after(async () => {
         if (fs.existsSync("covid-02-01-2020.json")) fs.unlinkSync("covid-02-01-2020.json");
-        if (fs.existsSync("_no_catalog-covid-02-01-2020-1-state.json"))
-            fs.unlinkSync("_no_catalog-covid-02-01-2020-1-state.json");
+        if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
         removePackageFiles(["covid-02-01-2020"]);
     });
 

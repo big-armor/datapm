@@ -95,8 +95,10 @@ export async function obtainCredentialsConfiguration(
         credentialsConfiguration,
         {
             ...jobContext,
-            print: (...args) => {}, // Eat these because we're about to do it for real in a moment
-            log: (...args) => {}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            print: () => {}, // Eat these because we're about to do it for real in a moment
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            log: () => {}
         }
     );
 

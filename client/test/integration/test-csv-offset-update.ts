@@ -21,9 +21,8 @@ describe("CSV Offset Tests", function () {
         if (fs.existsSync("countries-v1.json")) fs.unlinkSync("countries-v1.json");
         if (fs.existsSync("countries.csv")) fs.unlinkSync("countries.csv");
         if (fs.existsSync("countries.json")) fs.unlinkSync("countries.json");
-        if (fs.existsSync("_no_catalog-covid-02-01-2020-1-state.json"))
-            fs.unlinkSync("_no_catalog-covid-02-01-2020-1-state.json");
-        if (fs.existsSync("_no_catalog-countries-1-state.json")) fs.unlinkSync("_no_catalog-countries-1-state.json");
+        if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
+        if (fs.existsSync("local-countries-1-state.json")) fs.unlinkSync("local-countries-1-state.json");
     });
 
     it("Should create a test package", async () => {
@@ -153,7 +152,7 @@ describe("CSV Offset Tests", function () {
 
         expect(jsonLines.length).equal(5);
 
-        const stateFile = fs.readFileSync("_no_catalog-countries-1-state.json");
+        const stateFile = fs.readFileSync("local-countries-1-state.json");
 
         const state = JSON.parse(stateFile.toString()) as SinkState;
 
@@ -196,7 +195,7 @@ describe("CSV Offset Tests", function () {
 
         expect(jsonLines.length).equal(3);
 
-        const stateFile = fs.readFileSync("_no_catalog-countries-1-state.json");
+        const stateFile = fs.readFileSync("local-countries-1-state.json");
 
         const state = JSON.parse(stateFile.toString()) as SinkState;
 

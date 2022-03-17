@@ -12,12 +12,12 @@ describe("Standard Out Sink", function () {
     });
 
     beforeEach(async function () {
-        if (fs.existsSync("_no_catalog_state-codes_v1.datapm.state.json"))
-            fs.unlinkSync("_no_catalog_state-codes_v1.datapm.state.json");
+        if (fs.existsSync("local_state-codes_v1.datapm.state.json"))
+            fs.unlinkSync("local_state-codes_v1.datapm.state.json");
     });
 
     after(async function () {
-        fs.unlinkSync("_no_catalog_state-codes_v1.datapm.state.json");
+        fs.unlinkSync("local_state-codes_v1.datapm.state.json");
         removePackageFiles(["state-codes"]);
     });
 

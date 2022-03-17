@@ -10,7 +10,8 @@ import {
     RecordStreamContext,
     UpdateMethod,
     ParameterOption,
-    ParameterAnswer
+    ParameterAnswer,
+    DPMRecordValue
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -155,7 +156,7 @@ export async function streamRecords(
 ): Promise<{ readable: Readable; getCurrentUpdateMethod: () => UpdateMethod }> {
     const returnReadable = new Transform({
         objectMode: true,
-        transform: (chunk, encoding, callback) => {
+        transform: (chunk, _encoding, callback) => {
             callback(null, chunk);
         }
     });
@@ -281,7 +282,7 @@ function createStreamAndTransformPipeLine(
 
         let lastUpdateTime = new Date().getTime();
         const countBytes: PassThrough = new PassThrough({
-            transform: (chunk, encoding, callback) => {
+            transform: (chunk, _encoding, callback) => {
                 bytesTotal += chunk.length;
 
                 const currentTime = new Date().getTime();
@@ -308,7 +309,7 @@ function createStreamAndTransformPipeLine(
     if (streamState != null && streamState.streamOffset != null) {
         const streamOffSetTransform = new Transform({
             objectMode: true,
-            transform: function (chunks: RecordContext[], encoding, callback) {
+            transform: function (chunks: RecordContext[], _encoding, callback) {
                 const chunksToSend: RecordContext[] = [];
 
                 for (const chunk of chunks) {
@@ -331,7 +332,7 @@ function createStreamAndTransformPipeLine(
 
     const streamContextTransform = new Transform({
         objectMode: true,
-        transform: function (chunks: RecordContext[], encoding, callback) {
+        transform: function (chunks: RecordContext[], _encoding, callback) {
             const chunksToSend: RecordStreamContext[] = [];
 
             for (const chunk of chunks) {
@@ -354,7 +355,7 @@ function createStreamAndTransformPipeLine(
 
     const sanitizeTransform = new Transform({
         objectMode: true,
-        transform: function (chunks: RecordStreamContext[], encoding, callback) {
+        transform: function (chunks: RecordStreamContext[], _encoding, callback) {
             for (const chunk of chunks) {
                 const schema = schemas.find((s) => s.title === chunk.recordContext.schemaSlug);
 
@@ -381,7 +382,7 @@ function createStreamAndTransformPipeLine(
     if (deconflictOptions) {
         const deconflictTransform = new Transform({
             objectMode: true,
-            transform: function (chunks: RecordStreamContext[], encoding, callback) {
+            transform: function (chunks: RecordStreamContext[], _encoding, callback) {
                 const chunksToSend: RecordStreamContext[] = [];
 
                 for (const chunk of chunks) {
@@ -549,7 +550,7 @@ export function updateSchemaWithDeconflictOptions(
         [DeconflictOptions.CAST_TO_STRING]: "string"
     };
     for (const title in deconflictOptions) {
-        const property = Object.values(properties).find((p) => p.title == title);
+        const property = Object.values(properties).find((p) => p.title === title);
 
         if (property == null) throw new Error("Could not find property with title: " + title);
 
@@ -567,8 +568,10 @@ export function updateSchemaWithDeconflictOptions(
     }
 }
 
-export function resolveConflict(value: string, deconflictOption: DeconflictOptions): string | null {
+export function resolveConflict(value: DPMRecordValue, deconflictOption: DeconflictOptions): DPMRecordValue {
     if (value === "null") return value;
+    if (value == null) return value;
+
     if (deconflictOption === DeconflictOptions.ALL) return value;
     const valueType = discoverValueType(value);
     const typeConvertedValue = convertValueByValueType(value, valueType);
@@ -581,8 +584,8 @@ export function resolveConflict(value: string, deconflictOption: DeconflictOptio
         return "null";
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_BOOLEAN) {
-        if (valueType.type === "boolean") return value;
-        if (valueType.type === "number") return (+value > 0).toString();
+        if (valueType.type === "boolean") return typeConvertedValue;
+        if (valueType.type === "number") return ((typeConvertedValue as number) > 0).toString();
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_INTEGER) {
         if (valueType.format === "integer") return value;
@@ -594,12 +597,12 @@ export function resolveConflict(value: string, deconflictOption: DeconflictOptio
     if (deconflictOption === DeconflictOptions.CAST_TO_FLOAT) {
         if (valueType.format === "number") return value;
         if (valueType.type === "boolean") return typeConvertedValue ? "1.0" : "0.0";
-        if (valueType.format === "integer") return `${value}.0`;
+        if (valueType.format === "integer") return `${typeConvertedValue}.0`;
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE) {
         if (valueType.type === "date") return value;
         if (valueType.format === "integer")
-            return moment(new Date(+value))
+            return moment(new Date(typeConvertedValue as number))
                 .utc()
                 .format("YYYY-MM-DD HH:mm:ss");
     }

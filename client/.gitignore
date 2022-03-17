@@ -6,12 +6,12 @@ pkg*
 src/generated
 test/integration/registry-client.ts
 !*.datapm.json
-*.datapm.json
+/*.datapm.json
 *.datapm.state.json
 !*.LICENSE.md
-*.LICENSE.md
+/*.LICENSE.md
 !*.README.md
-*.README.md
+/*.README.md
 datapm-state.json
 *state.json
 countries*

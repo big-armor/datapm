@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
 import { Connector } from "../../Connector";
 import { TYPE } from "./DecodableConnectorDescription";
@@ -70,12 +71,12 @@ export class DecodableConnector implements Connector {
     ): Parameter[] | Promise<Parameter[]> {
         jobContext.print("INFO", "Use the Decodable CLI login command to authenticate first");
 
-        const authToken = getAuthToken();
+        getAuthToken();
 
         return [];
     }
 
-    async testConnection(connectionConfiguration: DPMConfiguration): Promise<string | true> {
+    async testConnection(): Promise<string | true> {
         // TODO test basic HTTP connection to aPI
         return true;
     }
@@ -96,13 +97,13 @@ export class DecodableConnector implements Connector {
             }
         );
 
-        if (accountsResponse.status != 200) {
+        if (accountsResponse.status !== 200) {
             return "Received status code " + accountsResponse.status + " from Decodable.";
         }
 
         const accounts = await accountsResponse.json();
 
-        if (accounts.length == 0) {
+        if (accounts.length === 0) {
             return "No accounts found in decodable.";
         }
 

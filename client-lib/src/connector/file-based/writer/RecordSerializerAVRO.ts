@@ -68,16 +68,20 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
         return avro.Type.forSchema({
             name: this.sanitizeName(schema.title as string),
             type: "record",
-            fields: Object.keys(schema.properties as Properties).map((field) => {
-                const property = (schema.properties as Properties)[field];
+            fields: Object.values(schema.properties as Properties).map((property) => {
                 const propertyTypes = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
                 let propertyType = propertyTypes[0] as string;
                 if (propertyTypes.includes("number")) {
-                    if (property.format?.includes("float")) propertyType = "float";
+                    if (property.format?.includes("number")) propertyType = "double";
                     else propertyType = "int";
                 }
+
+                if (property.title == null) {
+                    throw new Error("Property title is null");
+                }
+
                 return {
-                    name: this.sanitizeName(field),
+                    name: this.sanitizeName(property.title),
                     type: propertyType
                 };
             })
@@ -108,7 +112,16 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                                 delete recordData[key];
                             }
 
-                            const property = (schema.properties as Properties)[key];
+                            const property = Object.values(schema.properties as Properties).find(
+                                (p) => p.title === key
+                            );
+
+                            if (property == null) {
+                                throw new Error(
+                                    "Property " + key + " not found in schema. Package file needs to be updated"
+                                );
+                            }
+
                             const types = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
                             const formats = (property.format || "").split(",").filter((type) => type !== "null");
                             const valueType = {

@@ -5,10 +5,14 @@ docs
 
 # Has its own linting
 client
-client-lib
 
 # Never Lint
 node_modules
 dist
 lib/node_modules
 lib/dist
+
+client-lib/node_modules
+client-lib/dist
+client-lib/src/generated
+client-lib/test/integration/registry-client.ts

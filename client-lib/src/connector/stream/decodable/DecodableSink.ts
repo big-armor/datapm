@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
     DPMConfiguration,
     PackageFile,
@@ -6,8 +7,8 @@ import {
     Schema,
     UpdateMethod,
     SinkStateKey,
-    RecordContext,
-    SchemaIdentifier
+    SchemaIdentifier,
+    RecordStreamContext
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
@@ -18,7 +19,6 @@ import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from
 import { getAuthToken } from "./DecodableConnector";
 import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 import { fetch } from "cross-fetch";
-import { json } from "stream/consumers";
 import { SemVer } from "semver";
 
 type DecodableConnection = {
@@ -40,6 +40,13 @@ type DecodableConnection = {
     };
 };
 
+type DecodableSchemaProperty = {
+    name: string;
+    type: string;
+};
+
+type DecodableSchema = Array<DecodableSchemaProperty>;
+
 type DecodableStream = {
     id: string;
     name: string;
@@ -48,13 +55,6 @@ type DecodableStream = {
     create_time: string;
     update_time: string;
     schema: DecodableSchema;
-};
-
-type DecodableSchema = Array<DecodableSchemaProperty>;
-
-type DecodableSchemaProperty = {
-    name: string;
-    type: string;
 };
 
 type ListStreamsResponse = {
@@ -76,7 +76,7 @@ export class DecodableSink implements Sink {
         return DISPLAY_NAME;
     }
 
-    isStronglyTyped(configuration: DPMConfiguration): boolean | Promise<boolean> {
+    isStronglyTyped(): boolean | Promise<boolean> {
         return true;
     }
 
@@ -111,12 +111,9 @@ export class DecodableSink implements Sink {
         return [] as Parameter[];
     }
 
-    getSupportedStreamOptions(
-        configuration: DPMConfiguration,
-        sinkState: Maybe<SinkState>
-    ): SinkSupportedStreamOptions {
+    getSupportedStreamOptions(): SinkSupportedStreamOptions {
         return {
-            streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM],
+            streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET],
             updateMethods: [UpdateMethod.APPEND_ONLY_LOG]
         };
     }
@@ -124,9 +121,9 @@ export class DecodableSink implements Sink {
     async getWriteable(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        updateMethod: UpdateMethod,
+        _updateMethod: UpdateMethod,
         jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (!configuration.schemaStreamNames) {
@@ -155,11 +152,11 @@ export class DecodableSink implements Sink {
             writable: new Transform({
                 objectMode: true,
                 transform: async (
-                    records: RecordContext[],
-                    encoding: string,
-                    callback: (error?: Error | null, data?: any) => void
+                    records: RecordStreamContext[],
+                    _encoding: string,
+                    callback: (error?: Error | null, data?: RecordStreamContext) => void
                 ) => {
-                    const events = records.map((r) => r.record);
+                    const events = records.map((r) => r.recordContext.record);
                     const response = await fetch(
                         `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/connections/${connectionId}/events`,
                         {
@@ -184,36 +181,33 @@ export class DecodableSink implements Sink {
                         return;
                     }
 
-                    callback(null, events[events.length - 1]);
+                    callback(null, records[records.length - 1]);
                 }
             })
         };
     }
 
     async commitAfterWrites(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration,
-        commitKeys: CommitKey[],
-        sinkStateKey: SinkStateKey,
-        sinkState: SinkState,
-        jobContext: JobContext
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration,
+        _commitKeys: CommitKey[],
+        _sinkStateKey: SinkStateKey,
+        _sinkState: SinkState,
+        _jobContext: JobContext
     ): Promise<void> {
         // TODO save the sink state
     }
 
-    filterDefaultConfigValues(
-        catalogSlug: string | undefined,
-        packageFile: PackageFile,
-        configuration: DPMConfiguration
-    ): void {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    filterDefaultConfigValues(): void {}
 
     async getSinkState(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration,
-        SinkStateKey: SinkStateKey,
-        jobContext: JobContext
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey,
+        _jobContext: JobContext
     ): Promise<Maybe<SinkState>> {
         // TODO get the sink state
         return null;
@@ -400,7 +394,7 @@ export class DecodableSink implements Sink {
 
         task = await jobContext.startTask("Checking that Decodable Connection " + decodableStreamName + " is active");
 
-        if (connection.target_state == "STOPPED") {
+        if (connection.target_state === "STOPPED") {
             task.setMessage("Connection " + decodableStreamName + " is not active, starting");
 
             const response = await fetch(
@@ -438,7 +432,7 @@ export class DecodableSink implements Sink {
 
                 connection = (await statusResponse.json()) as DecodableConnection;
 
-                if (connection.actual_state == "RUNNING") {
+                if (connection.actual_state === "RUNNING") {
                     break;
                 }
             }
@@ -452,11 +446,23 @@ export class DecodableSink implements Sink {
     }
 
     getDecodableSchema(schema: Schema): DecodableSchema {
-        return Object.keys(schema.properties!).map((propertyName) => {
-            const property = schema.properties![propertyName];
+        if (schema.properties == null) {
+            throw new Error("Schema must have properties");
+        }
+
+        return Object.keys(schema.properties).map((propertyName) => {
+            const property = schema.properties?.[propertyName];
+
+            if (property == null) {
+                throw new Error("Schema property " + propertyName + " is not found");
+            }
+
+            if (property.title == null) {
+                throw new Error("Schema property " + propertyName + " must have a title");
+            }
 
             return {
-                name: property.title!,
+                name: property.title,
                 type: this.getDecodableType(property.type as JSONSchema7TypeName[], property.format)
             };
         });
