@@ -1,7 +1,7 @@
 {
     "name": "datapm-client",
     "description": "The DataPM client which is used to create and fetch packages.",
-    "version": "0.8.87",
+    "version": "0.8.88",
     "scripts": {
         "clean": "gulp clean",
         "prebuild": "cd ../client-lib && npm run build",
