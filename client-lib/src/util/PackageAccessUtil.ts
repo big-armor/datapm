@@ -26,6 +26,7 @@ export interface PackageFileWithContext {
     save(jobContext: JobContext, packageFile: PackageFile): Promise<void>;
 }
 export class RegistryPackageFileContext implements PackageFileWithContext {
+    // eslint-disable-next-line no-useless-constructor
     constructor(public packageFile: PackageFile, public packageObject: Package) {}
 
     get contextType(): "registry" {
@@ -83,6 +84,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
 }
 
 export class LocalPackageFileContext implements PackageFileWithContext {
+    // eslint-disable-next-line no-useless-constructor
     constructor(public packageFile: PackageFile, public packageFilePath: string) {}
 
     get contextType(): "localFile" {
@@ -138,6 +140,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
 }
 
 export class HttpPackageFileContext implements PackageFileWithContext {
+    // eslint-disable-next-line no-useless-constructor
     constructor(public packageFile: PackageFile, public url: string) {}
 
     get contextType(): "http" {

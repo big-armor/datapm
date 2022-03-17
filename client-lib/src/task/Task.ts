@@ -101,6 +101,7 @@ export abstract class Job<T> {
     private state: "INIT" | "STOPPED" | "STOPPING" | "RUNNING" | "COMPLETED" | "ERROR" = "INIT";
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
+    // eslint-disable-next-line no-useless-constructor
     constructor(private context: JobContext) {}
 
     /** Run the task and return an exit code */
