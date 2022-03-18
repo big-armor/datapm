@@ -27,7 +27,7 @@ describe("Postgres Source Test", function () {
     let postgresPort: number;
     let knexClient: Knex;
     let packageAFilePath: string;
-    const schemaAName = "undefined_covid-02-01-2020-v1";
+    const schemaAName = "local_covid-02-01-2020-v1";
 
     before(async function () {
         resetConfiguration();

@@ -185,6 +185,7 @@ export class MongoSinkModule implements Sink {
                     callback();
                 },
                 final: async function (callback) {
+                    console.log("Final called");
                     await self.complete(this);
                     callback();
                 }
@@ -328,12 +329,15 @@ export class MongoSinkModule implements Sink {
     }
 
     async flushPendingInserts(transform: Transform): Promise<void> {
+        console.log("Flushing pending inserts: " + this.pendingInserts.length);
         await this.model.insertMany(this.pendingInserts.map((i) => i.insert));
 
         if (this.pendingInserts.length > 0)
             transform.push(this.pendingInserts[this.pendingInserts.length - 1].originalRecord);
 
         this.pendingInserts = [];
+
+        console.log("Finished pending inserts: " + this.pendingInserts.length);
     }
 
     async commitAfterWrites(

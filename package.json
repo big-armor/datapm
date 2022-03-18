@@ -5,6 +5,10 @@
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
     "module": "backend/dist/index.js",
+    "engines": {
+        "node": ">=16.14.2",
+        "npm": ">=8.1.2"
+    },
     "scripts": {
         "prepare-dev-environment": "gulp prepareDevEnvironment",
         "clean": "gulp clean",

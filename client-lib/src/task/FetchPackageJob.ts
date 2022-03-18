@@ -268,6 +268,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         const sink = await sinkDescription.loadSinkFromModule();
 
+        this.jobContext.setCurrentStep(sinkConnectorDescription.getDisplayName() + " Configuration");
         parameterCount += await repeatedlyPromptParameters(
             this.jobContext,
             async () => {

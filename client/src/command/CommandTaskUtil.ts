@@ -166,6 +166,9 @@ export class CLIJobContext implements JobContext {
     }
 
     log(_message: string): void {
+        // eslint-disable-next-line no-useless-return
+        if (this.argv.quiet) return;
+
         /// TODO: Implement in memory logging with optional debug messages
     }
 
@@ -174,6 +177,8 @@ export class CLIJobContext implements JobContext {
     };
 
     setCurrentStep(step: string): void {
+        if (this.argv.quiet) return;
+
         console.log("");
         console.log(chalk.magenta(step));
     }

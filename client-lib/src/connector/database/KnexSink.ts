@@ -80,7 +80,7 @@ export abstract class KnexSink implements Sink {
         _sinkState: Maybe<SinkState>
     ): SinkSupportedStreamOptions {
         return {
-            updateMethods: [UpdateMethod.BATCH_FULL_SET],
+            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG],
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET, StreamSetProcessingMethod.PER_STREAM]
         };
     }
@@ -250,7 +250,7 @@ export abstract class KnexSink implements Sink {
     async flushPendingInserts(transform: Transform): Promise<void> {
         const tableName = this.getTableRef(this.client);
 
-        await this.client.table(tableName).insert(this.pendingInserts.map((p) => p.insertRecord));
+        const response = await this.client.table(tableName).insert(this.pendingInserts.map((p) => p.insertRecord));
 
         if (this.pendingInserts.length > 0)
             transform.push(this.pendingInserts[this.pendingInserts.length - 1].originalRecord);

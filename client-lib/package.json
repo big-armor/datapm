@@ -3,6 +3,10 @@
   "version": "0.8.88",
   "description": "DataPM Client library, which includes all logic used by the the command line and server to generate, manage, and fetch packages. ",
   "main": "src/main.ts",
+  "engines": {
+    "node": ">=16.14.2",
+    "npm": ">=8.1.2"
+  },
   "scripts": {
     "prebuild": "cd ../lib && npm run build && cd ../client-lib && gulp prebuild && npm run codegen",
     "build": "tsc",
