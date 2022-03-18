@@ -288,7 +288,7 @@ export async function fetch(
 
     const recordCounterTransform = new Transform({
         objectMode: true,
-        transform: function (chunk: RecordStreamContext[], _encoding, callback) {
+        transform: function (chunk: RecordStreamContext[], encoding, callback) {
             recordCount += chunk.length;
             this.push(chunk);
             callback(null);
@@ -410,6 +410,8 @@ export async function fetch(
                     let schemaWritable = schemaWriteables[schemaSlug];
 
                     if (schemaWritable == null) {
+                        // TODO These should be created before creating the switchingSchemaWritable??
+                        // That would make more sense in a lot of cases
                         await createSchemaWritable(
                             jobContext,
                             schemaWriteables,

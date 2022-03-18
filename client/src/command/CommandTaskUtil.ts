@@ -20,6 +20,8 @@ import {
 export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
 
+    currentTask: Task | undefined;
+
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
     getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
         return getRepositoryConfig(type, identifier);
@@ -79,6 +81,10 @@ export class CLIJobContext implements JobContext {
     }
 
     async startTask(taskTitle: string): Promise<Task> {
+        if (this.currentTask?.getStatus() === "RUNNING") {
+            this.currentTask.end("SUCCESS");
+        }
+
         let taskStatus: TaskStatus = "RUNNING";
 
         if (this.argv.quiet) {
@@ -89,7 +95,9 @@ export class CLIJobContext implements JobContext {
                     taskStatus = status;
                 },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setMessage: () => {}
+                setMessage: () => {},
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                clear: () => {}
             };
         }
 
@@ -100,7 +108,7 @@ export class CLIJobContext implements JobContext {
 
         this.currentOraSpinner = this.oraRef.start(taskTitle);
 
-        return {
+        this.currentTask = {
             getStatus: () => taskStatus,
             end: async (status, message) => {
                 if (!this.currentOraSpinner) return;
@@ -118,8 +126,13 @@ export class CLIJobContext implements JobContext {
                 if (!this.currentOraSpinner) return;
 
                 this.currentOraSpinner.text = message || this.currentOraSpinner.text;
+            },
+            clear: () => {
+                this.currentOraSpinner?.clear();
             }
         };
+
+        return this.currentTask;
     }
 
     print(type: string, message: string): void {

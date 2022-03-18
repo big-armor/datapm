@@ -304,7 +304,7 @@ function createStreamAndTransformPipeLine(
         }
     }
     // TODO there will be memory impacts for doing this, very large records will cause memory issues
-    lastTransform = lastTransform.pipe(new BatchingTransform(100));
+    lastTransform = lastTransform.pipe(new BatchingTransform(1000));
 
     if (streamState != null && streamState.streamOffset != null) {
         const streamOffSetTransform = new Transform({

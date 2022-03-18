@@ -20,6 +20,7 @@ import { getAuthToken } from "./DecodableConnector";
 import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 import { fetch } from "cross-fetch";
 import { SemVer } from "semver";
+import { BatchingTransform } from "../../../transforms/BatchingTransform";
 
 type DecodableConnection = {
     id: string;
@@ -130,6 +131,8 @@ export class DecodableSink implements Sink {
             throw new Error("Requires configuration.schemaStreamNames");
         }
 
+        const authToken = getAuthToken();
+
         const streamId = await this.getOrCreateStream(schema, connectionConfiguration, configuration, jobContext);
 
         const connectionId = await this.getOrCreateConnection(
@@ -140,15 +143,13 @@ export class DecodableSink implements Sink {
             jobContext
         );
 
-        const authToken = getAuthToken();
-
         return {
             getCommitKeys: () => {
                 return [] as CommitKey[];
             },
             outputLocation: `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/streams`,
             lastOffset: undefined,
-            transforms: [],
+            transforms: [new BatchingTransform(100)],
             writable: new Transform({
                 objectMode: true,
                 transform: async (
@@ -387,9 +388,9 @@ export class DecodableSink implements Sink {
 
             connection = (await response.json()) as DecodableConnection;
 
-            task.end("SUCCESS", "Created Decodable Connection " + decodableStreamName);
+            await task.end("SUCCESS", "Created Decodable Connection " + decodableStreamName);
         } else {
-            task.end("SUCCESS", "Found Decodable Connection " + decodableStreamName);
+            await task.end("SUCCESS", "Found Decodable Connection " + decodableStreamName);
         }
 
         task = await jobContext.startTask("Checking that Decodable Connection " + decodableStreamName + " is active");
@@ -437,9 +438,9 @@ export class DecodableSink implements Sink {
                 }
             }
 
-            task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " now running");
+            await task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " now running");
         } else {
-            task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " is already running");
+            await task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " is already running");
         }
 
         return connection.id;

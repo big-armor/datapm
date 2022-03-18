@@ -416,8 +416,8 @@ export async function fetchMultiple(
         const fetchPromise = fetch(
             jobContext,
             {
-                state: (_state) => {
-                    // TODO use this
+                state: (state) => {
+                    task.setMessage(state.resource.status.toString() + " " + state.resource.name);
                 },
                 progress: async (state) => {
                     latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =
