@@ -249,7 +249,9 @@ function prepareRegistryDockerBuildAssets() {
     const task4 = src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
     const task5 = src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
 
-    return merge(task1, task2, task3, task4, task5);
+    const task6 = src(["client-lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "client-lib", "dist")));
+
+    return merge(task1, task2, task3, task4, task5, task6);
 }
 
 function cleanRoot() {

@@ -5,8 +5,5 @@ npm-debug.log
 .terraform
 client/installers/macos/macOS-x64/application/*
 client/pkg-*
-**/dist
-dist
-!client-lib/dist
-!lib/dist
+./dist
 backend/tmp-registry-server-*
