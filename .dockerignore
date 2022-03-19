@@ -7,4 +7,6 @@ client/installers/macos/macOS-x64/application/*
 client/pkg-*
 **/dist
 dist
+!client-lib/dist
+!lib/dist
 backend/tmp-registry-server-*
