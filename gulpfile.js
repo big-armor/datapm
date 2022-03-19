@@ -23,6 +23,10 @@ function installLibDependencies() {
     return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
 }
 
+function installClientLibDependencies() {
+    return spawnAndLog("client-lib-deps", "npm", ["ci"], { cwd: "client-lib" });
+}
+
 function testLib() {
     return spawnAndLog("lib-test", "npm", ["run", "test"], { cwd: "lib" });
 }
@@ -254,6 +258,18 @@ function prepareRegistryDockerBuildAssets() {
     return merge(task1, task2, task3, task4, task5, task6);
 }
 
+function copyLibNodeModules() {
+    return spawnAndLog("copyLibNodeModules", "npx", ["copy-node-modules", "lib", path.join("dist", "lib", "dist")]);
+}
+
+function copyClientLibNodeModules() {
+    return spawnAndLog("copyLibNodeModules", "npx", [
+        "copy-node-modules",
+        "client-lib",
+        path.join("dist", "client-lib", "dist")
+    ]);
+}
+
 function cleanRoot() {
     return new Promise((resolve) => {
         if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
@@ -324,12 +340,17 @@ exports.deployAssets = series(
     // pushClientDockerImageLatest
 );
 
-exports.buildRegistryDockerImage = series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage);
+exports.buildRegistryDockerImage = series(
+    prepareRegistryDockerBuildAssets,
+    copyLibNodeModules,
+    copyClientLibNodeModules,
+    buildRegistryDockerImage
+);
 
 exports.prepareDevEnvironment = series(
     installRootDependencies,
     installLibDependencies,
-    buildLib,
+    installClientLibDependencies,
     installBackendDependencies,
     installFrontendDependencies,
     installDocsDependencies,
