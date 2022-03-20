@@ -10,6 +10,7 @@
   "scripts": {
     "prebuild": "cd ../lib && npm run build && cd ../client-lib && gulp prebuild && npm run codegen",
     "build": "tsc",
+    "clean": "gulp clean",
     "postbuild": "gulp postbuild",
     "pretest": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.yml",

@@ -3,8 +3,12 @@ const { series, src, dest } = require("gulp");
 const fs = require("fs");
 const path = require("path");
 
-async function clean() {
-    if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+function clean() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
 }
 
 function copyPackageFiles() {
@@ -39,3 +43,4 @@ function linkDataPMLib() {
 
 exports.prebuild = series(clean);
 exports.postbuild = series(copyPackageFiles, modifyPackagefile, linkDataPMLib);
+exports.clean = clean;

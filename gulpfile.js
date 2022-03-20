@@ -265,9 +265,18 @@ function copyLibNodeModules() {
 function copyClientLibNodeModules() {
     return spawnAndLog("copyLibNodeModules", "npx", [
         "copy-node-modules",
-        "client-lib",
+        path.join("client-lib"),
         path.join("dist", "client-lib", "dist")
     ]);
+}
+
+function deleteLibInClientLibNodeModules() {
+    return new Promise((resolve, reject) => {
+        if (fs.existsSync(path.join("dist", "client-lib", "dist", "node_modules", "datapm-lib"))) {
+            fs.rmSync(path.join("dist", "client-lib", "dist", "node_modules", "datapm-lib"), { recursive: true });
+        }
+        resolve();
+    });
 }
 
 function cleanRoot() {
@@ -279,7 +288,27 @@ function cleanRoot() {
 }
 
 function cleanLib() {
-    return spawnAndLog("clean-lib", "npm", ["run", "clean"]);
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "lib" });
+}
+
+function cleanClientLib() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "client-lib" });
+}
+
+function cleanClient() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "client" });
+}
+
+function cleanBackend() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "backend" });
+}
+
+function cleanFrontend() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "frontend" });
+}
+
+function cleanDocs() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "docs/website" });
 }
 
 exports.default = series(
@@ -295,6 +324,9 @@ exports.default = series(
     installDocsDependencies,
     buildDocs,
     prepareRegistryDockerBuildAssets,
+    copyLibNodeModules,
+    copyClientLibNodeModules,
+    deleteLibInClientLibNodeModules,
     buildRegistryDockerImage,
     installClientDependencies,
     buildClient
@@ -344,6 +376,7 @@ exports.buildRegistryDockerImage = series(
     prepareRegistryDockerBuildAssets,
     copyLibNodeModules,
     copyClientLibNodeModules,
+    deleteLibInClientLibNodeModules,
     buildRegistryDockerImage
 );
 
@@ -358,4 +391,4 @@ exports.prepareDevEnvironment = series(
     buildBackend
 );
 
-exports.clean = series(cleanLib, cleanRoot);
+exports.clean = series(cleanLib, cleanClientLib, cleanClient, cleanBackend, cleanFrontend, cleanDocs, cleanRoot);
