@@ -11,7 +11,8 @@ import {
     UpdateMethod,
     ParameterOption,
     ParameterAnswer,
-    DPMRecordValue
+    DPMRecordValue,
+    Parameter
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -67,7 +68,10 @@ export async function inspectSourceConnection(
 
     const connector = await connectorDescription.getConnector();
 
-    const connectionParameters = await connector.getConnectionParameters(source.connectionConfiguration);
+    let connectionParameters: Parameter<string>[] = [];
+
+    if (connector.requiresConnectionConfiguration())
+        connectionParameters = await connector.getConnectionParameters(source.connectionConfiguration);
 
     if (connectionParameters.length > 0) {
         throw new Error(
@@ -75,9 +79,10 @@ export async function inspectSourceConnection(
         );
     }
 
-    const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
-        source.connectionConfiguration
-    );
+    let repositoryIdentifier = new Date().toISOString();
+    if (connector.userSelectableConnectionHistory()) {
+        repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(source.connectionConfiguration);
+    }
 
     let credentialsConfiguration = {};
 
@@ -304,7 +309,7 @@ function createStreamAndTransformPipeLine(
         }
     }
     // TODO there will be memory impacts for doing this, very large records will cause memory issues
-    lastTransform = lastTransform.pipe(new BatchingTransform(1000));
+    lastTransform = lastTransform.pipe(new BatchingTransform(1000, 100));
 
     if (streamState != null && streamState.streamOffset != null) {
         const streamOffSetTransform = new Transform({

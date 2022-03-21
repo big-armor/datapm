@@ -25,14 +25,15 @@ import {
 } from "./Source";
 import { ConnectorDescription } from "./Connector";
 import { JSONSchema7TypeName } from "json-schema";
-import { EXTENDED_REPOSITORIES } from "./ConnectorUtil";
+import { EXTENDED_CONNECTORS } from "./ConnectorUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
+import { TimeOrDeathTransform } from "../transforms/TimeOrDeathTransform";
 
 export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
     const returnValue: SourceDescription[] = [];
 
-    for (let i = 0; i < EXTENDED_REPOSITORIES.length; i++) {
-        const repository = EXTENDED_REPOSITORIES[i];
+    for (let i = 0; i < EXTENDED_CONNECTORS.length; i++) {
+        const repository = EXTENDED_CONNECTORS[i];
 
         if (!repository.hasSource()) continue;
 
@@ -49,15 +50,15 @@ export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
 
 export async function getSourceByType(type: string): Promise<Maybe<SourceDescription>> {
     return (
-        (await EXTENDED_REPOSITORIES.filter((f) => f.hasSource())
+        (await EXTENDED_CONNECTORS.filter((f) => f.hasSource())
             .find((repository) => repository.getType() === type)
             ?.getSourceDescription()) || null
     );
 }
 
 export async function findRepositoryForSourceUri(uri: string): Promise<ConnectorDescription> {
-    for (let i = 0; i < EXTENDED_REPOSITORIES.length; i++) {
-        const repository = EXTENDED_REPOSITORIES[i];
+    for (let i = 0; i < EXTENDED_CONNECTORS.length; i++) {
+        const repository = EXTENDED_CONNECTORS[i];
 
         if (!repository.hasSource()) continue;
 
@@ -210,7 +211,9 @@ export async function generateSchemasFromSourceStreams(
             lastTransform = lastTransform.pipe(transform);
         });
 
-        lastTransform = lastTransform.pipe(new BatchingTransform(1000));
+        lastTransform = lastTransform.pipe(new BatchingTransform(1000, 100));
+
+        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(5000));
 
         lastTransform = lastTransform.pipe(statsTransform);
 

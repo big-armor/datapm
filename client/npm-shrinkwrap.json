@@ -71,14 +71,18 @@
                 "typescript": "^4.5.5",
                 "why-is-node-running": "^2.2.0",
                 "xml-js": "^1.6.11"
+            },
+            "engines": {
+                "node": ">=16.14.2",
+                "npm": ">=8.1.2"
             }
         },
         "../client-lib": {
             "name": "datapm-client-lib",
-            "version": "1.0.0",
+            "version": "0.8.94",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
-                "@apollo/client": "^3.4.0",
+                "@apollo/client": "^3.3.21",
                 "@google-cloud/bigquery": "^5.5.0",
                 "@types/uuid": "^8.3.1",
                 "avsc": "^5.6.2",
@@ -130,6 +134,7 @@
                 "unbzip2-stream": "^1.4.3",
                 "unzipper": "^0.10.11",
                 "uuid": "^8.3.2",
+                "ws": "^8.5.0",
                 "xlsx": "^0.16.9",
                 "xml-streamer": "^1.1.0"
             },
@@ -185,11 +190,15 @@
                 "ts-node": "^8.10.2",
                 "typescript": "^4.5.5",
                 "xml-js": "^1.6.11"
+            },
+            "engines": {
+                "node": ">=16.14.2",
+                "npm": ">=8.1.2"
             }
         },
         "../lib": {
             "name": "datapm-lib",
-            "version": "0.8.81",
+            "version": "0.8.94",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@types/semver": "^7.3.4",
@@ -215,6 +224,10 @@
                 "ts-node": "^9.0.0",
                 "tslint-config-prettier": "^1.18.0",
                 "typescript": "^4.5.5"
+            },
+            "engines": {
+                "node": ">=16.14.2",
+                "npm": ">=8.1.2"
             }
         },
         "../lib/dist": {
@@ -14356,7 +14369,7 @@
         "datapm-client-lib": {
             "version": "file:../client-lib",
             "requires": {
-                "@apollo/client": "^3.4.0",
+                "@apollo/client": "^3.3.21",
                 "@google-cloud/bigquery": "^5.5.0",
                 "@graphql-codegen/add": "1.17.7",
                 "@graphql-codegen/cli": "1.17.8",
@@ -14458,6 +14471,7 @@
                 "unbzip2-stream": "^1.4.3",
                 "unzipper": "^0.10.11",
                 "uuid": "^8.3.2",
+                "ws": "^8.5.0",
                 "xlsx": "^0.16.9",
                 "xml-js": "^1.6.11",
                 "xml-streamer": "^1.1.0"

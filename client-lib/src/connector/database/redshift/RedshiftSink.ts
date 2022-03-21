@@ -23,6 +23,7 @@ import {
 import { KnexSink } from "../../../connector/database/KnexSink";
 import { DISPLAY_NAME, TYPE } from "./RedshiftConnectorDescription";
 import { WritableWithContext } from "../../../connector/Sink";
+import { JobContext } from "../../../main";
 
 export class RedshiftSink extends KnexSink {
     redshiftClient: Redshift;
@@ -79,7 +80,10 @@ export class RedshiftSink extends KnexSink {
     async getParameters(
         catalogSlug: string,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 

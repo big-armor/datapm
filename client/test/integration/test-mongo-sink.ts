@@ -119,7 +119,6 @@ describe("Mongo Sink Test", function () {
             [packageAFilePath, "--sink", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
-                console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }

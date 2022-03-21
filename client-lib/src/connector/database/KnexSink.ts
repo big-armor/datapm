@@ -16,6 +16,7 @@ import { ExtendedJSONSchema7TypeName } from "../Source";
 import { convertValueByValueType, discoverValueType } from "../../transforms/StatsTransform";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
+import { JobContext } from "../../main";
 
 export abstract class KnexSink implements Sink {
     client: Knex;
@@ -44,7 +45,10 @@ export abstract class KnexSink implements Sink {
     abstract getParameters(
         catalogSlug: string | undefined,
         schema: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]>;
 
     abstract getSchemaBuilder(tx: Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder;
