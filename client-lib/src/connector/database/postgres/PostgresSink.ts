@@ -4,6 +4,7 @@ import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { SinkErrors, WritableWithContext } from "../../Sink";
 import { DISPLAY_NAME, TYPE } from "./PostgresConnectorDescription";
+import { JobContext } from "../../../main";
 
 export class PostgresSink extends KnexSink {
     tableExists: boolean;
@@ -70,7 +71,10 @@ export class PostgresSink extends KnexSink {
     async getParameters(
         catalogSlug: string,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
         const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
