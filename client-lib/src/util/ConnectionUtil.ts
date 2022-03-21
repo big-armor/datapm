@@ -37,10 +37,9 @@ export async function obtainConnectionConfiguration(
     let parameterCount = 0;
 
     // Check whether there are existing configurations for this type of repository
-    let savedRepositories:RepositoryConfig[] = [];
-    
-    if(connector.userSelectableConnectionHistory())
-        jobContext.getRepositoryConfigsByType(connector.getType());
+    const savedRepositories: RepositoryConfig[] = [];
+
+    if (connector.userSelectableConnectionHistory()) jobContext.getRepositoryConfigsByType(connector.getType());
 
     const pendingParameters = await connector.getConnectionParameters(connectionConfiguration);
 

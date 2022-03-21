@@ -79,14 +79,11 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             };
         }
 
-        if(!packageFileWithContext.hasPermissionToSave) {
-            await task.end(
-                        "ERROR",
-                        packageFileWithContext.cantSaveReason
-                    );
-                    return {
-                        exitCode: 1
-                    };
+        if (!packageFileWithContext.hasPermissionToSave) {
+            await task.end("ERROR", packageFileWithContext.cantSaveReason);
+            return {
+                exitCode: 1
+            };
         }
 
         await task.end("SUCCESS", "Edit permission found");

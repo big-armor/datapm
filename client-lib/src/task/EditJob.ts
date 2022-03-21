@@ -79,16 +79,13 @@ export class EditJob extends Job<EditJobResult> {
             };
         }
 
-        if(!packageFileWithContext.hasPermissionToSave) {
-            await task.end(
-                "ERROR",
-                packageFileWithContext.cantSaveReason
-            );
+        if (!packageFileWithContext.hasPermissionToSave) {
+            await task.end("ERROR", packageFileWithContext.cantSaveReason);
             return {
                 exitCode: 1
             };
         }
-        
+
         task.end("SUCCESS", "You have edit permission");
 
         task = await this.jobContext.startTask("Checking package is cononical...");

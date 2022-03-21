@@ -428,7 +428,10 @@ export class PackageJob extends Job<PackageJobResult> {
         };
 
         this.jobContext.setCurrentStep("Saving Package");
-        const packageFileWithContext: PackageFileWithContext = await this.jobContext.saveNewPackageFile(this.args.catalogSlug, packageFile);
+        const packageFileWithContext: PackageFileWithContext = await this.jobContext.saveNewPackageFile(
+            this.args.catalogSlug,
+            packageFile
+        );
 
         return {
             exitCode: 0,

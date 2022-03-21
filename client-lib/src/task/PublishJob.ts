@@ -299,7 +299,9 @@ export class PublishJob extends Job<PublishJobResult> {
         } else {
             this.jobContext.print(
                 "WARN",
-                "Can not save package the original package file via " + packageFileWithContext.contextType + ", so these publish settings will not be saved."
+                "Can not save package the original package file via " +
+                    packageFileWithContext.contextType +
+                    ", so these publish settings will not be saved."
             );
             this.jobContext.print("WARN", "Use the new package location for future publishing.");
         }

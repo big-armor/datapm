@@ -67,10 +67,7 @@ export interface JobContext {
     setCurrentStep(step: string): void;
 
     /** Sends a message to the user */
-    print(
-        type: MessageType,
-        message: string
-    ): void;
+    print(type: MessageType, message: string): void;
 
     startTask(message: string): Promise<Task>;
 
@@ -78,13 +75,10 @@ export interface JobContext {
     log(level: "ERROR" | "WARN" | "INFO" | "DEBUG", message: string): void;
 
     /** Saves a given package file and returns the PackageFileWithContext */
-    saveNewPackageFile(
-        catalogSlug: string | undefined,
-        packagefile:PackageFile,
-    ): Promise<PackageFileWithContext>;
+    saveNewPackageFile(catalogSlug: string | undefined, packagefile: PackageFile): Promise<PackageFileWithContext>;
 
     /** Returns a packageFileWithContext reference specific to the context in which
-     * the package is being requested. 
+     * the package is being requested.
      */
     getPackageFile(
         reference: string | PackageIdentifier,
