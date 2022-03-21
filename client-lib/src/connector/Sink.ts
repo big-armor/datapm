@@ -68,7 +68,10 @@ export interface Sink {
     getParameters(
         catalogSlug: string | undefined,
         schema: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> | Parameter[];
 
     /** Return a list of supported update methods, based on the configuration, schema, and current sink state */

@@ -19,6 +19,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoConnectorDescription";
 import { CommitKey, Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { JobContext } from "../../../main";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;
@@ -88,7 +89,10 @@ export class MongoSinkModule implements Sink {
     async getParameters(
         catalogSlug: string,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 

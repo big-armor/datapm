@@ -11,6 +11,7 @@ import { ConnectorDescription } from "./Connector";
 import { StreamTestConnectorDescription } from "./stream/test/StreamTestConnectorDescription";
 import { DataPMConnectorDescription } from "./file-based/datapm-registry/DataPMConnectorDescription";
 import { DecodableConnectorDescription } from "./stream/decodable/DecodableConnectorDescription";
+import { CoinbaseConnectorDescription } from "./stream/coinbase/CoinbaseConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -22,12 +23,13 @@ export const CONNECTORS: ConnectorDescription[] = [
     new HTTPConnectorDescription(),
     new LocalFileConnectorDescription(),
     new StandardOutConnectorDescription(),
-    new DecodableConnectorDescription()
+    new DecodableConnectorDescription(),
+    new CoinbaseConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
  * This can be used for hiding 'test' and depreciated implementations */
-export const EXTENDED_REPOSITORIES: ConnectorDescription[] = CONNECTORS.concat([
+export const EXTENDED_CONNECTORS: ConnectorDescription[] = CONNECTORS.concat([
     new StreamTestConnectorDescription(),
     new DataPMConnectorDescription()
 ]);
@@ -37,5 +39,5 @@ export function getConnectorDescriptions(): ConnectorDescription[] {
 }
 
 export function getConnectorDescriptionByType(type: string): ConnectorDescription | undefined {
-    return EXTENDED_REPOSITORIES.find((r) => r.getType() === type);
+    return EXTENDED_CONNECTORS.find((r) => r.getType() === type);
 }

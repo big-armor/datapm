@@ -50,7 +50,10 @@ export class DataPMSink implements Sink {
     getParameters(
         catalogSlug: string | undefined,
         schema: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Parameter[] | Promise<Parameter[]> {
         if (configuration.catalogSlug == null) {
             return [

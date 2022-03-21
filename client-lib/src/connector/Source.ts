@@ -137,10 +137,14 @@ export interface Property {
 }
 
 export interface InspectProgress {
+    msRemaining: number;
     recordCount: number;
     recordsInspectedCount: number;
     bytesProcessed: number;
     recordsPerSecond: number;
+
+    /** Whether this is the final inspection progress report */
+    final: boolean;
 }
 
 export interface StreamStatusContext {
