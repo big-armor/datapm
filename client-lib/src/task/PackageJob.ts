@@ -529,13 +529,20 @@ export async function inspectStreamSet(
         const recordsPerSecondString = numeral(progress.recordsPerSecond).format("0,0a");
         const recordsInspectedString = numeral(progress.recordsInspectedCount).format("0,0a");
         const bytesProcessedString = numeral(progress.bytesProcessed).format("0.0b");
+        const secondsRemaining = numeral(progress.msRemaining / 1000).format("0a");
 
         if (progress.recordCount !== progress.recordsInspectedCount) {
             text += `- ${recordsCountedString} records counted\n`;
         }
         text += `- ${recordsInspectedString} records inspected\n`;
-        text += `- ${bytesProcessedString} processed\n`;
-        text += `- ${recordsPerSecondString} records/second\n`;
+
+        if (progress.bytesProcessed > 0) text += `- ${bytesProcessedString} processed\n`;
+        text += `- ${recordsPerSecondString} records/second\n\n`;
+
+        if (!progress.final) {
+            text += chalk.gray(`${secondsRemaining} seconds remaining\n`);
+            text += chalk.gray("Press Ctrl+C to stop inspecting");
+        }
 
         return text;
     };

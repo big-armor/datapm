@@ -54,7 +54,7 @@ export interface RecordStreamEventContext {
     bytesReceived(streamSlug: string, byteCount: number): void;
 }
 
-/** Given a source, run an inspection results. This is useful to determine if anything has changed before
+/** Given a source, run an inspection. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
  */
 export async function inspectSourceConnection(

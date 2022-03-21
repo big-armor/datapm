@@ -1,10 +1,12 @@
 /* eslint-disable camelcase */
-import { DPMConfiguration, RecordContext, UpdateMethod } from "datapm-lib";
+import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../../Source";
 import { TYPE } from "./CoinbaseConnectorDescription";
 import { URI } from "./CoinbaseSourceDescription";
 import WebSocket from "ws";
+import fetch from "cross-fetch";
+import { value } from "numeral";
 
 type SubscriptionsMessage = {
     type: "subscriptions";
@@ -32,6 +34,29 @@ type TickerMessage = {
     last_size: string;
 };
 
+type CoinbaseProduct = {
+    id: string;
+    base_currency: string;
+    quote_currency: string;
+    base_min_size: string;
+    base_max_size: string;
+    quote_increment: string;
+    base_increment: string;
+    display_name: string;
+    min_market_funds: string;
+    max_market_funds: string;
+    margin_enabled: boolean;
+    post_only: boolean;
+    limit_only: boolean;
+    cancel_only: boolean;
+    status: string;
+    status_message: string;
+    trading_disabled: boolean;
+    fx_stablecoin: boolean;
+    max_slippage_percentage: string;
+    auction_mode: boolean;
+};
+
 export class CoinbaseSource implements Source {
     sourceType(): string {
         return TYPE;
@@ -43,6 +68,33 @@ export class CoinbaseSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
+        if (configuration.products == null || (configuration.products as string[]).length === 0) {
+            const pairs = await this.getPairs();
+
+            await context.parameterPrompt([
+                {
+                    type: ParameterType.AutoCompleteMultiSelect,
+                    configuration,
+                    name: "products",
+                    message: "Select target pairs",
+                    options: pairs
+                        .map((p) => {
+                            return {
+                                title: p.display_name,
+                                value: p.id,
+                                selected:
+                                    configuration.products == null
+                                        ? false
+                                        : (configuration.products as string[]).includes(p.id)
+                            };
+                        })
+                        .sort((a, b) => {
+                            return a.title.localeCompare(b.title);
+                        })
+                }
+            ]);
+        }
+
         return {
             configuration,
             defaultDisplayName: "Coinbase",
@@ -62,13 +114,8 @@ export class CoinbaseSource implements Source {
 
                                 const subscriptionString = JSON.stringify({
                                     type: "subscribe",
-                                    product_ids: ["ETH-USD", "ETH-EUR"],
-                                    channels: [
-                                        {
-                                            name: "ticker",
-                                            product_ids: ["ETH-BTC", "ETH-USD"]
-                                        }
-                                    ]
+                                    product_ids: configuration.products as string[],
+                                    channels: ["ticker"]
                                 });
 
                                 socket.send(subscriptionString);
@@ -113,5 +160,15 @@ export class CoinbaseSource implements Source {
                 resolve(websocket);
             });
         });
+    }
+
+    async getPairs(): Promise<CoinbaseProduct[]> {
+        const response = await fetch(`https://api.exchange.coinbase.com/products`, {
+            headers: {
+                Accept: "application/json"
+            }
+        });
+
+        return await response.json();
     }
 }

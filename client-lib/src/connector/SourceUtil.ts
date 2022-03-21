@@ -95,6 +95,8 @@ export async function generateSchemasFromSourceStreams(
     let completed = false;
     let error: Error;
 
+    const timeoutMs = 30000;
+
     const interval = setInterval(() => {
         if (completed || error) {
             clearInterval(interval);
@@ -104,10 +106,12 @@ export async function generateSchemasFromSourceStreams(
         const recordsInspectedCount = completedStreamsInspectedRecordCount + currentStreamInspectedCount;
         const currentTime = Date.now();
         streamStatusContext.onProgress({
+            msRemaining: timeoutMs - (currentTime - startTime),
             bytesProcessed: bytesReceived,
             recordsInspectedCount: recordsInspectedCount,
             recordCount,
-            recordsPerSecond: recordCount / ((currentTime - startTime) / 1000)
+            recordsPerSecond: recordCount / ((currentTime - startTime) / 1000),
+            final: false
         });
     }, 1000);
 
@@ -213,7 +217,7 @@ export async function generateSchemasFromSourceStreams(
 
         lastTransform = lastTransform.pipe(new BatchingTransform(1000, 100));
 
-        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(5000));
+        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(timeoutMs));
 
         lastTransform = lastTransform.pipe(statsTransform);
 
@@ -246,10 +250,12 @@ export async function generateSchemasFromSourceStreams(
         const currentTime = Date.now();
 
         streamStatusContext.onComplete({
+            msRemaining: 0,
             bytesProcessed: bytesReceived,
             recordsInspectedCount: completedStreamsInspectedRecordCount,
             recordCount: completedStreamsRecordCount,
-            recordsPerSecond: completedStreamsRecordCount / ((currentTime - startTime) / 1000)
+            recordsPerSecond: completedStreamsRecordCount / ((currentTime - startTime) / 1000),
+            final: true
         });
 
         for (const schema of Object.values(schemas)) {
