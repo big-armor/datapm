@@ -16,6 +16,7 @@ import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
 import { RecordSerializerJSONDescription } from "./writer/RecordSerializerJSONDescription";
+import { JobContext } from "../../main";
 
 export abstract class AbstractFileSink implements Sink {
     abstract getType(): string;
@@ -46,7 +47,7 @@ export abstract class AbstractFileSink implements Sink {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        commitKeys: CommitKey[], // TODO Use this to rename bulk upload files
+        _commitKeys: CommitKey[], // TODO Use this to rename bulk upload files
         sinkStateKey: SinkStateKey,
         sinkState: SinkState
     ): Promise<void> {
@@ -189,8 +190,11 @@ export abstract class AbstractFileSink implements Sink {
         _connectionConfiguration: DPMConfiguration,
         _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        updateMethod: UpdateMethod
+        updateMethod: UpdateMethod,
+        jobContext: JobContext
     ): Promise<WritableWithContext> {
+        const task = await jobContext.startTask("Opening File Writer");
+
         if (configuration.fileLocation == null) throw new Error("fileLocation configuration not specified");
 
         if (typeof configuration.fileLocation !== "string")
@@ -208,6 +212,8 @@ export abstract class AbstractFileSink implements Sink {
             configuration,
             updateMethod
         );
+
+        task.end("SUCCESS", "File Writer Opened");
 
         const formatTransforms = await serializerTransform.getTransforms(schema, configuration, updateMethod);
 

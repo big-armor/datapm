@@ -24,11 +24,11 @@ describe("Mongo Sink Test", function () {
     let mongoPort: number;
     let mongoUri: string;
     let packageAFilePath: string;
-    const collectionAName = "undefined_covid-02-01-2020-v1_covid-02-01-2020";
+    const collectionAName = "local_covid-02-01-2020-v1_covid-02-01-2020";
     let packageBFilePath: string;
-    const collectionBName = "undefined_all-types-v1_all-types";
+    const collectionBName = "local_all-types-v1_all-types";
     let packageCFilePath: string;
-    const collectionCName = "undefined_legislators-v1_legislators";
+    const collectionCName = "local_legislators-v1_legislators";
 
     before(async function () {
         resetConfiguration();
@@ -119,6 +119,7 @@ describe("Mongo Sink Test", function () {
             [packageAFilePath, "--sink", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
+                console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }

@@ -14,7 +14,7 @@ export class SinkStateWritable extends Writable {
         this.sinkState = sinkStateReference;
     }
 
-    _write(chunk: RecordStreamContext, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    _write(chunk: RecordStreamContext, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
         if (!chunk || chunk.recordContext.offset == null) {
             callback();
             return;

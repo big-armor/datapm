@@ -34,7 +34,7 @@ describe("S3 Sink Test", function () {
 
     after(async function () {
         removePackageFiles(["covid-02-01-2020"]);
-        for (const key of ["covid-02-01-2020.json", "_no_catalog-covid-02-01-2020-1-state.json"]) {
+        for (const key of ["covid-02-01-2020.json", "local-covid-02-01-2020-1-state.json"]) {
             await s3Client
                 .deleteObject({
                     Bucket: bucketName,
@@ -86,7 +86,7 @@ describe("S3 Sink Test", function () {
 
     it("Should find sink states in s3", async function () {
         const source = await s3Client
-            .getObject({ Bucket: bucketName, Key: `${s3OutputPath}/_no_catalog-covid-02-01-2020-1-state.json` })
+            .getObject({ Bucket: bucketName, Key: `${s3OutputPath}/local-covid-02-01-2020-1-state.json` })
             .promise();
         const sinkStates = JSON.parse(source.Body?.toString() || "");
         expect(sinkStates.packageVersion, "1.0.0");

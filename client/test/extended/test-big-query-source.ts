@@ -246,7 +246,7 @@ describe("Big Query Source Test", function () {
         expect(source.type).equal("googleBigQuery");
         expect(source.configuration?.mode).equal("Table");
         expect(source.configuration?.projectId).equal("datapm-big-query-test");
-        expect(source.configuration?.dataset).equal("undefined_covid_02_01_2020_v1");
+        expect(source.configuration?.dataset).equal("local_covid_02_01_2020_v1");
         expect(source.configuration?.tableName).equal("test_table_d");
         columns.forEach((column) => {
             const property = properties[column.columnName as string] as Schema;

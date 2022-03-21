@@ -30,13 +30,13 @@ describe("Postgres Sink Test", function () {
     let postgresPort: number;
     let knexClient: Knex;
     let packageAFilePath: string;
-    const schemaAName = "undefined_covid-02-01-2020-v1";
+    const schemaAName = "local_covid-02-01-2020-v1";
     const tableAName = "covid-02-01-2020";
     let packageBFilePath: string;
-    const schemaBName = "undefined_all-types-v1";
+    const schemaBName = "local_all-types-v1";
     const tableBName = "all-types";
     let packageCFilePath: string;
-    const schemaCName = "undefined_legislators-v1";
+    const schemaCName = "local_legislators-v1";
     const tableCName = "legislators";
 
     before(async function () {
@@ -541,7 +541,7 @@ describe("Postgres Sink Test", function () {
                 "--credentials",
                 "postgres",
                 "--sinkConfig",
-                '{"database":"postgres","schema":"undefined_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'
+                '{"database":"postgres","schema":"local_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'
             ],
             [],
             async (line: string) => {

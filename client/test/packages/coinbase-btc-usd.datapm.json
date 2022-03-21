@@ -1,0 +1,637 @@
+{
+    "$schema": "https://datapm.io/docs/package-file-schema-v0.8.0.json",
+    "canonical": true,
+    "sources": [
+        {
+            "slug": "file",
+            "streamSets": [
+                {
+                    "slug": "coinbaseUSD-small",
+                    "configuration": {},
+                    "schemaTitles": [
+                        "coinbaseUSD-small"
+                    ],
+                    "streamStats": {
+                        "inspectedCount": 99,
+                        "byteCount": 4300,
+                        "byteCountPrecision": "EXACT",
+                        "recordCount": 100,
+                        "recordCountPrecision": "EXACT"
+                    }
+                }
+            ],
+            "type": "file",
+            "connectionConfiguration": {},
+            "configuration": {
+                "uris": [
+                    "file://test/sources/coinbaseUSD-small.csv"
+                ],
+                "delimiter": ",",
+                "hasHeaderRow": false,
+                "updateMethod": "BATCH_FULL_SET"
+            }
+        }
+    ],
+    "generatedBy": "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",
+    "updatedDate": "2022-03-17T15:01:42.259Z",
+    "displayName": "Coinbase BTC USD",
+    "packageSlug": "coinbase-btc-usd",
+    "version": "1.0.0",
+    "description": "BTC USD ticks from coinbase",
+    "readmeFile": "coinbase-btc-usd.README.md",
+    "licenseFile": "coinbase-btc-usd.LICENSE.md",
+    "website": "",
+    "schemas": [
+        {
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "type": "object",
+            "title": "coinbaseUSD-small",
+            "properties": {
+                "Column0": {
+                    "title": "Column0",
+                    "recordCount": 100,
+                    "valueTypes": {
+                        "number": {
+                            "recordCount": 100,
+                            "valueType": "number",
+                            "numberMaxValue": 1420682127,
+                            "numberMinValue": 1417412036,
+                            "contentLabels": [
+                                {
+                                    "ocurrenceCount": 100,
+                                    "valuesTestedCount": 100,
+                                    "hidden": false,
+                                    "label": "phone_number",
+                                    "appliedByContentDetector": "PhoneNumberDetector"
+                                }
+                            ]
+                        }
+                    },
+                    "format": "integer",
+                    "type": [
+                        "number"
+                    ]
+                },
+                "Column1": {
+                    "title": "Column1",
+                    "recordCount": 100,
+                    "valueTypes": {
+                        "number": {
+                            "recordCount": 100,
+                            "valueType": "number",
+                            "numberMaxValue": 398,
+                            "numberMinValue": 270.35,
+                            "contentLabels": []
+                        }
+                    },
+                    "format": "integer,number",
+                    "type": [
+                        "number"
+                    ]
+                },
+                "Column2": {
+                    "title": "Column2",
+                    "recordCount": 100,
+                    "valueTypes": {
+                        "number": {
+                            "recordCount": 100,
+                            "valueType": "number",
+                            "stringOptions": {
+                                "0.010000000000": 81,
+                                "0.026555540000": 1,
+                                "0.250000000000": 1,
+                                "3.750000000000": 1,
+                                "4.900000000000": 1,
+                                "5.200000000000": 1,
+                                "0.100000000000": 3,
+                                "0.793600000000": 1,
+                                "0.066084200000": 1,
+                                "0.010524220000": 1,
+                                "0.350000000000": 1,
+                                "0.015000000000": 1,
+                                "0.225000000000": 1,
+                                "0.050000000000": 1,
+                                "0.990000000000": 1,
+                                "2.000000000000": 1,
+                                "1.000000000000": 2
+                            },
+                            "numberMaxValue": 5.2,
+                            "numberMinValue": 0.01,
+                            "contentLabels": []
+                        }
+                    },
+                    "format": "integer,number",
+                    "type": [
+                        "number"
+                    ]
+                }
+            },
+            "recordsInspectedCount": 0,
+            "recordCount": 100,
+            "sampleRecords": [
+                {
+                    "Column0": 1417412036,
+                    "Column1": 300,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417412423,
+                    "Column1": 300,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417415048,
+                    "Column1": 370,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417416612,
+                    "Column1": 370,
+                    "Column2": 0.02655554
+                },
+                {
+                    "Column0": 1417498166,
+                    "Column1": 377,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417517949,
+                    "Column1": 377.75,
+                    "Column2": 0.25
+                },
+                {
+                    "Column0": 1417517949,
+                    "Column1": 378,
+                    "Column2": 3.75
+                },
+                {
+                    "Column0": 1417518257,
+                    "Column1": 378,
+                    "Column2": 4.9
+                },
+                {
+                    "Column0": 1417518340,
+                    "Column1": 378,
+                    "Column2": 5.2
+                },
+                {
+                    "Column0": 1417545780,
+                    "Column1": 378,
+                    "Column2": 0.1
+                },
+                {
+                    "Column0": 1417546703,
+                    "Column1": 378,
+                    "Column2": 0.7936
+                },
+                {
+                    "Column0": 1417550521,
+                    "Column1": 378,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417584956,
+                    "Column1": 377.9,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417585904,
+                    "Column1": 378,
+                    "Column2": 0.0660842
+                },
+                {
+                    "Column0": 1417586889,
+                    "Column1": 378,
+                    "Column2": 0.01052422
+                },
+                {
+                    "Column0": 1417631579,
+                    "Column1": 378,
+                    "Column2": 0.35
+                },
+                {
+                    "Column0": 1417637186,
+                    "Column1": 377.01,
+                    "Column2": 0.1
+                },
+                {
+                    "Column0": 1417647358,
+                    "Column1": 378,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417657685,
+                    "Column1": 377.1,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1417830085,
+                    "Column1": 378,
+                    "Column2": 0.015
+                },
+                {
+                    "Column0": 1418077586,
+                    "Column1": 375.01,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1418077586,
+                    "Column1": 375,
+                    "Column2": 0.225
+                },
+                {
+                    "Column0": 1418179364,
+                    "Column1": 398,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1418179389,
+                    "Column1": 360.5,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1418355001,
+                    "Column1": 379,
+                    "Column2": 0.05
+                },
+                {
+                    "Column0": 1418355193,
+                    "Column1": 364.99,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1418355875,
+                    "Column1": 360.5,
+                    "Column2": 0.99
+                },
+                {
+                    "Column0": 1418355878,
+                    "Column1": 360,
+                    "Column2": 0.1
+                },
+                {
+                    "Column0": 1418355965,
+                    "Column1": 350,
+                    "Column2": 2
+                },
+                {
+                    "Column0": 1418936217,
+                    "Column1": 345,
+                    "Column2": 1
+                },
+                {
+                    "Column0": 1418936217,
+                    "Column1": 340,
+                    "Column2": 1
+                },
+                {
+                    "Column0": 1420680242,
+                    "Column1": 360,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680441,
+                    "Column1": 271.84,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680463,
+                    "Column1": 276.34,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680488,
+                    "Column1": 295.19,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680497,
+                    "Column1": 319.84,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680511,
+                    "Column1": 271.6,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680582,
+                    "Column1": 344.67,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680614,
+                    "Column1": 346.41,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680640,
+                    "Column1": 305.38,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680667,
+                    "Column1": 345.11,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680693,
+                    "Column1": 274.68,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680708,
+                    "Column1": 270.35,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680722,
+                    "Column1": 333.68,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680763,
+                    "Column1": 334.97,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680773,
+                    "Column1": 345.44,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680808,
+                    "Column1": 280.16,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680821,
+                    "Column1": 295.38,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680844,
+                    "Column1": 333.29,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680884,
+                    "Column1": 270.56,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680895,
+                    "Column1": 321.98,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680927,
+                    "Column1": 302.25,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680948,
+                    "Column1": 349.67,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420680983,
+                    "Column1": 302.12,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681009,
+                    "Column1": 287.34,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681049,
+                    "Column1": 330.17,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681066,
+                    "Column1": 281.36,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681087,
+                    "Column1": 336.38,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681115,
+                    "Column1": 347.37,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681153,
+                    "Column1": 326.1,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681176,
+                    "Column1": 324.84,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681189,
+                    "Column1": 341.35,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681201,
+                    "Column1": 348.77,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681244,
+                    "Column1": 344.67,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681253,
+                    "Column1": 340.62,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681294,
+                    "Column1": 333.73,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681328,
+                    "Column1": 329.84,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681359,
+                    "Column1": 313.42,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681372,
+                    "Column1": 333.28,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681390,
+                    "Column1": 273.2,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681422,
+                    "Column1": 316.19,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681462,
+                    "Column1": 323.27,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681484,
+                    "Column1": 351.38,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681507,
+                    "Column1": 307.38,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681514,
+                    "Column1": 284.78,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681534,
+                    "Column1": 305.93,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681548,
+                    "Column1": 328.7,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681562,
+                    "Column1": 314.65,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681579,
+                    "Column1": 279.37,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681594,
+                    "Column1": 337.9,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681639,
+                    "Column1": 328.24,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681671,
+                    "Column1": 318.31,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681678,
+                    "Column1": 327.61,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681719,
+                    "Column1": 307.25,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681728,
+                    "Column1": 317.98,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681748,
+                    "Column1": 359.39,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681771,
+                    "Column1": 301.99,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681802,
+                    "Column1": 303.53,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681811,
+                    "Column1": 290.18,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681856,
+                    "Column1": 333.28,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681874,
+                    "Column1": 278.49,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681897,
+                    "Column1": 329.03,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681921,
+                    "Column1": 333.45,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681963,
+                    "Column1": 318.88,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420681996,
+                    "Column1": 328.39,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420682014,
+                    "Column1": 326.47,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420682045,
+                    "Column1": 272.63,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420682060,
+                    "Column1": 331.94,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420682105,
+                    "Column1": 297.55,
+                    "Column2": 0.01
+                },
+                {
+                    "Column0": 1420682127,
+                    "Column1": 301.49,
+                    "Column2": 0.01
+                }
+            ],
+            "recordCountPrecision": "EXACT",
+            "unit": "tick"
+        }
+    ]
+}

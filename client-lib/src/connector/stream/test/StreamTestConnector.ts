@@ -1,8 +1,8 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
-import { Connector } from "../Connector";
+import { Connector } from "../../Connector";
 import { TYPE } from "./StreamTestConnectorDescription";
 
-export class StreamTestRepository implements Connector {
+export class StreamTestConnector implements Connector {
     getType(): string {
         return TYPE;
     }

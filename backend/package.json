@@ -45,7 +45,7 @@
         "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
         "datapm-client-lib": "./../client-lib",
-        "datapm-lib": "./../lib",
+        "datapm-lib": "file:../lib",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
@@ -133,5 +133,5 @@
         "tslint": "^6.1.2",
         "typescript": "^4.5.5"
     },
-    "version": "0.8.84"
+    "version": "0.8.95"
 }

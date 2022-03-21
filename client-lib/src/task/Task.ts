@@ -8,10 +8,15 @@ export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
 
 export type MessageType = "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START";
 export interface Task {
+    getStatus(): TaskStatus;
+
     setMessage(message?: string): void;
 
     /** After calling end, setStatus should never be called. */
     end(status: TaskStatus, message?: string): Promise<void>;
+
+    /** Removes the spinner */
+    clear(): void;
 
     // addSubTask(message: string): Task;
 }
@@ -116,6 +121,7 @@ export abstract class Job<T> {
     private state: "INIT" | "STOPPED" | "STOPPING" | "RUNNING" | "COMPLETED" | "ERROR" = "INIT";
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
+    // eslint-disable-next-line no-useless-constructor
     constructor(private context: JobContext) {}
 
     /** Run the task and return an exit code */

@@ -23,6 +23,10 @@ function installLibDependencies() {
     return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
 }
 
+function installClientLibDependencies() {
+    return spawnAndLog("client-lib-deps", "npm", ["ci"], { cwd: "client-lib" });
+}
+
 function testLib() {
     return spawnAndLog("lib-test", "npm", ["run", "test"], { cwd: "lib" });
 }
@@ -249,7 +253,30 @@ function prepareRegistryDockerBuildAssets() {
     const task4 = src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
     const task5 = src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
 
-    return merge(task1, task2, task3, task4, task5);
+    const task6 = src(["client-lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "client-lib", "dist")));
+
+    return merge(task1, task2, task3, task4, task5, task6);
+}
+
+function copyLibNodeModules() {
+    return spawnAndLog("copyLibNodeModules", "npx", ["copy-node-modules", "lib", path.join("dist", "lib", "dist")]);
+}
+
+function copyClientLibNodeModules() {
+    return spawnAndLog("copyLibNodeModules", "npx", [
+        "copy-node-modules",
+        path.join("client-lib"),
+        path.join("dist", "client-lib", "dist")
+    ]);
+}
+
+function deleteLibInClientLibNodeModules() {
+    return new Promise((resolve, reject) => {
+        if (fs.existsSync(path.join("dist", "client-lib", "dist", "node_modules", "datapm-lib"))) {
+            fs.rmSync(path.join("dist", "client-lib", "dist", "node_modules", "datapm-lib"), { recursive: true });
+        }
+        resolve();
+    });
 }
 
 function cleanRoot() {
@@ -261,7 +288,27 @@ function cleanRoot() {
 }
 
 function cleanLib() {
-    return spawnAndLog("clean-lib", "npm", ["run", "clean"]);
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "lib" });
+}
+
+function cleanClientLib() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "client-lib" });
+}
+
+function cleanClient() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "client" });
+}
+
+function cleanBackend() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "backend" });
+}
+
+function cleanFrontend() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "frontend" });
+}
+
+function cleanDocs() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "docs/website" });
 }
 
 exports.default = series(
@@ -277,6 +324,9 @@ exports.default = series(
     installDocsDependencies,
     buildDocs,
     prepareRegistryDockerBuildAssets,
+    copyLibNodeModules,
+    copyClientLibNodeModules,
+    deleteLibInClientLibNodeModules,
     buildRegistryDockerImage,
     installClientDependencies,
     buildClient
@@ -322,12 +372,18 @@ exports.deployAssets = series(
     // pushClientDockerImageLatest
 );
 
-exports.buildRegistryDockerImage = series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage);
+exports.buildRegistryDockerImage = series(
+    prepareRegistryDockerBuildAssets,
+    copyLibNodeModules,
+    copyClientLibNodeModules,
+    deleteLibInClientLibNodeModules,
+    buildRegistryDockerImage
+);
 
 exports.prepareDevEnvironment = series(
     installRootDependencies,
     installLibDependencies,
-    buildLib,
+    installClientLibDependencies,
     installBackendDependencies,
     installFrontendDependencies,
     installDocsDependencies,
@@ -335,4 +391,4 @@ exports.prepareDevEnvironment = series(
     buildBackend
 );
 
-exports.clean = series(cleanLib, cleanRoot);
+exports.clean = series(cleanLib, cleanClientLib, cleanClient, cleanBackend, cleanFrontend, cleanDocs, cleanRoot);

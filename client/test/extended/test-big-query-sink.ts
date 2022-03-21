@@ -17,13 +17,13 @@ const getBigQuerySinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
 
 describe("Big Query Sink Test", function () {
     let packageAFilePath: string;
-    const datasetAName = "undefined_covid_02_01_2020_v1";
+    const datasetAName = "local_covid_02_01_2020_v1";
     const tableAName = "test_table_a";
     let packageBFilePath: string;
-    const datasetBName = "undefined_all_types_v1";
+    const datasetBName = "local_all_types_v1";
     const tableBName = "test_table_b";
     let packageCFilePath: string;
-    const datasetCName = "undefined_legislators_v1";
+    const datasetCName = "local_legislators_v1";
     const tableCName = "test_table_c";
     const tableDName = "test_table_d";
 

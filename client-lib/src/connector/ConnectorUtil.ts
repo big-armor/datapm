@@ -8,8 +8,9 @@ import { HTTPConnectorDescription } from "./file-based/http/HTTPConnectorDescrip
 import { LocalFileConnectorDescription } from "./file-based/local-file/LocalFileConnectorDescription";
 import { StandardOutConnectorDescription } from "./file-based/standard-out/StandardOutConnectorDescription";
 import { ConnectorDescription } from "./Connector";
-import { StreamTestConnectorDescription } from "./stream/StreamTestConnectorDescription";
+import { StreamTestConnectorDescription } from "./stream/test/StreamTestConnectorDescription";
 import { DataPMConnectorDescription } from "./file-based/datapm-registry/DataPMConnectorDescription";
+import { DecodableConnectorDescription } from "./stream/decodable/DecodableConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -20,7 +21,8 @@ export const CONNECTORS: ConnectorDescription[] = [
     new GoogleSheetConnectorDescription(),
     new HTTPConnectorDescription(),
     new LocalFileConnectorDescription(),
-    new StandardOutConnectorDescription()
+    new StandardOutConnectorDescription(),
+    new DecodableConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.

@@ -29,7 +29,8 @@ export interface PackageFileWithContext {
     save(packageFile: PackageFile): Promise<void>;
 }
 export class RegistryPackageFileContext implements PackageFileWithContext {
-    constructor(public jobContext:JobContext, public packageFile: PackageFile, public packageObject: Package) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public jobContext: JobContext, public packageFile: PackageFile, public packageObject: Package) {}
 
     get contextType(): "registry" {
         return "registry";
@@ -42,13 +43,13 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
     get hasPermissionToSave(): boolean {
         return this.packageObject.myPermissions?.includes(Permission.EDIT) || false;
     }
-    
+
     get cantSaveReason(): string | undefined {
-        if(this.packageObject.myPermissions == null) {
+        if (this.packageObject.myPermissions == null) {
             return "You are not logged-in to the registry.";
         }
 
-        if(!this.packageObject.myPermissions.includes(Permission.EDIT)) {
+        if (!this.packageObject.myPermissions.includes(Permission.EDIT)) {
             return "You do not have edit permission for this package.";
         }
 
@@ -65,18 +66,16 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         );
     }
 
-
     get readmeFileUrl(): string | undefined {
         return (
             this.packageObject.identifier.registryURL +
             "/" +
             this.packageObject.identifier.catalogSlug +
             "/" +
-            this.packageObject.identifier.packageSlug
-            + "#readme"
+            this.packageObject.identifier.packageSlug +
+            "#readme"
         );
     }
-
 
     get licenseFileUrl(): string | undefined {
         return (
@@ -84,8 +83,8 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
             "/" +
             this.packageObject.identifier.catalogSlug +
             "/" +
-            this.packageObject.identifier.packageSlug
-            + "#license"
+            this.packageObject.identifier.packageSlug +
+            "#license"
         );
     }
 
@@ -122,6 +121,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
 }
 
 export class LocalPackageFileContext implements PackageFileWithContext {
+    // eslint-disable-next-line no-useless-constructor
     constructor(public jobContext: JobContext, public packageFile: PackageFile, public packageFilePath: string) {}
 
     get contextType(): "localFile" {
@@ -150,7 +150,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         return this.packageFilePath;
     }
 
-    get readmeFileUrl(): string | undefined { 
+    get readmeFileUrl(): string | undefined {
         return this.packageFile.readmeFile ? "file://" + this.packageFile.readmeFile : undefined;
     }
 
@@ -193,6 +193,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
 }
 
 export class HttpPackageFileContext implements PackageFileWithContext {
+    // eslint-disable-next-line no-useless-constructor
     constructor(public packageFile: PackageFile, public url: string) {}
 
     get contextType(): "http" {
@@ -210,7 +211,6 @@ export class HttpPackageFileContext implements PackageFileWithContext {
     get packageFileUrl(): string {
         return this.url;
     }
-
 
     get readmeFileUrl(): string | undefined {
         return undefined;

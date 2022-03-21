@@ -61,6 +61,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
         }
 
+        this.jobContext.setCurrentStep("Inspecting Package");
+
         if (this.args.reference == null) {
             const referencePromptResult = await this.jobContext.parameterPrompt([
                 {
@@ -128,6 +130,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         recordCountText = `${schemaCount} schemas with ${recordCountText} records`;
         this.jobContext.print("INFO", recordCountText);
 
+        this.jobContext.setCurrentStep("Sink Connector");
+
         // Getting sink
         let sinkType: string;
 
@@ -143,7 +147,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     type: ParameterType.AutoComplete,
                     configuration: {},
                     name: "type",
-                    message: "Destination?",
+                    message: "Connector?",
                     options: sinkDescriptions.map((sink) => {
                         return {
                             title: sink.getDisplayName(),
@@ -264,11 +268,13 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         const sink = await sinkDescription.loadSinkFromModule();
 
+        this.jobContext.setCurrentStep(sinkConnectorDescription.getDisplayName() + " Configuration");
         parameterCount += await repeatedlyPromptParameters(
             this.jobContext,
             async () => {
                 return sink.getParameters(
-                    (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug,
+                    (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug ||
+                        "local",
                     packageFile,
                     sinkConfiguration
                 );
@@ -287,7 +293,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.jobContext,
             packageFile,
             {
-                catalogSlug: packageFileWithContext.catalogSlug || "_no_catalog",
+                catalogSlug: packageFileWithContext.catalogSlug || "local",
                 packageSlug: packageFileWithContext.packageFile.packageSlug,
                 packageMajorVersion: new SemVer(packageFileWithContext.packageFile.version).major
             },
@@ -349,6 +355,8 @@ export async function fetchMultiple(
         const schemaUriInspectionResults = await inspectSourceConnection(jobContext, source, defaults);
 
         for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
+            jobContext.setCurrentStep("Checking State of " + streamSetPreview.slug);
+
             let sinkState = await sink.getSinkState(
                 sinkConnectionConfiguration,
                 sinkCredentialsConfiguration,
@@ -403,15 +411,16 @@ export async function fetchMultiple(
     const fetchPromises: Promise<FetchResult>[] = [];
 
     for (const fetchPreparation of fetchPreparations) {
-        const task = await jobContext.startTask("Fetching records for " + fetchPreparation.streamSetPreview.slug);
+        jobContext.setCurrentStep("Fetching " + fetchPreparation.streamSetPreview.slug);
+        let task = await jobContext.startTask("Opening sink stream");
 
         const fetchPromise = fetch(
             jobContext,
             {
-                state: (_state) => {
-                    // TODO use this
+                state: (state) => {
+                    task.setMessage(state.resource.status.toString() + " " + state.resource.name);
                 },
-                progress: (state) => {
+                progress: async (state) => {
                     latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =
                         state.recordsCommited;
 
@@ -448,6 +457,10 @@ export async function fetchMultiple(
                         const remainingTimeString = formatRemainingTime(state.secondsRemaining);
 
                         text += `   estimated ${remainingTimeString} seconds remaining`;
+                    }
+
+                    if (task.getStatus() !== "RUNNING") {
+                        task = await jobContext.startTask(text);
                     }
 
                     task.setMessage(text);

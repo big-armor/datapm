@@ -387,7 +387,7 @@ export async function fetch(
 
         const schemaSwitchingWritable: Writable = new Writable({
             objectMode: true,
-            write: async (chunks: RecordStreamContext[], encoding, callback) => {
+            write: async (chunks: RecordStreamContext[], _encoding, callback) => {
                 const writableBatches: Record<string, RecordStreamContext[]> = {};
 
                 for (const chunk of chunks) {
@@ -410,6 +410,8 @@ export async function fetch(
                     let schemaWritable = schemaWriteables[schemaSlug];
 
                     if (schemaWritable == null) {
+                        // TODO These should be created before creating the switchingSchemaWritable??
+                        // That would make more sense in a lot of cases
                         await createSchemaWritable(
                             jobContext,
                             schemaWriteables,
@@ -532,6 +534,16 @@ export async function fetch(
             returnPromiseResolve({
                 recordsTotal: recordCount
             });
+        });
+
+        schemaSwitchingWritable.on("error", async (error) => {
+            context.finish(
+                `Error writing records. This puts the sink state in an inconsisent state with the reocrds written. You will need to delete the file/tables/records from the target sink and restart the full transfer`,
+                recordCount,
+                FetchOutcome.FAILURE
+            );
+
+            returnPromiseReject(error);
         });
 
         const OFF_DEATH = ON_DEATH({})(() => {

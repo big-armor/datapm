@@ -183,7 +183,7 @@ describe("Redshift Sink Test", function () {
 
 			const records = await knexClient.withSchema(schemaName).table("_datapm_state");
 			const firstRecord = records[0];
-			expect(firstRecord.catalog_slug).equals("_no_catalog");
+			expect(firstRecord.catalog_slug).equals("local");
 			expect(firstRecord.package_slug).equals("covid-02-01-2020");
 			expect(firstRecord.package_major_version).equals(1);
 			expect(firstRecord.package_version).equals("1.0.0");

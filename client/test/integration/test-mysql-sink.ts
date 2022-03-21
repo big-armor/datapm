@@ -24,11 +24,11 @@ describe("MySQL Sink Test", function () {
     let mysqlPort: number;
     let knexClient: Knex;
     let packageAFilePath: string;
-    const tableAName = "undefined_covid-02-01-2020-v1_covid-02-01-2020";
+    const tableAName = "local_covid-02-01-2020-v1_covid-02-01-2020";
     let packageBFilePath: string;
-    const tableBName = "undefined_all-types-v1_all-types";
+    const tableBName = "local_all-types-v1_all-types";
     let packageCFilePath: string;
-    const tableCName = "undefined_legislators-v1_legislators";
+    const tableCName = "local_legislators-v1_legislators";
 
     before(async function () {
         resetConfiguration();

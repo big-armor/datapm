@@ -10,7 +10,8 @@ import {
     PackageFileWithContext,
     PackageIdentifier,
     getPackage,
-    writePackageFile
+    writePackageFile,
+    TaskStatus
 } from "datapm-client-lib";
 import { Writable } from "stream";
 import { SemVer } from "semver";
@@ -28,6 +29,8 @@ import {
 
 export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
+
+    currentTask: Task | undefined;
 
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
 
@@ -114,12 +117,23 @@ export class CLIJobContext implements JobContext {
     }
 
     async startTask(taskTitle: string): Promise<Task> {
+        if (this.currentTask?.getStatus() === "RUNNING") {
+            this.currentTask.end("SUCCESS");
+        }
+
+        let taskStatus: TaskStatus = "RUNNING";
+
         if (this.argv.quiet) {
             return {
+                getStatus: () => taskStatus,
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                end: async () => {},
+                end: async (status) => {
+                    taskStatus = status;
+                },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setMessage: () => {}
+                setMessage: () => {},
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                clear: () => {}
             };
         }
 
@@ -130,9 +144,12 @@ export class CLIJobContext implements JobContext {
 
         this.currentOraSpinner = this.oraRef.start(taskTitle);
 
-        return {
+        this.currentTask = {
+            getStatus: () => taskStatus,
             end: async (status, message) => {
                 if (!this.currentOraSpinner) return;
+
+                taskStatus = status;
 
                 this.currentOraSpinner.text = message || this.currentOraSpinner.text;
                 if (status === "SUCCESS") {
@@ -147,8 +164,13 @@ export class CLIJobContext implements JobContext {
                 if (!this.currentOraSpinner) return;
 
                 this.currentOraSpinner.text = message || this.currentOraSpinner.text;
+            },
+            clear: () => {
+                this.currentOraSpinner?.clear();
             }
         };
+
+        return this.currentTask;
     }
 
     print(type: string, message: string): void {
@@ -182,6 +204,9 @@ export class CLIJobContext implements JobContext {
     }
 
     log(_message: string): void {
+        // eslint-disable-next-line no-useless-return
+        if (this.argv.quiet) return;
+
         /// TODO: Implement in memory logging with optional debug messages
     }
 
@@ -190,6 +215,8 @@ export class CLIJobContext implements JobContext {
     };
 
     setCurrentStep(step: string): void {
+        if (this.argv.quiet) return;
+
         console.log("");
         console.log(chalk.magenta(step));
     }

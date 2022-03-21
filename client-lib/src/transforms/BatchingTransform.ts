@@ -18,8 +18,9 @@ export class BatchingTransform extends Transform {
         } else this.buffer.push(chunk);
 
         if (this.buffer.length >= this.maxSize) {
-            this.push(this.buffer);
-            this.buffer = [];
+            while (this.buffer.length >= this.maxSize) {
+                this.push(this.buffer.splice(0, this.maxSize));
+            }
         }
 
         callback(null);
@@ -27,7 +28,13 @@ export class BatchingTransform extends Transform {
 
     _flush(callback: (error?: Error | null) => void): void {
         if (this.buffer.length > 0) {
-            this.push(this.buffer);
+            try {
+                this.push(this.buffer);
+            } catch (e) {
+                // console.log(e)
+                callback(e);
+                return;
+            }
         }
         this.buffer = [];
         callback(null);

@@ -30,7 +30,7 @@ export class StatsTransform extends Transform {
 
     async _transform(
         recordContexts: RecordContext[],
-        encoding: BufferEncoding,
+        _encoding: BufferEncoding,
         callback: TransformCallback
     ): Promise<void> {
         this.recordCount += recordContexts.length;

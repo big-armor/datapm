@@ -1,10 +1,14 @@
 {
     "name": "datapm-registry",
-    "version": "0.8.84",
+    "version": "0.8.95",
     "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
     "module": "backend/dist/index.js",
+    "engines": {
+        "node": ">=16.14.2",
+        "npm": ">=8.1.2"
+    },
     "scripts": {
         "prepare-dev-environment": "gulp prepareDevEnvironment",
         "clean": "gulp clean",
@@ -19,8 +23,8 @@
         "git-tag": "gulp gitTag",
         "git-commit-push": "gulp gitCommitPush",
         "deploy": "gulp deployAssets",
-        "lint": "eslint . && cd client && npm run lint && cd ../client-lib && npm run lint",
-        "lint:fix": "eslint --fix . && cd client && npm run lint:fix && cd ../client-lib && npm run lint:fix",
+        "lint": "eslint . && cd client && npm run lint",
+        "lint:fix": "eslint --fix . && cd client && npm run lint:fix",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "test:snyk": "snyk test",
         "checkLicense": "npx license-checker --onlyAllow \"BSD;MIT;Apache-2.0;ISC;Python-2.0;BSD-3-Clause;Unlicense;Custom: http: //github.com/substack/node-bufferlist;CC-BY-4.0;Custom: https://datapm.io;BSD-2-Clause;Apache 2.0;Public Domain;EUPL-1.1;CC-BY-3.0;CC0-1.0;0BSD;BSD*\""

@@ -19,7 +19,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -50,7 +50,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -94,7 +94,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -146,7 +146,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -191,7 +191,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Install Build Tools
               run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint
@@ -266,10 +266,10 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Presinstall node-gyp cache
-              run: npx node-gyp install 16.13.2
+              run: npx node-gyp install 16.14.2
 
             - name: Install Lib dependencies
               working-directory: lib
@@ -330,7 +330,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -394,7 +394,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -643,7 +643,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "16.13.2"
+                  node-version: "16.14.2"
 
             - name: Install Dependencies
               run: npm ci

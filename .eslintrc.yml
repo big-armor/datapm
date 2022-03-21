@@ -15,7 +15,8 @@ plugins:
 rules:
     {
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars-experimental": "error",
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-unused-vars-experimental": "off",
         "no-unused-vars": "off",
         "prettier/prettier": "error",
         "linebreak-style": ["error", "unix"],

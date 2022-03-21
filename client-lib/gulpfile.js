@@ -3,8 +3,12 @@ const { series, src, dest } = require("gulp");
 const fs = require("fs");
 const path = require("path");
 
-async function clean() {
-    if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+function clean() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
 }
 
 function copyPackageFiles() {
@@ -15,7 +19,7 @@ function modifyPackagefile() {
     const packageJson = JSON.parse(fs.readFileSync(path.join("dist", "package.json"), "utf8"));
 
     packageJson.main = "main.js";
-    packageJson.dependencies["datapm-lib"] = "../../lib/dist"
+    packageJson.dependencies["datapm-lib"] = "../../lib/dist";
 
     // write the new package.json file
     fs.writeFileSync(path.join("dist", "package.json"), JSON.stringify(packageJson, null, 2));
@@ -24,7 +28,7 @@ function modifyPackagefile() {
 }
 
 function linkDataPMLib() {
-     const libPath = path.join(__dirname, "dist", "node_modules");
+    const libPath = path.join(__dirname, "dist", "node_modules");
     if (!fs.existsSync(libPath)) {
         fs.mkdirSync(libPath, { recursive: true });
     }
@@ -39,3 +43,4 @@ function linkDataPMLib() {
 
 exports.prebuild = series(clean);
 exports.postbuild = series(copyPackageFiles, modifyPackagefile, linkDataPMLib);
+exports.clean = clean;

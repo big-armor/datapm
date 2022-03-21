@@ -1,6 +1,6 @@
-import { Connector, ConnectorDescription } from "../Connector";
-import { SinkDescription } from "../Sink";
-import { SourceDescription } from "../Source";
+import { Connector, ConnectorDescription } from "../../Connector";
+import { SinkDescription } from "../../Sink";
+import { SourceDescription } from "../../Source";
 
 export const DISPLAY_NAME = "Stream Test";
 export const TYPE = "test";
@@ -15,8 +15,8 @@ export class StreamTestConnectorDescription implements ConnectorDescription {
     }
 
     async getConnector(): Promise<Connector> {
-        const source = await import("./StreamTestRepository");
-        return new source.StreamTestRepository();
+        const source = await import("./StreamTestConnector");
+        return new source.StreamTestConnector();
     }
 
     async getSourceDescription(): Promise<SourceDescription | null> {

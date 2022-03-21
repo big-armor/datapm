@@ -175,7 +175,7 @@ export class CSVParser implements Parser {
             new Transform({
                 readableObjectMode: true,
                 writableObjectMode: false,
-                transform: (chunk, encoding, callback) => {
+                transform: (chunk, _encoding, callback) => {
                     if (typeof configuration?.hasHeaderRow === "string") {
                         configuration.hasHeaderRow = configuration?.hasHeaderRow === "true";
                     }

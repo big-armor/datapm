@@ -15,7 +15,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
+const fetchCommandPrompts = ["Connector?", "File Format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 

@@ -1,11 +1,16 @@
 {
   "name": "datapm-client-lib",
-  "version": "1.0.0",
+  "version": "0.8.95",
   "description": "DataPM Client library, which includes all logic used by the the command line and server to generate, manage, and fetch packages. ",
   "main": "src/main.ts",
+  "engines": {
+    "node": ">=16.14.2",
+    "npm": ">=8.1.2"
+  },
   "scripts": {
     "prebuild": "cd ../lib && npm run build && cd ../client-lib && gulp prebuild && npm run codegen",
     "build": "tsc",
+    "clean": "gulp clean",
     "postbuild": "gulp postbuild",
     "pretest": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.yml",
