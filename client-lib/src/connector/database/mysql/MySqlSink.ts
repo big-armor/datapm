@@ -1,4 +1,4 @@
-import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType, UpdateMethod } from "datapm-lib";
 import Knex, { Ref, Transaction } from "knex";
 import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
@@ -96,7 +96,10 @@ export class MySqlSink extends KnexSink implements Sink {
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration
+        configuration: DPMConfiguration,
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
+        jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (connectionConfiguration.host == null) throw new Error("'host' is a required configuration value for mysql");
         if (connectionConfiguration.port == null) throw new Error("'port' is a required configuration value for mysql");
@@ -114,9 +117,21 @@ export class MySqlSink extends KnexSink implements Sink {
         // Check DB Existence
         this.checkDBExistence(this.client, configuration);
 
-        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
+        const writable = super.getWriteable(
+            schema,
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration,
+            updateMethod,
+            replaceExistingData,
+            jobContext
+        );
 
         await this.client.transaction(async (tx) => {
+            if (replaceExistingData) {
+                await tx.schema.dropTableIfExists(this.getSafeTableName(this.tablePrefix + schema.title));
+            }
+
             await this.createTableFromSchema(tx, schema);
         });
 

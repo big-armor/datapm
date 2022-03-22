@@ -422,7 +422,8 @@ export async function fetch(
                             sinkConnectionConfiguration,
                             sinkCredentialsConfiguration,
                             sinkConfiguration,
-                            sourceStream.getCurrentUpdateMethod() // TODO will this work for multi-source packages with a mix of update methods?
+                            sourceStream.getCurrentUpdateMethod(), // TODO will this work for multi-source packages with a mix of update methods?
+                            sinkState == null || sourceStream.getCurrentUpdateMethod() === UpdateMethod.BATCH_FULL_SET
                         );
 
                         schemaWritable = schemaWriteables[schemaSlug];
@@ -571,7 +572,8 @@ async function createSchemaWritable(
     sinkConnectionConfiguration: DPMConfiguration,
     sinkCredentialsConfiguration: DPMConfiguration,
     sinkConfiguration: DPMConfiguration,
-    updateMethod: UpdateMethod
+    updateMethod: UpdateMethod,
+    replaceExistingData: boolean
 ): Promise<WritableWithContext> {
     const writeableWithContext = await sink.getWriteable(
         schema,
@@ -579,6 +581,7 @@ async function createSchemaWritable(
         sinkCredentialsConfiguration,
         sinkConfiguration,
         updateMethod,
+        replaceExistingData,
         jobContext
     );
     writablesWithContexts.push(writeableWithContext);

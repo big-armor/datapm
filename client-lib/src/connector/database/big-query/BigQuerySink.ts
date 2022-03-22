@@ -174,7 +174,15 @@ export class BigQuerySink implements Sink {
         }
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
+        jobContext: JobContext
+    ): Promise<WritableWithContext> {
         this.schema = schema;
         this.configuration = configuration;
 

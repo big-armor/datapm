@@ -207,8 +207,6 @@ export async function streamRecords(
                 ? UpdateMethod.APPEND_ONLY_LOG
                 : UpdateMethod.BATCH_FULL_SET;
 
-        if (sinkState == null) updateMethod = UpdateMethod.BATCH_FULL_SET;
-
         if (updateMethod === UpdateMethod.BATCH_FULL_SET) sinkState = null;
 
         const streamState = sinkState?.streamSets[streamSetPreview.slug]?.streamStates[currentStreamSummary.name];

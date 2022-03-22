@@ -163,6 +163,7 @@ describe("Publish Data Append Log Tests", async function () {
 
         const content = fs.readFileSync("tmp-files/countries.json").toString();
         const lines = content.split("\n");
+        expect(lines.length).equals(6);
         const firstRecord = JSON.parse(lines[0]);
         expect(firstRecord.code).equal("AD");
         expect(firstRecord.name).equal("Andorra");
@@ -250,6 +251,6 @@ describe("Publish Data Append Log Tests", async function () {
 
         const content = fs.readFileSync("tmp-files/countries.json").toString();
         const lines = content.split("\n");
-        expect(lines.length).equals(4);
+        expect(lines.length).equals(9);
     });
 });

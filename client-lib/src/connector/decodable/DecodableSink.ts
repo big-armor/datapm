@@ -178,6 +178,7 @@ export class DecodableSink implements Sink {
         _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         _updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
         jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (!configuration.schemaStreamNames) {
