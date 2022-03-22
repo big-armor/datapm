@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
 import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
-import { Connector } from "../../Connector";
+import { Connector } from "../Connector";
 import { TYPE } from "./DecodableConnectorDescription";
 import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
 import fetch from "cross-fetch";
 import os from "os";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../main";
 
 type DecodableAuthConfig = {
     tokens: {

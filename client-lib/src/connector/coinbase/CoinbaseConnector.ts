@@ -1,6 +1,6 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
-import { JobContext } from "../../../task/Task";
-import { Connector } from "../../Connector";
+import { JobContext } from "../../task/Task";
+import { Connector } from "../Connector";
 import { TYPE } from "./CoinbaseConnectorDescription";
 
 export class CoinbaseConnector implements Connector {

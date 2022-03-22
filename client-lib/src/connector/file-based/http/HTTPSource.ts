@@ -5,6 +5,7 @@ import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
 import { TYPE, DISPLAY_NAME } from "./HTTPConnectorDescription";
 import { fileNameFromUrl } from "../../../util/NameUtil";
+import { readDataPMVersion } from "../../../main";
 
 export class HTTPSource extends AbstractFileStreamSource {
     sourceType(): string {
@@ -25,7 +26,7 @@ export class HTTPSource extends AbstractFileStreamSource {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getClient(url: string): any {
+    getClient(url: string): typeof http {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let client: any = http;
 
@@ -54,49 +55,72 @@ export class HTTPSource extends AbstractFileStreamSource {
                     const fileName = fileNameFromUrl(uri as string);
 
                     this.getClient(uri)
-                        .request(uri, { method: "HEAD" }, (response: IncomingMessage) => {
-                            const lastUpdatedHash = response.headers["last-modified"];
-
-                            const fileStreamContext: FileStreamContext = {
-                                fileName,
-                                uri,
-                                lastUpdatedHash,
-                                openStream: () => {
-                                    return new Promise((resolve, reject) => {
-                                        const request = this.getClient(uri).get(uri, (response: IncomingMessage) => {
-                                            const fileName = fileNameFromUrl(uri as string, response);
-
-                                            let expectedBytes = 0;
-
-                                            if (response.headers["content-length"])
-                                                expectedBytes = Number.parseInt(response.headers["content-length"]);
-
-                                            const mimeType = response.headers["content-type"];
-
-                                            let lastUpdatedHash = new Date().toISOString();
-
-                                            if (typeof response.headers.etag === "string")
-                                                lastUpdatedHash = response.headers.etag;
-
-                                            const sourceResponse: FileOpenStreamContext = {
-                                                stream: response,
-                                                fileName,
-                                                fileSize: expectedBytes,
-                                                reportedMimeType: mimeType,
-                                                lastUpdatedHash
-                                            };
-                                            resolve(sourceResponse);
-                                        });
-
-                                        request.on("error", (error: Error) => {
-                                            reject(error);
-                                        });
-                                    });
+                        .request(
+                            uri,
+                            {
+                                method: "HEAD",
+                                agent: false,
+                                headers: {
+                                    // "User-Agent":
+                                    //    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+                                    "User-Agent": `DataPM/${readDataPMVersion()}`
                                 }
-                            };
+                            },
+                            (response: IncomingMessage) => {
+                                const lastUpdatedHash = response.headers["last-modified"];
 
-                            resolve(fileStreamContext);
-                        })
+                                const fileStreamContext: FileStreamContext = {
+                                    fileName,
+                                    uri,
+                                    lastUpdatedHash,
+                                    openStream: () => {
+                                        return new Promise((resolve, reject) => {
+                                            const request = this.getClient(uri).get(
+                                                uri,
+                                                {
+                                                    agent: false,
+                                                    headers: {
+                                                        "User-Agent": `DataPM/${readDataPMVersion()}`
+                                                    }
+                                                },
+                                                (response: IncomingMessage) => {
+                                                    const fileName = fileNameFromUrl(uri as string, response);
+
+                                                    let expectedBytes = 0;
+
+                                                    if (response.headers["content-length"])
+                                                        expectedBytes = Number.parseInt(
+                                                            response.headers["content-length"]
+                                                        );
+
+                                                    const mimeType = response.headers["content-type"];
+
+                                                    let lastUpdatedHash = new Date().toISOString();
+
+                                                    if (typeof response.headers.etag === "string")
+                                                        lastUpdatedHash = response.headers.etag;
+
+                                                    const sourceResponse: FileOpenStreamContext = {
+                                                        stream: response,
+                                                        fileName,
+                                                        fileSize: expectedBytes,
+                                                        reportedMimeType: mimeType,
+                                                        lastUpdatedHash
+                                                    };
+                                                    resolve(sourceResponse);
+                                                }
+                                            );
+
+                                            request.on("error", (error: Error) => {
+                                                reject(error);
+                                            });
+                                        });
+                                    }
+                                };
+
+                                resolve(fileStreamContext);
+                            }
+                        )
                         .end();
                 });
             })

@@ -19,6 +19,7 @@ export * from "./util/RegistryClient";
 export * from "./util/PackageAccessUtil";
 export * from "./util/PackageUtil";
 export * from "./util/RegistryReferenceUtil";
+export * from "./util/DataPMVersionUtil";
 
 /** Configuration interfaces */
 export * from "./config/Config";

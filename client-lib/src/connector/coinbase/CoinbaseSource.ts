@@ -1,12 +1,11 @@
 /* eslint-disable camelcase */
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
-import { InspectionResults, Source, SourceInspectionContext } from "../../Source";
+import { InspectionResults, Source, SourceInspectionContext } from "../Source";
 import { TYPE } from "./CoinbaseConnectorDescription";
 import { URI } from "./CoinbaseSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { value } from "numeral";
 
 type SubscriptionsMessage = {
     type: "subscriptions";
