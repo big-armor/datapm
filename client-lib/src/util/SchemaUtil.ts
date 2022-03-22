@@ -170,7 +170,7 @@ export async function streamRecords(
 
     let index = 0;
 
-    const getCurrentUpdateMethod = UpdateMethod.BATCH_FULL_SET;
+    let updateMethod = UpdateMethod.BATCH_FULL_SET;
 
     const moveToNextStream = async function () {
         let currentStreamSummary: StreamSummary;
@@ -201,7 +201,7 @@ export async function streamRecords(
             ); // TODO This could be more leanient, but warn of lost or duplicated data
         }
 
-        let updateMethod =
+        updateMethod =
             streamSupportedUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
             sinkSupportedUpdateMethods.includes(UpdateMethod.APPEND_ONLY_LOG)
                 ? UpdateMethod.APPEND_ONLY_LOG
@@ -265,7 +265,7 @@ export async function streamRecords(
     return {
         readable: returnReadable,
         getCurrentUpdateMethod() {
-            return getCurrentUpdateMethod;
+            return updateMethod;
         }
     };
 }
