@@ -79,7 +79,8 @@ export async function generateSchemasFromSourceStreams(
     streamSetPreview: StreamSetPreview,
     streamStatusContext: StreamStatusContext,
     _sourceInspectionContext: SourceInspectionContext,
-    _configuration: DPMConfiguration
+    _configuration: DPMConfiguration,
+    inspectionSeconds: number
 ): Promise<SourceStreamsInspectionResult> {
     const schemas: { [key: string]: Schema } = {};
 
@@ -95,7 +96,7 @@ export async function generateSchemasFromSourceStreams(
     let completed = false;
     let error: Error;
 
-    const timeoutMs = 30000;
+    const timeoutMs = inspectionSeconds * 1000;
 
     const interval = setInterval(() => {
         if (completed || error) {
