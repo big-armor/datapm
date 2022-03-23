@@ -6,10 +6,13 @@ import { Transform, TransformCallback } from "stream";
 export class BatchingTransform extends Transform {
     buffer: unknown[] = [];
     maxSize: number;
+    maxDelayMs: number;
+    timeout: NodeJS.Timeout | undefined;
 
-    constructor(maxSize: number) {
+    constructor(maxSize: number, maxTimeDelay: number) {
         super({ objectMode: true });
         this.maxSize = maxSize;
+        this.maxDelayMs = maxTimeDelay;
     }
 
     _transform(chunk: unknown, _encoding: BufferEncoding, callback: TransformCallback): void {
@@ -18,18 +21,24 @@ export class BatchingTransform extends Transform {
         } else this.buffer.push(chunk);
 
         if (this.buffer.length >= this.maxSize) {
-            while (this.buffer.length >= this.maxSize) {
-                this.push(this.buffer.splice(0, this.maxSize));
-            }
+            this._flush(callback);
+            return;
+        } else if (this.timeout == null) {
+            this.timeout = setTimeout(() => {
+                this._flush(() => {
+                    // do nothing
+                });
+            }, this.maxDelayMs);
         }
-
         callback(null);
     }
 
     _flush(callback: (error?: Error | null) => void): void {
         if (this.buffer.length > 0) {
             try {
-                this.push(this.buffer);
+                while (this.buffer.length > 0) {
+                    this.push(this.buffer.splice(0, this.maxSize));
+                }
             } catch (e) {
                 // console.log(e)
                 callback(e);
@@ -37,6 +46,10 @@ export class BatchingTransform extends Transform {
             }
         }
         this.buffer = [];
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
         callback(null);
     }
 

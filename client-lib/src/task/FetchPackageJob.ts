@@ -276,7 +276,10 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug ||
                         "local",
                     packageFile,
-                    sinkConfiguration
+                    sinkConnectionConfiguration,
+                    sinkCredentialsConfiguration,
+                    sinkConfiguration,
+                    this.jobContext
                 );
             },
             this.args.defaults || false
@@ -426,7 +429,7 @@ export async function fetchMultiple(
 
                     let text = "";
 
-                    const recordCountString = numeral(state.recordsRecieved).format("0.0a");
+                    const recordCountString = numeral(state.recordsRecieved).format("0a");
                     const recordsPerSecondString = numeral(state.recordsPerSecond).format("0.0a");
 
                     text += `Fetching ${fetchPreparation.streamSetPreview.slug}\n`;

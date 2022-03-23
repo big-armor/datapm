@@ -1,7 +1,7 @@
 {
     "name": "datapm-client",
     "description": "The DataPM client which is used to create and fetch packages.",
-    "version": "0.8.95",
+    "version": "0.8.97",
     "engines": {
         "node": ">=16.14.2",
         "npm": ">=8.1.2"

@@ -33,7 +33,12 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 validate: (value) => validatePromptResponse(value, promptParameter)
             };
         } else if (
-            [ParameterType.AutoComplete, ParameterType.Select, ParameterType.MultiSelect].includes(promptParameter.type)
+            [
+                ParameterType.AutoCompleteMultiSelect,
+                ParameterType.AutoComplete,
+                ParameterType.Select,
+                ParameterType.MultiSelect
+            ].includes(promptParameter.type)
         ) {
             if (!promptParameter.options || promptParameter.options.length === 0) {
                 throw new Error(

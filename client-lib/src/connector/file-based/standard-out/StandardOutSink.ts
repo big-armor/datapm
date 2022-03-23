@@ -17,6 +17,7 @@ import { Transform } from "stream";
 import { RecordSerializedContext } from "../../../connector/file-based/AbstractFileSink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./StandardOutConnectorDescription";
+import { JobContext } from "../../../main";
 
 export class StandardOutSinkModule implements Sink {
     getSupportedStreamOptions(
@@ -91,7 +92,10 @@ export class StandardOutSinkModule implements Sink {
     async getParameters(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
             catalogSlug,

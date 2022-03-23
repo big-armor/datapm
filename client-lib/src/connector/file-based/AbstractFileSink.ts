@@ -138,7 +138,10 @@ export abstract class AbstractFileSink implements Sink {
     async getParameters(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const defaultParameterValues: DPMConfiguration = await this.getDefaultParameterValues(
             catalogSlug,

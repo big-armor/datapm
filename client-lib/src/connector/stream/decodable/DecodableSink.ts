@@ -8,7 +8,8 @@ import {
     UpdateMethod,
     SinkStateKey,
     SchemaIdentifier,
-    RecordStreamContext
+    RecordStreamContext,
+    ParameterType
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
@@ -69,6 +70,9 @@ type ListConnectionsResponse = {
 };
 
 export class DecodableSink implements Sink {
+    streamIds: Map<string, string> = new Map();
+    connectorIds: Map<string, string> = new Map();
+
     getType(): string {
         return TYPE;
     }
@@ -81,14 +85,19 @@ export class DecodableSink implements Sink {
         return true;
     }
 
-    getParameters(
+    async getParameters(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
-    ): Parameter[] {
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
+    ): Promise<Parameter[]> {
         configuration.schemaStreamNames = {};
 
         for (const schema of packageFile.schemas) {
+            if (schema.title == null) throw new Error("Schema has no title");
+
             const schemaReference: SchemaIdentifier = {
                 registryUrl: "",
                 catalogSlug: catalogSlug as string,
@@ -106,7 +115,51 @@ export class DecodableSink implements Sink {
                 "_" +
                 schemaReference.schemaTitle;
 
-            configuration.schemaStreamNames[schema.title as string] = decodableStreamName;
+            if (configuration["stream-name-" + schema.title] == null) {
+                return [
+                    {
+                        type: ParameterType.Text,
+                        name: "stream-name-" + schema.title,
+                        configuration,
+                        message: "Stream for " + schema.title + " records?",
+                        defaultValue: decodableStreamName
+                    }
+                ];
+            }
+
+            if (configuration["connection-name-" + schema.title] == null) {
+                return [
+                    {
+                        type: ParameterType.Text,
+                        name: "connection-name-" + schema.title,
+                        configuration,
+                        message: "Connection for " + schema.title + " records?",
+                        defaultValue: decodableStreamName
+                    }
+                ];
+            }
+
+            if (this.streamIds.get(schema.title) == null) {
+                const streamId = await this.getOrCreateStream(
+                    schema,
+                    connectionConfiguration,
+                    configuration,
+                    jobContext
+                );
+                this.streamIds.set(schema.title, streamId);
+            }
+
+            if (this.connectorIds.get(schema.title) == null) {
+                const connectorId = await this.getOrCreateConnection(
+                    this.streamIds.get(schema.title) as string,
+                    schema,
+                    connectionConfiguration,
+                    configuration,
+                    jobContext
+                );
+
+                this.connectorIds.set(schema.title, connectorId);
+            }
         }
 
         return [] as Parameter[];
@@ -131,17 +184,11 @@ export class DecodableSink implements Sink {
             throw new Error("Requires configuration.schemaStreamNames");
         }
 
+        if (schema.title == null) throw new Error("Schema has no title");
+
         const authToken = getAuthToken();
 
-        const streamId = await this.getOrCreateStream(schema, connectionConfiguration, configuration, jobContext);
-
-        const connectionId = await this.getOrCreateConnection(
-            streamId,
-            schema,
-            connectionConfiguration,
-            configuration,
-            jobContext
-        );
+        const connectionId = this.connectorIds.get(schema.title);
 
         return {
             getCommitKeys: () => {
@@ -149,7 +196,7 @@ export class DecodableSink implements Sink {
             },
             outputLocation: `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/streams`,
             lastOffset: undefined,
-            transforms: [new BatchingTransform(100)],
+            transforms: [new BatchingTransform(100, 100)],
             writable: new Transform({
                 objectMode: true,
                 transform: async (
@@ -221,7 +268,9 @@ export class DecodableSink implements Sink {
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<string> {
-        const decodableStreamName = (configuration.schemaStreamNames as Record<string, string>)[schema.title as string];
+        const decodableStreamName = (configuration as Record<string, string>)[
+            ("stream-name-" + schema.title) as string
+        ];
 
         const task = await jobContext.startTask("Finding existing Decodable Stream for " + decodableStreamName);
 
@@ -317,7 +366,9 @@ export class DecodableSink implements Sink {
     ): Promise<string> {
         let task = await jobContext.startTask("Finding existing connections");
 
-        const decodableStreamName = (configuration.schemaStreamNames as Record<string, string>)[schema.title as string];
+        const decodableConnectionName = (configuration as Record<string, string>)[
+            ("connection-name-" + schema.title) as string
+        ];
 
         let connection: DecodableConnection | undefined;
 
@@ -344,7 +395,7 @@ export class DecodableSink implements Sink {
 
             const responseJson = (await response.json()) as ListConnectionsResponse;
 
-            connection = responseJson.items.find((c) => c.name === decodableStreamName);
+            connection = responseJson.items.find((c) => c.name === decodableConnectionName);
 
             if (connection) {
                 break;
@@ -358,7 +409,7 @@ export class DecodableSink implements Sink {
         }
 
         if (!connection) {
-            task.setMessage("Decodable Connection " + decodableStreamName + " does not exist, creating");
+            task.setMessage("Decodable Connection " + decodableConnectionName + " does not exist, creating");
 
             const decodableSchema = this.getDecodableSchema(schema);
 
@@ -372,7 +423,7 @@ export class DecodableSink implements Sink {
                         Authorization: `Bearer ${getAuthToken()}`
                     },
                     body: JSON.stringify({
-                        name: decodableStreamName,
+                        name: decodableConnectionName,
                         description: "Created by DataPM",
                         connector: "rest",
                         type: "source",
@@ -388,15 +439,17 @@ export class DecodableSink implements Sink {
 
             connection = (await response.json()) as DecodableConnection;
 
-            await task.end("SUCCESS", "Created Decodable Connection " + decodableStreamName);
+            await task.end("SUCCESS", "Created Decodable Connection " + decodableConnectionName);
         } else {
-            await task.end("SUCCESS", "Found Decodable Connection " + decodableStreamName);
+            await task.end("SUCCESS", "Found Decodable Connection " + decodableConnectionName);
         }
 
-        task = await jobContext.startTask("Checking that Decodable Connection " + decodableStreamName + " is active");
+        task = await jobContext.startTask(
+            "Checking that Decodable Connection " + decodableConnectionName + " is active"
+        );
 
         if (connection.target_state === "STOPPED") {
-            task.setMessage("Connection " + decodableStreamName + " is not active, starting");
+            task.setMessage("Connection " + decodableConnectionName + " is not active, starting");
 
             const response = await fetch(
                 `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/connections/${connection.id}/activate`,
@@ -413,7 +466,7 @@ export class DecodableSink implements Sink {
                 throw new Error("Error attempting to start Decodable Connection: " + response.statusText);
             }
 
-            task.setMessage("Waiting for Decodable Connection " + decodableStreamName + " to start");
+            task.setMessage("Waiting for Decodable Connection " + decodableConnectionName + " to start");
 
             while (true) {
                 const statusResponse = await fetch(
@@ -438,9 +491,9 @@ export class DecodableSink implements Sink {
                 }
             }
 
-            await task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " now running");
+            await task.end("SUCCESS", "Decodable Connection " + decodableConnectionName + " now running");
         } else {
-            await task.end("SUCCESS", "Decodable Connection " + decodableStreamName + " is already running");
+            await task.end("SUCCESS", "Decodable Connection " + decodableConnectionName + " is already running");
         }
 
         return connection.id;

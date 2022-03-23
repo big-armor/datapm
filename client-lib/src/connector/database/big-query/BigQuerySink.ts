@@ -21,6 +21,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryConnectorDescription";
+import { JobContext } from "../../../main";
 
 export class BigQuerySink implements Sink {
     client: BigQuery;
@@ -88,7 +89,10 @@ export class BigQuerySink implements Sink {
     async getParameters(
         catalogSlug: string,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
             throw new Error(

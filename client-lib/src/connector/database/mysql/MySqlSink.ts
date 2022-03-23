@@ -4,6 +4,7 @@ import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { DISPLAY_NAME, TYPE } from "./MySqlConnectorDescription";
 import { Sink, SinkErrors, WritableWithContext } from "../../Sink";
+import { JobContext } from "../../../main";
 
 export class MySqlSink extends KnexSink implements Sink {
     tablePrefix: string;
@@ -55,7 +56,10 @@ export class MySqlSink extends KnexSink implements Sink {
     async getParameters(
         catalogSlug: string,
         packageFile: PackageFile,
-        configuration: DPMConfiguration
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 

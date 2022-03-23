@@ -3,6 +3,7 @@ import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { JobContext } from "../task/Task";
+import { of } from "zen-observable";
 
 /** Requests from the user credentials for each source - without saving those credentials to any configuration file */
 export async function obtainCredentials(jobContext: JobContext, source: Source): Promise<DPMConfiguration> {
@@ -16,12 +17,6 @@ export async function obtainCredentials(jobContext: JobContext, source: Source):
     if (repository === undefined) {
         throw new Error(`Could not find repository implementation for type ${source.type}`);
     }
-
-    const connectionIdentifier = await repository.getRepositoryIdentifierFromConfiguration(
-        source.connectionConfiguration
-    );
-
-    console.log(`For the ${connectorDescription.getDisplayName()} repository ${connectionIdentifier}`);
 
     const credentialsPromptResponse = await promptForCredentials(
         jobContext,
@@ -193,6 +188,11 @@ export async function promptForCredentials(
 ): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number }> {
     let credentialsSuccess = false;
     let parameterCount = 0;
+
+    if (connector.requiresCredentialsConfiguration() === false) {
+        return { credentialsConfiguration, parameterCount };
+    }
+
     while (!credentialsSuccess) {
         parameterCount += await repeatedlyPromptParameters(
             jobContext,

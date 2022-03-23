@@ -6,6 +6,7 @@ export enum ParameterType {
     Text = "text",
     Select = "select",
     MultiSelect = "multiselect",
+    AutoCompleteMultiSelect = "autocompleteMultiselect",
     Number = "number",
     Password = "password"
 }
