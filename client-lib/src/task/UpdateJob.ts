@@ -34,6 +34,13 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
     }
 
     async _execute(): Promise<JobResult<PackageFileWithContext>> {
+        let packageString = this.argv.reference as string;
+        if (this.argv.reference && typeof this.argv.reference !== "string") {
+            const packageIdentifier = this.argv.reference;
+            packageString = packageIdentifier.catalogSlug + "/" + packageIdentifier.packageSlug;
+        }
+
+        this.jobContext.log("INFO", "Started package update job for " + packageString);
         if (this.argv.reference == null) {
             const referencePromptResult = await this.jobContext.parameterPrompt([
                 {
@@ -61,7 +68,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
         try {
             packageFileWithContext = await this.jobContext.getPackageFile(this.argv.reference, "canonicalIfAvailable"); // getPackage(this.jobContext, this.argv.reference, "canonicalIfAvailable");
         } catch (error) {
-            await task.end("ERROR", error.message);
+            await task.end("ERROR", error.message, error);
             return {
                 exitCode: 1
             };

@@ -545,3 +545,28 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   }
 }
 
+
+resource "google_cloud_scheduler_job" "package_updates" {
+  depends_on       = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-pacakge-updates"
+  project          = google_project.project.project_id
+  region           = var.gcp_location
+  description      = "To invoke updating packages"
+  schedule         = "0 * * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "62s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"PACKAGE_UPDATE\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) { runJob(key: $key, job: $job)}\"}")
+  }
+}
+

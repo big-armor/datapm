@@ -1704,11 +1704,6 @@ type Mutation {
     deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void
 
     """
-    For proxying user activity tracking outside of other API requests
-    """
-    track(actions: JSON!): Int!
-
-    """
     Given a token, validate a user's email address
     """
     verifyEmailAddress(token: String!): Void
@@ -1741,5 +1736,5 @@ type Mutation {
     """
     Run a named job. Key is a shared key. Job is the name of the job to run
     """
-    runJob(key: String!, job: JobType!, packageIdentifier: PackageIdentifierInput): Void
+    runJob(key: String!, job: JobType!): Void
 }

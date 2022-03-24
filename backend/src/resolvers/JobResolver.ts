@@ -9,12 +9,12 @@ import {
     monthlyNotifications,
     weeklyNotifications
 } from "../service/notification-service";
-import { JobType, Maybe, PackageIdentifierInput } from "../generated/graphql";
+import { JobType } from "../generated/graphql";
 import { packageUpdateScheduling } from "../service/package-update-service";
 
 export const runJob = async (
     _0: any,
-    { key, job, packageIdentifier }: { key: string; job: string, packageIdentifier?: Maybe<PackageIdentifierInput> },
+    { key, job }: { key: string; job: string },
     context: Context,
     info: any
 ): Promise<void> => {
@@ -54,10 +54,6 @@ export const runJob = async (
         await monthlyNotifications(context.connection);
     } else if (job === JobType.PACKAGE_UPDATE) {
         
-        if(packageIdentifier == null) {
-            throw new Error("packageIdentifier must be provided");
-        }
-
         await packageUpdateScheduling(context.connection);
 
 

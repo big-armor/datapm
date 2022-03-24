@@ -98,7 +98,10 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     }
 
     async startJob() {
-        const context = new WebsocketJobContext(this.socketContext, this.socket, this.channelName);
+
+        const jobId = "user-package-update-" + randomUUID();
+
+        const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
 
         const job = new UpdatePackageJob(context, {
             reference: {
