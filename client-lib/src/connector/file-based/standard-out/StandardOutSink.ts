@@ -110,7 +110,7 @@ export class StandardOutSinkModule implements Sink {
                     type: ParameterType.Select,
                     name: "format",
                     defaultValue: defaultParameterValues.format as string,
-                    message: "File Format?",
+                    message: "File format?",
                     options: getRecordSerializers()
                         .map((writer) => {
                             return { title: writer.getDisplayName(), value: writer.getOutputMimeType() };

@@ -6,7 +6,8 @@ import {
     Properties,
     Schema,
     Parameter,
-    ParameterType
+    ParameterType,
+    UpdateMethod
 } from "datapm-lib";
 import fs from "fs";
 import Knex, { Ref, Transaction } from "knex";
@@ -234,17 +235,35 @@ export class RedshiftSink extends KnexSink {
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration
+        configuration: DPMConfiguration,
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
+        jobContext: JobContext
     ): Promise<WritableWithContext> {
         this.fileName = `${schema.title}_${Date.now()}.csv`;
 
         // Open a connection to the database
         this.client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
 
-        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
+        const writable = super.getWriteable(
+            schema,
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration,
+            updateMethod,
+            replaceExistingData,
+            jobContext
+        );
 
         await this.client.transaction(async (tx) => {
             await tx.raw(`CREATE SCHEMA IF NOT EXISTS "${configuration.schema}"`);
+
+            if (replaceExistingData) {
+                await tx.raw(
+                    `DROP TABLE IF EXISTS "${configuration.schema}"."${this.getSafeTableName(schema.title as string)}"`
+                );
+            }
+
             await this.createTableFromSchema(tx, configuration, schema);
         });
 

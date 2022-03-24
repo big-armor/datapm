@@ -1,4 +1,4 @@
-import { Source, SourceDescription } from "../../Source";
+import { Source, SourceDescription } from "../Source";
 import { DISPLAY_NAME, TYPE } from "./CoinbaseConnectorDescription";
 
 export const URI = "wss://ws-feed.exchange.coinbase.com";

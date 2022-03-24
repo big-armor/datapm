@@ -90,6 +90,7 @@ export interface Sink {
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
         jobContext: JobContext
     ): Promise<WritableWithContext>;
 

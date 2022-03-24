@@ -10,8 +10,8 @@ import { StandardOutConnectorDescription } from "./file-based/standard-out/Stand
 import { ConnectorDescription } from "./Connector";
 import { StreamTestConnectorDescription } from "./stream/test/StreamTestConnectorDescription";
 import { DataPMConnectorDescription } from "./file-based/datapm-registry/DataPMConnectorDescription";
-import { DecodableConnectorDescription } from "./stream/decodable/DecodableConnectorDescription";
-import { CoinbaseConnectorDescription } from "./stream/coinbase/CoinbaseConnectorDescription";
+import { DecodableConnectorDescription } from "./decodable/DecodableConnectorDescription";
+import { CoinbaseConnectorDescription } from "./coinbase/CoinbaseConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),

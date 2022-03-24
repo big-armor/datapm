@@ -13,15 +13,15 @@ import {
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
-import { JobContext } from "../../../task/Task";
-import { Maybe } from "../../../util/Maybe";
-import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
-import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { JobContext } from "../../task/Task";
+import { Maybe } from "../../util/Maybe";
+import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 import { getAuthToken } from "./DecodableConnector";
 import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 import { fetch } from "cross-fetch";
 import { SemVer } from "semver";
-import { BatchingTransform } from "../../../transforms/BatchingTransform";
+import { BatchingTransform } from "../../transforms/BatchingTransform";
 
 type DecodableConnection = {
     id: string;
@@ -178,6 +178,7 @@ export class DecodableSink implements Sink {
         _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         _updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
         jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (!configuration.schemaStreamNames) {

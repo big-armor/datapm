@@ -55,6 +55,7 @@ export class PackageJobArguments {
     catalogSlug?: string;
     repositoryIdentifier?: string;
     credentialsIdentifier?: string;
+    inspectionSeconds?: number;
 }
 
 export class PackageJob extends Job<PackageJobResult> {
@@ -223,7 +224,8 @@ export class PackageJob extends Job<PackageJobResult> {
                 streamSetPreview,
                 sourceInspectionContext,
                 this.jobContext,
-                sourceConfiguration
+                sourceConfiguration,
+                this.args.inspectionSeconds || 30
             );
 
             await task.end(
@@ -477,7 +479,8 @@ export async function inspectStreamSet(
     streamSetPreview: StreamSetPreview,
     sourceInspectionContext: SourceInspectionContext,
     jobContext: JobContext,
-    sourceConfiguration: DPMConfiguration
+    sourceConfiguration: DPMConfiguration,
+    inspectionSeconds: number
 ): Promise<SourceStreamsInspectionResult> {
     // Parsing file content
 
@@ -534,7 +537,8 @@ export async function inspectStreamSet(
                 }
             },
             sourceInspectionContext,
-            sourceConfiguration
+            sourceConfiguration,
+            inspectionSeconds
         );
         return inspectionResults;
     } catch (error) {

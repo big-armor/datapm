@@ -1,6 +1,6 @@
-import { Connector, ConnectorDescription } from "../../Connector";
-import { SinkDescription } from "../../Sink";
-import { SourceDescription } from "../../Source";
+import { Connector, ConnectorDescription } from "../Connector";
+import { SinkDescription } from "../Sink";
+import { SourceDescription } from "../Source";
 
 export const DISPLAY_NAME = "Decodable";
 export const TYPE = "decodable";

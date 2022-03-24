@@ -25,6 +25,7 @@ export class UpdateArguments {
     reference?: string | PackageIdentifier;
     defaults?: boolean;
     forceUpdate?: boolean;
+    inspectionSeconds?: number;
 }
 
 export class UpdatePackageJob extends Job<PackageFileWithContext> {
@@ -220,7 +221,8 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                     streamSet,
                     sourceInspectionContext,
                     this.jobContext,
-                    sourceObject.configuration || {}
+                    sourceObject.configuration || {},
+                    this.argv.inspectionSeconds || 30
                 );
 
                 newPackageFile.schemas = [...newPackageFile.schemas, ...streamInspectionResult.schemas];
