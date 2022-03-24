@@ -93,7 +93,10 @@ export abstract class KnexSink implements Sink {
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration
+        configuration: DPMConfiguration,
+        _updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
+        _jobContext: JobContext
     ): Promise<WritableWithContext> {
         this.schema = schema;
         this.configuration = configuration;

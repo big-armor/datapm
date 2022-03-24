@@ -15,7 +15,7 @@ import {
 import fs from "fs";
 import { UpdateCatalogDocument, UpdatePackageDocument } from "datapm-client-lib";
 
-const fetchCommandPrompts = ["Connector?", "File Format?", "File Location?"];
+const fetchCommandPrompts = ["Connector?", "File format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 

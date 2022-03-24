@@ -1,4 +1,4 @@
-import { Sink, SinkDescription } from "../../Sink";
+import { Sink, SinkDescription } from "../Sink";
 import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 
 export class DecodableSinkDescription implements SinkDescription {

@@ -149,7 +149,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             transform: (chunk:DataRecordContext, encoding, callback) => {
 
                 if(chunk.offset <= this.lastObservedOffset) {
-                    callback(new Error("Offset must be greater than the last saved offset"));
+                    callback(new Error("Offset (" + chunk.offset + ") must be greater than the last saved offset (" + this.lastObservedOffset + ")"));
                     return;    
                 }
 

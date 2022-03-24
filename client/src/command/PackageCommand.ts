@@ -8,6 +8,7 @@ export class PackageCommandArguments {
     configuration?: string;
     references?: string[];
     catalogSlug?: string;
+    inspectionSeconds?: number;
 }
 export class PackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {
@@ -38,6 +39,10 @@ export class PackageCommand implements Command {
                     .option("configuration", {
                         describe: "JSON object for configuring source options",
                         type: "string"
+                    })
+                    .option("inspectionSeconds", {
+                        describe: "Number of seconds to wait for source inspection",
+                        type: "number"
                     })
                     .help(),
             handler: packageCommand

@@ -26,7 +26,8 @@ export abstract class AbstractFileSink implements Sink {
     abstract getWritableTransform(
         fileName: string,
         configuration: DPMConfiguration,
-        updateMethod: UpdateMethod
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean
     ): Promise<{ writingTransform: Transform; outputUrl: string }>;
 
     abstract getSinkStateWritable(
@@ -156,7 +157,7 @@ export abstract class AbstractFileSink implements Sink {
                     type: ParameterType.Select,
                     name: "format",
                     defaultValue: defaultParameterValues.format as string,
-                    message: "File Format?",
+                    message: "File format?",
                     options: getRecordSerializers()
                         .map((writer) => {
                             return { title: writer.getDisplayName(), value: writer.getOutputMimeType() };
@@ -194,6 +195,7 @@ export abstract class AbstractFileSink implements Sink {
         _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
         jobContext: JobContext
     ): Promise<WritableWithContext> {
         const task = await jobContext.startTask("Opening File Writer");
@@ -213,7 +215,8 @@ export abstract class AbstractFileSink implements Sink {
         const writableStreamResponse = await this.getWritableTransform(
             `${schema.title}.${serializerTransform?.getFileExtension()}`,
             configuration,
-            updateMethod
+            updateMethod,
+            replaceExistingData
         );
 
         task.end("SUCCESS", "File Writer Opened");

@@ -86,7 +86,8 @@ export class LocalFileSink extends AbstractFileSink {
     async getWritableTransform(
         fileName: string,
         configuration: DPMConfiguration,
-        updateMethod: UpdateMethod
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean
     ): Promise<{ writingTransform: Transform; outputUrl: string }> {
         const outputUrl = configuration.fileLocation + `/${fileName}`;
 
@@ -95,7 +96,7 @@ export class LocalFileSink extends AbstractFileSink {
         }
 
         let mode = "w";
-        if (updateMethod === UpdateMethod.APPEND_ONLY_LOG) mode = "a";
+        if (!replaceExistingData && updateMethod === UpdateMethod.APPEND_ONLY_LOG) mode = "a";
 
         const fileHandle = fs.openSync(outputUrl, mode);
 

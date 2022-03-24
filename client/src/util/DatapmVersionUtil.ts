@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path/posix";
+import { readDataPMVersion } from "datapm-client-lib";
 import os from "os";
 
 let datapmVersionPrinted = false;
@@ -15,21 +14,4 @@ export function printDataPMVersion(argv: any): void {
         console.log("");
         datapmVersionPrinted = true;
     }
-}
-
-function readDataPMVersion(): string {
-    let currentDirectory = __dirname;
-
-    let lastDirectory = "asdfas";
-    while (currentDirectory !== lastDirectory) {
-        if (fs.existsSync(path.join(currentDirectory, "package.json"))) {
-            const packageContents = fs.readFileSync(path.join(currentDirectory, "package.json"));
-            const packageJson = JSON.parse(packageContents.toString());
-            return packageJson.version;
-        }
-        lastDirectory = currentDirectory;
-        currentDirectory = path.resolve(currentDirectory, "..");
-    }
-
-    throw new Error("Could not find package.json");
 }

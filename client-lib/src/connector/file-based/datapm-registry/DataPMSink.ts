@@ -109,6 +109,7 @@ export class DataPMSink implements Sink {
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
         jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (typeof connectionConfiguration.url !== "string") {
@@ -150,7 +151,8 @@ export class DataPMSink implements Sink {
                                 schemaTitle: record.recordContext.schemaSlug,
                                 registryUrl: connectionConfiguration.url as string
                             },
-                            updateMethod
+                            updateMethod,
+                            replaceExistingData
                         );
 
                         this.serverChannelForRecordKey[this.recordToChannelKey(record)] = serverChannel;
@@ -258,11 +260,10 @@ export class DataPMSink implements Sink {
     async startUploadRequest(
         socket: Socket,
         streamIdentifier: SchemaRepositoryStreamIdentifier,
-        updateMethod: UpdateMethod
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean
     ): Promise<string> {
-        const startNewBatch = updateMethod === UpdateMethod.BATCH_FULL_SET;
-
-        const uploadRequest = new StartUploadRequest(streamIdentifier, startNewBatch, updateMethod);
+        const uploadRequest = new StartUploadRequest(streamIdentifier, replaceExistingData, updateMethod);
 
         let uploadChannelName = "not-set";
 

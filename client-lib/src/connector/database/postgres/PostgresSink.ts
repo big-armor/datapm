@@ -1,4 +1,4 @@
-import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType, UpdateMethod } from "datapm-lib";
 import Knex, { Ref, Transaction } from "knex";
 import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
@@ -123,7 +123,10 @@ export class PostgresSink extends KnexSink {
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration
+        configuration: DPMConfiguration,
+        updateMethod: UpdateMethod,
+        replaceExistingData: boolean,
+        jobContext: JobContext
     ): Promise<WritableWithContext> {
         if (connectionConfiguration.host == null)
             throw new Error("'host' is a required configuration value for postgresql");
@@ -148,11 +151,21 @@ export class PostgresSink extends KnexSink {
             schema,
             connectionConfiguration,
             credentialsConfiguration,
-            configuration
+            configuration,
+            updateMethod,
+            replaceExistingData,
+            jobContext
         );
 
         await this.client.transaction(async (tx) => {
             await tx.raw(`CREATE SCHEMA IF NOT EXISTS "${configuration.schema}"`);
+
+            if (replaceExistingData) {
+                await tx.raw(
+                    `DROP TABLE IF EXISTS "${configuration.schema}"."${this.getSafeTableName(schema.title as string)}"`
+                );
+            }
+
             await this.createTableFromSchema(tx, configuration, schema);
         });
 

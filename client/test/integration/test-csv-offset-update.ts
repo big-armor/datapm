@@ -132,7 +132,7 @@ describe("CSV Offset Tests", function () {
                     input: "Local" + KEYS.ENTER
                 },
                 {
-                    message: "File Format?",
+                    message: "File format?",
                     input: "JSON" + KEYS.ENTER
                 },
                 {
@@ -175,7 +175,7 @@ describe("CSV Offset Tests", function () {
                     input: "Local" + KEYS.ENTER
                 },
                 {
-                    message: "File Format?",
+                    message: "File format?",
                     input: "JSON" + KEYS.ENTER
                 },
                 {
