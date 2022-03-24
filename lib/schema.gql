@@ -281,6 +281,7 @@ enum JobType {
     DAILY_NOTIFICATIONS
     WEEKLY_NOTIFICATIONS
     MONTHLY_NOTIFICATIONS
+    PACKAGE_UPDATE
 }
 
 """
@@ -1740,5 +1741,5 @@ type Mutation {
     """
     Run a named job. Key is a shared key. Job is the name of the job to run
     """
-    runJob(key: String!, job: JobType!): Void
+    runJob(key: String!, job: JobType!, packageIdentifier: PackageIdentifierInput): Void
 }

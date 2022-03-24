@@ -9,14 +9,20 @@ import {
     monthlyNotifications,
     weeklyNotifications
 } from "../service/notification-service";
-import { JobType } from "../generated/graphql";
+import { JobType, Maybe, PackageIdentifierInput } from "../generated/graphql";
+import { packageUpdateScheduling } from "../service/package-update-service";
 
 export const runJob = async (
     _0: any,
-    { key, job }: { key: string; job: string },
+    { key, job, packageIdentifier }: { key: string; job: string, packageIdentifier?: Maybe<PackageIdentifierInput> },
     context: Context,
     info: any
 ): Promise<void> => {
+
+    if(process.env["LEADER_ELECTION_DISABLED"] !== "true") {
+        throw new Error("Leader election is not disabled. Jobs can not be invoked remotely.");
+    }
+
     if (process.env["SCHEDULER_KEY"] == null) {
         throw new Error("SCHEDULER_KEY environment variable not defined");
     }
@@ -37,15 +43,24 @@ export const runJob = async (
     }
 
     if (job === JobType.INSTANT_NOTIFICATIONS) {
-        instantNotifications(context.connection);
+        await instantNotifications(context.connection);
     } else if (job === JobType.HOURLY_NOTIFICATIONS) {
-        hourlyNotifications(context.connection);
+        await hourlyNotifications(context.connection);
     } else if (job === JobType.DAILY_NOTIFICATIONS) {
-        dailyNotifications(context.connection);
+        await dailyNotifications(context.connection);
     } else if (job === JobType.WEEKLY_NOTIFICATIONS) {
-        weeklyNotifications(context.connection);
+        await weeklyNotifications(context.connection);
     } else if (job === JobType.MONTHLY_NOTIFICATIONS) {
-        monthlyNotifications(context.connection);
+        await monthlyNotifications(context.connection);
+    } else if (job === JobType.PACKAGE_UPDATE) {
+        
+        if(packageIdentifier == null) {
+            throw new Error("packageIdentifier must be provided");
+        }
+
+        await packageUpdateScheduling(context.connection);
+
+
     } else {
         throw new Error("JOB_NOT_RECOGNIZED - " + job);
     }

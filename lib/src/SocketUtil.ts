@@ -338,7 +338,10 @@ export enum JobRequestType {
     EXIT = "exit",
 
     /** When responding with an error */
-    ERROR = "error"
+    ERROR = "error",
+
+    /** Sent by the server when a running task message should be removed from the UI */
+    CLEAR_TASK = "clearTask"
 }
 
 /** For certain JobMessages, they need a message type. This is really a copy and paste
