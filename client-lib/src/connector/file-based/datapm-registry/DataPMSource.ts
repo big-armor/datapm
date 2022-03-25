@@ -23,11 +23,10 @@ import { SemVer } from "semver";
 import { Socket } from "socket.io-client";
 import { PassThrough } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { getPackage } from "../../../util/PackageContext";
 import { InspectionResults, Source, SourceInspectionContext, StreamSetPreview, StreamSummary } from "../../Source";
 import { connectSocket } from "./DataPMRepository";
 import { TYPE } from "./DataPMConnectorDescription";
-import { JobContext } from "../../../main";
+import { getPackageFromUrl, JobContext } from "../../../main";
 
 export class DataPMSource implements Source {
     socket: Socket;
@@ -44,7 +43,7 @@ export class DataPMSource implements Source {
     ): Promise<InspectionResults> {
         const url = connectionConfiguration.url + "/" + configuration.catalogSlug + "/" + configuration.packageSlug;
 
-        const packageFileWithContext = await getPackage(context.jobContext, url, "modified");
+        const packageFileWithContext = await getPackageFromUrl(context.jobContext, url, "modified");
 
         const socket = await this.connectSocket(context.jobContext, connectionConfiguration, credentialsConfiguration);
 

@@ -363,11 +363,7 @@ describe("Edit Package Command Tests", async () => {
             [`http://localhost:${registryServerPort}/testa-edit-command/test`],
             prompts,
             async (line: string) => {
-                if (
-                    line.includes(
-                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
-                    )
-                ) {
+                if (line.includes("You do not have edit permission for this package")) {
                     results.messageFound = true;
                 }
             }
@@ -395,6 +391,7 @@ describe("Edit Package Command Tests", async () => {
         };
 
         const cmdResult = await testCmd("edit", [packageAFilePath, "--defaults"], [], async (line: string) => {
+            console.log(line);
             if (line.includes("You are not logged in to the registry. Use the following command to login")) {
                 results.messageFound = true;
             }

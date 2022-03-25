@@ -17,10 +17,6 @@ import {
     UpdatePackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
-import request from "superagent";
-import fs from "fs";
-import sanitize from "sanitize-filename";
-import { TEMP_STORAGE_PATH } from "./setup";
 
 describe("Package Issues and Comments Tests", async () => {
     const DATA_ENDPOINT_URL = "localhost:4000/data";

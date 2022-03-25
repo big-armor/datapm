@@ -84,25 +84,6 @@ export interface JobContext {
         reference: string | PackageIdentifier,
         modifiedOrCanonical: "modified" | "canonicalIfAvailable"
     ): Promise<PackageFileWithContext>;
-
-    /** Return a writable for a package file */
-    getPackageFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
-
-    getReadMeFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
-
-    getLicenseFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
 }
 
 export interface JobResult<T> {

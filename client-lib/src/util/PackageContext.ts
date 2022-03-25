@@ -1,5 +1,4 @@
 import {
-    loadPackageFileFromDisk,
     parsePackageFileJSON,
     catalogSlugValid,
     packageSlugValid,
@@ -7,13 +6,12 @@ import {
     validatePackageFile,
     RegistryReference
 } from "datapm-lib";
-import fs from "fs";
-import path from "path";
 import { Package, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { JobContext } from "../task/Task";
-import { publishPackageFile, writeLicenseFile, writePackageFile, writeReadmeFile } from "./PackageUtil";
+import { publishPackageFile } from "./PackageUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import fetch from "cross-fetch";
+import { parsePackageIdentifier } from "./ParsePackageIdentifierUtil";
 
 export interface PackageFileWithContext {
     packageFile: PackageFile;
@@ -120,78 +118,6 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
     }
 }
 
-export class LocalPackageFileContext implements PackageFileWithContext {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(public jobContext: JobContext, public packageFile: PackageFile, public packageFilePath: string) {}
-
-    get contextType(): "localFile" {
-        return "localFile";
-    }
-
-    get permitsSaving(): boolean {
-        return true;
-    }
-
-    get hasPermissionToSave(): boolean {
-        const fileStats = fs.statSync(this.packageFileUrl);
-
-        return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
-    }
-
-    get cantSaveReason(): string | undefined {
-        if (!this.hasPermissionToSave) {
-            return "You do not have write permission on the package file.";
-        }
-
-        return undefined;
-    }
-
-    get packageFileUrl(): string {
-        return this.packageFilePath;
-    }
-
-    get readmeFileUrl(): string | undefined {
-        return this.packageFile.readmeFile ? "file://" + this.packageFile.readmeFile : undefined;
-    }
-
-    get licenseFileUrl(): string | undefined {
-        return this.packageFile.licenseFile ? "file://" + this.packageFile.licenseFile : undefined;
-    }
-
-    async save(packageFile: PackageFile): Promise<void> {
-        // Write updates to the target package file in place
-        let task = await this.jobContext.startTask("Writing package file...");
-        let packageFileLocation;
-
-        try {
-            packageFileLocation = await writePackageFile(this.jobContext, undefined, packageFile);
-
-            await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
-            throw error;
-        }
-
-        task = await this.jobContext.startTask("Writing README file...");
-        try {
-            const readmeFileLocation = writeReadmeFile(this.jobContext, undefined, packageFile);
-            await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the README file: ${error.message}`);
-            throw error;
-        }
-
-        task = await this.jobContext.startTask("Writing LICENSE file...");
-        try {
-            const licenseFileLocation = writeLicenseFile(this.jobContext, undefined, packageFile);
-            await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
-            throw error;
-        }
-    }
-}
-
 export class HttpPackageFileContext implements PackageFileWithContext {
     // eslint-disable-next-line no-useless-constructor
     constructor(public packageFile: PackageFile, public url: string) {}
@@ -261,7 +187,7 @@ async function fetchPackage(
     return new RegistryPackageFileContext(jobContext, packageFile, packageEntity);
 }
 
-export async function getPackage(
+export async function getPackageFromUrl(
     jobContext: JobContext,
     identifier: string | PackageIdentifierInput,
     modifiedOrCanonical: "modified" | "canonicalIfAvailable"
@@ -290,23 +216,6 @@ export async function getPackage(
 
         const packageFile = parsePackageFileJSON(await http.text());
         return new HttpPackageFileContext(packageFile, identifier);
-    } else if (typeof identifier === "string" && fs.existsSync(identifier)) {
-        const packageFile = loadPackageFileFromDisk(identifier);
-        let pathToPackageFile = path.dirname(identifier);
-
-        if (!path.isAbsolute(identifier)) {
-            pathToPackageFile = process.cwd();
-            const directory = path.dirname(identifier);
-
-            if (directory !== ".") {
-                pathToPackageFile += path.sep + directory;
-            }
-        }
-        const packageFileName = path.basename(identifier);
-
-        const filePAth = path.join(pathToPackageFile, packageFileName);
-
-        return new LocalPackageFileContext(jobContext, packageFile, filePAth);
     } else if (typeof identifier === "string" && isValidPackageIdentifier(identifier) !== false) {
         const packageIdentifier: PackageIdentifierInput = {
             catalogSlug: identifier.split("/")[0],
@@ -319,15 +228,6 @@ export async function getPackage(
             `Reference '${identifier}' is either not a valid package identifier, a valid package url, or url pointing to a valid package file.`
         );
     }
-}
-
-export function parsePackageIdentifier(url: string): PackageIdentifierInput {
-    const pathParts = url.split("/");
-
-    return {
-        catalogSlug: pathParts[pathParts.length - 2],
-        packageSlug: pathParts[pathParts.length - 1]
-    };
 }
 
 /** Whether a string is a valid identifier for a package on datapm.io */

@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import ora from "ora";
-import fs from "fs";
 import path from "path";
 import {
     JobContext,
@@ -9,12 +8,8 @@ import {
     RegistryConfig,
     PackageFileWithContext,
     PackageIdentifier,
-    getPackage,
-    writePackageFile,
     TaskStatus
 } from "datapm-client-lib";
-import { Writable } from "stream";
-import { SemVer } from "semver";
 import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
 import {
@@ -26,6 +21,8 @@ import {
     saveRepositoryConfig,
     saveRepositoryCredential
 } from "../util/ConfigUtil";
+import { LocalPackageFileContext } from "../util/LocalPackageFileContext";
+import { getPackage } from "../util/GetPackageUtil";
 
 export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
@@ -54,52 +51,19 @@ export class CLIJobContext implements JobContext {
         catalogSlug: string | undefined,
         packagefile: PackageFile
     ): Promise<PackageFileWithContext> {
-        const packageFileLocation = await writePackageFile(this, catalogSlug, packagefile);
+        const packageFileWithContext = new LocalPackageFileContext(
+            this,
+            packagefile,
+            path.join(process.cwd(), packagefile.packageSlug + ".datapm.json")
+        );
 
-        return getPackage(this, packageFileLocation, "canonicalIfAvailable");
+        await packageFileWithContext.save(packagefile);
+
+        return packageFileWithContext;
     }
 
     getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
         return getRepositoryConfig(type, identifier);
-    }
-
-    async getPackageFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".datapm.json");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
-    }
-
-    async getReadMeFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{
-        writable: Writable;
-        location: string; // eslint-disable-next-line prefer-promise-reject-errors
-    }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".README.md");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
-    }
-
-    async getLicenseFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".LICENSE.md");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
     }
 
     getRepositoryConfigsByType(type: string): RepositoryConfig[] {

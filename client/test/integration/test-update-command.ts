@@ -336,11 +336,7 @@ describe("Update Package Command Tests", async () => {
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
             async (line: string) => {
-                if (
-                    line.includes(
-                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
-                    )
-                ) {
+                if (line.includes("You do not have edit permission for this package")) {
                     results.messageFound = true;
                 }
             }

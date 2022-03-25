@@ -34,7 +34,6 @@ import { Maybe } from "../util/Maybe";
 import { Job, JobContext, JobResult } from "./Task";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { JSONSchema7TypeName } from "json-schema";
 import numeral from "numeral";
 import { PackageFileWithContext } from "../main";
