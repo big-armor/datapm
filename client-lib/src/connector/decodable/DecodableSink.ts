@@ -143,6 +143,7 @@ export class DecodableSink implements Sink {
                 const streamId = await this.getOrCreateStream(
                     schema,
                     connectionConfiguration,
+                    credentialsConfiguration,
                     configuration,
                     jobContext
                 );
@@ -154,6 +155,7 @@ export class DecodableSink implements Sink {
                     this.streamIds.get(schema.title) as string,
                     schema,
                     connectionConfiguration,
+                    credentialsConfiguration,
                     configuration,
                     jobContext
                 );
@@ -175,7 +177,7 @@ export class DecodableSink implements Sink {
     async getWriteable(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         _updateMethod: UpdateMethod,
         replaceExistingData: boolean,
@@ -187,7 +189,7 @@ export class DecodableSink implements Sink {
 
         if (schema.title == null) throw new Error("Schema has no title");
 
-        const authToken = getAuthToken();
+        const authToken = getAuthToken(credentialsConfiguration);
 
         const connectionId = this.connectorIds.get(schema.title);
 
@@ -266,6 +268,7 @@ export class DecodableSink implements Sink {
     async getOrCreateStream(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<string> {
@@ -290,7 +293,7 @@ export class DecodableSink implements Sink {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${getAuthToken()}`
+                    Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                 }
             });
 
@@ -331,7 +334,7 @@ export class DecodableSink implements Sink {
                     headers: {
                         Accept: "application/json",
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${getAuthToken()}`
+                        Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                     },
                     body: requestBody
                 }
@@ -362,6 +365,7 @@ export class DecodableSink implements Sink {
         streamId: string,
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<string> {
@@ -386,7 +390,7 @@ export class DecodableSink implements Sink {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
-                    Authorization: `Bearer ${getAuthToken()}`
+                    Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                 }
             });
 
@@ -421,7 +425,7 @@ export class DecodableSink implements Sink {
                     headers: {
                         Accept: "application/json",
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${getAuthToken()}`
+                        Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                     },
                     body: JSON.stringify({
                         name: decodableConnectionName,
@@ -458,7 +462,7 @@ export class DecodableSink implements Sink {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
-                        Authorization: `Bearer ${getAuthToken()}`
+                        Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                     }
                 }
             );
@@ -476,7 +480,7 @@ export class DecodableSink implements Sink {
                         method: "GET",
                         headers: {
                             Accept: "application/json",
-                            Authorization: `Bearer ${getAuthToken()}`
+                            Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                         }
                     }
                 );

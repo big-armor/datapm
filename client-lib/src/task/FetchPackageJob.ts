@@ -288,7 +288,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         // Write records
         let interupted: false | string = false;
 
-        ON_DEATH({})((signal) => {
+        ON_DEATH({})((signal: string) => {
             interupted = signal;
         });
 
