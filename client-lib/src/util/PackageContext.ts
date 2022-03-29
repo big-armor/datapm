@@ -13,13 +13,28 @@ import { getRegistryClientWithConfig } from "./RegistryClient";
 import fetch from "cross-fetch";
 import { parsePackageIdentifier } from "./ParsePackageIdentifierUtil";
 
+export type CantSaveReasons = "NOT_AUTHENTICATED" | "SAVE_NOT_AVAILABLE" | "NOT_AUTHORIZED";
+
+export function cantSaveReasonToString(reason: CantSaveReasons): string {
+    switch (reason) {
+        case "NOT_AUTHENTICATED":
+            return "You are not authenticated to the registry. Use the `datapm login` command to authenticate.";
+        case "SAVE_NOT_AVAILABLE":
+            return "Saving is not available for this package";
+        case "NOT_AUTHORIZED":
+            return "You do not have edit/write permission for the package.";
+        default:
+            return "Unknown reason";
+    }
+}
+
 export interface PackageFileWithContext {
     packageFile: PackageFile;
     contextType: "localFile" | "registry" | "http";
     catalogSlug?: string;
     permitsSaving: boolean;
     hasPermissionToSave: boolean;
-    cantSaveReason?: string;
+    cantSaveReason: CantSaveReasons | false;
     packageFileUrl: string;
     readmeFileUrl: string | undefined;
     licenseFileUrl: string | undefined;
@@ -28,7 +43,12 @@ export interface PackageFileWithContext {
 }
 export class RegistryPackageFileContext implements PackageFileWithContext {
     // eslint-disable-next-line no-useless-constructor
-    constructor(public jobContext: JobContext, public packageFile: PackageFile, public packageObject: Package) {}
+    constructor(
+        public jobContext: JobContext,
+        public packageFile: PackageFile,
+        public packageObject: Package,
+        public isAuthenticated: boolean
+    ) {}
 
     get contextType(): "registry" {
         return "registry";
@@ -42,16 +62,16 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         return this.packageObject.myPermissions?.includes(Permission.EDIT) || false;
     }
 
-    get cantSaveReason(): string | undefined {
-        if (this.packageObject.myPermissions == null) {
-            return "You are not logged-in to the registry.";
+    get cantSaveReason(): CantSaveReasons | false {
+        if (this.isAuthenticated !== true) {
+            return "NOT_AUTHENTICATED";
         }
 
-        if (!this.packageObject.myPermissions.includes(Permission.EDIT)) {
-            return "You do not have edit permission for this package.";
+        if (!this.packageObject.myPermissions?.includes(Permission.EDIT)) {
+            return "NOT_AUTHORIZED";
         }
 
-        return undefined;
+        return false;
     }
 
     get packageFileUrl(): string {
@@ -146,6 +166,10 @@ export class HttpPackageFileContext implements PackageFileWithContext {
         return undefined;
     }
 
+    get cantSaveReason(): CantSaveReasons | false {
+        return "SAVE_NOT_AVAILABLE";
+    }
+
     save(): Promise<void> {
         throw new Error("HttpPackageFileContext does not support saving");
     }
@@ -157,6 +181,8 @@ async function fetchPackage(
     identifier: PackageIdentifierInput,
     modifiedOrCanonical: "modified" | "canonicalIfAvailable"
 ): Promise<RegistryPackageFileContext> {
+    const registryConfig = jobContext.getRegistryConfig(registryUrl);
+
     const registryClient = getRegistryClientWithConfig(jobContext, { url: registryUrl });
 
     const response = await registryClient.getPackage({
@@ -184,14 +210,14 @@ async function fetchPackage(
     validatePackageFile(packageFileJSON);
     const packageFile = parsePackageFileJSON(packageFileJSON);
 
-    return new RegistryPackageFileContext(jobContext, packageFile, packageEntity);
+    return new RegistryPackageFileContext(jobContext, packageFile, packageEntity, registryConfig?.apiKey != null);
 }
 
 export async function getPackageFromUrl(
     jobContext: JobContext,
     identifier: string | PackageIdentifierInput,
     modifiedOrCanonical: "modified" | "canonicalIfAvailable"
-): Promise<PackageFileWithContext> {
+): Promise<HttpPackageFileContext | RegistryPackageFileContext> {
     if (typeof identifier === "string" && (identifier.startsWith("http://") || identifier.startsWith("https://"))) {
         const http = await fetch(identifier, {
             method: "GET"

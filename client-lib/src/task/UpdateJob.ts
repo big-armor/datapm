@@ -10,7 +10,7 @@ import {
 } from "datapm-lib";
 import { PackageIdentifier } from "../generated/graphql";
 import { SourceInspectionContext } from "../connector/Source";
-import { PackageFileWithContext } from "../util/PackageContext";
+import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import { JobContext, Job, JobResult } from "./Task";
 import clone from "rfdc";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
@@ -88,7 +88,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
         }
 
         if (!packageFileWithContext.hasPermissionToSave) {
-            await task.end("ERROR", packageFileWithContext.cantSaveReason);
+            await task.end("ERROR", cantSaveReasonToString(packageFileWithContext.cantSaveReason as CantSaveReasons));
             return {
                 exitCode: 1
             };

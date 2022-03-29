@@ -1,6 +1,6 @@
 import { PackageFile } from "datapm-lib";
 import { Writable } from "stream";
-import { JobContext } from "datapm-client-lib";
+import { JobContext, CantSaveReasons } from "datapm-client-lib";
 import { PackageFileWithContext } from "datapm-client-lib/src/util/PackageContext";
 import fs from "fs";
 import path from "path";
@@ -23,12 +23,12 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
     }
 
-    get cantSaveReason(): string | undefined {
+    get cantSaveReason(): CantSaveReasons | false {
         if (!this.hasPermissionToSave) {
-            return "You do not have write permission on the package file.";
+            return "NOT_AUTHORIZED";
         }
 
-        return undefined;
+        return false;
     }
 
     get packageFileUrl(): string {

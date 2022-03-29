@@ -1,4 +1,4 @@
-import { JobContext, MessageType, PackageFileWithContext, PackageIdentifier, parsePackageIdentifier, RegistryConfig, RepositoryConfig, Task } from "datapm-client-lib";
+import { CantSaveReasons, JobContext, MessageType, PackageFileWithContext, PackageIdentifier, parsePackageIdentifier, RegistryConfig, RepositoryConfig, Task } from "datapm-client-lib";
 import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
 import { SemVer } from "semver";
 import { Writable } from "stream";
@@ -95,13 +95,13 @@ export abstract class BackendJobContextBase implements JobContext {
 
         let editPermission = false;
 
-        let cantSaveReason: string | undefined = "You do not have edit permission on the pacakge";
+        let cantSaveReason: CantSaveReasons | false = "NOT_AUTHORIZED"
 
         if((this.context as AuthenticatedContext).me != null) {
             const authenicatedContext = this.context as AuthenticatedContext;
             const permissions = await resolvePackagePermissions(this.context, identifier, authenicatedContext.me);
             editPermission = permissions.includes(Permission.EDIT);
-            cantSaveReason = undefined;
+            cantSaveReason = false;
         }
 
         return {

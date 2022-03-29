@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { PackageFile, PublishMethod, RegistryReference, ParameterOption, ParameterType } from "datapm-lib";
 import { Catalog } from "../generated/graphql";
-import { RegistryPackageFileContext } from "../util/PackageContext";
+import { RegistryPackageFileContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import { publishPackageFile } from "../util/PackageUtil";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { Job, JobContext, JobResult } from "./Task";
@@ -287,23 +287,16 @@ export class PublishJob extends Job<PublishJobResult> {
 
         await publishPackageFile(this.jobContext, packageFile, targetRegistries);
 
-        if (packageFileWithContext.permitsSaving) {
-            if (packageFileWithContext.hasPermissionToSave) {
-                await packageFileWithContext.save(packageFile);
-            } else {
-                this.jobContext.print(
-                    "WARN",
-                    packageFileWithContext.cantSaveReason || "You don't have permission to save this package file."
-                );
-            }
+        if (packageFileWithContext.permitsSaving && packageFileWithContext.hasPermissionToSave) {
+            await packageFileWithContext.save(packageFile);
         } else {
             this.jobContext.print(
-                "WARN",
-                "Can not save package the original package file via " +
-                    packageFileWithContext.contextType +
-                    ", so these publish settings will not be saved."
+                "ERROR",
+                cantSaveReasonToString(packageFileWithContext.cantSaveReason as CantSaveReasons)
             );
-            this.jobContext.print("WARN", "Use the new package location for future publishing.");
+            return {
+                exitCode: 1
+            };
         }
 
         return {

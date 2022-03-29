@@ -11,7 +11,7 @@ import {
     ParameterType
 } from "datapm-lib";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { PackageFileWithContext } from "../util/PackageContext";
+import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import chalk from "chalk";
 import { SemVer } from "semver";
 import clone from "rfdc";
@@ -51,7 +51,7 @@ export class EditJob extends Job<EditJobResult> {
         // Finding package
         let task = await this.jobContext.startTask("Finding package...");
 
-        let packageFileWithContext;
+        let packageFileWithContext: PackageFileWithContext;
 
         try {
             packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "canonicalIfAvailable");
@@ -80,7 +80,7 @@ export class EditJob extends Job<EditJobResult> {
         }
 
         if (!packageFileWithContext.hasPermissionToSave) {
-            await task.end("ERROR", packageFileWithContext.cantSaveReason);
+            await task.end("ERROR", cantSaveReasonToString(packageFileWithContext.cantSaveReason as CantSaveReasons));
             return {
                 exitCode: 1
             };
