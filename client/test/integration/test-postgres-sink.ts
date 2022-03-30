@@ -513,7 +513,6 @@ describe("Postgres Sink Test", function () {
             [packageCFilePath, "--forceUpdate", "--sink", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
-                console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }

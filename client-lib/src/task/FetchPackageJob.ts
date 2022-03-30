@@ -91,7 +91,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
         } catch (error) {
             if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
-                await task.end("ERROR", "You are not authenticated to the registry.");
+                await task.end("ERROR", "You are not logged in to the registry.");
 
                 this.jobContext.print("INFO", "Use the following command to authenticate.");
                 this.jobContext.print("NONE", chalk.green("datapm registry login"));

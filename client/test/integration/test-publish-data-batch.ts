@@ -268,7 +268,7 @@ describe("Publish Data Batch Tests", async function () {
             [`http://localhost:${registryServerPort}/test-publish-data-batch-A/countries`, "--forceUpdate"],
             prompts,
             async (line: string) => {
-                if (line.includes("You are not authenticated to the registry")) {
+                if (line.includes("You are not logged in to the registry")) {
                     results.messageFound = true;
                 }
             }
