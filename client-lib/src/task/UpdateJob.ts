@@ -97,7 +97,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                     };
                 } else if (error.message === "NOT_AUTHENTICATED") {
                     await task.end("ERROR", "You are not logged in to the registry.");
-                    this.jobContext.print("INFO", chalk.green("Use the following command to login"));
+                    this.jobContext.print("INFO", "Use the following command to login");
                     this.jobContext.print(
                         "INFO",
                         chalk.green("datapm registry login " + registryPackageFileContext.registryUrl)

@@ -28,11 +28,11 @@ When using a private DataPM registry, you'll still have access with all the grea
 
 ## Software requirements
 
-DataPM Registry requires a PostgreSQL version 13 database server. Your choose to use an existing instance, a cloud based instance, or to create a standalone instance using a simple Docker image from Postgres.
+DataPM Registry requires a PostgreSQL version 13 database server. You can use an existing instance, a cloud based instance, or a Docker image from Postgres.
 
 ## Hardware requirements
 
-DataPM Registry server does not require significant hardware resources, and runs well in a virtualized environment. These specs are given a simple minimums.
+DataPM Registry server does not require significant hardware resources, and runs well in a virtualized environment. These specs are given as basic minimums.
 
 -   CPU: 1 core
 -   RAM: 2GB
