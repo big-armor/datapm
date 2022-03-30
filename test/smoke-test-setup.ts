@@ -37,14 +37,14 @@ before(async function () {
 
     console.log("Postgres started on  " + postgresIpAddress + ":" + postgresPortNumber);
 
-    mailDevContainer = await new GenericContainer("maildev/maildev")
+    mailDevContainer = await new GenericContainer("maildev/maildev", "2.0.2")
         .withExposedPorts(80, 25)
         .withName("smtp")
         .withNetworkMode(network.getName())
         .start();
 
-    mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
-    const mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
+    mailDevWebPortNumber = mailDevContainer.getMappedPort(1080);
+    const mailDevSMTPPortNumber = mailDevContainer.getMappedPort(1025);
     const mailDevIpAddress = mailDevContainer.getIpAddress(network.getName());
 
     console.log(
@@ -70,7 +70,7 @@ before(async function () {
         .withEnv("TYPEORM_USERNAME", "postgres")
         .withEnv("TYPEORM_PASSWORD", "postgres")
         .withEnv("SMTP_SERVER", "smtp")
-        .withEnv("SMTP_PORT", "25")
+        .withEnv("SMTP_PORT", mailDevSMTPPortNumber.toString())
         .withEnv("SMTP_USER", "")
         .withEnv("SMTP_PASSWORD", "")
         .withEnv("SMTP_SECURE", "false")
