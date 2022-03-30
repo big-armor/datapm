@@ -12,6 +12,7 @@ import { StreamTestConnectorDescription } from "./stream/test/StreamTestConnecto
 import { DataPMConnectorDescription } from "./file-based/datapm-registry/DataPMConnectorDescription";
 import { DecodableConnectorDescription } from "./decodable/DecodableConnectorDescription";
 import { CoinbaseConnectorDescription } from "./coinbase/CoinbaseConnectorDescription";
+import { KrakenConnectorDescription } from "./kraken/KrakenConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -24,7 +25,8 @@ export const CONNECTORS: ConnectorDescription[] = [
     new LocalFileConnectorDescription(),
     new StandardOutConnectorDescription(),
     new DecodableConnectorDescription(),
-    new CoinbaseConnectorDescription()
+    new CoinbaseConnectorDescription(),
+    new KrakenConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.

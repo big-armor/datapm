@@ -84,14 +84,14 @@ before(async function () {
 
     listrTasks.push({
         task: async function (): Promise<void> {
-            mailDevContainer = await new GenericContainer("maildev/maildev")
-                .withExposedPorts(80, 25)
+            mailDevContainer = await new GenericContainer("maildev/maildev", "2.0.2")
+                .withExposedPorts(1080, 1025)
                 .withName("smtp-" + runName)
                 .withNetworkMode(network.getName())
                 .start();
 
-            mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
-            mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
+            mailDevWebPortNumber = mailDevContainer.getMappedPort(1080);
+            mailDevSMTPPortNumber = mailDevContainer.getMappedPort(1025);
             mailDevIpAddress = mailDevContainer.getContainerIpAddress();
             console.log(
                 "maildev started on " +

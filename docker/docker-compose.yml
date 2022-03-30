@@ -38,4 +38,4 @@ services:
     smtp:
         image: namshi/smtp:latest
         ports:
-            - "25:25"
+            - "1025:25"
