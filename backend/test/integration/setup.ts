@@ -74,7 +74,7 @@ before(async function () {
 
     // star the maildev server
     mailServer = new maildev({
-        smtp: 1025,
+        smtp: 1026,
         web: 1081,
         ignoreTLS: true
     });
@@ -94,7 +94,7 @@ before(async function () {
     serverProcess = execa("npm", ["run", "start-nowatch"], {
         env: {
             TYPEORM_PORT: postgresPortNumber.toString(),
-            SMTP_PORT: "1025",
+            SMTP_PORT: "1026",
             SMTP_SERVER: "localhost",
             SMTP_USER: "",
             SMTP_PASSWORD: "",
