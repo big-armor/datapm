@@ -53,6 +53,7 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 name: promptParameter.name,
                 message: promptParameter.message,
                 hint: promptParameter.hint,
+                initial: promptParameter.defaultValue,
                 choices: promptParameter.options.filter((o) => o.disabled !== true),
                 min: promptParameter.numberMinimumValue,
                 validate: (value) => validatePromptResponse(value, promptParameter)

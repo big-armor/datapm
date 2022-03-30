@@ -98,6 +98,7 @@ export async function obtainCredentialsConfiguration(
     );
 
     if (
+        connector.userSelectableConnectionHistory() &&
         !credentialsIdentifier &&
         Object.keys(credentialsConfiguration).length === 0 &&
         pendingParameters.length > 0 &&
@@ -159,7 +160,7 @@ export async function obtainCredentialsConfiguration(
 
     parameterCount += credentialsPromptResponse.parameterCount;
 
-    if (Object.keys(credentialsConfiguration).length > 0) {
+    if (connector.userSelectableConnectionHistory() && Object.keys(credentialsConfiguration).length > 0) {
         credentialsIdentifier = await connector.getCredentialsIdentifierFromConfiguration(
             connectionConfiguration,
             credentialsConfiguration

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
+import { DPMConfiguration, nameToSlug, Parameter, ParameterType } from "datapm-lib";
 import { Connector } from "../Connector";
 import { TYPE } from "./DecodableConnectorDescription";
 import yaml from "js-yaml";
@@ -11,7 +11,7 @@ import { JobContext } from "../../main";
 
 type DecodableAuthConfig = {
     tokens: {
-        default: {
+        [key: string]: {
             access_token: string;
             refresh_token: string;
             id_token: string;
@@ -19,6 +19,18 @@ type DecodableAuthConfig = {
     };
     version: string;
 };
+
+type DecodableConfig = {
+    version: string;
+    "active-profile": string;
+    profiles: {
+        [key: string]: {
+            account: string;
+        };
+    };
+};
+
+let printedDecodableLoginMessage = false;
 
 export class DecodableConnector implements Connector {
     getType(): string {
@@ -43,7 +55,7 @@ export class DecodableConnector implements Connector {
 
     getCredentialsIdentifierFromConfiguration(
         _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration
     ): Promise<string> {
         throw new Error("Method not implemented.");
     }
@@ -66,12 +78,41 @@ export class DecodableConnector implements Connector {
 
     getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
-        _authenticationConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         jobContext: JobContext
     ): Parameter[] | Promise<Parameter[]> {
-        jobContext.print("INFO", "Use the Decodable CLI login command to authenticate first");
+        if (!printedDecodableLoginMessage) {
+            jobContext.print("INFO", "Use the Decodable CLI login command to authenticate first");
+            printedDecodableLoginMessage = true;
+        }
 
-        getAuthToken();
+        if (credentialsConfiguration.profile == null) {
+            const authConfig = getDecodableAuthConfig();
+
+            const config = getDecodableConfig();
+
+            const defaultProfile = config["active-profile"] || "default";
+
+            return [
+                {
+                    name: "profile",
+                    type: ParameterType.AutoComplete,
+                    stringMinimumLength: 1,
+                    configuration: credentialsConfiguration,
+                    message: "Auth Profile Name?",
+                    defaultValue: defaultProfile,
+                    options: Object.keys(authConfig.tokens)
+                        .map((profile) => ({
+                            title: profile,
+                            value: profile,
+                            selected: profile === defaultProfile
+                        }))
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                }
+            ];
+        } else {
+            getAuthToken(credentialsConfiguration);
+        }
 
         return [];
     }
@@ -83,9 +124,9 @@ export class DecodableConnector implements Connector {
 
     async testCredentials(
         connectionConfiguration: DPMConfiguration,
-        _authenticationConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
-        const authToken = getAuthToken();
+        const authToken = getAuthToken(credentialsConfiguration);
 
         const accountsResponse = await fetch(
             `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/accounts`,
@@ -111,7 +152,31 @@ export class DecodableConnector implements Connector {
     }
 }
 
-export function getAuthToken(): string {
+export function getAuthToken(credentialsConfiguration: DPMConfiguration): string {
+    const authFile = getDecodableAuthConfig();
+
+    if (typeof credentialsConfiguration.profile !== "string") {
+        throw new Error("Credentials configuration is missing decodable profile name");
+    }
+
+    const profile = credentialsConfiguration.profile;
+
+    const authProfile = authFile.tokens[profile];
+
+    if (authProfile == null) {
+        throw new Error(`No profile ${profile} found in decodable auth file`);
+    }
+
+    const accessToken = authProfile.access_token as string;
+
+    if (accessToken == null) {
+        throw new Error("Decodable auth profile " + profile + " does not contain an access token.");
+    }
+
+    return accessToken;
+}
+
+function getDecodableAuthConfig(): DecodableAuthConfig {
     const decodableAuthFile = path.join(os.homedir(), ".decodable", "auth");
 
     if (!fs.existsSync(decodableAuthFile)) {
@@ -120,11 +185,25 @@ export function getAuthToken(): string {
 
     const authFile = yaml.load(fs.readFileSync(decodableAuthFile, "utf8")) as DecodableAuthConfig;
 
-    const accessToken = authFile.tokens.default.access_token as string;
-
-    if (accessToken == null) {
-        throw new Error("Decodable access token is missing from " + decodableAuthFile);
+    if (authFile.tokens == null || Object.keys(authFile.tokens).length === 0) {
+        throw new Error(decodableAuthFile + " file contains no tokens. Login with Decodable CLI tool.");
     }
 
-    return accessToken;
+    return authFile;
+}
+
+function getDecodableConfig(): DecodableConfig {
+    const decodableConfigFile = path.join(os.homedir(), ".decodable", "config");
+
+    if (!fs.existsSync(decodableConfigFile)) {
+        throw new Error("You must login using the decodable CLI tool before using this connector.");
+    }
+
+    const authFile = yaml.load(fs.readFileSync(decodableConfigFile, "utf8")) as DecodableConfig;
+
+    if (authFile.profiles == null || Object.keys(authFile.profiles).length === 0) {
+        throw new Error(decodableConfigFile + " file contains no profiles. Login with Decodable CLI tool.");
+    }
+
+    return authFile;
 }
