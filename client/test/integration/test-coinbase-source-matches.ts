@@ -16,7 +16,7 @@ describe("Coinbase Matches Source", () => {
         }
     });
 
-    it("Should create a package from coinbase", async () => {
+    it("Should create a package from coinbase matches", async () => {
         let messageFound = false;
         const cmdResult = await testCmd(
             "package",
@@ -84,7 +84,6 @@ describe("Coinbase Matches Source", () => {
                 }
             ],
             async (line: string) => {
-                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     messageFound = true;
                 }
