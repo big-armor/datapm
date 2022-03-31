@@ -144,7 +144,7 @@ export class BinanceSource implements Source {
                     type: ParameterType.Select,
                     configuration,
                     name: "channelType",
-                    message: "Select channel type",
+                    message: "Select channel",
                     options: [
                         {
                             title: "Book ticker, real-time updates",
