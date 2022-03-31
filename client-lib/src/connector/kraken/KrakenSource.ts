@@ -6,7 +6,6 @@ import { TYPE } from "./KrakenConnectorDescription";
 import { URI } from "./KrakenSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { integer } from "aws-sdk/clients/cloudfront";
 
 type KrakenTickerMessage = {
     a: [string, number, string];
@@ -14,7 +13,7 @@ type KrakenTickerMessage = {
     c: [string, string];
     v: [number, number];
     p: [number, number];
-    t: [integer, integer];
+    t: [number, number];
     l: [number, number];
     h: [number, number];
     o: [number, number];

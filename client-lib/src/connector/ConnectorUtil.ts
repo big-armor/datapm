@@ -13,6 +13,7 @@ import { DataPMConnectorDescription } from "./file-based/datapm-registry/DataPMC
 import { DecodableConnectorDescription } from "./decodable/DecodableConnectorDescription";
 import { CoinbaseConnectorDescription } from "./coinbase/CoinbaseConnectorDescription";
 import { KrakenConnectorDescription } from "./kraken/KrakenConnectorDescription";
+import { FTXConnectorDescription } from "./ftx/FTXConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -26,7 +27,8 @@ export const CONNECTORS: ConnectorDescription[] = [
     new StandardOutConnectorDescription(),
     new DecodableConnectorDescription(),
     new CoinbaseConnectorDescription(),
-    new KrakenConnectorDescription()
+    new KrakenConnectorDescription(),
+    new FTXConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
