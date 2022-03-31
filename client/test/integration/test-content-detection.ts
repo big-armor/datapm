@@ -116,7 +116,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Phone Numbers", async function () {
         expect(
-            packageA.schemas[0].properties?.phoneNumbers.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.phoneNumberStrings.valueTypes?.string.contentLabels?.find(
                 (cl) => cl.label === PHONE_NUMBER_LABEL
             ) != null
         ).equal(true);
