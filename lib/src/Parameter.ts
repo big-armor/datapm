@@ -32,7 +32,7 @@ export interface Parameter<T extends string = string> {
     stringMinimumLength?: number;
     stringMaximumLength?: number;
     stringRegExp?: { pattern: RegExp; message: string };
-    validate?: (value: string | number | boolean, parameter: Parameter) => true | string;
+    validate?: (value: string[] | string | number | boolean, parameter: Parameter) => true | string;
 
     /** The configuration object on which the parameter value should be set. Required because
      * configurations can be heirarchical (for nested use cases)

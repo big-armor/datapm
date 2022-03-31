@@ -4,7 +4,7 @@ import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
-describe("Coinbase Source", () => {
+describe("Coinbase Ticker Source", () => {
     after(() => {
         if (fs.existsSync("coinbase-btc-usd-ticker.datapm.json")) {
             fs.unlinkSync("coinbase-btc-usd-ticker.datapm.json");
@@ -25,6 +25,10 @@ describe("Coinbase Source", () => {
                 {
                     message: "Source?",
                     input: "Coinbase" + KEYS.ENTER
+                },
+                {
+                    message: "Select channels",
+                    input: "ticker " + KEYS.ENTER
                 },
                 {
                     message: "Select target pairs",

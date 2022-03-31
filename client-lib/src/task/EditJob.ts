@@ -501,7 +501,7 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
     }
 }
 
-function validUrl(value: string | number | boolean): true | string {
+function validUrl(value: string[] | string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }

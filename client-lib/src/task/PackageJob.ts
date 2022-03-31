@@ -575,7 +575,7 @@ export async function inspectStreamSet(
     }
 }
 
-function validUrl(value: string | number | boolean): true | string {
+function validUrl(value: string[] | string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }
@@ -593,12 +593,16 @@ function validUrl(value: string | number | boolean): true | string {
     return true;
 }
 
-function validSampleRecordCount(value: number | string | boolean, parameter: Parameter): true | string {
+function validSampleRecordCount(value: string[] | number | string | boolean, parameter: Parameter): true | string {
     if (value === "" && parameter.defaultValue != null) return true;
 
     if (typeof value === "string") return "Must be a number";
 
     if (typeof value === "boolean") return "Must be a boolean";
+
+    if (Array.isArray(value)) {
+        return "Must be a number";
+    }
 
     if (value == null) return "Number, 0 to 100, required";
     if (value > 100) return "Number less than 100 required";
@@ -773,7 +777,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
                 type: ParameterType.Text,
                 message: "What SQL or other process was used to derive this data?",
                 configuration: {},
-                validate: (value: string | number | boolean) => {
+                validate: (value: string[] | string | number | boolean) => {
                     if (typeof value !== "string") {
                         return "Must be a string";
                     }

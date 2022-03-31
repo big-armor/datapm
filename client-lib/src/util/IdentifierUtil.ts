@@ -1,6 +1,6 @@
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 
-export function validVersion(value: string | number | boolean): true | string {
+export function validVersion(value: string[] | string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }
@@ -14,12 +14,16 @@ export function validVersion(value: string | number | boolean): true | string {
     return true;
 }
 
-export function validPackageDisplayName(value: string | number | boolean): true | string {
+export function validPackageDisplayName(value: string[] | string | number | boolean): true | string {
     if (value == null) return "Must not be null";
 
     if (typeof value === "number") return "Must be a string";
 
     if (typeof value === "boolean") return "Must be a string";
+
+    if (Array.isArray(value)) {
+        return "Must be a string";
+    }
 
     if (value.length < 3) return "Must be longer than 3 characters";
 
@@ -30,7 +34,7 @@ export function validPackageDisplayName(value: string | number | boolean): true 
     return true;
 }
 
-export function validShortPackageDescription(value: string | number | boolean): true | string {
+export function validShortPackageDescription(value: string[] | string | number | boolean): true | string {
     if (value == null) return "Must not be null";
 
     if (typeof value !== "string") return "Must be a string";
@@ -42,7 +46,7 @@ export function validShortPackageDescription(value: string | number | boolean): 
     return true;
 }
 
-export function validUnit(value: string | number | boolean): true | string {
+export function validUnit(value: string[] | string | number | boolean): true | string {
     if (typeof value !== "string") return "Must be a string";
     if (value && value.length > 128) return "Must be less than 128 characters";
     return true;
