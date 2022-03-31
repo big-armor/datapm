@@ -14,6 +14,7 @@ import { DecodableConnectorDescription } from "./decodable/DecodableConnectorDes
 import { CoinbaseConnectorDescription } from "./coinbase/CoinbaseConnectorDescription";
 import { KrakenConnectorDescription } from "./kraken/KrakenConnectorDescription";
 import { FTXConnectorDescription } from "./ftx/FTXConnectorDescription";
+import { BinanceConnectorDescription } from "./binance/BinanceConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -28,7 +29,8 @@ export const CONNECTORS: ConnectorDescription[] = [
     new DecodableConnectorDescription(),
     new CoinbaseConnectorDescription(),
     new KrakenConnectorDescription(),
-    new FTXConnectorDescription()
+    new FTXConnectorDescription(),
+    new BinanceConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.

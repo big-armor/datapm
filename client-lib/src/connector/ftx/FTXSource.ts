@@ -105,7 +105,7 @@ export class FTXSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
-        if (configuration.products == null || (configuration.products as string[]).length === 0) {
+        if (configuration.instance == null) {
             await context.parameterPrompt([
                 {
                     type: ParameterType.Select,
@@ -124,7 +124,9 @@ export class FTXSource implements Source {
                     ]
                 }
             ]);
+        }
 
+        if (configuration.markets == null || (configuration.markets as string[]).length === 0) {
             const pairs = await this.getPairs(configuration);
 
             await context.parameterPrompt([
