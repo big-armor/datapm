@@ -5,6 +5,17 @@ import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Coinbase Source", () => {
+    after(() => {
+        if (fs.existsSync("coinbase-btc-usd-ticker.datapm.json")) {
+            fs.unlinkSync("coinbase-btc-usd-ticker.datapm.json");
+            fs.unlinkSync("coinbase-btc-usd-ticker.README.md");
+            fs.unlinkSync("coinbase-btc-usd-ticker.LICENSE.md");
+        }
+        if (fs.existsSync("ticker.csv")) {
+            fs.unlinkSync("ticker.csv");
+        }
+    });
+
     it("Should create a package from coinbase", async () => {
         let messageFound = false;
         const cmdResult = await testCmd(

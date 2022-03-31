@@ -2,8 +2,20 @@ import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
+import fs from "fs";
 
 describe("Kraken Source", () => {
+    after(() => {
+        if (fs.existsSync("kraken-eth-usd-ticker.datapm.json")) {
+            fs.unlinkSync("kraken-eth-usd-ticker.datapm.json");
+            fs.unlinkSync("kraken-eth-usd-ticker.README.md");
+            fs.unlinkSync("kraken-eth-usd-ticker.LICENSE.md");
+        }
+        if (fs.existsSync("ticker.csv")) {
+            fs.unlinkSync("ticker.csv");
+        }
+    });
+
     it("Should create a package from kraken", async () => {
         let messageFound = false;
         const cmdResult = await testCmd(

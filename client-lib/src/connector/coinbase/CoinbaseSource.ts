@@ -123,6 +123,10 @@ export class CoinbaseSource implements Source {
                                     objectMode: true
                                 });
 
+                                socket.on("close", () => {
+                                    stream.end();
+                                });
+
                                 socket.on("message", (message) => {
                                     const data = JSON.parse(message.toString()) as SubscriptionsMessage | TickerMessage;
 
@@ -157,6 +161,9 @@ export class CoinbaseSource implements Source {
             const websocket = new WebSocket(URI);
             websocket.on("open", () => {
                 resolve(websocket);
+            });
+            websocket.on("ping", () => {
+                websocket.pong();
             });
         });
     }

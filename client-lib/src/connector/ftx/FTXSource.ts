@@ -215,6 +215,7 @@ export class FTXSource implements Source {
 
                                 stream.on("close", () => {
                                     clearInterval(heartBeatInterval);
+                                    stream.end();
                                 });
 
                                 return {
@@ -240,6 +241,9 @@ export class FTXSource implements Source {
             const websocket = new WebSocket(uri);
             websocket.on("open", () => {
                 resolve(websocket);
+            });
+            websocket.on("ping", () => {
+                websocket.pong();
             });
         });
     }

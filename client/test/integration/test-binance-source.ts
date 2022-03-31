@@ -5,6 +5,17 @@ import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Binance Source", () => {
+    after(() => {
+        if (fs.existsSync("binance-btc-usdc-ticker.datapm.json")) {
+            fs.unlinkSync("binance-btc-usdc-ticker.datapm.json");
+            fs.unlinkSync("binance-btc-usdc-ticker.README.md");
+            fs.unlinkSync("binance-btc-usdc-ticker.LICENSE.md");
+        }
+        if (fs.existsSync("bookTicker.csv")) {
+            fs.unlinkSync("bookTicker.csv");
+        }
+    });
+
     it("Should create a package from binance", async () => {
         let messageFound = false;
         const cmdResult = await testCmd(
@@ -77,7 +88,6 @@ describe("Binance Source", () => {
                 }
             ],
             async (line: string) => {
-                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     messageFound = true;
                 }

@@ -9,7 +9,7 @@ export class PhoneNumberDetector extends RegexDetector {
     }
 
     getRegExp(): RegExp {
-        return /\b(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\b/;
+        return /\b(?:\+?(\d{1,3})[-. (]+)?(\d{3})[-. )]+(\d{3})[-. ]+(\d{4})(?: *x(\d+))?\b/;
     }
 
     getLabel(): string {

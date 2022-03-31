@@ -5,6 +5,17 @@ import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("FTX Source", () => {
+    after(() => {
+        if (fs.existsSync("ftx-btc-usd-ticker.datapm.json")) {
+            fs.unlinkSync("ftx-btc-usd-ticker.datapm.json");
+            fs.unlinkSync("ftx-btc-usd-ticker.README.md");
+            fs.unlinkSync("ftx-btc-usd-ticker.LICENSE.md");
+        }
+        if (fs.existsSync("ticker.csv")) {
+            fs.unlinkSync("ticker.csv");
+        }
+    });
+
     it("Should create a package from ftx", async () => {
         let messageFound = false;
         const cmdResult = await testCmd(
