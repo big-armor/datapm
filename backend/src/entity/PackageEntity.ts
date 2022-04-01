@@ -62,4 +62,7 @@ export class PackageEntity extends EntityBaseModel {
 
     @Column({ name: "view_count", nullable: false })
     public viewCount: number;
+
+    @Column({ name: "last_update_job_date", nullable: false })
+    public lastUpdateJobDate: Date;
 }

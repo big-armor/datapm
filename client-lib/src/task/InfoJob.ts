@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { Schema } from "datapm-lib";
 import { Job, JobContext, JobResult } from "../task/Task";
-import { getPackage } from "../util/PackageAccessUtil";
 import { printSchema } from "../util/SchemaUtil";
 export class InfoJobArguments {
     reference: string;
@@ -16,7 +15,7 @@ export class InfoJob extends Job<InfoJobResult> {
         let packageFileWithContext;
 
         try {
-            packageFileWithContext = await getPackage(this.jobContext, this.args.reference.toString(), "modified");
+            packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference.toString(), "modified");
         } catch (error) {
             if (Array.isArray(error)) {
                 if (error.find((_error) => _error.message === "NOT_FOUND")) {

@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { ErrorResponse, JobMessageRequest, JobMessageType, JobMessageResponse, Response, SocketError, StartPackageUpdateRequest, StartPackageUpdateResponse } from "datapm-lib";
+import { ErrorResponse, JobMessageRequest, JobRequestType, JobMessageResponse, Response, SocketError, StartPackageUpdateRequest, StartPackageUpdateResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
@@ -9,7 +9,7 @@ import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
-import { BackendContext } from "../job/BackendContext";
+import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { UpdatePackageJob } from "datapm-client-lib";
 
 const PACKAGE_LOCK_PREFIX = "package";
@@ -34,7 +34,6 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         if(!await this.createLock()) {
             return;
         }
-
         
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.request.packageIdentifier});
 
@@ -53,7 +52,7 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
             targetPackageVersionId: latestVersionEntity.id,
         });
 
-        this.socket.on(this.channelName,this.handleChannelEvents)
+        this.socket.on(this.channelName,this.handleChannelEvents);
 
 
         callback(new StartPackageUpdateResponse(this.channelName));
@@ -64,30 +63,32 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
 
         return new Promise<void>((resolve) => {
              if(reason === "client") {
-                this.socket.emit(this.channelName, new JobMessageResponse(JobMessageType.EXIT));
+                this.socket.emit(this.channelName, new JobMessageResponse(JobRequestType.EXIT));
             } else if(reason === "disconnect") {
 
             } else if(reason === "server") {
-                this.socket.emit(this.channelName, new JobMessageRequest(JobMessageType.EXIT),(response:JobMessageResponse) => {
-                    resolve();
-                });
-                return;
             }
+
+            this.socket.off(this.channelName,this.handleChannelEvents);
+
+            this.removeLock();
+
+            resolve();
         });
         
     }
 
     handleChannelEvents = async (request:JobMessageRequest, callback:(response:JobMessageResponse | ErrorResponse) => void) => {
 
-          if(request.requestType === JobMessageType.EXIT) {
+          if(request.requestType === JobRequestType.EXIT) {
             this.stop("client");
             return;
-        } else if(request.requestType === JobMessageType.START_JOB) {
+        } else if(request.requestType === JobRequestType.START_JOB) {
 
             try {
                 this.startJob();
 
-                callback(new JobMessageResponse(JobMessageType.START_JOB));
+                callback(new JobMessageResponse(JobRequestType.START_JOB));
             } catch(error) {
                 callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
             }
@@ -97,23 +98,38 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     }
 
     async startJob() {
-        const context = new BackendContext(this.socketContext);
+
+        const jobId = "user-package-update-" + randomUUID();
+
+        const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
 
         const job = new UpdatePackageJob(context, {
+            reference: {
+                ...this.request.packageIdentifier,
+                registryURL: process.env["REGISTRY_URL"]!
+            },
             defaults: true
         });
 
-        await job.execute();
+        const jobResult = await job.execute();
+
+        const exitMessage = new JobMessageRequest(JobRequestType.EXIT);
+        exitMessage.exitCode = jobResult.exitCode;
+
+        this.socket.emit(this.channelName, exitMessage)
+
+        this.stop("server");
+
     }
 
 
     async createLock():Promise<boolean> {
 
-        const lock = this.distributedLockingService.lock(PACKAGE_LOCK_PREFIX + "-" + this.channelName);
+        const lock = this.distributedLockingService.lock(this.getLockKey());
 
         if(!lock) {
             this.socket.emit(this.channelName, SocketError.STREAM_LOCKED, {
-                message: "Stream " + this.channelName + " is locked by another session: " + lock,
+                message: "Stream " + this.request.packageIdentifier.catalogSlug + "/" + this.request.packageIdentifier.packageSlug + " is locked by another session: " + lock,
                 errorType: SocketError.STREAM_LOCKED
             });
             return false;
@@ -122,7 +138,11 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         return true;
     }
 
-    async removeLock(channelName:string):Promise<void> {
-        this.distributedLockingService.unlock(PACKAGE_LOCK_PREFIX + "-" + channelName);
+    async removeLock():Promise<void> {
+        this.distributedLockingService.unlock(this.getLockKey());
+    }
+
+    getLockKey():string {
+        return PACKAGE_LOCK_PREFIX + "-" + this.request.packageIdentifier.catalogSlug + "/" + this.request.packageIdentifier.packageSlug;
     }
 }

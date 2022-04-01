@@ -1,11 +1,16 @@
 import chalk from "chalk";
 import ora from "ora";
-import fs from "fs";
 import path from "path";
-import { JobContext, Task, RepositoryConfig, RegistryConfig, TaskStatus } from "datapm-client-lib";
-import { Writable } from "stream";
-import { SemVer } from "semver";
-import { DPMConfiguration, Parameter, ParameterAnswer } from "datapm-lib";
+import {
+    JobContext,
+    Task,
+    RepositoryConfig,
+    RegistryConfig,
+    PackageFileWithContext,
+    PackageIdentifier,
+    TaskStatus
+} from "datapm-client-lib";
+import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
 import {
     getRegistryConfigs,
@@ -16,6 +21,8 @@ import {
     saveRepositoryConfig,
     saveRepositoryCredential
 } from "../util/ConfigUtil";
+import { LocalPackageFileContext } from "../util/LocalPackageFileContext";
+import { getPackage } from "../util/GetPackageUtil";
 
 export class CLIJobContext implements JobContext {
     currentOraSpinner: ora.Ora | undefined;
@@ -23,47 +30,40 @@ export class CLIJobContext implements JobContext {
     currentTask: Task | undefined;
 
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
+
+    getPackageFile(
+        reference: string | PackageIdentifier,
+        modifiedOrCanonical: "modified" | "canonicalIfAvailable"
+    ): Promise<PackageFileWithContext> {
+        if (typeof reference !== "string") {
+            reference =
+                reference.registryURL +
+                (reference.registryURL ? "/" : "") +
+                reference.catalogSlug +
+                "/" +
+                reference.packageSlug;
+        }
+
+        return getPackage(this, reference, modifiedOrCanonical);
+    }
+
+    async saveNewPackageFile(
+        catalogSlug: string | undefined,
+        packagefile: PackageFile
+    ): Promise<PackageFileWithContext> {
+        const packageFileWithContext = new LocalPackageFileContext(
+            this,
+            packagefile,
+            path.join(process.cwd(), packagefile.packageSlug + ".datapm.json")
+        );
+
+        await packageFileWithContext.save(packagefile);
+
+        return packageFileWithContext;
+    }
+
     getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
         return getRepositoryConfig(type, identifier);
-    }
-
-    async getPackageFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".datapm.json");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
-    }
-
-    async getReadMeFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{
-        writable: Writable;
-        location: string; // eslint-disable-next-line prefer-promise-reject-errors
-    }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".README.md");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
-    }
-
-    async getLicenseFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }> {
-        const packageFileLocation = path.join(process.cwd(), packageSlug + ".LICENSE.md");
-        return {
-            writable: fs.createWriteStream(packageFileLocation),
-            location: packageFileLocation
-        };
     }
 
     getRepositoryConfigsByType(type: string): RepositoryConfig[] {
@@ -121,6 +121,8 @@ export class CLIJobContext implements JobContext {
                 } else {
                     this.currentOraSpinner.fail();
                 }
+
+                this.currentOraSpinner = undefined;
             },
             setMessage: (message) => {
                 if (!this.currentOraSpinner) return;

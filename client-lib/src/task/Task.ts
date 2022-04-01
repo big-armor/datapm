@@ -1,16 +1,19 @@
-import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration } from "datapm-lib";
+import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration, PackageFile } from "datapm-lib";
 import { SemVer } from "semver";
 import { Writable } from "stream";
 import { RepositoryConfig, RegistryConfig } from "../config/Config";
+import { PackageFileWithContext, PackageIdentifier } from "../main";
 
 export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
+
+export type MessageType = "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START";
 export interface Task {
     getStatus(): TaskStatus;
 
     setMessage(message?: string): void;
 
     /** After calling end, setStatus should never be called. */
-    end(status: TaskStatus, message?: string): Promise<void>;
+    end(status: TaskStatus, message?: string, error?: Error): Promise<void>;
 
     /** Removes the spinner */
     clear(): void;
@@ -53,7 +56,7 @@ export interface JobContext {
     getRegistryConfig(url: string): RegistryConfig | undefined;
 
     /** Should prompt the user with the given parameter inputs */
-    parameterPrompt: <T extends string = string>(parameters: Array<Parameter<T>>) => Promise<ParameterAnswer<T>>;
+    parameterPrompt<T extends string = string>(parameters: Array<Parameter<T>>): Promise<ParameterAnswer<T>>;
 
     /** Sets the names of the steps to be performed during the task. Can be updated at any
      * time throughout the task lifecycle.
@@ -64,34 +67,23 @@ export interface JobContext {
     setCurrentStep(step: string): void;
 
     /** Sends a message to the user */
-    print(
-        type: "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUCCESS" | "FAIL" | "UPDATE" | "START",
-        message: string
-    ): void;
+    print(type: MessageType, message: string): void;
 
     startTask(message: string): Promise<Task>;
 
     /** Outputs to the logs (not intended for the user console) */
     log(level: "ERROR" | "WARN" | "INFO" | "DEBUG", message: string): void;
 
-    /** Return a writable for a package file */
-    getPackageFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
+    /** Saves a given package file and returns the PackageFileWithContext */
+    saveNewPackageFile(catalogSlug: string | undefined, packagefile: PackageFile): Promise<PackageFileWithContext>;
 
-    getReadMeFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
-
-    getLicenseFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>;
+    /** Returns a packageFileWithContext reference specific to the context in which
+     * the package is being requested.
+     */
+    getPackageFile(
+        reference: string | PackageIdentifier,
+        modifiedOrCanonical: "modified" | "canonicalIfAvailable"
+    ): Promise<PackageFileWithContext>;
 }
 
 export interface JobResult<T> {

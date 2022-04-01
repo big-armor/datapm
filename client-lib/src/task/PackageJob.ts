@@ -34,15 +34,15 @@ import { Maybe } from "../util/Maybe";
 import { Job, JobContext, JobResult } from "./Task";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { JSONSchema7TypeName } from "json-schema";
 import numeral from "numeral";
+import { PackageFileWithContext } from "../main";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PackageJobResult {
     packageFileLocation: string;
-    readmeFileLocation: string;
-    licenseFileLocation: string;
+    readmeFileLocation: string | undefined;
+    licenseFileLocation: string | undefined;
 }
 
 export class PackageJobArguments {
@@ -433,48 +433,19 @@ export class PackageJob extends Job<PackageJobResult> {
             schemas: Object.values(schemas)
         };
 
-        this.jobContext.setCurrentStep("Saving Files");
-        let task = await this.jobContext.startTask("Writing package file...");
-        let packageFileLocation;
-        let readmeFileLocation;
-        let licenseFileLocation;
-
-        try {
-            packageFileLocation = await writePackageFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
-            return { exitCode: 1 };
-        }
-
-        task = await this.jobContext.startTask("Writing README file...");
-        try {
-            readmeFileLocation = await writeReadmeFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the README file: ${error.message}`);
-            return { exitCode: 1 };
-        }
-
-        task = await this.jobContext.startTask("Writing LICENSE file...");
-        try {
-            licenseFileLocation = await writeLicenseFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
-            return { exitCode: 1 };
-        }
+        this.jobContext.setCurrentStep("Saving Package");
+        const packageFileWithContext: PackageFileWithContext = await this.jobContext.saveNewPackageFile(
+            this.args.catalogSlug,
+            packageFile
+        );
 
         return {
             exitCode: 0,
 
             result: {
-                packageFileLocation,
-                readmeFileLocation,
-                licenseFileLocation
+                packageFileLocation: packageFileWithContext.packageFileUrl,
+                readmeFileLocation: packageFileWithContext.readmeFileUrl,
+                licenseFileLocation: packageFileWithContext.licenseFileUrl
             }
         };
     }

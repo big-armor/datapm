@@ -16,10 +16,11 @@ export * from "./task/SearchJob";
 /** Various Utils */
 export * from "./util/IdentifierUtil";
 export * from "./util/RegistryClient";
-export * from "./util/PackageAccessUtil";
+export * from "./util/PackageContext";
 export * from "./util/PackageUtil";
 export * from "./util/RegistryReferenceUtil";
 export * from "./util/DataPMVersionUtil";
+export * from "./util/ParsePackageIdentifierUtil";
 
 /** Configuration interfaces */
 export * from "./config/Config";

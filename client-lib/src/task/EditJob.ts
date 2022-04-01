@@ -11,9 +11,7 @@ import {
     ParameterType
 } from "datapm-lib";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { getPackage, PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageAccessUtil";
-import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
-import { Permission } from "../generated/graphql";
+import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import chalk from "chalk";
 import { SemVer } from "semver";
 import clone from "rfdc";
@@ -53,10 +51,10 @@ export class EditJob extends Job<EditJobResult> {
         // Finding package
         let task = await this.jobContext.startTask("Finding package...");
 
-        let packageFileWithContext;
+        let packageFileWithContext: PackageFileWithContext;
 
         try {
-            packageFileWithContext = await getPackage(this.jobContext, this.args.reference, "canonicalIfAvailable");
+            packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "canonicalIfAvailable");
         } catch (error) {
             await task.end("ERROR", error.message);
             return {
@@ -67,50 +65,6 @@ export class EditJob extends Job<EditJobResult> {
         await task.end("SUCCESS", "Found package file");
 
         task = await this.jobContext.startTask("Checking permissions...");
-
-        // TODO Refactor packageFileWithContext to contain the logic to get permissions
-        if (packageFileWithContext.contextType === "registry") {
-            const registryPackageFileContext = packageFileWithContext as RegistryPackageFileContext;
-
-            try {
-                await checkPackagePermissionsOnRegistry(
-                    this.jobContext,
-                    {
-                        catalogSlug: packageFileWithContext.catalogSlug as string,
-                        packageSlug: packageFileWithContext.packageFile.packageSlug
-                    },
-                    registryPackageFileContext.registryUrl,
-                    Permission.EDIT
-                );
-            } catch (error) {
-                if (error.message === "NOT_AUTHORIZED") {
-                    await task.end(
-                        "ERROR",
-                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
-                    );
-                    return {
-                        exitCode: 1
-                    };
-                } else if (error.message === "NOT_AUTHENTICATED") {
-                    await task.end(
-                        "ERROR",
-                        "You are not logged in to the registry. Use the following command to login"
-                    );
-                    this.jobContext.print(
-                        "NONE",
-                        chalk.green("datapm registry login " + registryPackageFileContext.registryUrl)
-                    );
-                    return {
-                        exitCode: 1
-                    };
-                }
-
-                await task.end("ERROR", "There was an error checking package permissions: " + error.message);
-                return {
-                    exitCode: 1
-                };
-            }
-        }
 
         const oldPackageFile = packageFileWithContext.packageFile;
 
@@ -126,10 +80,7 @@ export class EditJob extends Job<EditJobResult> {
         }
 
         if (!packageFileWithContext.hasPermissionToSave) {
-            await task.end(
-                "ERROR",
-                "You do not have permission to save to " + packageFileWithContext.packageFileUrl.replace("file://", "")
-            );
+            await task.end("ERROR", cantSaveReasonToString(packageFileWithContext.cantSaveReason as CantSaveReasons));
             return {
                 exitCode: 1
             };
@@ -278,7 +229,7 @@ export class EditJob extends Job<EditJobResult> {
             website: promptResponses.website
         };
 
-        await packageFileWithContext.save(this.jobContext, newPackageFile);
+        await packageFileWithContext.save(newPackageFile);
 
         return {
             exitCode: 0,

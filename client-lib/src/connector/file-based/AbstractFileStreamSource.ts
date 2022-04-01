@@ -95,14 +95,14 @@ export abstract class AbstractFileStreamSource implements Source {
 
         if (!context.quiet) {
             if (fileBufferSummary.fileName) {
-                context.jobContext.log("INFO", `File Name: ${fileBufferSummary.fileName}`);
+                context.jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
             }
             if (fileBufferSummary.fileSize) {
                 const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
-                context.jobContext.log("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
+                context.jobContext.print("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
             }
             if (fileBufferSummary.detectedMimeType) {
-                context.jobContext.log("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
+                context.jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
             }
         }
 

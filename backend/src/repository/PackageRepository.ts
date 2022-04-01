@@ -588,5 +588,24 @@ export class PackageRepository extends Repository<PackageEntity> {
             .getCount();
     }
 
+    async getPackageOldestUpdated(
+        beforeDate:Date,
+        offset: number,
+        limit: number,
+        relations?: string[]
+
+    ): Promise<PackageEntity[]> {
+
+        const ALIAS = "LeastUpdatedPackages";
+        return this.createQueryBuilder(ALIAS)
+            .offset(offset)
+            .limit(limit)
+            .addRelations(ALIAS, relations)
+            .where('"LeastUpdatedPackages"."last_update_job_date" < :beforeDate', { beforeDate })
+            .orderBy('"LeastUpdatedPackages"."last_update_job_date"', "ASC")
+            .getMany();
+
+    }
+
 
 }

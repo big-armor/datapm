@@ -7,10 +7,8 @@ import {
     UpdateUserInput,
     CreateUserInput,
     RecoverMyPasswordInput,
-    UserStatus,
-    User
+    UserStatus
 } from "../generated/graphql";
-import { mixpanel } from "../util/mixpanel";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { sendVerifyEmail, sendForgotPasswordEmail } from "../util/smtpUtil";

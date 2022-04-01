@@ -22,7 +22,6 @@ import {
     BuilderIOSettings,
     BuilderIOPage
 } from "./generated/graphql";
-import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
@@ -725,6 +724,5 @@ export const resolvers: {
 
         runJob,
 
-        track: (_, { actions }, context: HTTPContext) => mixpanel.track(actions, context.request)
     }
 };
