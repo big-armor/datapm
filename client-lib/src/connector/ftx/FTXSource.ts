@@ -3,9 +3,10 @@ import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "da
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../Source";
 import { TYPE } from "./FTXConnectorDescription";
-import { URI, URI_US } from "./FTXSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
+import { getWebSocketUri } from "./FTXConnector";
+import { connection } from "mongoose";
 
 type FtxRestResponse<T> = {
     success: boolean;
@@ -105,27 +106,6 @@ export class FTXSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
-        if (configuration.instance == null) {
-            await context.parameterPrompt([
-                {
-                    type: ParameterType.Select,
-                    configuration,
-                    name: "instance",
-                    message: "Select instance",
-                    options: [
-                        {
-                            title: "ftx.com",
-                            value: "ftx.com"
-                        },
-                        {
-                            title: "ftx.us",
-                            value: "ftx.us"
-                        }
-                    ]
-                }
-            ]);
-        }
-
         if (configuration.markets == null || (configuration.markets as string[]).length === 0) {
             const pairs = await this.getPairs(configuration);
 
@@ -169,7 +149,7 @@ export class FTXSource implements Source {
                             updateMethod: UpdateMethod.APPEND_ONLY_LOG,
                             updateHash: new Date().toISOString(),
                             openStream: async () => {
-                                const socket = await this.connectSocket(configuration);
+                                const socket = await this.connectSocket(connectionConfiguration);
 
                                 socket.on("message", (message) => {
                                     const data = JSON.parse(message.toString()) as
@@ -230,13 +210,9 @@ export class FTXSource implements Source {
         };
     }
 
-    async connectSocket(configuration: DPMConfiguration): Promise<WebSocket> {
+    async connectSocket(connectionConfiguration: DPMConfiguration): Promise<WebSocket> {
         return new Promise((resolve, reject) => {
-            let uri = URI;
-
-            if (configuration.instance === "ftx.us") {
-                uri = URI_US;
-            }
+            const uri = getWebSocketUri(connectionConfiguration);
 
             const websocket = new WebSocket(uri);
             websocket.on("open", () => {
@@ -248,13 +224,13 @@ export class FTXSource implements Source {
         });
     }
 
-    async getPairs(configuration: DPMConfiguration): Promise<FtxRestResponse<FtxMarket[]>> {
-        let websocketUrl = `https://ftx.com/api/markets`;
-        if (configuration.instance === "ftx.us") {
-            websocketUrl = `https://ftx.us/api/markets`;
+    async getPairs(connectionConfiguration: DPMConfiguration): Promise<FtxRestResponse<FtxMarket[]>> {
+        let marketsUrl = `https://ftx.com/api/markets`;
+        if (connectionConfiguration.instance === "ftx.us") {
+            marketsUrl = `https://ftx.us/api/markets`;
         }
 
-        const response = await fetch(websocketUrl, {
+        const response = await fetch(marketsUrl, {
             headers: {
                 Accept: "application/json"
             }

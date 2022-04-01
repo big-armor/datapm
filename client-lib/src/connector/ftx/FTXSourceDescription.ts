@@ -1,8 +1,5 @@
 import { Source, SourceDescription } from "../Source";
-import { DISPLAY_NAME, TYPE } from "./FTXConnectorDescription";
-
-export const URI = "wss://ftx.com/ws/";
-export const URI_US = "wss://ftx.us/ws/";
+import { DISPLAY_NAME, TYPE, URI, URI_US } from "./FTXConnectorDescription";
 
 export class FTXSourceDescription implements SourceDescription {
     sourceType(): string {

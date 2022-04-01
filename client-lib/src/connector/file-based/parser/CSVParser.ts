@@ -133,7 +133,10 @@ export class CSVParser implements Parser {
             }
         }
 
-        if (configuration.hasHeaderRow === "true" && configuration.headerRowNumber == null) {
+        if (
+            (configuration.hasHeaderRow === "true" || configuration.hasHeaderRow === true) &&
+            configuration.headerRowNumber == null
+        ) {
             await context.parameterPrompt([
                 {
                     configuration,

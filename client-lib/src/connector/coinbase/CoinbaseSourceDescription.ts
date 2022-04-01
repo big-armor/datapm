@@ -1,7 +1,5 @@
 import { Source, SourceDescription } from "../Source";
-import { DISPLAY_NAME, TYPE } from "./CoinbaseConnectorDescription";
-
-export const URI = "wss://ws-feed.exchange.coinbase.com";
+import { DISPLAY_NAME, TYPE, URI } from "./CoinbaseConnectorDescription";
 
 export class CoinbaseSourceDescription implements SourceDescription {
     sourceType(): string {

@@ -27,6 +27,10 @@ describe("Kraken Source", () => {
                     input: "Kraken" + KEYS.ENTER
                 },
                 {
+                    message: "Select channels",
+                    input: "ticker " + KEYS.ENTER
+                },
+                {
                     message: "Select target pairs",
                     input: "ETH/USD " + KEYS.ENTER
                 },

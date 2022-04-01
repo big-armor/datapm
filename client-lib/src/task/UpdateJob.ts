@@ -212,6 +212,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 };
             }
             const connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
+            sourceObject.connectionConfiguration = connectionConfiguration;
 
             const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
                 connectionConfiguration
@@ -251,6 +252,13 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             }
 
             credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
+
+            if (connector.requiresCredentialsConfiguration()) {
+                sourceObject.credentialsIdentifier = await connector.getCredentialsIdentifierFromConfiguration(
+                    connectionConfiguration,
+                    credentialsConfiguration
+                );
+            }
 
             const uriInspectionResults = await inspectSource(
                 source,

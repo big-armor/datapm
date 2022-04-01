@@ -47,9 +47,8 @@ export interface Connector {
      * to uniquely identify the repository. This is used to identify the repository in the UI.
      *
      * Example: MySQL would return hostname:port. A PaaS like Google Big Query would return a static string because there is only one public instance
-     *
-     * Return false if no repository information should be saved  */
-    getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string>;
+     */
+    getRepositoryIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string>;
 
     /** Given a complete credentels configuration object, return a string that the user would use
      * to uniquely identify the access credentials. This is used to identify the credentials in the UI.

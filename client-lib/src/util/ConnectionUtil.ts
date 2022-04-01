@@ -41,8 +41,6 @@ export async function obtainConnectionConfiguration(
 
     const pendingParameters = await connector.getConnectionParameters(connectionConfiguration);
 
-    let connectionIdentifier: string | undefined;
-
     if (
         !repositoryIdentifier &&
         connector.userSelectableConnectionHistory() &&
@@ -97,11 +95,9 @@ export async function obtainConnectionConfiguration(
 
     parameterCount += connectionConfigurationResponse.parameterCount;
 
-    if (connector.userSelectableConnectionHistory() && connectionConfigurationResponse.connectionConfiguration) {
-        connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
-            connectionConfigurationResponse.connectionConfiguration
-        );
-    }
+    const connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+        connectionConfigurationResponse.connectionConfiguration
+    );
 
     return {
         connectionConfiguration: connectionConfigurationResponse.connectionConfiguration,

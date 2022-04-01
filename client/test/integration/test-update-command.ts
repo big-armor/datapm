@@ -20,7 +20,9 @@ import {
     removePackageFiles,
     testCmd,
     writeCSVFile,
-    TestResults
+    TestResults,
+    PromptInput,
+    KEYS
 } from "./test-utils";
 
 // Prompts
@@ -236,6 +238,42 @@ describe("Update Package Command Tests", async () => {
         expect(newPackageFile.schemas[0].sampleRecords?.length).equals(100);
         expect(newPackageFile.schemas[0].recordCount).equals(200);
         expect(newPackageFile.schemas[0].unit).equals(undefined);
+    });
+
+    it("Should prompt for and save missing configuration parameters", async () => {
+        const packageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+        delete packageFile.sources[0].configuration?.headerRowNumber;
+
+        fs.writeFileSync("test.datapm.json", JSON.stringify(packageFile, null, 2));
+
+        const prompts: PromptInput[] = [
+            {
+                message: "Header row line number?",
+                input: "1" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                console.log(line);
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        expect(cmdResult.code, "Exit code").equals(0);
+
+        expect(newPackageFile.sources[0].configuration?.headerRowNumber).equals(0);
     });
 
     it("Publish package A", async () => {

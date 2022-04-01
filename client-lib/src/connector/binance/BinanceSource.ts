@@ -7,6 +7,8 @@ import { URI } from "./BinanceSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { JobContext } from "../../main";
+import { getWebSocketUri } from "./BinanceConnector";
+import { connection } from "mongoose";
 
 type BinanceSymbol = {
     symbol: string;
@@ -117,27 +119,6 @@ export class BinanceSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
-        if (configuration.instance == null) {
-            await context.parameterPrompt([
-                {
-                    type: ParameterType.Select,
-                    configuration,
-                    name: "instance",
-                    message: "Select instance",
-                    options: [
-                        {
-                            title: "binance.com",
-                            value: "binance.com"
-                        },
-                        {
-                            title: "binance.us",
-                            value: "binance.us"
-                        }
-                    ]
-                }
-            ]);
-        }
-
         if (configuration.channelType == null) {
             await context.parameterPrompt([
                 {
@@ -164,7 +145,7 @@ export class BinanceSource implements Source {
         }
 
         if (configuration.pairs == null || (configuration.pairs as string[]).length === 0) {
-            const pairs = await this.getPairs(context.jobContext, configuration);
+            const pairs = await this.getPairs(context.jobContext, connectionConfiguration);
 
             await context.parameterPrompt([
                 {
@@ -313,11 +294,7 @@ export class BinanceSource implements Source {
     }
 
     async connectSocket(configuration: DPMConfiguration): Promise<WebSocket> {
-        let webSocketUri = "wss://stream.binance.com:9443/stream";
-
-        if (configuration.instance === "binance.us") {
-            webSocketUri = "wss://stream.binance.us:9443/stream";
-        }
+        let webSocketUri = getWebSocketUri(configuration);
 
         webSocketUri +=
             "?streams=" +
@@ -337,12 +314,12 @@ export class BinanceSource implements Source {
         });
     }
 
-    async getPairs(jobContext: JobContext, configuration: DPMConfiguration): Promise<BinanceSymbol[]> {
+    async getPairs(jobContext: JobContext, connectionConfiguration: DPMConfiguration): Promise<BinanceSymbol[]> {
         const task = await jobContext.startTask("Retreiving available trading pairs");
 
         let uri = "https://api.binance.com";
 
-        if (configuration.instance === "binance.us") {
+        if (connectionConfiguration.instance === "binance.us") {
             uri = "https://api.binance.us";
         }
 

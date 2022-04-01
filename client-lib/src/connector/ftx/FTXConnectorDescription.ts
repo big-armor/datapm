@@ -5,6 +5,9 @@ import { SourceDescription } from "../Source";
 export const DISPLAY_NAME = "FTX";
 export const TYPE = "FTX";
 
+export const URI = "wss://ftx.com/ws/";
+export const URI_US = "wss://ftx.us/ws/";
+
 export class FTXConnectorDescription implements ConnectorDescription {
     getDisplayName(): string {
         return DISPLAY_NAME;

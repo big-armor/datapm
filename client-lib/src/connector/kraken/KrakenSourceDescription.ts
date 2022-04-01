@@ -1,7 +1,6 @@
 import { Source, SourceDescription } from "../Source";
+import { URI } from "./KrakenConnector";
 import { DISPLAY_NAME, TYPE } from "./KrakenConnectorDescription";
-
-export const URI = "wss://ws.kraken.com";
 
 export class KrakenSourceDescription implements SourceDescription {
     sourceType(): string {

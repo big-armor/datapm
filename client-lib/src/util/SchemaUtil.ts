@@ -79,10 +79,9 @@ export async function inspectSourceConnection(
         );
     }
 
-    let repositoryIdentifier = new Date().toISOString();
-    if (connector.userSelectableConnectionHistory()) {
-        repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(source.connectionConfiguration);
-    }
+    const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+        source.connectionConfiguration
+    );
 
     let credentialsConfiguration = {};
 
@@ -113,6 +112,8 @@ export async function inspectSourceConnection(
     if (sourceDescription == null) throw new Error(`Unable to find source description for type ${source.type}`);
 
     const sourceImplementation = await sourceDescription.getSource();
+
+    jobContext.print("INFO", "Connecting to " + repositoryIdentifier);
 
     const sourceInspectResult = await sourceImplementation.inspectURIs(
         source.connectionConfiguration,

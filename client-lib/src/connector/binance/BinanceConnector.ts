@@ -1,4 +1,4 @@
-import { DPMConfiguration, Parameter } from "datapm-lib";
+import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
 import { JobContext } from "../../task/Task";
 import { Connector } from "../Connector";
 import { TYPE } from "./BinanceConnectorDescription";
@@ -9,7 +9,7 @@ export class BinanceConnector implements Connector {
     }
 
     requiresConnectionConfiguration(): boolean {
-        return false;
+        return true;
     }
 
     userSelectableConnectionHistory(): boolean {
@@ -20,8 +20,8 @@ export class BinanceConnector implements Connector {
         return false;
     }
 
-    getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
-        throw new Error("not supposed to be called, userSelectableConnectionHistory() should be false");
+    async getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return getWebSocketUri(configuration);
     }
 
     getCredentialsIdentifierFromConfiguration(
@@ -31,10 +31,28 @@ export class BinanceConnector implements Connector {
         throw new Error("not supposed to be called, requiresCredentialsConfiguration() should be false");
     }
 
-    getConnectionParameters(
-        connectionConfiguration: DPMConfiguration
-    ): Parameter<string>[] | Promise<Parameter<string>[]> {
-        throw new Error("Not supposed to be called, requiresConnectionConfiguration() should be false");
+    async getConnectionParameters(connectionConfiguration: DPMConfiguration): Promise<Parameter<string>[]> {
+        if (connectionConfiguration.instance == null) {
+            return [
+                {
+                    type: ParameterType.Select,
+                    configuration: connectionConfiguration,
+                    name: "instance",
+                    message: "Select instance",
+                    options: [
+                        {
+                            title: "binance.com",
+                            value: "binance.com"
+                        },
+                        {
+                            title: "binance.us",
+                            value: "binance.us"
+                        }
+                    ]
+                }
+            ];
+        }
+        return [];
     }
 
     getCredentialsParameters(
@@ -56,4 +74,12 @@ export class BinanceConnector implements Connector {
     ): Promise<string | true> {
         return true;
     }
+}
+
+export function getWebSocketUri(configuration: DPMConfiguration): string {
+    if (configuration.instance === "binance.us") {
+        return "wss://stream.binance.us:9443/stream";
+    }
+
+    return "wss://stream.binance.com:9443/stream";
 }

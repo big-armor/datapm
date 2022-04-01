@@ -145,7 +145,7 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        const repository = await maybeConnectorDescription.getConnector();
+        const connector = await maybeConnectorDescription.getConnector();
         const sourceDescription = await maybeConnectorDescription.getSourceDescription();
 
         if (sourceDescription == null) {
@@ -158,7 +158,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const connectionConfigurationResults = await obtainConnectionConfiguration(
             this.jobContext,
-            repository,
+            connector,
             connectionConfiguration,
             this.args.repositoryIdentifier,
             this.args.defaults
@@ -171,7 +171,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const credentialsConfigurationResults = await obtainCredentialsConfiguration(
             this.jobContext,
-            repository,
+            connector,
             connectionConfiguration,
             credentialsConfiguration,
             false,
@@ -199,8 +199,7 @@ export class PackageJob extends Job<PackageJobResult> {
             }
         };
 
-        this.jobContext.print("NONE", "");
-        this.jobContext.setCurrentStep(chalk.magenta("Inspecting Data"));
+        this.jobContext.setCurrentStep(chalk.magenta("Finding Stream Sets"));
 
         const uriInspectionResults = await inspectSource(
             source,
@@ -216,6 +215,12 @@ export class PackageJob extends Job<PackageJobResult> {
         const schemas: Record<string, Schema> = {};
 
         const streamSets: StreamSet[] = [];
+
+        this.jobContext.setCurrentStep(chalk.magenta("Inspecting Stream Sets"));
+        this.jobContext.print(
+            "INFO",
+            "Connecting to " + (await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration))
+        );
 
         for (const streamSetPreview of uriInspectionResults.streamSetPreviews) {
             const task = await this.jobContext.startTask("Inspecting Stream Set " + streamSetPreview.slug);

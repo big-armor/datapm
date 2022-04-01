@@ -1,7 +1,7 @@
-import { DPMConfiguration, Parameter } from "datapm-lib";
+import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
 import { JobContext } from "../../task/Task";
 import { Connector } from "../Connector";
-import { TYPE } from "./FTXConnectorDescription";
+import { TYPE, URI, URI_US } from "./FTXConnectorDescription";
 
 export class FTXConnector implements Connector {
     getType(): string {
@@ -9,7 +9,7 @@ export class FTXConnector implements Connector {
     }
 
     requiresConnectionConfiguration(): boolean {
-        return false;
+        return true;
     }
 
     userSelectableConnectionHistory(): boolean {
@@ -20,8 +20,8 @@ export class FTXConnector implements Connector {
         return false;
     }
 
-    getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
-        throw new Error("not supposed to be called, userSelectableConnectionHistory() should be false");
+    async getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return getWebSocketUri(configuration);
     }
 
     getCredentialsIdentifierFromConfiguration(
@@ -31,10 +31,29 @@ export class FTXConnector implements Connector {
         throw new Error("not supposed to be called, requiresCredentialsConfiguration() should be false");
     }
 
-    getConnectionParameters(
-        connectionConfiguration: DPMConfiguration
-    ): Parameter<string>[] | Promise<Parameter<string>[]> {
-        throw new Error("Not supposed to be called, requiresConnectionConfiguration() should be false");
+    async getConnectionParameters(connectionConfiguration: DPMConfiguration): Promise<Parameter<string>[]> {
+        if (connectionConfiguration.instance == null) {
+            return [
+                {
+                    type: ParameterType.Select,
+                    configuration: connectionConfiguration,
+                    name: "instance",
+                    message: "Select instance",
+                    options: [
+                        {
+                            title: "ftx.com",
+                            value: "ftx.com"
+                        },
+                        {
+                            title: "ftx.us",
+                            value: "ftx.us"
+                        }
+                    ]
+                }
+            ];
+        }
+
+        return [];
     }
 
     getCredentialsParameters(
@@ -56,4 +75,14 @@ export class FTXConnector implements Connector {
     ): Promise<string | true> {
         return true;
     }
+}
+
+export function getWebSocketUri(connectionConfiguration: DPMConfiguration): string {
+    let uri = URI;
+
+    if (connectionConfiguration.instance === "ftx.us") {
+        uri = URI_US;
+    }
+
+    return uri;
 }

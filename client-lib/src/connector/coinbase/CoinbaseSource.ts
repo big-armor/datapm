@@ -2,8 +2,7 @@
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../Source";
-import { TYPE } from "./CoinbaseConnectorDescription";
-import { URI } from "./CoinbaseSourceDescription";
+import { TYPE, URI } from "./CoinbaseConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 
