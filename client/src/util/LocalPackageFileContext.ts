@@ -44,19 +44,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 
     async save(packageFile: PackageFile): Promise<void> {
-        // Write updates to the target package file in place
-        let task = await this.jobContext.startTask("Writing package file...");
-
-        try {
-            await writePackageFile(undefined, packageFile, this.packageFilePath);
-
-            await task.end("SUCCESS", `Wrote package file ${this.packageFilePath}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
-            throw error;
-        }
-
-        task = await this.jobContext.startTask("Writing README file...");
+        let task = await this.jobContext.startTask("Writing README file...");
         try {
             const readmeFileLocation = await writeReadmeFile(undefined, packageFile);
             await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
@@ -71,6 +59,17 @@ export class LocalPackageFileContext implements PackageFileWithContext {
             await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
         } catch (error) {
             await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
+            throw error;
+        }
+
+        task = await this.jobContext.startTask("Writing package file...");
+
+        try {
+            await writePackageFile(undefined, packageFile, this.packageFilePath);
+
+            await task.end("SUCCESS", `Wrote package file ${this.packageFilePath}`);
+        } catch (error) {
+            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
             throw error;
         }
     }
@@ -89,25 +88,41 @@ async function writePackageFile(
 }
 
 async function writeReadmeFile(catalogSlug: string | undefined, packageFile: PackageFile): Promise<string> {
-    const contents = `# ${packageFile.displayName}\n \n ${packageFile.description}`;
+    const contents =
+        packageFile.readmeMarkdown != null
+            ? packageFile.readmeMarkdown
+            : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
 
-    const readmeFileLocation = path.join(process.cwd(), packageFile.packageSlug + ".README.md");
+    const readmeFileLocation =
+        packageFile.readmeFile != null
+            ? packageFile.readmeFile
+            : path.join(process.cwd(), packageFile.packageSlug + ".README.md");
 
     const writable = fs.createWriteStream(readmeFileLocation);
 
     await writeFile(writable, contents);
 
+    delete packageFile.readmeMarkdown;
+
     return readmeFileLocation;
 }
 
 async function writeLicenseFile(catalogSlug: string | undefined, packageFile: PackageFile): Promise<string> {
-    const contents = "# License\n\nLicense not defined. Contact author.";
+    const contents =
+        typeof packageFile.licenseMarkdown === "string"
+            ? (packageFile.licenseMarkdown as string)
+            : "# License\n\nLicense not defined. Contact author.";
 
-    const licenseFileLocation = path.join(process.cwd(), packageFile.packageSlug + ".LICENSE.md");
+    const licenseFileLocation =
+        packageFile.licenseFile != null
+            ? packageFile.licenseFile
+            : path.join(process.cwd(), packageFile.packageSlug + ".LICENSE.md");
 
     const writable = fs.createWriteStream(licenseFileLocation);
 
     await writeFile(writable, contents);
+
+    delete packageFile.licenseMarkdown;
 
     return licenseFileLocation;
 }

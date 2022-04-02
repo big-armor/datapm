@@ -262,7 +262,6 @@ describe("Update Package Command Tests", async () => {
             ["test.datapm.json", "--forceUpdate"],
             prompts,
             async (line: string) => {
-                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }
@@ -274,6 +273,50 @@ describe("Update Package Command Tests", async () => {
         expect(cmdResult.code, "Exit code").equals(0);
 
         expect(newPackageFile.sources[0].configuration?.headerRowNumber).equals(0);
+    });
+
+    it("Should preserve README and LICENSE files", async () => {
+        const packageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        fs.writeFileSync(packageFile.readmeFile as string, "README SAVED");
+        fs.writeFileSync(packageFile.licenseFile as string, "LICENSE SAVED");
+
+        const prompts: PromptInput[] = [
+            {
+                message: "Header row line number?",
+                input: "1" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+
+        const rawPackageFile = JSON.parse(fs.readFileSync("test.datapm.json", "utf8"));
+
+        expect(rawPackageFile.readmeMarkdown).to.equal(undefined);
+        expect(rawPackageFile.licenseMarkdown).to.equal(undefined);
+
+        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        const readmeContents = fs.readFileSync(newPackageFile.readmeFile as string, "utf-8");
+        expect(readmeContents).equals("README SAVED");
+
+        const licenseContents = fs.readFileSync(newPackageFile.licenseFile as string, "utf-8");
+        expect(licenseContents).equals("LICENSE SAVED");
     });
 
     it("Publish package A", async () => {
