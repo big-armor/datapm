@@ -300,6 +300,10 @@ export class PackageJob extends Job<PackageJobResult> {
                 continue;
             }
 
+            this.jobContext.setCurrentStep(`${schema.title} Schema Details`);
+
+            SchemaUtil.printSchema(this.jobContext, schema);
+
             if (!this.args.defaults) await schemaSpecificQuestions(this.jobContext, schema);
         }
 
@@ -584,10 +588,6 @@ function validSampleRecordCount(value: string[] | number | string | boolean, par
 }
 
 async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
-    jobContext.setCurrentStep(`${schema.title} Schema Details`);
-
-    SchemaUtil.printSchema(jobContext, schema);
-
     let properties = schema.properties as Properties;
     // Ignore Attributes
     const ignoreAttributesResponse = await jobContext.parameterPrompt([
