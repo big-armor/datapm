@@ -124,9 +124,9 @@ export class EditJob extends Job<EditJobResult> {
             `${chalk.gray("Last updated date: ")} ${chalk.yellow(oldPackageFile.updatedDate)}`
         );
 
-        this.jobContext.setCurrentStep(chalk.magenta("Schema Refinement"));
-
         for (const schema of newPackageFile.schemas) {
+            this.jobContext.setCurrentStep(chalk.magenta(schema.title + " Schema Options"));
+
             SchemaUtil.printSchema(this.jobContext, schema);
 
             await schemaPrompts(this.jobContext, schema);

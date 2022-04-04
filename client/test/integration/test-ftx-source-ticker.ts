@@ -31,6 +31,10 @@ describe("FTX Source", () => {
                     input: "ftx.com" + KEYS.ENTER
                 },
                 {
+                    message: "Select channels",
+                    input: "ticker " + KEYS.ENTER
+                },
+                {
                     message: "Select target pairs",
                     input: "BTC/USD " + KEYS.ENTER
                 },

@@ -616,6 +616,10 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
     return null;
 }
 
+/** Prints only the record count and property info for the schema.
+ * Does not print the schema title, because that is expected to printed
+ * in context before this method is called.
+ */
 export function printSchema(jobContext: JobContext, schema: Schema): void {
     let recordCount = numeral(schema.recordCount).format("0,0");
 
@@ -629,7 +633,7 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
         throw new Error("Schema title is undefined");
     }
 
-    jobContext.print("NONE", schema.title);
+    // Title is expected to be printed before this method is called
 
     if (schema.properties == null || Object.keys(schema.properties).length === 0) {
         jobContext.print("WARN", "Has no properties");

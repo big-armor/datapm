@@ -102,7 +102,14 @@ export class StatsTransform extends Transform {
                     }
                 }
 
-                const typeConvertedValue = convertValueByValueType(value, valueType);
+                let typeConvertedValue: DPMRecordValue;
+                try {
+                    typeConvertedValue = convertValueByValueType(value, valueType);
+                } catch (error) {
+                    console.log(JSON.stringify(recordContext, null, 2));
+                    throw error;
+                }
+
                 typeConvertedRecord[title] = typeConvertedValue;
 
                 let valueTypeStats = property.valueTypes[valueType.type];

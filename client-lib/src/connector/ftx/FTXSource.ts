@@ -6,7 +6,6 @@ import { TYPE } from "./FTXConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { getWebSocketUri } from "./FTXConnector";
-import { connection } from "mongoose";
 
 type FtxRestResponse<T> = {
     success: boolean;
@@ -106,6 +105,27 @@ export class FTXSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
+        if (configuration.channels == null) {
+            await context.parameterPrompt([
+                {
+                    type: ParameterType.AutoCompleteMultiSelect,
+                    name: "channels",
+                    message: "Select channels",
+                    configuration,
+                    options: [
+                        {
+                            title: "trades",
+                            value: "trades"
+                        },
+                        {
+                            title: "ticker",
+                            value: "ticker"
+                        }
+                    ]
+                }
+            ]);
+        }
+
         if (configuration.markets == null || (configuration.markets as string[]).length === 0) {
             const pairs = await this.getPairs(configuration);
 
@@ -158,28 +178,50 @@ export class FTXSource implements Source {
                                         | FTXUnsubscribeResponse
                                         | FTXTickerUpdate;
 
-                                    if (data.type === "update" && data.channel === "ticker") {
-                                        const recordContext: RecordContext = {
-                                            record: data.data,
-                                            schemaSlug: "ticker"
-                                        };
+                                    if (
+                                        data.type === "update" &&
+                                        (data.channel === "ticker" || data.channel === "trades")
+                                    ) {
+                                        if (Array.isArray(data.data)) {
+                                            for (const item of data.data) {
+                                                const recordContext: RecordContext = {
+                                                    record: {
+                                                        ...item,
+                                                        market: data.market
+                                                    },
+                                                    schemaSlug: data.channel
+                                                };
 
-                                        stream.push(recordContext);
+                                                stream.push(recordContext);
+                                            }
+                                        } else {
+                                            const recordContext: RecordContext = {
+                                                record: {
+                                                    ...data.data,
+                                                    market: data.market
+                                                },
+                                                schemaSlug: data.channel
+                                            };
+
+                                            stream.push(recordContext);
+                                        }
                                     }
 
                                     return true;
                                 });
 
                                 for (const market of configuration.markets as string[]) {
-                                    const subscription: FTXSubscribeRequest = {
-                                        op: "subscribe",
-                                        channel: "ticker",
-                                        market
-                                    };
+                                    for (const channel of configuration.channels as string[]) {
+                                        const subscription: FTXSubscribeRequest = {
+                                            op: "subscribe",
+                                            channel: channel as "trades" | "ticker",
+                                            market
+                                        };
 
-                                    const subscriptionString = JSON.stringify(subscription);
+                                        const subscriptionString = JSON.stringify(subscription);
 
-                                    socket.send(subscriptionString);
+                                        socket.send(subscriptionString);
+                                    }
                                 }
 
                                 const stream = new PassThrough({

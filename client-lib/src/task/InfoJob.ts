@@ -57,6 +57,7 @@ export class InfoJob extends Job<InfoJobResult> {
             this.jobContext.print("NONE", `${description}\r\n`);
 
             packageFile.schemas?.forEach((schema: Schema) => {
+                this.jobContext.setCurrentStep(schema.title + " Schema Info");
                 printSchema(this.jobContext, schema);
             });
 
