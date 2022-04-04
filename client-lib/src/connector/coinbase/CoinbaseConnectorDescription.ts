@@ -5,6 +5,8 @@ import { SourceDescription } from "../Source";
 export const DISPLAY_NAME = "Coinbase";
 export const TYPE = "coinbase";
 
+export const URI = "wss://ws-feed.exchange.coinbase.com";
+
 export class CoinbaseConnectorDescription implements ConnectorDescription {
     getDisplayName(): string {
         return DISPLAY_NAME;

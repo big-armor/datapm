@@ -2,6 +2,7 @@ import PGMutexLock from "pg-mutex-lock";
 import { Connection } from "typeorm";
 import { DistributedLockingService } from "./distributed-locking-service";
 import { startNotificationService, stopNotificationService } from "./notification-service";
+import { startPackageUpdateService, stopPackageUpdateService } from "./package-update-service";
 
 const LEADER_KEY = "datapm-leader";
 
@@ -52,9 +53,10 @@ export class LeaderElectionService {
 
     startLeaderServices():void {
         startNotificationService(this.connection);
+        startPackageUpdateService(this.connection);
     }
 
     async stopLeaderServices() {
-        stopNotificationService();
+        return Promise.all([stopNotificationService(), stopPackageUpdateService()]);
     }
 }

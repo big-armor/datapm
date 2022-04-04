@@ -34,15 +34,15 @@ import { Maybe } from "../util/Maybe";
 import { Job, JobContext, JobResult } from "./Task";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { JSONSchema7TypeName } from "json-schema";
 import numeral from "numeral";
+import { PackageFileWithContext } from "../main";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PackageJobResult {
     packageFileLocation: string;
-    readmeFileLocation: string;
-    licenseFileLocation: string;
+    readmeFileLocation: string | undefined;
+    licenseFileLocation: string | undefined;
 }
 
 export class PackageJobArguments {
@@ -145,7 +145,7 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        const repository = await maybeConnectorDescription.getConnector();
+        const connector = await maybeConnectorDescription.getConnector();
         const sourceDescription = await maybeConnectorDescription.getSourceDescription();
 
         if (sourceDescription == null) {
@@ -158,7 +158,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const connectionConfigurationResults = await obtainConnectionConfiguration(
             this.jobContext,
-            repository,
+            connector,
             connectionConfiguration,
             this.args.repositoryIdentifier,
             this.args.defaults
@@ -171,7 +171,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const credentialsConfigurationResults = await obtainCredentialsConfiguration(
             this.jobContext,
-            repository,
+            connector,
             connectionConfiguration,
             credentialsConfiguration,
             false,
@@ -199,8 +199,7 @@ export class PackageJob extends Job<PackageJobResult> {
             }
         };
 
-        this.jobContext.print("NONE", "");
-        this.jobContext.setCurrentStep(chalk.magenta("Inspecting Data"));
+        this.jobContext.setCurrentStep(chalk.magenta("Finding Stream Sets"));
 
         const uriInspectionResults = await inspectSource(
             source,
@@ -216,6 +215,12 @@ export class PackageJob extends Job<PackageJobResult> {
         const schemas: Record<string, Schema> = {};
 
         const streamSets: StreamSet[] = [];
+
+        this.jobContext.setCurrentStep(chalk.magenta("Inspecting Stream Sets"));
+        this.jobContext.print(
+            "INFO",
+            "Connecting to " + (await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration))
+        );
 
         for (const streamSetPreview of uriInspectionResults.streamSetPreviews) {
             const task = await this.jobContext.startTask("Inspecting Stream Set " + streamSetPreview.slug);
@@ -428,48 +433,19 @@ export class PackageJob extends Job<PackageJobResult> {
             schemas: Object.values(schemas)
         };
 
-        this.jobContext.setCurrentStep("Saving Files");
-        let task = await this.jobContext.startTask("Writing package file...");
-        let packageFileLocation;
-        let readmeFileLocation;
-        let licenseFileLocation;
-
-        try {
-            packageFileLocation = await writePackageFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
-            return { exitCode: 1 };
-        }
-
-        task = await this.jobContext.startTask("Writing README file...");
-        try {
-            readmeFileLocation = await writeReadmeFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the README file: ${error.message}`);
-            return { exitCode: 1 };
-        }
-
-        task = await this.jobContext.startTask("Writing LICENSE file...");
-        try {
-            licenseFileLocation = await writeLicenseFile(this.jobContext, this.args.catalogSlug, packageFile);
-
-            await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
-        } catch (error) {
-            await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
-            return { exitCode: 1 };
-        }
+        this.jobContext.setCurrentStep("Saving Package");
+        const packageFileWithContext: PackageFileWithContext = await this.jobContext.saveNewPackageFile(
+            this.args.catalogSlug,
+            packageFile
+        );
 
         return {
             exitCode: 0,
 
             result: {
-                packageFileLocation,
-                readmeFileLocation,
-                licenseFileLocation
+                packageFileLocation: packageFileWithContext.packageFileUrl,
+                readmeFileLocation: packageFileWithContext.readmeFileUrl,
+                licenseFileLocation: packageFileWithContext.licenseFileUrl
             }
         };
     }
@@ -575,7 +551,7 @@ export async function inspectStreamSet(
     }
 }
 
-function validUrl(value: string | number | boolean): true | string {
+function validUrl(value: string[] | string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }
@@ -593,12 +569,16 @@ function validUrl(value: string | number | boolean): true | string {
     return true;
 }
 
-function validSampleRecordCount(value: number | string | boolean, parameter: Parameter): true | string {
+function validSampleRecordCount(value: string[] | number | string | boolean, parameter: Parameter): true | string {
     if (value === "" && parameter.defaultValue != null) return true;
 
     if (typeof value === "string") return "Must be a number";
 
     if (typeof value === "boolean") return "Must be a boolean";
+
+    if (Array.isArray(value)) {
+        return "Must be a number";
+    }
 
     if (value == null) return "Number, 0 to 100, required";
     if (value > 100) return "Number less than 100 required";
@@ -773,7 +753,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
                 type: ParameterType.Text,
                 message: "What SQL or other process was used to derive this data?",
                 configuration: {},
-                validate: (value: string | number | boolean) => {
+                validate: (value: string[] | string | number | boolean) => {
                     if (typeof value !== "string") {
                         return "Must be a string";
                     }

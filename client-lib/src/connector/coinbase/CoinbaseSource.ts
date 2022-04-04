@@ -2,8 +2,7 @@
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../Source";
-import { TYPE } from "./CoinbaseConnectorDescription";
-import { URI } from "./CoinbaseSourceDescription";
+import { TYPE, URI } from "./CoinbaseConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 
@@ -13,6 +12,19 @@ type SubscriptionsMessage = {
         name: string;
         product_ids: string[];
     }[];
+};
+
+type MatchMessage = {
+    type: "last_match" | "match";
+    trade_id: number;
+    sequence: number;
+    maker_order_id: string;
+    taker_order_id: string;
+    time: string;
+    product_id: string;
+    size: string;
+    price: string;
+    side: "buy" | "sell";
 };
 
 type TickerMessage = {
@@ -67,6 +79,34 @@ export class CoinbaseSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
+        if (configuration.channels == null) {
+            await context.parameterPrompt([
+                {
+                    type: ParameterType.AutoCompleteMultiSelect,
+                    configuration,
+                    name: "channels",
+                    message: "Select channels",
+                    validate: (value) => {
+                        if ((value as string[]).length === 0) {
+                            return "You must select at least one channel";
+                        }
+
+                        return true;
+                    },
+                    options: [
+                        {
+                            title: "matches",
+                            value: "matches"
+                        },
+                        {
+                            title: "ticker",
+                            value: "ticker"
+                        }
+                    ]
+                }
+            ]);
+        }
+
         if (configuration.products == null || (configuration.products as string[]).length === 0) {
             const pairs = await this.getPairs();
 
@@ -114,7 +154,7 @@ export class CoinbaseSource implements Source {
                                 const subscriptionString = JSON.stringify({
                                     type: "subscribe",
                                     product_ids: configuration.products as string[],
-                                    channels: ["ticker"]
+                                    channels: configuration.channels
                                 });
 
                                 socket.send(subscriptionString);
@@ -123,8 +163,15 @@ export class CoinbaseSource implements Source {
                                     objectMode: true
                                 });
 
+                                socket.on("close", () => {
+                                    stream.end();
+                                });
+
                                 socket.on("message", (message) => {
-                                    const data = JSON.parse(message.toString()) as SubscriptionsMessage | TickerMessage;
+                                    const data = JSON.parse(message.toString()) as
+                                        | SubscriptionsMessage
+                                        | TickerMessage
+                                        | MatchMessage;
 
                                     if (data.type === "subscriptions") {
                                         return true;
@@ -137,6 +184,15 @@ export class CoinbaseSource implements Source {
                                         };
                                         stream.push(recordContext);
                                     }
+
+                                    if (data.type === "last_match" || data.type === "match") {
+                                        const recordContext: RecordContext = {
+                                            record: data,
+                                            schemaSlug: "match"
+                                        };
+                                        stream.push(recordContext);
+                                    }
+
                                     return true;
                                 });
 
@@ -157,6 +213,9 @@ export class CoinbaseSource implements Source {
             const websocket = new WebSocket(URI);
             websocket.on("open", () => {
                 resolve(websocket);
+            });
+            websocket.on("ping", () => {
+                websocket.pong();
             });
         });
     }

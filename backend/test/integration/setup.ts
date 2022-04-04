@@ -1,4 +1,4 @@
-import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
+import { GenericContainer, StartedTestContainer } from "testcontainers";
 
 import execa from "execa";
 import { ExecaChildProcess } from "execa";
@@ -6,19 +6,22 @@ import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
-import { RandomUuid } from "testcontainers/dist/uuid";
 import { createTestClient, createUser } from "./test-utils";
 import { ActivityLogChangeType, ActivityLogEventType, RegistryStatusDocument } from "./registry-client";
 import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
+import { TEMP_STORAGE_PATH } from "./constants";
+
 const maildev = require("maildev");
+
+export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 let container: StartedTestContainer;
 let serverProcess: ExecaChildProcess;
+let testDataServerProcess: execa.ExecaChildProcess<string>;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
-export const TEMP_STORAGE_PATH = "tmp-registry-server-storage-" + new RandomUuid().nextUuid();
 export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
 const MAX_SERVER_LOG_LINES = 25;
 
@@ -138,6 +141,23 @@ before(async function () {
         console.log("Registry server exited with code " + code + " and signal " + signal);
     });
 
+    
+    const serverStartResponse = await startServerProcess(
+        "Test data",
+        "npm",
+        ["run", "start:test-data-server"],
+        "./",
+        {
+            PORT: dataServerPort.toString()
+        },
+        [],
+        []
+    );
+
+    testDataServerProcess = serverStartResponse.serverProcess;
+    
+        
+
     // Wait for the server to start
     await new Promise<void>(async (r) => {
         let serverReady = false;
@@ -194,6 +214,31 @@ after(async function () {
             fs.rmSync(storageFolderPath, { recursive: true });
     }
 
+    if(testDataServerProcess) {
+            testDataServerProcess.stdout?.destroy();
+        testDataServerProcess.stderr?.destroy();
+
+        if (testDataServerProcess.pid !== undefined) {
+            try {
+                const pids = pidtree(testDataServerProcess.pid, { root: true });
+
+                // recursively kill all child processes
+                (await pids).forEach((p) => {
+                    console.log("Killing process " + p);
+                    try {
+                        process.kill(p); // TODO Wait for process to actually exit, then kill it with sign 9 (SIGKILL) after a timeout
+                    } catch (error) {
+                        console.error("Error killing process " + p);
+                        console.error(error);
+                    }
+                });
+                console.log("test data server stopped normally");
+            } catch (error) {
+                console.log("error stopping processes " + error.message);
+            }
+        }
+    }
+
     serverProcess.stdout!.destroy();
     serverProcess.stderr!.destroy();
 
@@ -224,3 +269,79 @@ after(async function () {
 
     mailServer.close();
 });
+
+
+
+async function startServerProcess(
+    name: string,
+    command: string,
+    args: string[],
+    cwd: string,
+    env: NodeJS.ProcessEnv | undefined,
+    serverLogLines: string[],
+    serverErrorLogLines: string[]
+): Promise<{ serverProcess: ExecaChildProcess<string> }> {
+    console.log("Starting " + name + " server");
+
+    const serverProcess = execa(command, args, {
+        cwd,
+        env
+    });
+
+    serverProcess.stdout?.addListener("data", (chunk: Buffer) => {
+        const line = chunk.toString();
+
+        serverLogLines.push(line);
+
+        if (serverLogLines.length > MAX_SERVER_LOG_LINES) serverLogLines.shift();
+
+        if (line.startsWith("{")) return;
+        console.log(line);
+    });
+
+    serverProcess.stderr?.addListener("data", (chunk: Buffer) => {
+        const line = chunk.toString();
+
+        serverErrorLogLines.push(line);
+
+        if (serverErrorLogLines.length > MAX_SERVER_LOG_LINES) serverErrorLogLines.shift();
+
+        if (line.startsWith("{")) return;
+        console.error(line);
+    });
+
+    serverProcess.addListener("error", (err) => {
+        console.error(name + " server process error");
+        console.error(JSON.stringify(err));
+    });
+
+    serverProcess.addListener("exit", (code, signal) => {
+        console.log(name + " server exited with code " + code + " and signal " + signal);
+    });
+
+    // Wait for the server to start
+    await new Promise<void>((resolve) => {
+        let serverReady = false;
+
+        console.log("Waiting for " + name + " to start");
+        serverProcess.stdout?.on("data", async (buffer: Buffer) => {
+            const line = buffer.toString();
+            if (line.indexOf("🚀") !== -1) {
+                console.log(name + " server started!");
+                serverReady = true;
+
+                resolve();
+            }
+        });
+
+        serverProcess.stdout?.on("error", (err: Error) => {
+            console.error(JSON.stringify(err, null, 1));
+        });
+
+        serverProcess.stdout?.on("close", () => {
+            if (!serverReady) throw new Error(name + " server exited before becoming ready");
+        });
+    });
+
+    return { serverProcess };
+}

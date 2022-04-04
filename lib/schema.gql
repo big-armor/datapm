@@ -131,6 +131,8 @@ enum ActivityLogEventType {
 
     PACKAGE_UPDATE_JOB_STARTED
     PACKAGE_UPDATE_JOB_ENDED
+    PACKAGE_JOB_STARTED
+    PACKAGE_JOB_ENDED
 
     VERSION_CREATED
     VERSION_UPDATED
@@ -279,6 +281,7 @@ enum JobType {
     DAILY_NOTIFICATIONS
     WEEKLY_NOTIFICATIONS
     MONTHLY_NOTIFICATIONS
+    PACKAGE_UPDATE
 }
 
 """
@@ -1699,11 +1702,6 @@ type Mutation {
     Deletes a given version from a package. Use this sparingly, to allow for a viewable history of change for the package
     """
     deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void
-
-    """
-    For proxying user activity tracking outside of other API requests
-    """
-    track(actions: JSON!): Int!
 
     """
     Given a token, validate a user's email address

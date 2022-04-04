@@ -62,7 +62,7 @@ export async function resolvePackagePermissions(
     return permissions;
 }
 
-async function hasPermission(
+export async function hasPermission(
     permission: Permission,
     context: Context,
     identifier: PackageIdentifierInput

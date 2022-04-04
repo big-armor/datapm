@@ -3,6 +3,8 @@ import { JobContext } from "../../task/Task";
 import { Connector } from "../Connector";
 import { TYPE } from "./KrakenConnectorDescription";
 
+export const URI = "wss://ws.kraken.com";
+
 export class KrakenConnector implements Connector {
     getType(): string {
         return TYPE;
@@ -20,8 +22,8 @@ export class KrakenConnector implements Connector {
         return false;
     }
 
-    getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
-        throw new Error("not supposed to be called, userSelectableConnectionHistory() should be false");
+    async getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return URI;
     }
 
     getCredentialsIdentifierFromConfiguration(

@@ -37,17 +37,18 @@ export async function obtainConnectionConfiguration(
     let parameterCount = 0;
 
     // Check whether there are existing configurations for this type of repository
-    const existingConfiguration = jobContext.getRepositoryConfigsByType(connector.getType());
+    let savedRepositories: RepositoryConfig[] = [];
+
+    if (connector.userSelectableConnectionHistory())
+        savedRepositories = jobContext.getRepositoryConfigsByType(connector.getType());
 
     const pendingParameters = await connector.getConnectionParameters(connectionConfiguration);
-
-    let connectionIdentifier: string | undefined;
 
     if (
         !repositoryIdentifier &&
         connector.userSelectableConnectionHistory() &&
         pendingParameters.length > 0 &&
-        existingConfiguration.length > 0
+        savedRepositories.length > 0
     ) {
         parameterCount++;
 
@@ -55,7 +56,7 @@ export async function obtainConnectionConfiguration(
             value: RepositoryConfig;
             title: string;
         }[] = [
-            ...existingConfiguration.map((c) => {
+            ...savedRepositories.map((c) => {
                 return { value: c, title: c.identifier };
             }),
             {
@@ -97,11 +98,9 @@ export async function obtainConnectionConfiguration(
 
     parameterCount += connectionConfigurationResponse.parameterCount;
 
-    if (connector.userSelectableConnectionHistory() && connectionConfigurationResponse.connectionConfiguration) {
-        connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
-            connectionConfigurationResponse.connectionConfiguration
-        );
-    }
+    const connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+        connectionConfigurationResponse.connectionConfiguration
+    );
 
     return {
         connectionConfiguration: connectionConfigurationResponse.connectionConfiguration,

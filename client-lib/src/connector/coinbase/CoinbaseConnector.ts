@@ -1,7 +1,7 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
 import { JobContext } from "../../task/Task";
 import { Connector } from "../Connector";
-import { TYPE } from "./CoinbaseConnectorDescription";
+import { TYPE, URI } from "./CoinbaseConnectorDescription";
 
 export class CoinbaseConnector implements Connector {
     getType(): string {
@@ -20,8 +20,8 @@ export class CoinbaseConnector implements Connector {
         return false;
     }
 
-    getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
-        throw new Error("not supposed to be called, userSelectableConnectionHistory() should be false");
+    async getRepositoryIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return URI;
     }
 
     getCredentialsIdentifierFromConfiguration(

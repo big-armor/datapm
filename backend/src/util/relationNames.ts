@@ -1,3 +1,4 @@
+import { GraphQLResolveInfo } from "graphql";
 import graphqlFields from "graphql-fields";
 
 function isEmpty(obj: any): boolean {
@@ -61,7 +62,7 @@ export function getRelationNames(obj: object, parentNames: string = ""): string[
     return out;
 }
 
-export function getGraphQlRelationName(info: any): string[] {
+export function getGraphQlRelationName(info: GraphQLResolveInfo): string[] {
     const fields = graphqlFields(info);
 
     return getRelationNames(fields);

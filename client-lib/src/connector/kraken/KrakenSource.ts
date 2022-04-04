@@ -3,10 +3,9 @@ import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "da
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../Source";
 import { TYPE } from "./KrakenConnectorDescription";
-import { URI } from "./KrakenSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { integer } from "aws-sdk/clients/cloudfront";
+import { URI } from "./KrakenConnector";
 
 type KrakenTickerMessage = {
     a: [string, number, string];
@@ -14,13 +13,24 @@ type KrakenTickerMessage = {
     c: [string, string];
     v: [number, number];
     p: [number, number];
-    t: [integer, integer];
+    t: [number, number];
     l: [number, number];
     h: [number, number];
     o: [number, number];
 };
 
-type KrakenMessage = [number, KrakenTickerMessage, string, string];
+type KrakenTradeMessage = [string, string, string, "b" | "s", "m" | "l", string][];
+
+// https://docs.kraken.com/websockets/#message-spread
+type KrakenSpreadMessage = [
+    string, // bid
+    string, // ask
+    string, // timestampe
+    string, // bidVolume
+    string // askVolume
+];
+
+type KrakenMessage = [number, KrakenTickerMessage | KrakenTradeMessage | KrakenSpreadMessage, string, string];
 
 type KrakenResponse<T> = {
     error: string;
@@ -74,6 +84,31 @@ export class KrakenSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
+        if (configuration.channels == null) {
+            await context.parameterPrompt([
+                {
+                    type: ParameterType.AutoCompleteMultiSelect,
+                    configuration,
+                    name: "channels",
+                    message: "Select channels",
+                    options: [
+                        {
+                            title: "ticker",
+                            value: "ticker"
+                        },
+                        {
+                            title: "trade",
+                            value: "trade"
+                        },
+                        {
+                            title: "spread",
+                            value: "spread"
+                        }
+                    ]
+                }
+            ]);
+        }
+
         if (configuration.products == null || (configuration.products as string[]).length === 0) {
             const pairs = await this.getPairs();
 
@@ -119,50 +154,91 @@ export class KrakenSource implements Source {
                             openStream: async () => {
                                 const socket = await this.connectSocket();
 
-                                const subscriptionString = JSON.stringify({
-                                    event: "subscribe",
-                                    pair: configuration.products as string[],
-                                    subscription: {
-                                        name: "ticker"
-                                    }
-                                });
+                                for (const channel of configuration.channels as string[]) {
+                                    const subscriptionString = JSON.stringify({
+                                        event: "subscribe",
+                                        pair: configuration.products as string[],
+                                        subscription: {
+                                            name: channel
+                                        }
+                                    });
 
-                                socket.send(subscriptionString);
+                                    socket.send(subscriptionString);
+                                }
 
                                 const stream = new PassThrough({
                                     objectMode: true
                                 });
 
-                                socket.on("message", (message) => {
-                                    const data = JSON.parse(message.toString()) as KrakenMessage;
+                                socket.on("close", () => {
+                                    stream.end();
+                                });
 
-                                    if (data[2] === "ticker") {
+                                socket.on("message", (message) => {
+                                    const messageObject = JSON.parse(message.toString()) as KrakenMessage;
+
+                                    if (messageObject[2] === "ticker") {
+                                        const tickerData = messageObject[1] as KrakenTickerMessage;
+
                                         const recordContext: RecordContext = {
                                             record: {
-                                                pair: data[3],
-                                                ask_price: data[1].a[0],
-                                                ask_whole_lot_volume: data[1].a[1],
-                                                ask_lot_volume: data[1].a[2],
-                                                bid_price: data[1].b[0],
-                                                bid_whole_lot_volume: data[1].b[1],
-                                                bid_lot_volume: data[1].b[2],
-                                                close_price: data[1].c[0],
-                                                close_lot_volume: data[1].c[1],
-                                                volume_today: data[1].v[0],
-                                                volume_last_24_hours: data[1].v[1],
-                                                weighted_average_price: data[1].p[0],
-                                                weighted_average_last_24_hours: data[1].p[1],
-                                                trades_today: data[1].t[0],
-                                                trades_last_24_hours: data[1].t[1],
-                                                low_today: data[1].l[0],
-                                                low_last_24_hours: data[1].l[1],
-                                                high_today: data[1].h[0],
-                                                high_last_24_hours: data[1].h[1],
-                                                open_price: data[1].o[0],
-                                                open_last_24_hours: data[1].o[1]
+                                                pair: messageObject[3],
+                                                ask_price: tickerData.a[0],
+                                                ask_whole_lot_volume: tickerData.a[1],
+                                                ask_lot_volume: tickerData.a[2],
+                                                bid_price: tickerData.b[0],
+                                                bid_whole_lot_volume: tickerData.b[1],
+                                                bid_lot_volume: tickerData.b[2],
+                                                close_price: tickerData.c[0],
+                                                close_lot_volume: tickerData.c[1],
+                                                volume_today: tickerData.v[0],
+                                                volume_last_24_hours: tickerData.v[1],
+                                                weighted_average_price: tickerData.p[0],
+                                                weighted_average_last_24_hours: tickerData.p[1],
+                                                trades_today: tickerData.t[0],
+                                                trades_last_24_hours: tickerData.t[1],
+                                                low_today: tickerData.l[0],
+                                                low_last_24_hours: tickerData.l[1],
+                                                high_today: tickerData.h[0],
+                                                high_last_24_hours: tickerData.h[1],
+                                                open_price: tickerData.o[0],
+                                                open_last_24_hours: tickerData.o[1]
                                             },
                                             schemaSlug: "ticker"
                                         };
+                                        stream.push(recordContext);
+                                    } else if (messageObject[2] === "trade") {
+                                        const tradeData = messageObject[1] as KrakenTradeMessage;
+
+                                        const recordContexts = tradeData.map<RecordContext>((t) => {
+                                            return {
+                                                schemaSlug: "trade",
+                                                record: {
+                                                    pair: messageObject[3],
+                                                    price: t[0],
+                                                    volume: t[1],
+                                                    time: t[2],
+                                                    side: t[3],
+                                                    orderType: t[4],
+                                                    misc: t[5]
+                                                }
+                                            };
+                                        });
+
+                                        stream.push(recordContexts);
+                                    } else if (messageObject[2] === "spread") {
+                                        const spreadData = messageObject[1] as KrakenSpreadMessage;
+                                        const recordContext: RecordContext = {
+                                            schemaSlug: "spread",
+                                            record: {
+                                                bid: spreadData[0],
+                                                ask: spreadData[1],
+                                                timestamp: spreadData[2],
+                                                bidVolume: spreadData[3],
+                                                askVolume: spreadData[4]
+                                            }
+                                        };
+
                                         stream.push(recordContext);
                                     }
                                     return true;
@@ -185,6 +261,9 @@ export class KrakenSource implements Source {
             const websocket = new WebSocket(URI);
             websocket.on("open", () => {
                 resolve(websocket);
+            });
+            websocket.on("ping", () => {
+                websocket.pong();
             });
         });
     }

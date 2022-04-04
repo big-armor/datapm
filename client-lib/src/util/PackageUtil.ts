@@ -74,61 +74,6 @@ export function differenceToString(difference: Difference): string {
     return message;
 }
 
-async function writeFile(writable: internal.Writable, contents: string) {
-    return new Promise<void>((resolve, reject) => {
-        writable.write(contents, (err) => {
-            writable.end();
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-export async function writePackageFile(
-    jobContext: JobContext,
-    catalogSlug: string | undefined,
-    packageFile: PackageFile
-): Promise<string> {
-    const json = JSON.stringify(packageFile, null, " ");
-
-    const semver = new SemVer(packageFile.version);
-    const response = await jobContext.getPackageFileWritable(catalogSlug, packageFile.packageSlug, semver);
-
-    await writeFile(response.writable, json);
-
-    return response.location;
-}
-
-export async function writeReadmeFile(
-    jobContext: JobContext,
-    catalogSlug: string | undefined,
-    packageFile: PackageFile
-): Promise<string> {
-    const contents = `# ${packageFile.displayName}\n \n ${packageFile.description}`;
-    const semver = new SemVer(packageFile.version);
-
-    const response = await jobContext.getReadMeFileWritable(catalogSlug, packageFile.packageSlug, semver);
-    await writeFile(response.writable, contents);
-    return response.location;
-}
-
-export async function writeLicenseFile(
-    jobContext: JobContext,
-    catalogSlug: string | undefined,
-    packageFile: PackageFile
-): Promise<string> {
-    const contents = "# License\n\nLicense not defined. Contact author.";
-
-    const semver = new SemVer(packageFile.version);
-
-    const response = await jobContext.getLicenseFileWritable(catalogSlug, packageFile.packageSlug, semver);
-    await writeFile(response.writable, contents);
-    return response.location;
-}
-
 export enum PublishSchemaSteps {
     CONNECT = "connect",
     FIND_EXISTING_PACKAGE = "find_existing_package",

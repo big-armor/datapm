@@ -20,7 +20,9 @@ import {
     removePackageFiles,
     testCmd,
     writeCSVFile,
-    TestResults
+    TestResults,
+    PromptInput,
+    KEYS
 } from "./test-utils";
 
 // Prompts
@@ -238,6 +240,85 @@ describe("Update Package Command Tests", async () => {
         expect(newPackageFile.schemas[0].unit).equals(undefined);
     });
 
+    it("Should prompt for and save missing configuration parameters", async () => {
+        const packageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+        delete packageFile.sources[0].configuration?.headerRowNumber;
+
+        fs.writeFileSync("test.datapm.json", JSON.stringify(packageFile, null, 2));
+
+        const prompts: PromptInput[] = [
+            {
+                message: "Header row line number?",
+                input: "1" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        expect(cmdResult.code, "Exit code").equals(0);
+
+        expect(newPackageFile.sources[0].configuration?.headerRowNumber).equals(0);
+    });
+
+    it("Should preserve README and LICENSE files", async () => {
+        const packageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        fs.writeFileSync(packageFile.readmeFile as string, "README SAVED");
+        fs.writeFileSync(packageFile.licenseFile as string, "LICENSE SAVED");
+
+        const prompts: PromptInput[] = [
+            {
+                message: "Header row line number?",
+                input: "1" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+
+        const rawPackageFile = JSON.parse(fs.readFileSync("test.datapm.json", "utf8"));
+
+        expect(rawPackageFile.readmeMarkdown).to.equal(undefined);
+        expect(rawPackageFile.licenseMarkdown).to.equal(undefined);
+
+        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
+        const readmeContents = fs.readFileSync(newPackageFile.readmeFile as string, "utf-8");
+        expect(readmeContents).equals("README SAVED");
+
+        const licenseContents = fs.readFileSync(newPackageFile.licenseFile as string, "utf-8");
+        expect(licenseContents).equals("LICENSE SAVED");
+    });
+
     it("Publish package A", async () => {
         const prompts = getPublishCommandPromptInputs();
         const results: TestResults = {
@@ -336,11 +417,7 @@ describe("Update Package Command Tests", async () => {
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
             async (line: string) => {
-                if (
-                    line.includes(
-                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
-                    )
-                ) {
+                if (line.includes("You do not have edit/write permission for the package.")) {
                     results.messageFound = true;
                 }
             }

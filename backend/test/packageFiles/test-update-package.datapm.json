@@ -1,0 +1,112 @@
+{
+    "$schema": "https://datapm.io/docs/package-file-schema-v0.8.0.json",
+    "canonical": true,
+    "sources": [
+        {
+            "slug": "file",
+            "streamSets": [
+                {
+                    "slug": "update-test",
+                    "configuration": {},
+                    "schemaTitles": [
+                        "update-test"
+                    ],
+                    "streamStats": {
+                        "inspectedCount": 1,
+                        "byteCount": 23,
+                        "byteCountPrecision": "EXACT",
+                        "recordCount": 2,
+                        "recordCountPrecision": "EXACT"
+                    }
+                }
+            ],
+            "type": "http",
+            "connectionConfiguration": {
+                "uris": [
+                    "http://localhost:$TEST_DATA_SERVER_PORT/update-test.csv"
+                ]
+            },
+            "configuration": {
+                "delimiter": ",",
+                "hasHeaderRow": true,
+                "headerRowNumber": 0,
+                "updateMethod": "BATCH_FULL_SET"
+            }
+        }
+    ],
+    "generatedBy": "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",
+    "updatedDate": "2022-03-11T19:31:03.377Z",
+    "displayName": "Test Update Package",
+    "packageSlug": "test-update-package",
+    "version": "1.0.0",
+    "description": "for testing UpdateJob via websockets",
+    "readmeFile": "test-update-package.README.md",
+    "licenseFile": "test-update-package.LICENSE.md",
+    "website": "",
+    "schemas": [
+        {
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "type": "object",
+            "title": "update-test",
+            "properties": {
+                "column1": {
+                    "title": "column1",
+                    "recordCount": 2,
+                    "valueTypes": {
+                        "string": {
+                            "recordCount": 2,
+                            "valueType": "string",
+                            "stringOptions": {
+                                "a": 1,
+                                "b": 1
+                            },
+                            "stringMaxLength": 1,
+                            "stringMinLength": 1,
+                            "contentLabels": []
+                        }
+                    },
+                    "format": "string",
+                    "type": [
+                        "string"
+                    ]
+                },
+                "column2": {
+                    "title": "column2",
+                    "recordCount": 2,
+                    "valueTypes": {
+                        "number": {
+                            "recordCount": 2,
+                            "valueType": "number",
+                            "stringOptions": {
+                                "1": 1,
+                                "2": 1
+                            },
+                            "numberMaxValue": 2,
+                            "numberMinValue": 1,
+                            "contentLabels": []
+                        }
+                    },
+                    "format": "integer",
+                    "type": [
+                        "number"
+                    ],
+                    "unit": "ducks"
+                }
+            },
+            "recordsInspectedCount": 0,
+            "recordCount": 2,
+            "sampleRecords": [
+                {
+                    "column1": "a",
+                    "column2": 1
+                },
+                {
+                    "column1": "b",
+                    "column2": 2
+                }
+            ],
+            "recordCountPrecision": "EXACT",
+            "unit": "row"
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 import { comparePackages } from "datapm-lib";
 import chalk from "chalk";
 import ora from "ora";
-import { getPackage, differenceToString } from "datapm-client-lib";
+import { differenceToString } from "datapm-client-lib";
 import { CompareArguments } from "./CompareCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
@@ -19,26 +19,14 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
     // Fetching prior package
     oraRef.start("Fetching prior package");
 
-    const priorPackageWithContext = await getPackage(jobContext, argv.priorPackage, "canonicalIfAvailable").catch(
-        (error) => {
-            oraRef.fail();
-            console.log(chalk.red(error.message));
-            process.exit(1);
-        }
-    );
+    const priorPackageWithContext = await jobContext.getPackageFile(argv.priorPackage, "canonicalIfAvailable");
 
     oraRef.succeed("Fetched prior package");
 
     // Fetching new package
     oraRef.start("Fetching new package");
 
-    const newPackageWithContext = await getPackage(jobContext, argv.newPackage, "canonicalIfAvailable").catch(
-        (error) => {
-            oraRef.fail();
-            console.log(chalk.red(error.message));
-            process.exit(1);
-        }
-    );
+    const newPackageWithContext = await jobContext.getPackageFile(argv.newPackage, "canonicalIfAvailable");
 
     oraRef.succeed("Fetched new package");
 
