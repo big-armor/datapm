@@ -1,7 +1,7 @@
-import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
+// import { expect } from "chai";
+// import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
-import { KEYS, testCmd } from "./test-utils";
+// import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("FTX Source", () => {

@@ -105,11 +105,10 @@ export class StatsTransform extends Transform {
                 let typeConvertedValue: DPMRecordValue;
                 try {
                     typeConvertedValue = convertValueByValueType(value, valueType);
-                } catch(error) {
+                } catch (error) {
                     console.log(JSON.stringify(recordContext, null, 2));
                     throw error;
                 }
-
 
                 typeConvertedRecord[title] = typeConvertedValue;
 

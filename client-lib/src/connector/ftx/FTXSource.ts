@@ -105,8 +105,7 @@ export class FTXSource implements Source {
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
-
-        if(configuration.channels == null) {
+        if (configuration.channels == null) {
             await context.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
@@ -124,7 +123,7 @@ export class FTXSource implements Source {
                         }
                     ]
                 }
-            ])
+            ]);
         }
 
         if (configuration.markets == null || (configuration.markets as string[]).length === 0) {
@@ -179,11 +178,12 @@ export class FTXSource implements Source {
                                         | FTXUnsubscribeResponse
                                         | FTXTickerUpdate;
 
-                                    if (data.type === "update" && (data.channel === "ticker" || data.channel === "trades")) {
-
-                                        if(Array.isArray(data.data)) {
-
-                                            for(const item of data.data) {
+                                    if (
+                                        data.type === "update" &&
+                                        (data.channel === "ticker" || data.channel === "trades")
+                                    ) {
+                                        if (Array.isArray(data.data)) {
+                                            for (const item of data.data) {
                                                 const recordContext: RecordContext = {
                                                     record: {
                                                         ...item,
@@ -194,7 +194,6 @@ export class FTXSource implements Source {
 
                                                 stream.push(recordContext);
                                             }
-
                                         } else {
                                             const recordContext: RecordContext = {
                                                 record: {
@@ -206,16 +205,13 @@ export class FTXSource implements Source {
 
                                             stream.push(recordContext);
                                         }
-
-                                        
                                     }
 
                                     return true;
                                 });
 
                                 for (const market of configuration.markets as string[]) {
-
-                                    for(const channel of configuration.channels as string[]) {
+                                    for (const channel of configuration.channels as string[]) {
                                         const subscription: FTXSubscribeRequest = {
                                             op: "subscribe",
                                             channel: channel as "trades" | "ticker",
@@ -224,10 +220,8 @@ export class FTXSource implements Source {
 
                                         const subscriptionString = JSON.stringify(subscription);
 
-                                        socket.send(subscriptionString);    
+                                        socket.send(subscriptionString);
                                     }
-
-                                    
                                 }
 
                                 const stream = new PassThrough({
