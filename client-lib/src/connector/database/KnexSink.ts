@@ -236,7 +236,7 @@ export abstract class KnexSink implements Sink {
                     if (format === "boolean") {
                         tableBuilder.boolean(key + typeAppend);
                     } else if (format === "number") {
-                        tableBuilder.float(key + typeAppend);
+                        tableBuilder.double(key + typeAppend);
                     } else if (format === "integer") {
                         tableBuilder.bigInteger(key + typeAppend);
                     } else if (format === "date") {

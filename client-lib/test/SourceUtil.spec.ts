@@ -16,8 +16,9 @@ describe("String value type checks", () => {
         expect(discoverValueTypeFromString("01").type).equal("string");
     });
 
-    test("string detect floating point", () => {
+    test("string detect doubles", () => {
         expect(discoverValueTypeFromString("-7.32").type).equal("number");
+        expect(discoverValueTypeFromString("-7.32").format).equal("number");
     });
     test("string detect boolean", () => {
         expect(discoverValueTypeFromString("tRuE").type).equal("boolean");
@@ -68,6 +69,16 @@ describe("detect type check", function () {
     });
     test("array", () => {
         expect(discoverValueType([1, 2, 3]).type).equal("array");
+    });
+    test("number", () => {
+        expect(discoverValueType("1.2").type).equal("number");
+        expect(discoverValueType("1.2").format).equal("number");
+
+        expect(discoverValueType("1.0").type).equal("number");
+        expect(discoverValueType("1.0").type).equal("number");
+
+        expect(discoverValueType(1.0).type).equal("number");
+        expect(discoverValueType(1.0).type).equal("number");
     });
 });
 
