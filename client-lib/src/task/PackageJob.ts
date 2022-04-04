@@ -295,8 +295,6 @@ export class PackageJob extends Job<PackageJobResult> {
         for (const key of Object.keys(schemas)) {
             const schema = schemas[key];
 
-            SchemaUtil.printSchema(this.jobContext, schema);
-
             if (schema.properties == null || Object.keys(schema.properties).length === 0) {
                 delete schemas[key];
                 continue;
@@ -586,7 +584,9 @@ function validSampleRecordCount(value: string[] | number | string | boolean, par
 }
 
 async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
-    jobContext.setCurrentStep(`${schema.title} Details`);
+    jobContext.setCurrentStep(`${schema.title} Schema Details`);
+
+    SchemaUtil.printSchema(jobContext, schema);
 
     let properties = schema.properties as Properties;
     // Ignore Attributes
