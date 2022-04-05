@@ -96,7 +96,11 @@ export class LocalFileSink extends AbstractFileSink {
         }
 
         let mode = "w";
-        if (!replaceExistingData && updateMethod === UpdateMethod.APPEND_ONLY_LOG) mode = "a";
+        if (
+            !replaceExistingData &&
+            (updateMethod === UpdateMethod.APPEND_ONLY_LOG || updateMethod === UpdateMethod.CONTINUOUS)
+        )
+            mode = "a";
 
         const fileHandle = fs.openSync(outputUrl, mode);
 
