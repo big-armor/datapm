@@ -21,6 +21,7 @@ export class TimeOrDeathTransform extends Transform {
                 clearTimeout(this.timeout);
                 this.timeout = undefined;
             }
+
             if (this.cancelDeath) {
                 this.cancelDeath();
                 this.cancelDeath = undefined;

@@ -533,7 +533,10 @@ export async function inspectStreamSet(
             streamSetPreview,
             {
                 onStart: (streamName: string) => {
-                    task.setMessage(`Inspecting ${streamName}...`);
+                    task.setMessage(`Connecting to ${streamName}...`);
+                },
+                onReconnect: (streamName: string) => {
+                    task.setMessage(`Reconnecting to ${streamName}...`);
                 },
                 onProgress: (progress: InspectProgress) => {
                     task.setMessage(progressText(progress));

@@ -142,13 +142,13 @@ export interface InspectProgress {
     recordsInspectedCount: number;
     bytesProcessed: number;
     recordsPerSecond: number;
-
     /** Whether this is the final inspection progress report */
     final: boolean;
 }
 
 export interface StreamStatusContext {
     onStart(streamName: string): void;
+    onReconnect(streamName: string): void;
     onProgress(progress: InspectProgress): void;
     onComplete(progress: InspectProgress): void;
 }

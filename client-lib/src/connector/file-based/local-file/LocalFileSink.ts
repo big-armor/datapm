@@ -52,7 +52,7 @@ export class LocalFileSink extends AbstractFileSink {
     /** Return a list of supported update methods, based on the configuration, schema, and current sink state */
     getSupportedStreamOptions(_configuration: DPMConfiguration, _sinkState: SinkState): SinkSupportedStreamOptions {
         return {
-            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG],
+            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS],
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET, StreamSetProcessingMethod.PER_STREAM]
         };
     }

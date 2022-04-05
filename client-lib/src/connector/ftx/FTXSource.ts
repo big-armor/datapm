@@ -237,7 +237,9 @@ export class FTXSource implements Source {
 
                                 stream.on("close", () => {
                                     clearInterval(heartBeatInterval);
-                                    stream.end();
+
+                                    const closableStates: number[] = [WebSocket.OPEN, WebSocket.CONNECTING];
+                                    if (closableStates.includes(socket.readyState)) socket.close();
                                 });
 
                                 return {

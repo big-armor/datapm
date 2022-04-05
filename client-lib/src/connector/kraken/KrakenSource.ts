@@ -244,6 +244,11 @@ export class KrakenSource implements Source {
                                     return true;
                                 });
 
+                                stream.on("close", () => {
+                                    const closableStates: number[] = [WebSocket.OPEN, WebSocket.CONNECTING];
+                                    if (closableStates.includes(socket.readyState)) socket.close();
+                                });
+
                                 return {
                                     stream,
                                     transforms: []

@@ -31,6 +31,7 @@ import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { JobContext } from "../task/Task";
+import ON_DEATH from "death";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -49,6 +50,10 @@ export interface RecordStreamEventContext {
         expectedRecordCount: number | undefined,
         expectedByteCount: number | undefined
     ): void;
+
+    waitingToReconnect(streamSlug: string): void;
+
+    connecting(streamSlug: string): void;
 
     /** The number of bytes received in total, since staring the stream */
     bytesReceived(streamSlug: string, byteCount: number): void;
@@ -173,37 +178,56 @@ export async function streamRecords(
 
     let updateMethod = UpdateMethod.BATCH_FULL_SET;
 
+    let lastConnectedDate: Date = new Date();
+
+    let currentStreamSummary: StreamSummary | null = null;
+
+    let currentStreamAndTransform: StreamAndTransforms | null = null;
+
+    const usr1Handler = () => {
+        if (currentStreamAndTransform) currentStreamAndTransform.stream.emit("close");
+    };
+
+    process.on("SIGUSR1", usr1Handler);
+
     const moveToNextStream = async function () {
-        let currentStreamSummary: StreamSummary;
-        if (streamSetPreview.streamSummaries) {
+        if (currentStreamSummary?.updateMethod === UpdateMethod.CONTINUOUS) {
+            const currenDate: Date = new Date();
+            const timeSinceLastConnected = currenDate.getTime() - lastConnectedDate?.getTime();
+
+            const waitMilliseconds = Math.min(timeSinceLastConnected * 10, 30000);
+
+            context.waitingToReconnect(currentStreamSummary.name);
+            await new Promise((resolve) => setTimeout(resolve, waitMilliseconds));
+        } else if (streamSetPreview.streamSummaries) {
             currentStreamSummary = streamSetPreview.streamSummaries?.[index++];
-            if (currentStreamSummary == null) {
-                returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
-                return;
-            }
         } else {
-            const streamSummary = await streamSetPreview.moveToNextStream?.();
-            if (!streamSummary) {
-                returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
-                return;
-            }
+            const streamSummary = (await streamSetPreview.moveToNextStream?.()) || null;
             currentStreamSummary = streamSummary;
         }
 
-        const streamSupportedUpdateMethod = currentStreamSummary.updateMethod;
+        if (currentStreamSummary == null) {
+            process.off("SIGUSR1", usr1Handler);
+            returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
+            return;
+        }
 
-        if (!sinkSupportedUpdateMethods.find((s) => s === streamSupportedUpdateMethod)) {
+        const streamUpdateMethod = currentStreamSummary.updateMethod;
+
+        if (!sinkSupportedUpdateMethods.find((s) => s === streamUpdateMethod)) {
             throw new Error(
                 "Source update method: " +
-                    streamSupportedUpdateMethod +
+                    streamUpdateMethod +
                     " and sink only supports update methods " +
                     sinkSupportedUpdateMethods.join(",") +
                     " Therefore there is no way to stream from this source to this sink"
             ); // TODO This could be more leanient, but warn of lost or duplicated data
         }
 
+        // TODO  determine how to handle continuous streams
+
         updateMethod =
-            streamSupportedUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
+            streamUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
             sinkSupportedUpdateMethods.includes(UpdateMethod.APPEND_ONLY_LOG)
                 ? UpdateMethod.APPEND_ONLY_LOG
                 : UpdateMethod.BATCH_FULL_SET;
@@ -212,7 +236,17 @@ export async function streamRecords(
 
         const streamState = sinkState?.streamSets[streamSetPreview.slug]?.streamStates[currentStreamSummary.name];
 
-        const currentStreamAndTransform = await currentStreamSummary.openStream(streamState || null);
+        context.connecting(currentStreamSummary.name);
+
+        try {
+            currentStreamAndTransform = await currentStreamSummary.openStream(streamState || null);
+        } catch (error) {
+            if (currentStreamSummary.updateMethod === UpdateMethod.CONTINUOUS) {
+                setTimeout(moveToNextStream, 1); // clear call stack and try again
+                return;
+            }
+            throw error;
+        }
 
         if (transform != null) {
             transform.removeAllListeners();
@@ -255,6 +289,7 @@ export async function streamRecords(
         });
 
         transform.on("end", () => {
+            lastConnectedDate = new Date();
             moveToNextStream();
         });
     };

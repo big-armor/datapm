@@ -6,6 +6,7 @@ import {
     Properties,
     Schema,
     StreamStats,
+    UpdateMethod,
     ValueTypes
 } from "datapm-lib";
 import { Writable } from "stream";
@@ -21,7 +22,8 @@ import {
     SourceStreamsInspectionResult,
     StreamAndTransforms,
     StreamSetPreview,
-    StreamStatusContext
+    StreamStatusContext,
+    StreamSummary
 } from "./Source";
 import { ConnectorDescription } from "./Connector";
 import { JSONSchema7TypeName } from "json-schema";
@@ -129,7 +131,9 @@ export async function generateSchemasFromSourceStreams(
         returnPromiseResolve = resolve;
     });
 
-    let streamIndex = 0;
+    // Holds the next stream that will be opened
+    let nextStreamIndex = 0;
+    let currentStreamSummary: StreamSummary | null = null;
 
     const contentLabelDetector = new ContentLabelDetector();
 
@@ -137,26 +141,28 @@ export async function generateSchemasFromSourceStreams(
         completedStreamsRecordCount += currentStreamRecordCount;
         completedStreamsInspectedRecordCount += currentStreamInspectedCount;
 
-        let sourceStreamContext: StreamAndTransforms;
         if (streamSetPreview.streamSummaries) {
             const { streamSummaries } = streamSetPreview;
             if (streamSummaries.length === 0) {
-                return Promise.reject(new Error("STREAM_NOT_AVAILABLE"));
+                return Promise.reject(new Error("NO_STREAMS_FOUND"));
             }
-            if (streamIndex === streamSummaries.length) {
+            if (nextStreamIndex === streamSummaries.length) {
                 finalize(true);
                 return;
             }
-            const streamSummary = streamSummaries[streamIndex++];
-            sourceStreamContext = await streamSummary.openStream(null);
+            currentStreamSummary = streamSummaries[nextStreamIndex++];
+            streamStatusContext.onStart(currentStreamSummary.name);
         } else {
             const streamSummary = await streamSetPreview.moveToNextStream?.();
             if (!streamSummary) {
                 finalize(true);
                 return;
             }
-            sourceStreamContext = await streamSummary.openStream(null);
+            currentStreamSummary = streamSummary;
+            streamStatusContext.onStart(currentStreamSummary.name);
         }
+
+        const sourceStreamContext: StreamAndTransforms = await currentStreamSummary.openStream(null);
 
         const byteCountTransform = new InflatedByteCountTransform(
             (bytes) => {

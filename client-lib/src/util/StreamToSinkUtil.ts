@@ -24,6 +24,7 @@ import {
 } from "./SchemaUtil";
 import { SinkStateWritable } from "./transforms/SinkStateWritable";
 import { JobContext } from "../main";
+import { connected } from "process";
 
 export interface FetchResult {
     recordsTotal: number;
@@ -76,13 +77,15 @@ export async function newRecordsAvailable(
 }
 
 export enum FetchStatus {
-    PLANNING_OPERATIONS,
-    OPENING_STREAM,
-    READING_STREAM,
-    READING_STREAM_WARNING,
-    CLOSING,
-    FLUSHING_FINAL_RECORDS,
-    COMPLETED
+    PLANNING_OPERATIONS = "Planning operations",
+    OPENING_STREAM = "Opening stream",
+    READING_STREAM = "Reading stream",
+    READING_STREAM_WARNING = "Reading stream warning",
+    CLOSING = "Closing",
+    FLUSHING_FINAL_RECORDS = "Flushing final records",
+    COMPLETED = "Completed",
+    WAITING_TO_RECONNECT_TO_STREAM = "Waiting to reconnect to stream",
+    RECONNECTING_TO_STREAM = "Reconnecting to stream"
 }
 
 export enum FetchOutcome {
@@ -241,7 +244,7 @@ export async function fetch(
                 context.state({
                     resource: {
                         name: streamSlug,
-                        status: FetchStatus.OPENING_STREAM
+                        status: FetchStatus.READING_STREAM
                     }
                 });
 
@@ -265,7 +268,29 @@ export async function fetch(
                     streamExpectedStatus.expectedByteCount = expectedByteCount;
                 }
             },
+            connecting: (streamSlug: string) => {
+                context.state({
+                    resource: {
+                        name: streamSlug,
+                        status: FetchStatus.RECONNECTING_TO_STREAM
+                    }
+                });
+            },
+            waitingToReconnect: (streamSlug: string) => {
+                context.state({
+                    resource: {
+                        name: streamSlug,
+                        status: FetchStatus.WAITING_TO_RECONNECT_TO_STREAM
+                    }
+                });
+            },
             bytesReceived: (streamSlug: string, bytesTotal: number) => {
+                context.state({
+                    resource: {
+                        name: streamSlug,
+                        status: FetchStatus.READING_STREAM
+                    }
+                });
                 const streamExpectedStatus = expectedStreamStats[streamSlug];
 
                 streamExpectedStatus.bytesReceived = bytesTotal;
@@ -547,14 +572,18 @@ export async function fetch(
             returnPromiseReject(error);
         });
 
-        const OFF_DEATH = ON_DEATH({})(() => {
+        const cancelDeath = ON_DEATH((signal) => {
+            if (signal !== "SIGINT") {
+                return;
+            }
+
             stoppedEarly = true;
             sourceStream.readable.unpipe();
             recordCounterTransform.end();
         });
 
         sourceStream.readable.once("close", () => {
-            if (OFF_DEATH) OFF_DEATH();
+            if (cancelDeath) cancelDeath();
         });
 
         sourceStream.readable.pipe(recordCounterTransform);
