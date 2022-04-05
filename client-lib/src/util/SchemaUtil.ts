@@ -224,12 +224,10 @@ export async function streamRecords(
             ); // TODO This could be more leanient, but warn of lost or duplicated data
         }
 
-        // TODO  determine how to handle continuous streams
-
         updateMethod =
-            streamUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
-            sinkSupportedUpdateMethods.includes(UpdateMethod.APPEND_ONLY_LOG)
-                ? UpdateMethod.APPEND_ONLY_LOG
+            streamUpdateMethod !== UpdateMethod.BATCH_FULL_SET &&
+            sinkSupportedUpdateMethods.includes(streamUpdateMethod)
+                ? streamUpdateMethod
                 : UpdateMethod.BATCH_FULL_SET;
 
         if (updateMethod === UpdateMethod.BATCH_FULL_SET) sinkState = null;

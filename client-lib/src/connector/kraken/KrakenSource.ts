@@ -149,7 +149,7 @@ export class KrakenSource implements Source {
                     streamSummaries: [
                         {
                             name: "kraken-websocket",
-                            updateMethod: UpdateMethod.APPEND_ONLY_LOG,
+                            updateMethod: UpdateMethod.CONTINUOUS,
                             updateHash: new Date().toISOString(),
                             openStream: async () => {
                                 const socket = await this.connectSocket();

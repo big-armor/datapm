@@ -166,7 +166,7 @@ export class FTXSource implements Source {
                     streamSummaries: [
                         {
                             name: "ftx-websocket",
-                            updateMethod: UpdateMethod.APPEND_ONLY_LOG,
+                            updateMethod: UpdateMethod.CONTINUOUS,
                             updateHash: new Date().toISOString(),
                             openStream: async () => {
                                 const socket = await this.connectSocket(connectionConfiguration);
