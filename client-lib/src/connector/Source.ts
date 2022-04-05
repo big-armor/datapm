@@ -157,4 +157,6 @@ export interface SourceStreamsInspectionResult {
     schemas: Schema[];
 
     streamStats: StreamStats;
+
+    updateMethods: UpdateMethod[];
 }

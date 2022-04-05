@@ -20,7 +20,8 @@ import {
     Source,
     StreamSet,
     ValueTypeStatistics
-} from "./PackageFile-v0.8.0";
+} from "./PackageFile-v0.8.1";
+import { PackageFile080 } from "./main";
 
 export type DPMRecordValue =
     | number
@@ -739,10 +740,26 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
 
         const oldPackageFile = packageFileObject as PackageFile070;
 
-        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile080;
 
         if (newPackageFile.canonical == null) {
             newPackageFile.canonical = true;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.8.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
+
+        const oldPackageFile = packageFileObject as PackageFile080;
+
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+
+        for (const source of newPackageFile.sources) {
+            for (const streamSet of source.streamSets) {
+                if (streamSet.updateMethods == null) {
+                    streamSet.updateMethods = [];
+                }
+            }
         }
     }
 

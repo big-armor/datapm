@@ -98,6 +98,8 @@ export async function generateSchemasFromSourceStreams(
     let completed = false;
     let error: Error;
 
+    const updateMethods: UpdateMethod[] = [];
+
     const timeoutMs = inspectionSeconds * 1000;
 
     const interval = setInterval(() => {
@@ -163,6 +165,10 @@ export async function generateSchemasFromSourceStreams(
         }
 
         const sourceStreamContext: StreamAndTransforms = await currentStreamSummary.openStream(null);
+
+        if (updateMethods.find((v) => v === currentStreamSummary?.updateMethod) == null) {
+            updateMethods.push(currentStreamSummary.updateMethod);
+        }
 
         const byteCountTransform = new InflatedByteCountTransform(
             (bytes) => {
@@ -304,7 +310,8 @@ export async function generateSchemasFromSourceStreams(
 
         returnPromiseResolve({
             schemas: Object.values(schemas),
-            streamStats
+            streamStats,
+            updateMethods
         });
     };
 

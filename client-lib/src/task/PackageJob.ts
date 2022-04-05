@@ -254,7 +254,8 @@ export class PackageJob extends Job<PackageJobResult> {
                 configuration: streamSetPreview.configuration,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 schemaTitles: sourceStreamInspectionResults.schemas.map((s) => s.title!),
-                streamStats: sourceStreamInspectionResults.streamStats
+                streamStats: sourceStreamInspectionResults.streamStats,
+                updateMethods: sourceStreamInspectionResults.updateMethods
             };
 
             streamSets.push(streamSet);
