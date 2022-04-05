@@ -370,8 +370,11 @@ describe("Postgres Sink Test", function () {
             expect(columns.find((column) => column.column_name === "Float" && column.data_type === "double precision"))
                 .to.exist;
             // eslint-disable-next-line no-unused-expressions
-            expect(columns.find((column) => column.column_name === "Integer_Float" && column.data_type === "real")).to
-                .exist;
+            expect(
+                columns.find(
+                    (column) => column.column_name === "Integer_Float" && column.data_type === "double precision"
+                )
+            ).to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(columns.find((column) => column.column_name === "Boolean" && column.data_type === "boolean")).to
                 .exist;
@@ -409,7 +412,7 @@ describe("Postgres Sink Test", function () {
                 columns.find(
                     (column) =>
                         column.column_name === "Integer_Float_Boolean_Date_DateTime_String-number" &&
-                        column.data_type === "real"
+                        column.data_type === "double precision"
                 )
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
