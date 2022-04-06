@@ -11,6 +11,10 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./search/search.module").then((m) => m.SearchModule)
     },
     {
+        path: "downloads",
+        loadChildren: () => import("./downloads/downloads.module").then((m) => m.DownloadsModule)   
+    },
+    {
         path: "collection/:collectionSlug",
         loadChildren: () =>
             import("./collection-details/collection-details.module").then((m) => m.CollectionDetailsModule)
@@ -20,17 +24,17 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./auth-callbacks/auth-callbacks.module").then((m) => m.AuthCallbacksModule)
     },
     {
-        path: "",
-        loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
-    },
-    {
         path: ":catalogSlug/:packageSlug",
         loadChildren: () => import("./package/package.module").then((m) => m.PackageModule)
     },
     {
         path: "login",
         loadChildren: () => import("./login-container/login-container.module").then((m) => m.LoginContainerModule)
-    }
+    },
+    { // IMPORTANT - this one must be last
+        path: "",
+        loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
+    },
 ];
 
 @NgModule({
