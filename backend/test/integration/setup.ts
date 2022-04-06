@@ -7,10 +7,11 @@ import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
 import { createTestClient, createUser } from "./test-utils";
-import { ActivityLogChangeType, ActivityLogEventType, RegistryStatusDocument } from "./registry-client";
+import { ActivityLogChangeType, ActivityLogEventType, RegistryStatus, RegistryStatusDocument } from "./registry-client";
 import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
 import { TEMP_STORAGE_PATH } from "./constants";
+import { readDataPMVersion } from "datapm-client-lib"
 
 const maildev = require("maildev");
 
@@ -202,6 +203,9 @@ describe("Server should start", async function () {
         });
 
         expect(response.errors == null).equal(true);
+        expect(response.data.registryStatus.registryUrl).equal("http://localhost:4200");
+        expect(response.data.registryStatus.status).equal(RegistryStatus.SERVING_REQUESTS);
+        expect(response.data.registryStatus.version).equal(readDataPMVersion());
     });
 });
 

@@ -7,6 +7,7 @@ import { PackageCommandArguments } from "./PackageCommand";
 import { exit } from "process";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
 import { ParameterType } from "datapm-lib";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function generatePackage(args: PackageCommandArguments): Promise<void> {
     printDataPMVersion(args);
@@ -72,6 +73,8 @@ export async function generatePackage(args: PackageCommandArguments): Promise<vo
         jobContext.print("NONE", chalk.green(`datapm publish ${jobResult.result?.packageFileLocation}`));
         exit(1);
     }
+
+    await checkDataPMVersion();
 
     process.exit(0);
 }

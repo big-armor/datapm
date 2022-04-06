@@ -221,6 +221,7 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
+import { readDataPMVersion } from "datapm-client-lib";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -551,7 +552,11 @@ export const resolvers: {
 
     Query: {
         registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
-            return RegistryStatus.SERVING_REQUESTS;
+            return {
+                status: RegistryStatus.SERVING_REQUESTS,
+                version: readDataPMVersion(),
+                registryUrl: process.env["REGISTRY_URL"] as string
+            }
         },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             return await getUserFromCacheOrDbByUsername(context, context.me.username, getGraphQlRelationName(info));

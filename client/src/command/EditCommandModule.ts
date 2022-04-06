@@ -4,6 +4,7 @@ import { EditArguments } from "./EditCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { EditJob } from "datapm-client-lib";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function editPackage(argv: EditArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -36,6 +37,8 @@ export async function editPackage(argv: EditArguments): Promise<void> {
             console.log(chalk.green(`datapm publish ${packageFileWithContext.packageFileUrl.replace("file://", "")}`));
             process.exit(0);
         }
+
+        await checkDataPMVersion();
 
         process.exit(0);
     } catch (error) {

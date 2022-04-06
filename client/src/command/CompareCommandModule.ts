@@ -5,6 +5,7 @@ import { differenceToString } from "datapm-client-lib";
 import { CompareArguments } from "./CompareCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function comparePackagesCommand(argv: CompareArguments): Promise<void> {
     const oraRef = ora({
@@ -64,4 +65,6 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
 
         console.log(chalk.yellow(message));
     });
+
+    await checkDataPMVersion();
 }

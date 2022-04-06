@@ -431,6 +431,12 @@ type MyFollowsResult {
     count: Int!
 }
 
+type RegistryStatusResult {
+    status: RegistryStatus!
+    version: String!
+    registryUrl: String!
+}
+
 """
 Represents a single package's listing in a collection, and information about how it was added
 """
@@ -1283,7 +1289,7 @@ type Query {
     """
     For validating that the server is up, and requesting it's status
     """
-    registryStatus: RegistryStatus
+    registryStatus: RegistryStatusResult!
 
     """
     Get authenticated user's follows

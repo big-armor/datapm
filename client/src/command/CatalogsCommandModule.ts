@@ -4,6 +4,7 @@ import ora from "ora";
 import { Catalog, RegistryClient } from "datapm-client-lib";
 import { getRegistryConfigs } from "../util/ConfigUtil";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function viewCatalogs(): Promise<void> {
     printDataPMVersion({});
@@ -52,4 +53,6 @@ export async function viewCatalogs(): Promise<void> {
             });
         }
     });
+
+    await checkDataPMVersion();
 }

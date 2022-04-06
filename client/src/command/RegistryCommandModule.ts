@@ -3,7 +3,6 @@ import { passwordValid, validateUsernameOrEmail } from "datapm-lib";
 import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
-import fetch from "cross-fetch";
 
 import {
     CreateAPIKeyDocument,
@@ -21,7 +20,6 @@ import {
 import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry } from "../util/ConfigUtil";
 
 import os from "os";
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client/core";
 import {
     Commands,
     RegistryAddArguments,
@@ -32,6 +30,7 @@ import {
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { defaultPromptOptions } from "../util/DefaultParameterOptions";
 import { CLIJobContext } from "./CommandTaskUtil";
+import { createRegistryClient } from "../util/RegistryClient";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
@@ -389,39 +388,6 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
     console.log("Your requests to " + args.url + " will now be authenticated as user " + args.username);
 
     process.exit(0);
-}
-
-function createRegistryClient(url: string, jwt: string | undefined) {
-    const headers: { [key: string]: string } = {
-        Accept: "charset=utf-8"
-    };
-
-    if (jwt) {
-        headers.Authorization = "Bearer " + jwt;
-    }
-
-    const httpLink = new HttpLink({
-        fetch: (fetch as unknown) as WindowOrWorkerGlobalScope["fetch"],
-        headers,
-        uri: `${url}/graphql`
-    });
-
-    return new ApolloClient({
-        link: ApolloLink.from([httpLink]),
-        cache: new InMemoryCache(),
-
-        defaultOptions: {
-            mutate: {
-                errorPolicy: "all"
-            },
-            query: {
-                errorPolicy: "all"
-            },
-            watchQuery: {
-                errorPolicy: "all"
-            }
-        }
-    });
 }
 
 function validUrl(value: string): boolean | string {
