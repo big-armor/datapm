@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
 import fetch from "cross-fetch";
 
 export function createRegistryClient(url: string, jwt: string | undefined): ApolloClient<NormalizedCacheObject> {
