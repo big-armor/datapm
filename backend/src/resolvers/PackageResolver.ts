@@ -663,6 +663,10 @@ export const packageUpdateMethods = async (parent: Package, _1: any, context: Co
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     const latestVersion = await getPackageLatestVersionFromCacheOrDbById(context, packageEntity.id);
 
+
+    if(latestVersion == null)
+        return [];
+
     return latestVersion.updateMethods || [];
 
 }
