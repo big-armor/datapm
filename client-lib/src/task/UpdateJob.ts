@@ -246,7 +246,8 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                     schemaTitles: streamInspectionResult.schemas.map((s: Schema) => s.title as string),
                     slug: streamSet.slug,
                     streamStats: streamInspectionResult.streamStats,
-                    lastUpdateHash: streamSet.updateHash
+                    lastUpdateHash: streamSet.updateHash,
+                    updateMethods: streamInspectionResult.updateMethods
                 });
             }
             newPackageFile.sources.push({

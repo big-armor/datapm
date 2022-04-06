@@ -346,7 +346,7 @@ export class BigQuerySink implements Sink {
                     } else if (format === "number") {
                         dbSchema.push({
                             name: `${key}${typeAppend}`,
-                            type: "FLOAT"
+                            type: "FLOAT64"
                         });
                     } else if (format === "integer") {
                         dbSchema.push({

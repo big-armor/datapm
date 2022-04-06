@@ -181,6 +181,7 @@ async function promptForRegistryUrl(args: { url?: string }, failOk = false): Pro
                         type: "text",
                         name: "url",
                         message: "Registry URL?",
+                        initial: "https://datapm.io",
                         validate: async (value) => {
                             return validUrl(value);
                         }

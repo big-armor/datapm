@@ -4,5 +4,7 @@ query CatalogPackages($identifier: CatalogIdentifierInput!, $offset: Int!, $limi
         description
         createdAt
         updatedAt
+        isPublic
+        myPermissions
     }
 }

@@ -79,7 +79,7 @@
         },
         "../client-lib": {
             "name": "datapm-client-lib",
-            "version": "0.8.94",
+            "version": "0.8.103",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@apollo/client": "^3.3.21",
@@ -135,7 +135,7 @@
                 "unzipper": "^0.10.11",
                 "uuid": "^8.3.2",
                 "ws": "^8.5.0",
-                "xlsx": "^0.16.9",
+                "xlsx": "^0.17.0",
                 "xml-streamer": "^1.1.0"
             },
             "devDependencies": {
@@ -173,6 +173,7 @@
                 "@types/tar-stream": "^2.2.0",
                 "@types/through": "0.0.30",
                 "@types/unzipper": "^0.10.3",
+                "@types/ws": "^8.5.3",
                 "@types/yargs": "^15.0.5",
                 "chai": "^4.2.0",
                 "del": "^6.0.0",
@@ -198,7 +199,7 @@
         },
         "../lib": {
             "name": "datapm-lib",
-            "version": "0.8.94",
+            "version": "0.8.103",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@types/semver": "^7.3.4",
@@ -14406,6 +14407,7 @@
                 "@types/through": "0.0.30",
                 "@types/unzipper": "^0.10.3",
                 "@types/uuid": "^8.3.1",
+                "@types/ws": "^8.5.3",
                 "@types/yargs": "^15.0.5",
                 "avsc": "^5.6.2",
                 "aws-sdk": "^2.865.0",
@@ -14472,7 +14474,7 @@
                 "unzipper": "^0.10.11",
                 "uuid": "^8.3.2",
                 "ws": "^8.5.0",
-                "xlsx": "^0.16.9",
+                "xlsx": "^0.17.0",
                 "xml-js": "^1.6.11",
                 "xml-streamer": "^1.1.0"
             }

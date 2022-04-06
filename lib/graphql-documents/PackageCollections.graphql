@@ -11,6 +11,9 @@ query PackageCollections($packageIdentifier: PackageIdentifierInput!, $limit: In
                 }
                 displayName
                 description
+                updateMethods
+                isPublic
+                myPermissions
                 creator {
                     username
                 }

@@ -254,7 +254,8 @@ export class PackageJob extends Job<PackageJobResult> {
                 configuration: streamSetPreview.configuration,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 schemaTitles: sourceStreamInspectionResults.schemas.map((s) => s.title!),
-                streamStats: sourceStreamInspectionResults.streamStats
+                streamStats: sourceStreamInspectionResults.streamStats,
+                updateMethods: sourceStreamInspectionResults.updateMethods
             };
 
             streamSets.push(streamSet);
@@ -533,7 +534,10 @@ export async function inspectStreamSet(
             streamSetPreview,
             {
                 onStart: (streamName: string) => {
-                    task.setMessage(`Inspecting ${streamName}...`);
+                    task.setMessage(`Connecting to ${streamName}...`);
+                },
+                onReconnect: (streamName: string) => {
+                    task.setMessage(`Reconnecting to ${streamName}...`);
                 },
                 onProgress: (progress: InspectProgress) => {
                     task.setMessage(progressText(progress));

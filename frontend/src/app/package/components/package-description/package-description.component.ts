@@ -66,7 +66,7 @@ export class PackageDescriptionComponent {
                         });
                     });
 
-                    this.relatedPackages = [...packageByIdentifier.values()];
+                    this.relatedPackages = [...this.relatedPackages, ...packageByIdentifier.values()];
                 }
             });
 

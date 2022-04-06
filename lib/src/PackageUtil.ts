@@ -20,7 +20,8 @@ import {
     Source,
     StreamSet,
     ValueTypeStatistics
-} from "./PackageFile-v0.8.0";
+} from "./PackageFile-v0.8.1";
+import { PackageFile080 } from "./main";
 
 export type DPMRecordValue =
     | number
@@ -85,8 +86,9 @@ export enum DifferenceType {
     CHANGE_SOURCE_CONNECTION = "CHANGE_SOURCE_CONNECTION",
     CHANGE_SOURCE_CREDENTIALS = "CHANGE_SOURCE_CREDENTIALS",
     CHANGE_SOURCE_CONFIGURATION = "CHANGE_SOURCE_CONFIGURATION",
+    CHANGE_STREAM_UPDATE_METHOD = "CHANGE_STREAM_UPDATE_METHOD",
     CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS", // APPLIES ONLY TO PackageFileV040 and earlier
-    CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
+    CHANGE_STREAM_STATS = "CHANGE_STREAM_STATS",
     CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     HIDE_PROPERTY = "HIDE_PROPERTY",
@@ -322,6 +324,11 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
             continue;
         }
 
+        const updateMethodComparison = compareArrays(newStreamSet.updateMethods, priorStreamSet.updateMethods);
+
+        if (!updateMethodComparison) {
+            response.push({ type: DifferenceType.CHANGE_STREAM_UPDATE_METHOD, pointer });
+        }
         response = response.concat(compareStream(priorStreamSet, newStreamSet, pointer));
     }
 
@@ -428,6 +435,15 @@ export function sourceURIsEquivalent(urisA: string[], urisB: string[]): boolean 
 }
 
 /** Retuns whether the two objects are identical or not */
+export function compareArrays(priorArray?: unknown[] | null, newArray?: unknown[] | null): boolean {
+    if (priorArray == null && newArray == null) return true;
+
+    if ((priorArray == null && newArray != null) || (priorArray != null && newArray == null)) return false;
+
+    return deepEqual(priorArray, newArray);
+}
+
+/** Retuns whether the two objects are identical or not */
 export function compareConfigObjects(
     priorObject?: DPMConfiguration | null,
     newObject?: DPMConfiguration | null
@@ -483,6 +499,7 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
+            case DifferenceType.CHANGE_STREAM_UPDATE_METHOD:
                 // nothing to do
                 break;
 
@@ -739,10 +756,26 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
 
         const oldPackageFile = packageFileObject as PackageFile070;
 
-        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile080;
 
         if (newPackageFile.canonical == null) {
             newPackageFile.canonical = true;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.8.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
+
+        const oldPackageFile = packageFileObject as PackageFile080;
+
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+
+        for (const source of newPackageFile.sources) {
+            for (const streamSet of source.streamSets) {
+                if (streamSet.updateMethods == null) {
+                    streamSet.updateMethods = [];
+                }
+            }
         }
     }
 

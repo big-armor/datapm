@@ -49,9 +49,7 @@ export class PublishPackageCommandModule {
             jobContext.print("NONE", "");
             jobContext.print(
                 "NONE",
-                chalk.yellow(
-                    `Use the command${targetRegistries.length > 1 ? "s" : ""} below to view the new package version`
-                )
+                chalk.yellow(`Use the command${targetRegistries.length > 1 ? "s" : ""} below to view the package`)
             );
             urls.forEach((url) => {
                 console.log(chalk.green(`datapm info ${url}`));

@@ -50,32 +50,41 @@
         </div>
 
         <div class="row mb-3">
-            <div class="col-6 col-sm-6">
+
+
+
+            <div class="col-6 col-sm-6 mb-3">
                 <p class="text-light-gray">version</p>
                 <p class="text-dark-gray">
                     {{ package?.latestVersion.identifier | version }}
                 </p>
             </div>
-            <div class="col-6">
+
+
+            <div class="col-6 col-sm-6 mb-3" *ngIf="(packageFile | packageFileUpdateMethod) !== ''">
+                <p class="text-light-gray">update method</p>
+                <p class="text-dark-gray">
+                    {{ packageFile | packageFileUpdateMethod }}
+                </p>
+            </div>
+
+            <div class="col-6 mb-3">
                 <p class="text-light-gray">record count</p>
                 <p class="text-dark-gray">{{ getRecordCount(packageFile) }} {{ packageUnit }} records</p>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-6">
+
+            <div class="col-6 mb-3">
                 <p class="text-light-gray">last refreshed</p>
                 <p class="text-dark-gray">
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
-            <div class="col-6" *ngIf="packageSizeBytes > 0">
+            <div class="col-6 mb-3" *ngIf="packageSizeBytes > 0">
                 <p class="text-light-gray">unpacked size</p>
                 <p class="text-dark-gray">{{ packageFile | packageSize }}</p>
             </div>
-        </div>
 
-        <div class="row mb-3" *ngIf="packageFile?.website">
-            <div class="col-12 mb-2">
+            <div class="col-12 mb-3"  *ngIf="packageFile?.website">
                 <p class="text-light-gray">website</p>
                 <p class="text-dark-gray text-overflow-elipses">
                     <a class="color-info" target="_blank" href="{{ packageFile?.website }}">{{

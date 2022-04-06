@@ -1,4 +1,5 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { UpdateMethod } from "../generated/graphql";
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";
 import { UserEntity } from "./UserEntity";
@@ -37,4 +38,11 @@ export class VersionEntity extends EntityBaseModel {
 
     @Column({ length: 250 })
     description: string;
+
+    @Column({ name: "update_methods",
+        type: 'jsonb',
+        array: true,
+        default: () => "'[]'::jsonb",
+        nullable: false,})
+    updateMethods: UpdateMethod[];
 }

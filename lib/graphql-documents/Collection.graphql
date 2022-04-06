@@ -23,6 +23,9 @@ query Collection($identifier: CollectionIdentifierInput!) {
             }
             displayName
             description
+            isPublic
+            myPermissions
+            updateMethods
             latestVersion {
                 identifier {
                     versionMajor

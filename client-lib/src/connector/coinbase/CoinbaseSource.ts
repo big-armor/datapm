@@ -146,7 +146,7 @@ export class CoinbaseSource implements Source {
                     streamSummaries: [
                         {
                             name: "coinbase-websocket",
-                            updateMethod: UpdateMethod.APPEND_ONLY_LOG,
+                            updateMethod: UpdateMethod.CONTINUOUS,
                             updateHash: new Date().toISOString(),
                             openStream: async () => {
                                 const socket = await this.connectSocket();
@@ -194,6 +194,11 @@ export class CoinbaseSource implements Source {
                                     }
 
                                     return true;
+                                });
+
+                                stream.on("close", () => {
+                                    const closableStates: number[] = [WebSocket.OPEN, WebSocket.CONNECTING];
+                                    if (closableStates.includes(socket.readyState)) socket.close();
                                 });
 
                                 return {

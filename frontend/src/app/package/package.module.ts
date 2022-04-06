@@ -19,6 +19,7 @@ import { PackageVersionComponent } from "./components/package-version/package-ve
 import { PackageSizePipe } from "./pipes/package-size.pipe";
 import { SchemaPropertiesPipe } from "./pipes/schema-properties.pipe";
 import { VersionPipe } from "./pipes/version.pipe";
+import { PackageFileUpdateMethodPipe } from "./pipes/package-file-update-method.pipe";
 import { PackageInfoComponent } from "./components/package-info/package-info.component";
 import { MatTableModule } from "@angular/material/table";
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
@@ -61,6 +62,7 @@ import { PackageFollowersComponent } from "./components/package-followers/packag
         PackageSizePipe,
         SchemaPropertiesPipe,
         VersionPipe,
+        PackageFileUpdateMethodPipe,
         PackageInfoComponent,
         PackagePermissionComponent,
         AddUserComponent,

@@ -1,7 +1,7 @@
 import "./util/prototypeExtensions";
 import { GraphQLScalarType } from "graphql";
 import { getUserByUserName, UserRepository } from "./repository/UserRepository";
-import { AuthenticatedContext, AutoCompleteContext, Context, HTTPContext } from "./context";
+import { AuthenticatedContext, AutoCompleteContext, Context } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
 import {
     MutationResolvers,
@@ -66,7 +66,8 @@ import {
     versionPackage,
     modifiedPackageFile,
     versionUpdatedAt,
-    canonicalPackageFile
+    canonicalPackageFile,
+    versionUpdateMethods
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
@@ -123,7 +124,8 @@ import {
     packageViewedCount,
     packageIsPublic,
     myRecentlyViewedPackages,
-    movePackage
+    movePackage,
+    packageUpdateMethods
 } from "./resolvers/PackageResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
@@ -514,7 +516,8 @@ export const resolvers: {
         fetchedCount: packageFetchCount,
         updatedAt: packageUpdatedAt,
         viewedCount: packageViewedCount,
-        isPublic: packageIsPublic
+        isPublic: packageIsPublic,
+        updateMethods: packageUpdateMethods,
     },
     PackageIssue: {
         author: getPackageIssueAuthor,
@@ -530,7 +533,8 @@ export const resolvers: {
         author: versionAuthor,
         createdAt: versionCreatedAt,
         package: versionPackage,
-        updatedAt: versionUpdatedAt
+        updatedAt: versionUpdatedAt,
+        updateMethods: versionUpdateMethods
     },
     Follow: {
         package: followPackage

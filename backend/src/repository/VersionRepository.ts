@@ -6,6 +6,7 @@ import { SemVer } from "semver";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { FileStorageService } from "../storage/files/file-storage-service";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { PackageFile } from "datapm-lib";
 
 @EntityRepository()
 export class VersionRepository {
@@ -32,23 +33,27 @@ export class VersionRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
-        const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
+    async save(userId: number, identifier: PackageIdentifierInput, packageFile: PackageFile) {
+        // TODO this should probably be in the transaction 
+        // const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
 
         return await this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
-            let semVer = new SemVer(value.packageFile.version);
+            let semVer = new SemVer(packageFile.version);
+
+            const updateMethods = packageFile.sources.flatMap(source => source.streamSets.flatMap(streamSet => streamSet.updateMethods));
 
             let version = transaction.getRepository(VersionEntity).create({
                 packageId: packageEntity.id,
                 majorVersion: semVer.major,
                 minorVersion: semVer.minor,
                 patchVersion: semVer.patch,
-                description: value.packageFile.description || undefined,
+                description: packageFile.description || undefined,
                 authorId: userId,
                 createdAt: new Date(),
-                updatedAt: new Date(value.packageFile.updatedDate)
+                updatedAt: new Date(packageFile.updatedDate),
+                updateMethods
             });
 
             return await transaction.save(version);

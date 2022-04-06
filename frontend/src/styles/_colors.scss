@@ -76,6 +76,13 @@ $green-4-color: rgba($green-1-color, 0.4);
 $green-5-color: rgba($green-1-color, 0.2);
 $green-6-color: rgba($green-1-color, 0.1);
 
+$green-2-color-dark: rgba($green-1-color, 0.8);
+$green-3-color-dark: rgba($green-1-color, 0.6);
+$green-4-color-dark: rgba($green-1-color, 0.4);
+$green-5-color-dark: rgba($green-1-color, 0.2);
+$green-6-color-dark: rgba($green-1-color, 0.1);
+
+
 $info-color: #017fb9;
 $info-color-dark: #58a6ff;
 
@@ -254,6 +261,18 @@ $colors: (
         $green-1-color,
         $green-1-color-dark
     ),
+    --green-2-color: (
+        $green-2-color,
+        $green-2-color-dark
+    ),
+    --green-3-color: ($green-3-color,
+        $green-3-color-dark),
+    --green-4-color: ($green-4-color,
+        $green-4-color-dark),
+    --green-5-color: ($green-5-color,
+        $green-5-color-dark),
+    --green-6-color: ($green-6-color,
+        $green-6-color-dark),
     --info-color: (
         $info-color,
         $info-color-dark

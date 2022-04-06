@@ -21,7 +21,7 @@ import { formatRemainingTime } from "../util/DateUtil";
 import { PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageContext";
 import { repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
-import { fetch, FetchOutcome, FetchResult, newRecordsAvailable } from "../util/StreamToSinkUtil";
+import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
 import { Job, JobContext, JobResult } from "./Task";
 import numeral from "numeral";
 
@@ -289,7 +289,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         let interupted: false | string = false;
 
         ON_DEATH({})((signal: string) => {
-            interupted = signal;
+            if (signal === "SIGINT") {
+                interupted = signal;
+            }
         });
 
         const listrStatuses = await fetchMultiple(
@@ -414,25 +416,34 @@ export async function fetchMultiple(
     const fetchPromises: Promise<FetchResult>[] = [];
 
     for (const fetchPreparation of fetchPreparations) {
-        jobContext.setCurrentStep("Fetching " + fetchPreparation.streamSetPreview.slug);
+        jobContext.setCurrentStep("Reading " + fetchPreparation.streamSetPreview.slug);
         let task = await jobContext.startTask("Opening sink stream");
+
+        let fetchStatus: FetchStatus = FetchStatus.OPENING_STREAM;
 
         const fetchPromise = fetch(
             jobContext,
             {
                 state: (state) => {
+                    fetchStatus = state.resource.status;
                     task.setMessage(state.resource.status.toString() + " " + state.resource.name);
                 },
                 progress: async (state) => {
                     latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =
                         state.recordsCommited;
 
+                    if (fetchStatus !== FetchStatus.READING_STREAM) return;
+
                     let text = "";
 
-                    const recordCountString = numeral(state.recordsRecieved).format("0a");
+                    const recordCountString =
+                        state.recordsRecieved < 10000
+                            ? numeral(state.recordsRecieved).format("0,0")
+                            : numeral(state.recordsRecieved).format("0.00a");
+
                     const recordsPerSecondString = numeral(state.recordsPerSecond).format("0.0a");
 
-                    text += `Fetching ${fetchPreparation.streamSetPreview.slug}\n`;
+                    text += `Stream ${fetchPreparation.streamSetPreview.slug}\n`;
 
                     if (state.percentComplete) {
                         const percentString = numeral(state.percentComplete).format("0.0%");
@@ -469,6 +480,7 @@ export async function fetchMultiple(
                     task.setMessage(text);
                 },
                 finish: (line, recordCount, result) => {
+                    fetchStatus = FetchStatus.COMPLETED;
                     latestStatuses[
                         fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug
                     ] = recordCount;

@@ -23,6 +23,15 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     const job = new FetchPackageJob(new CLIJobContext(oraRef, argv), argv);
 
+    process.stdin.on("keypress", function (
+        ch,
+        key: { name: string; ctrl: boolean; meta: boolean; shift: boolean; sequence: string }
+    ) {
+        if (key.ctrl === true && key.meta === false && key.shift === false && key.name === "r") {
+            process.kill(process.pid, "SIGUSR1");
+        }
+    });
+
     const jobResult = await job.execute();
 
     if (jobResult.exitCode !== 0) {

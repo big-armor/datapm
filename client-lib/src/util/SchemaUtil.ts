@@ -31,11 +31,12 @@ import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { JobContext } from "../task/Task";
+import ON_DEATH from "death";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
     CAST_TO_INTEGER = "CAST_TO_INTEGER",
-    CAST_TO_FLOAT = "CAST_TO_FLOAT",
+    CAST_TO_DOUBLE = "CAST_TO_DOUBLE",
     CAST_TO_DATE = "CAST_TO_DATE",
     CAST_TO_STRING = "CAST_TO_STRING",
     CAST_TO_NULL = "CAST_TO_NULL",
@@ -49,6 +50,10 @@ export interface RecordStreamEventContext {
         expectedRecordCount: number | undefined,
         expectedByteCount: number | undefined
     ): void;
+
+    waitingToReconnect(streamSlug: string): void;
+
+    connecting(streamSlug: string): void;
 
     /** The number of bytes received in total, since staring the stream */
     bytesReceived(streamSlug: string, byteCount: number): void;
@@ -173,29 +178,46 @@ export async function streamRecords(
 
     let updateMethod = UpdateMethod.BATCH_FULL_SET;
 
+    let lastConnectedDate: Date = new Date();
+
+    let currentStreamSummary: StreamSummary | null = null;
+
+    let currentStreamAndTransform: StreamAndTransforms | null = null;
+
+    const usr1Handler = () => {
+        if (currentStreamAndTransform) currentStreamAndTransform.stream.emit("close");
+    };
+
+    process.on("SIGUSR1", usr1Handler);
+
     const moveToNextStream = async function () {
-        let currentStreamSummary: StreamSummary;
-        if (streamSetPreview.streamSummaries) {
+        if (currentStreamSummary?.updateMethod === UpdateMethod.CONTINUOUS) {
+            const currenDate: Date = new Date();
+            const timeSinceLastConnected = currenDate.getTime() - lastConnectedDate?.getTime();
+
+            const waitMilliseconds = Math.min(timeSinceLastConnected * 10, 30000);
+
+            context.waitingToReconnect(currentStreamSummary.name);
+            await new Promise((resolve) => setTimeout(resolve, waitMilliseconds));
+        } else if (streamSetPreview.streamSummaries) {
             currentStreamSummary = streamSetPreview.streamSummaries?.[index++];
-            if (currentStreamSummary == null) {
-                returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
-                return;
-            }
         } else {
-            const streamSummary = await streamSetPreview.moveToNextStream?.();
-            if (!streamSummary) {
-                returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
-                return;
-            }
+            const streamSummary = (await streamSetPreview.moveToNextStream?.()) || null;
             currentStreamSummary = streamSummary;
         }
 
-        const streamSupportedUpdateMethod = currentStreamSummary.updateMethod;
+        if (currentStreamSummary == null) {
+            process.off("SIGUSR1", usr1Handler);
+            returnReadable.end(); // VERY IMPORTANT use end not ".push(null)"
+            return;
+        }
 
-        if (!sinkSupportedUpdateMethods.find((s) => s === streamSupportedUpdateMethod)) {
+        const streamUpdateMethod = currentStreamSummary.updateMethod;
+
+        if (!sinkSupportedUpdateMethods.find((s) => s === streamUpdateMethod)) {
             throw new Error(
                 "Source update method: " +
-                    streamSupportedUpdateMethod +
+                    streamUpdateMethod +
                     " and sink only supports update methods " +
                     sinkSupportedUpdateMethods.join(",") +
                     " Therefore there is no way to stream from this source to this sink"
@@ -203,16 +225,26 @@ export async function streamRecords(
         }
 
         updateMethod =
-            streamSupportedUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
-            sinkSupportedUpdateMethods.includes(UpdateMethod.APPEND_ONLY_LOG)
-                ? UpdateMethod.APPEND_ONLY_LOG
+            streamUpdateMethod !== UpdateMethod.BATCH_FULL_SET &&
+            sinkSupportedUpdateMethods.includes(streamUpdateMethod)
+                ? streamUpdateMethod
                 : UpdateMethod.BATCH_FULL_SET;
 
         if (updateMethod === UpdateMethod.BATCH_FULL_SET) sinkState = null;
 
         const streamState = sinkState?.streamSets[streamSetPreview.slug]?.streamStates[currentStreamSummary.name];
 
-        const currentStreamAndTransform = await currentStreamSummary.openStream(streamState || null);
+        context.connecting(currentStreamSummary.name);
+
+        try {
+            currentStreamAndTransform = await currentStreamSummary.openStream(streamState || null);
+        } catch (error) {
+            if (currentStreamSummary.updateMethod === UpdateMethod.CONTINUOUS) {
+                setTimeout(moveToNextStream, 1); // clear call stack and try again
+                return;
+            }
+            throw error;
+        }
 
         if (transform != null) {
             transform.removeAllListeners();
@@ -255,6 +287,7 @@ export async function streamRecords(
         });
 
         transform.on("end", () => {
+            lastConnectedDate = new Date();
             moveToNextStream();
         });
     };
@@ -466,9 +499,9 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
             title: "Cast all values as integer",
             value: DeconflictOptions.CAST_TO_INTEGER
         },
-        [DeconflictOptions.CAST_TO_FLOAT]: {
-            title: "Cast all values as float",
-            value: DeconflictOptions.CAST_TO_FLOAT
+        [DeconflictOptions.CAST_TO_DOUBLE]: {
+            title: "Cast all values as double",
+            value: DeconflictOptions.CAST_TO_DOUBLE
         },
         [DeconflictOptions.CAST_TO_DATE]: {
             title: "Cast all values as date",
@@ -499,7 +532,7 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
             DeconflictOptions.CAST_TO_INTEGER,
             DeconflictOptions.ALL
         ],
-        "boolean,number": [DeconflictOptions.CAST_TO_BOOLEAN, DeconflictOptions.CAST_TO_FLOAT, DeconflictOptions.ALL],
+        "boolean,number": [DeconflictOptions.CAST_TO_BOOLEAN, DeconflictOptions.CAST_TO_DOUBLE, DeconflictOptions.ALL],
         "boolean,string": [
             DeconflictOptions.CAST_TO_STRING,
             DeconflictOptions.CAST_TO_NULL,
@@ -516,14 +549,14 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
         "date,number": [DeconflictOptions.CAST_TO_STRING, DeconflictOptions.ALL],
         "date,string": [DeconflictOptions.CAST_TO_STRING, DeconflictOptions.CAST_TO_NULL, DeconflictOptions.SKIP],
         // INTEGER
-        "integer,number": [DeconflictOptions.CAST_TO_FLOAT, DeconflictOptions.CAST_TO_STRING, DeconflictOptions.ALL],
+        "integer,number": [DeconflictOptions.CAST_TO_DOUBLE, DeconflictOptions.CAST_TO_STRING, DeconflictOptions.ALL],
         "integer,string": [
             DeconflictOptions.CAST_TO_STRING,
             DeconflictOptions.CAST_TO_NULL,
             DeconflictOptions.SKIP,
             DeconflictOptions.ALL
         ],
-        // FLOAT
+        // DOUBLE
         "number,string": [
             DeconflictOptions.CAST_TO_STRING,
             DeconflictOptions.CAST_TO_NULL,
@@ -549,7 +582,7 @@ export function updateSchemaWithDeconflictOptions(
     const deconflictRules = {
         [DeconflictOptions.CAST_TO_BOOLEAN]: "boolean",
         [DeconflictOptions.CAST_TO_INTEGER]: "integer",
-        [DeconflictOptions.CAST_TO_FLOAT]: "number",
+        [DeconflictOptions.CAST_TO_DOUBLE]: "number",
         [DeconflictOptions.CAST_TO_DATE]: "date-time",
         [DeconflictOptions.CAST_TO_STRING]: "string"
     };
@@ -598,7 +631,7 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
             return (typeConvertedValue as Date).getTime().toString();
         }
     }
-    if (deconflictOption === DeconflictOptions.CAST_TO_FLOAT) {
+    if (deconflictOption === DeconflictOptions.CAST_TO_DOUBLE) {
         if (valueType.format === "number") return value;
         if (valueType.type === "boolean") return typeConvertedValue ? "1.0" : "0.0";
         if (valueType.format === "integer") return `${typeConvertedValue}.0`;

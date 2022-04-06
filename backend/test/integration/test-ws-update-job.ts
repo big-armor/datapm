@@ -14,9 +14,7 @@ import { loadPackageFileFromDisk, PublishMethod, StartPackageUpdateResponse, Err
 import { describe, it } from "mocha";
 import { Socket } from "socket.io-client";
 import { ActivityLogLine, dataServerPort, findActivityLogLine, serverLogLines } from "./setup";
-import fs from "fs";
-import path from "path";
-import { TEMP_STORAGE_PATH } from "./constants";
+
 
 /** Tests when the registry is used as a proxy for a published data package */
 describe("Package Tests", async () => {

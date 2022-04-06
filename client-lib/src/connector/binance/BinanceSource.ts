@@ -3,12 +3,10 @@ import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "da
 import { PassThrough } from "stream";
 import { InspectionResults, Source, SourceInspectionContext } from "../Source";
 import { TYPE } from "./BinanceConnectorDescription";
-import { URI } from "./BinanceSourceDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { JobContext } from "../../main";
 import { getWebSocketUri } from "./BinanceConnector";
-import { connection } from "mongoose";
 
 type BinanceSymbol = {
     symbol: string;
@@ -184,7 +182,7 @@ export class BinanceSource implements Source {
                     streamSummaries: [
                         {
                             name: "binance-websocket",
-                            updateMethod: UpdateMethod.APPEND_ONLY_LOG,
+                            updateMethod: UpdateMethod.CONTINUOUS,
                             updateHash: new Date().toISOString(),
                             openStream: async () => {
                                 const socket = await this.connectSocket(configuration);
@@ -279,6 +277,11 @@ export class BinanceSource implements Source {
                                         stream.write(recordContext);
                                     }
                                     return true;
+                                });
+
+                                stream.on("close", () => {
+                                    const closableStates: number[] = [WebSocket.OPEN, WebSocket.CONNECTING];
+                                    if (closableStates.includes(socket.readyState)) socket.close();
                                 });
 
                                 return {

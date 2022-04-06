@@ -40,6 +40,9 @@ query GetPageContent($route: String!) {
                     updatedAt
                     packageFile
                 }
+                updateMethods
+                isPublic
+                myPermissions
                 creator {
                     username
                     displayName

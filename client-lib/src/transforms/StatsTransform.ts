@@ -171,14 +171,17 @@ export function discoverValueTypeFromString(value: string): { type: ExtendedJSON
 
     if (booleanValues.includes(value.trim().toLowerCase())) return { type: "boolean", format: "boolean" };
 
-    if (
-        isNumber(value.toString()) &&
-        !(value.length > 1 && value.trim().startsWith("0") && !value.trim().startsWith("0."))
-    ) {
-        if (+value % 1 === 0) {
+    if (isNumber(value.toString())) {
+        const trimmedValue = value.trim();
+
+        // Find doubles with no more than one preceding zero before a period
+        if (trimmedValue.match(/^[-+]?(?:(?:[1-9][\d,]*)|0)\.\d+$/)) {
+            return { type: "number", format: "number" };
+
+            // Find integers, no leading zeros, only three numbers between commas, no other characters, allows leading +/-
+        } else if (trimmedValue.match(/^[-+]?(?![\D0])(?:\d+(?:(?<!\d{4}),(?=\d{3}(?:,|$)))?)+$|^0$/)) {
             return { type: "number", format: "integer" };
         }
-        return { type: "number", format: "number" };
     }
 
     if (isDate(value)) {

@@ -87,7 +87,7 @@ describe("Upgrading package files automatically", function () {
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.8.0.json");
+        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.8.1.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
 
         expect(Array.isArray(packageFile.sources[0].configuration!.uris)).equal(true);
