@@ -499,6 +499,7 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
+            case DifferenceType.CHANGE_STREAM_UPDATE_METHOD:
                 // nothing to do
                 break;
 
