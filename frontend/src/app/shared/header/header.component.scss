@@ -31,16 +31,17 @@
             width: 100%;
         }
 
+
         button {
             position: absolute;
             top: 2px;
             right: 8px;
 
-            ::ng-deep {
+            
                 .mat-icon {
                     color: var(--primary-color);
                 }
-            }
+            
         }
     }
 }

@@ -27,6 +27,7 @@ export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.CHANGE_PACKAGE_DESCRIPTION]: "Changed Package Description",
     [DifferenceType.CHANGE_SOURCE]: "Changed Source",
     [DifferenceType.CHANGE_SOURCE_CONFIGURATION]: "Changed Source Configuration",
+    [DifferenceType.CHANGE_STREAM_UPDATE_METHOD]: "Changed Source Update Method",
     [DifferenceType.CHANGE_STREAM_STATS]: "Changed Stream Stats",
     [DifferenceType.CHANGE_STREAM_UPDATE_HASH]: "Changed Stream Update Hash",
     [DifferenceType.CHANGE_STREAM_STATS]: "Changed Stream Stats",

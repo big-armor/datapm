@@ -25,6 +25,7 @@ query AutoComplete($startsWith: String!) {
                 displayName
                 nameIsPublic
             }
+            updateMethods
             updatedAt
             identifier {
                 registryURL

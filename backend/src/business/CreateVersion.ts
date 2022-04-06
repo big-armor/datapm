@@ -96,12 +96,12 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
 
                 savedVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .save(context.me.id, packageIdentifier, value);
+                    .save(context.me.id, packageIdentifier, newPackageFile);
             }
         } else {
             savedVersion = await transaction
                 .getCustomRepository(VersionRepository)
-                .save(context.me.id, packageIdentifier, value);
+                .save(context.me.id, packageIdentifier, newPackageFile);
         }
 
         const versionIdentifier = {

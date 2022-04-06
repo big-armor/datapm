@@ -18,7 +18,8 @@ import {
     VersionIdentifierInput,
     ActivityLogEventType,
     ActivityLogChangeType,
-    ActivityLogResult
+    ActivityLogResult,
+    UpdateMethod
 } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
@@ -205,7 +206,7 @@ export const packageCatalog = async (
 export const packageLatestVersion = async (
     parent: Package,
     _1: any,
-    context: AuthenticatedContext,
+    context: Context,
     info: any
 ): Promise<Version | null> => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
@@ -656,6 +657,15 @@ export const packageIsPublic = async (parent: Package, _1: any, context: Context
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     return packageEntity.isPublic;
 };
+
+export const packageUpdateMethods = async (parent: Package, _1: any, context: Context, info: any): Promise<UpdateMethod[]> => {
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
+    const latestVersion = await getPackageLatestVersionFromCacheOrDbById(context, packageEntity.id);
+
+    return latestVersion.updateMethods || [];
+
+}
 
 export const getPackageFromCacheOrDbById = async (
     context: Context,

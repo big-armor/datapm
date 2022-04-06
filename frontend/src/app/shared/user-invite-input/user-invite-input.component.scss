@@ -24,39 +24,12 @@
         }
     }
 
-    ::ng-deep .mat-form-field-flex {
-        background-color: var(--custom-secondary-color);
-        border-radius: 6px;
-    }
 
-    ::ng-deep .mat-chip {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: $weight-400;
-        font-size: $small-font;
-        line-height: 18px;
-        letter-spacing: 0.5px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-        padding-right: 4px;
-        padding-left: 4px;
-    }
-
-    ::ng-deep .mat-icon {
+    .mat-icon {
         height: 20px;
         font-size: $title-font;
         width: 22px;
         color: var(--info-color);
     }
 
-    ::ng-deep .mat-chip-remove {
-        color: var(--gray-1-color);
-        margin-left: 2px;
-    }
-
-    ::ng-deep .mat-form-field-outline {
-        color: transparent !important;
-        height: 0px !important;
-        border: 0;
-    }
 }

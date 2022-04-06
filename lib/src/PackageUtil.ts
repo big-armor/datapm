@@ -86,6 +86,7 @@ export enum DifferenceType {
     CHANGE_SOURCE_CONNECTION = "CHANGE_SOURCE_CONNECTION",
     CHANGE_SOURCE_CREDENTIALS = "CHANGE_SOURCE_CREDENTIALS",
     CHANGE_SOURCE_CONFIGURATION = "CHANGE_SOURCE_CONFIGURATION",
+    CHANGE_STREAM_UPDATE_METHOD = "CHANGE_STREAM_UPDATE_METHOD",
     CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS", // APPLIES ONLY TO PackageFileV040 and earlier
     CHANGE_STREAM_STATS = "CHANGE_STREAM_STATS",
     CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
@@ -323,6 +324,11 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
             continue;
         }
 
+        const updateMethodComparison = compareArrays(newStreamSet.updateMethods, priorStreamSet.updateMethods);
+
+        if (!updateMethodComparison) {
+            response.push({ type: DifferenceType.CHANGE_STREAM_UPDATE_METHOD, pointer });
+        }
         response = response.concat(compareStream(priorStreamSet, newStreamSet, pointer));
     }
 
@@ -426,6 +432,15 @@ export function sourceURIsEquivalent(urisA: string[], urisB: string[]): boolean 
     }
 
     return true;
+}
+
+/** Retuns whether the two objects are identical or not */
+export function compareArrays(priorArray?: unknown[] | null, newArray?: unknown[] | null): boolean {
+    if (priorArray == null && newArray == null) return true;
+
+    if ((priorArray == null && newArray != null) || (priorArray != null && newArray == null)) return false;
+
+    return deepEqual(priorArray, newArray);
 }
 
 /** Retuns whether the two objects are identical or not */

@@ -198,6 +198,12 @@ enum OrderBy {
     UPDATED_AT
 }
 
+enum UpdateMethod {
+    CONTINUOUS
+    BATCH_FULL_SET
+    APPEND_ONLY_LOG
+}
+
 """
 Package difference types
 """
@@ -356,6 +362,7 @@ type Package {
     myPermissions: [Permission!]
     fetchedCount: Int
     viewedCount: Int
+    updateMethods: [UpdateMethod!]
 }
 
 """
@@ -482,6 +489,8 @@ type Version {
     An unmodified copy of the package file that is only returned when the requesting user has EDIT permissions on the package.
     """
     canonicalPackageFile: PackageFileJSON
+
+    updateMethods: [UpdateMethod!]
 }
 
 """

@@ -26,5 +26,6 @@ query CollectionPackages($identifier: CollectionIdentifierInput!, $offset: Int!,
         }
         isPublic
         myPermissions
+        updateMethods
     }
 }

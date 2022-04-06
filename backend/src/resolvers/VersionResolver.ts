@@ -1,13 +1,5 @@
-import { SemVer } from "semver";
 import {
-    compatibilityToString,
-    comparePackages,
-    diffCompatibility,
-    nextVersion,
     PackageFile,
-    Compability,
-    upgradePackageFile,
-    Difference,
     PublishMethod,
     Source
 } from "datapm-lib";
@@ -15,7 +7,6 @@ import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
 import { AuthenticatedContext, Context } from "./../context";
 import {
-    ActivityLogChangeType,
     ActivityLogEventType,
     CreateVersionInput,
     Package,
@@ -23,12 +14,10 @@ import {
     Permission,
     User,
     Version,
-    VersionConflict,
     VersionIdentifier,
-    VersionIdentifierInput
+    VersionIdentifierInput,
+    UpdateMethod
 } from "../generated/graphql";
-import { ApolloError } from "apollo-server";
-import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "./../util/relationNames";
 import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
@@ -36,13 +25,11 @@ import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
-import { saveVersionComparison } from "../repository/VersionComparisonRepository";
 import { Connection, EntityManager } from "typeorm";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { GraphQLResolveInfo } from "graphql";
 import { createOrUpdateVersion } from "../business/CreateVersion";
-import graphqlFields from "graphql-fields";
 
 export const versionEntityToGraphqlObject = async (
     context: Context,
@@ -202,7 +189,19 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
                         },
                         streamStats: {
                             inspectedCount: 0,
-                        }
+                        },
+                        updateMethods: 
+                            Array.from(packageFile.sources
+                                .flatMap(s => s.streamSets)
+                                .filter(s => s.schemaTitles.includes(schema.title!))
+                                .reduce((acc, s) => {
+                                    for(const u of s.updateMethods) {
+                                        acc.add(u)
+                                    }
+                                    return acc;
+                                }, new Set<UpdateMethod>())
+                            )
+                                
                         // TODO implement lastUpdateHash and stream stats by 
                         // keeping an index of the records at data storage time in index.ts
                     }
@@ -285,6 +284,22 @@ export const versionCreatedAt = async (
 
     return version.createdAt;
 };
+
+export const versionUpdateMethods = async (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<UpdateMethod[] | null> => {
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
+    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+        return null;
+    }
+
+    return version.updateMethods;
+
+}
 
 export const versionUpdatedAt = async (
     parent: Version,

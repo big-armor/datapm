@@ -1506,3 +1506,73 @@ blockquote {
     border-left: 2px solid var(--gray-5-color);
     padding-left: 10px;
 }
+
+.mat-form-field-infix {
+    border-top: none;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $small-font;
+    line-height: 18px;
+    padding: 0.15em 0;
+}
+
+.mat-form-field-flex {
+    background-color: var(--custom-secondary-color);
+    border-radius: 4px;
+}
+
+.mat-form-field-wrapper {
+    padding-bottom: 0px;
+}
+
+.mat-chip {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $small-font;
+    min-height: 24px;
+    letter-spacing: 0.5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 4px;
+    padding-left: 7px;
+}
+
+.mat-standard-chip {
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 16px;
+    align-items: center;
+    cursor: default;
+    min-height: 32px;
+    height: 1px;
+}
+
+.mat-chip.mat-chip-small {
+    font-size: $xsmall-font;
+    color: var(--gray-3-color);
+    background-color: var(--gray-10-color);
+    padding: 8px 6px;
+    position:inherit;
+    min-height: 12px;
+    margin-right: 4px;
+}
+
+.mat-chip.public-chip {
+    color: var(--green-1-color);
+    background-color: var(--green-6-color);
+}
+
+.mat-chip-remove {
+    color: $gray-1-color;
+    margin-left: 2px;
+    opacity: 1;
+}
+
+.mat-form-field-outline {
+    color: transparent !important;
+    height: 0px !important;
+    border: 0;
+}

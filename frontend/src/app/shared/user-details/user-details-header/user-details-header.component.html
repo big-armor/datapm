@@ -8,13 +8,13 @@
             <div class="p-2 align-self-center" [class.not-current-user]="!isCurrentUser">
                 <span *ngIf="user.firstName && user.lastName && (user.nameIsPublic || isCurrentUser)">
                     <span class="text-main-title font-22">{{ user | username }}</span>
-                    <span *ngIf="user.nameIsPublic" class="public-text">(public)</span>
-                    <span *ngIf="!user.nameIsPublic" class="not-public-text">(not public)</span><br />
+                    <span *ngIf="user.nameIsPublic" class="public-text">public</span>
+                    <span *ngIf="!user.nameIsPublic" class="not-public-text">not public</span><br />
                 </span>
 
                 <div class="username dpm-text-body my-2">
                     <span [class.text-main-title]="!user.firstName && !user.lastName">{{ "@" + user.username }}</span>
-                    <span class="public-text">(public)</span>
+                    <span class="public-text">public</span>
                 </div>
             </div>
             <div *ngIf="!isCurrentUser" class="p-2 ml-auto d-flex align-items-center">
@@ -28,8 +28,8 @@
             <div *ngIf="user.website && (user.websiteIsPublic || isCurrentUser)" class="pb-1">
                 <span class="social-link">
                     <a target="_blank" href="{{ user.website }}">{{ user.website }}</a>
-                    <span *ngIf="user.websiteIsPublic && isCurrentUser" class="public-text">(public)</span>
-                    <span *ngIf="!user.websiteIsPublic && isCurrentUser" class="not-public-text">(not public)</span>
+                    <span *ngIf="user.websiteIsPublic && isCurrentUser" class="public-text">public</span>
+                    <span *ngIf="!user.websiteIsPublic && isCurrentUser" class="not-public-text">not public</span>
                 </span>
             </div>
 
@@ -38,9 +38,9 @@
                     <a target="_blank" href="mailto:{{ user.emailAddress }}" class="social-img">
                         <em class="far fa-envelope"></em>
                     </a>
-                    <span *ngIf="user.emailAddressIsPublic && isCurrentUser" class="public-text">(public)</span>
+                    <span *ngIf="user.emailAddressIsPublic && isCurrentUser" class="public-text">public</span>
                     <span *ngIf="!user.emailAddressIsPublic && isCurrentUser" class="not-public-text"
-                        >(not public)</span
+                        >not public</span
                     >
                 </span>
 
@@ -48,9 +48,9 @@
                     <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}" class="social-img">
                         <em class="fab fa-twitter"></em>
                     </a>
-                    <span *ngIf="user.twitterHandleIsPublic && isCurrentUser" class="public-text">(public)</span>
+                    <span *ngIf="user.twitterHandleIsPublic && isCurrentUser" class="public-text">public</span>
                     <span *ngIf="!user.twitterHandleIsPublic && isCurrentUser" class="not-public-text"
-                        >(not public)</span
+                        >not public</span
                     >
                 </span>
 
@@ -58,9 +58,9 @@
                     <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}" class="social-img">
                         <em class="fab fa-github"></em>
                     </a>
-                    <span *ngIf="user.gitHubHandleIsPublic && isCurrentUser" class="public-text">(public)</span>
+                    <span *ngIf="user.gitHubHandleIsPublic && isCurrentUser" class="public-text">public</span>
                     <span *ngIf="!user.gitHubHandleIsPublic && isCurrentUser" class="not-public-text"
-                        >(not public)</span
+                        >not public</span
                     >
                 </span>
             </div>

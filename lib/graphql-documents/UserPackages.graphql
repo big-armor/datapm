@@ -27,6 +27,7 @@ query UserPackages($username: String!, $offSet: Int!, $limit: Int!) {
                 }
                 createdAt
             }
+            updateMethods
             creator {
                 username
                 firstName

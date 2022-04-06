@@ -16,7 +16,8 @@ import {
     collectionSlugValid,
     Source,
     compareSource,
-    compareSources
+    compareSources,
+    UpdateMethod
 } from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
@@ -353,7 +354,8 @@ describe("Checking VersionUtil", () => {
                     schemaTitles: ["A"],
                     streamStats: {
                         inspectedCount: 0
-                    }
+                    },
+                    updateMethods: []
                 }
             ]
         };
@@ -371,7 +373,8 @@ describe("Checking VersionUtil", () => {
                     schemaTitles: ["A"],
                     streamStats: {
                         inspectedCount: 0
-                    }
+                    },
+                    updateMethods: []
                 }
             ]
         };
@@ -413,7 +416,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 0
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -433,7 +437,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 0
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -466,7 +471,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 0
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -486,7 +492,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 0
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -513,7 +520,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 0
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -533,7 +541,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -569,7 +578,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -592,7 +602,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -621,7 +632,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -642,7 +654,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -670,7 +683,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -693,7 +707,8 @@ describe("Checking VersionUtil", () => {
                         schemaTitles: ["A"],
                         streamStats: {
                             inspectedCount: 1
-                        }
+                        },
+                        updateMethods: []
                     }
                 ]
             }
@@ -704,6 +719,56 @@ describe("Checking VersionUtil", () => {
         expect(diffs.length).equals(1);
 
         expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_CONFIGURATION);
+    });
+
+    it("Source configuration detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                connectionConfiguration: {},
+                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        },
+                        updateMethods: [UpdateMethod.BATCH_FULL_SET]
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                connectionConfiguration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        },
+                        updateMethods: [UpdateMethod.APPEND_ONLY_LOG]
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_STREAM_UPDATE_METHOD);
     });
 
     it("Package File updated dates", function () {

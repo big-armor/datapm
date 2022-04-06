@@ -73,6 +73,7 @@ import { MovePackageComponent } from "./move-package/move-package.component";
 import { HeroComponent } from "./hero/hero.component";
 import { SwiperModule } from "swiper/angular";
 import { FollowersComponent } from "./followers/followers.component";
+import { UpdateMethodPipe } from "../package/pipes/update-method.pipe";
 
 @NgModule({
     declarations: [
@@ -124,7 +125,8 @@ import { FollowersComponent } from "./followers/followers.component";
         UserTypeFollowingComponent,
         MovePackageComponent,
         HeroComponent,
-        FollowersComponent
+        FollowersComponent,
+        UpdateMethodPipe
     ],
     imports: [
         CommonModule,
