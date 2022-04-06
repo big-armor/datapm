@@ -72,7 +72,7 @@ export class PublishPackageCommandModule {
             jobContext.print("NONE", chalk.green(`datapm update ${argv.reference}`));
         }
 
-        await checkDataPMVersion();
+        await checkDataPMVersion(oraRef);
 
         process.exit(0);
     }

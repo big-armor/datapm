@@ -1,19 +1,20 @@
 import chalk from "chalk";
 import { readDataPMVersion, RegistryStatusDocument } from "datapm-client-lib";
+import { Ora } from "ora";
 import { SemVer } from "semver";
 import { createRegistryClient } from "./RegistryClient";
 
-export async function checkDataPMVersion(): Promise<void> {
+export async function checkDataPMVersion(oraRef: Ora): Promise<void> {
     try {
         console.log(" ");
-        await _checkDataPMVersion();
+        await _checkDataPMVersion(oraRef);
     } catch (error) {
-        console.error("There was a problem checking for DataPM updates. " + error.message);
+        oraRef.info("There was a problem checking for DataPM updates. " + error.message);
         console.log(" ");
     }
 }
 
-async function _checkDataPMVersion(): Promise<boolean> {
+async function _checkDataPMVersion(oraRef: Ora): Promise<boolean> {
     const registryClient = createRegistryClient("https://datapm.io", undefined);
 
     const response = await registryClient.query({
@@ -33,7 +34,7 @@ async function _checkDataPMVersion(): Promise<boolean> {
     const serverSemVer = new SemVer(status.version);
 
     if (localSemVer.compare(serverSemVer) < 0) {
-        console.error(
+        oraRef.warn(
             chalk.yellow(
                 `There is a new version (${status.version}) of DataPM available. You are using ${localDataPMVersion}.`
             )

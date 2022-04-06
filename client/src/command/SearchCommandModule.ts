@@ -18,5 +18,5 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
     const job = new SearchJob(jobContext, argv);
     await job.execute();
 
-    await checkDataPMVersion();
+    await checkDataPMVersion(oraRef);
 }

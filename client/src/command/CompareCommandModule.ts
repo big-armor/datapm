@@ -66,5 +66,5 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
         console.log(chalk.yellow(message));
     });
 
-    await checkDataPMVersion();
+    await checkDataPMVersion(oraRef);
 }

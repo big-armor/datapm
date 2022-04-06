@@ -33,7 +33,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             process.exit(0);
         }
 
-        await checkDataPMVersion();
+        await checkDataPMVersion(oraRef);
 
         process.exit(0);
     } catch (error) {

@@ -24,7 +24,7 @@ export async function getInfo(argv: InfoArguments): Promise<void> {
 
     const result = await job.execute();
 
-    await checkDataPMVersion();
+    await checkDataPMVersion(oraRef);
 
     process.exit(result.exitCode);
 }

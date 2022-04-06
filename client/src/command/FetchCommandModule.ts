@@ -77,7 +77,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         );
     }
 
-    await checkDataPMVersion();
+    if (!argv.quiet) await checkDataPMVersion(oraRef);
 
     process.exit(0);
 }
