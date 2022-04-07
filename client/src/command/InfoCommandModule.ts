@@ -3,6 +3,7 @@ import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { InfoArguments } from "./InfoCommand";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { InfoJob } from "datapm-client-lib";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function getInfo(argv: InfoArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -22,6 +23,8 @@ export async function getInfo(argv: InfoArguments): Promise<void> {
     const job = new InfoJob(jobContext, argv);
 
     const result = await job.execute();
+
+    await checkDataPMVersion(oraRef);
 
     process.exit(result.exitCode);
 }

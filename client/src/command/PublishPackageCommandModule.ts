@@ -4,6 +4,7 @@ import { PackageIdentifier, PublishJob, PublishJobArguments, identifierToString 
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { exit } from "process";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export enum PublishDataSteps {
     STARTING_UPLOAD = "starting_upload",
@@ -71,7 +72,8 @@ export class PublishPackageCommandModule {
             jobContext.print("NONE", chalk.green(`datapm update ${argv.reference}`));
         }
 
-        jobContext.print("NONE", "");
+        await checkDataPMVersion(oraRef);
+
         process.exit(0);
     }
 }

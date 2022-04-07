@@ -813,7 +813,7 @@ describe("Catalog Tests", async () => {
         });
         expect(response.errors == null, "no errors").to.equal(true);
         expect(
-            response.data!.userCatalogs.catalogs!.find((c) => c.identifier.catalogSlug == "user-a-second-catalog-v2")
+            response.data?.userCatalogs.catalogs?.find((c) => c.identifier.catalogSlug == "user-a-second-catalog-v2")
         ).to.not.equal(undefined);
     });
 

@@ -6,6 +6,7 @@ import ora from "ora";
 import { OraQuiet } from "../util/OraQuiet";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { exit } from "process";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -75,6 +76,8 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             )
         );
     }
+
+    if (!argv.quiet) await checkDataPMVersion(oraRef);
 
     process.exit(0);
 }

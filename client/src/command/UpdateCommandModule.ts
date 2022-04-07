@@ -3,6 +3,7 @@ import ora from "ora";
 import { UpdateArguments, UpdatePackageJob } from "datapm-client-lib";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 
 export async function updatePackage(argv: UpdateArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -31,6 +32,8 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             console.log(chalk.green(`datapm publish ${taskResult.result.packageFileUrl.replace("file://", "")}`));
             process.exit(0);
         }
+
+        await checkDataPMVersion(oraRef);
 
         process.exit(0);
     } catch (error) {

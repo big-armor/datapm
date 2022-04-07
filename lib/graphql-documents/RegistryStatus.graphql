@@ -1,3 +1,7 @@
 query RegistryStatus {
-    registryStatus
+    registryStatus {
+        status
+        version
+        registryUrl
+    }
 }
