@@ -1,11 +1,4 @@
-import {
-    parsePackageFileJSON,
-    catalogSlugValid,
-    packageSlugValid,
-    PackageFile,
-    validatePackageFile,
-    RegistryReference
-} from "datapm-lib";
+import { parsePackageFileJSON, catalogSlugValid, packageSlugValid, PackageFile, RegistryReference } from "datapm-lib";
 import { Package, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { JobContext } from "../task/Task";
 import { publishPackageFile } from "./PackageUtil";
@@ -207,7 +200,6 @@ async function fetchPackage(
         packageFileJSON = version.canonicalPackageFile;
     }
 
-    validatePackageFile(packageFileJSON);
     const packageFile = parsePackageFileJSON(packageFileJSON);
 
     return new RegistryPackageFileContext(jobContext, packageFile, packageEntity, registryConfig?.apiKey != null);

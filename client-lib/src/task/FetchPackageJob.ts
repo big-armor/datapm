@@ -90,6 +90,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         try {
             packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
         } catch (error) {
+            if (typeof error.message === "string" && error.message.includes("ERROR_SCHEMA_VERSION_TOO_NEW")) {
+                await task.end("ERROR", "The package file was created by a newer version of the datapm client.");
+
+                this.jobContext.print("INFO", "Update the datapm client to the latest version to use this package.");
+                this.jobContext.print("NONE", "https://datapm.io/downloads");
+            }
             if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
                 await task.end("ERROR", "You are not logged in to the registry.");
 
