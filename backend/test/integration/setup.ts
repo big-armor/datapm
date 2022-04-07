@@ -11,7 +11,9 @@ import { ActivityLogChangeType, ActivityLogEventType, RegistryStatus, RegistrySt
 import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
 import { TEMP_STORAGE_PATH } from "./constants";
-import { readDataPMVersion } from "datapm-client-lib"
+import path from "path";
+// NOTE: including "datapm-client-lib" here causes a build error where suddently the response objects 
+// in the generated graphql schema are seen as "any" type.
 
 const maildev = require("maildev");
 
@@ -205,7 +207,11 @@ describe("Server should start", async function () {
         expect(response.errors == null).equal(true);
         expect(response.data.registryStatus.registryUrl).equal("http://localhost:4200");
         expect(response.data.registryStatus.status).equal(RegistryStatus.SERVING_REQUESTS);
-        expect(response.data.registryStatus.version).equal(readDataPMVersion());
+
+        const packageFileJson = fs.readFileSync(path.join(__dirname,"..","..","package.json"));
+        const packageFile = JSON.parse(packageFileJson.toString());
+
+        expect(response.data.registryStatus.version).equal(packageFile.version);
     });
 });
 
