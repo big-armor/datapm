@@ -19,6 +19,7 @@ import { DPMRecordSerializer } from "../writer/RecordSerializer";
 import { RecordSerializerCSVDescription } from "../writer/RecordSerializerCSVDescription";
 import { DISPLAY_NAME, TYPE } from "./LocalFileConnectorDescription";
 import { getLocalDataPath } from "../../../util/LocalDataUtil";
+import { SemVer } from "semver";
 
 export class LocalFileSink extends AbstractFileSink {
     getType(): string {
@@ -40,7 +41,15 @@ export class LocalFileSink extends AbstractFileSink {
 
         const localDataPath = getLocalDataPath(catalogSlug, packageFile.packageSlug);
 
-        const location = path.join(localDataPath, packageFile.version, serializerTransform.getFileExtension());
+        const semVer = new SemVer(packageFile.version);
+
+        const packageMajorVersion = semVer.major;
+
+        const location = path.join(
+            localDataPath,
+            packageMajorVersion.toString(),
+            serializerTransform.getFileExtension()
+        );
 
         return {
             ...(await super.getDefaultParameterValues(catalogSlug, packageFile, configuration)),

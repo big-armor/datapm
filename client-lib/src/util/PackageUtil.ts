@@ -4,7 +4,8 @@ import {
     DPMConfiguration,
     PackageFile,
     PublishMethod,
-    RegistryReference
+    RegistryReference,
+    Source
 } from "datapm-lib";
 import { SemVer } from "semver";
 import { CreateVersionInput } from "../generated/graphql";
@@ -17,6 +18,8 @@ import numeral from "numeral";
 import { JobContext, Task } from "../task/Task";
 import { fetchMultiple } from "../task/FetchPackageJob";
 import internal from "stream";
+import { InspectionResults } from "../main";
+import { inspectSourceConnection } from "./SchemaUtil";
 
 type CredentialsBySourceSlug = Map<string, DPMConfiguration>;
 
@@ -219,9 +222,25 @@ async function publishData(
 
     const dataPMSink = await dataPMSinkDescription.loadSinkFromModule();
 
+    const sourcesAndInspectionResults: {
+        source: Source;
+        inspectionResult: InspectionResults;
+    }[] = [];
+
+    for (const source of packageFile.sources) {
+        jobContext.setCurrentStep("Inspecting " + source.slug);
+        const inspectionResult = await inspectSourceConnection(jobContext, source, false);
+
+        sourcesAndInspectionResults.push({
+            source,
+            inspectionResult
+        });
+    }
+
     return await fetchMultiple(
         jobContext,
         packageFile,
+        sourcesAndInspectionResults,
         {
             catalogSlug: targetRegistry.catalogSlug,
             packageSlug: packageFile.packageSlug,

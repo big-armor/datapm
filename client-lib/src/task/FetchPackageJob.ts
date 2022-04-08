@@ -136,6 +136,21 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         recordCountText = `${schemaCount} schemas with ${recordCountText} records`;
         this.jobContext.print("INFO", recordCountText);
 
+        const sourcesAndInspectionResults: {
+            source: Source;
+            inspectionResult: InspectionResults;
+        }[] = [];
+
+        for (const source of packageFile.sources) {
+            this.jobContext.setCurrentStep("Inspecting " + source.slug);
+            const inspectionResult = await inspectSourceConnection(this.jobContext, source, this.args.defaults);
+
+            sourcesAndInspectionResults.push({
+                source,
+                inspectionResult
+            });
+        }
+
         this.jobContext.setCurrentStep("Sink Connector");
 
         // Getting sink
@@ -303,6 +318,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         const listrStatuses = await fetchMultiple(
             this.jobContext,
             packageFile,
+            sourcesAndInspectionResults,
             {
                 catalogSlug: packageFileWithContext.catalogSlug || "local",
                 packageSlug: packageFileWithContext.packageFile.packageSlug,
@@ -346,6 +362,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 export async function fetchMultiple(
     jobContext: JobContext,
     packageFile: PackageFile,
+    sourcesAndInspectionResults: { source: Source; inspectionResult: InspectionResults }[],
     sinkStateKey: SinkStateKey,
     sink: Sink,
     sinkConnectionConfiguration: DPMConfiguration,
@@ -362,10 +379,11 @@ export async function fetchMultiple(
         sinkState: SinkState | null;
     }[] = [];
 
-    for (const source of packageFile.sources) {
-        const schemaUriInspectionResults = await inspectSourceConnection(jobContext, source, defaults);
+    for (const sourceAndInspectionResults of sourcesAndInspectionResults) {
+        const source = sourceAndInspectionResults.source;
+        const uriInspectionResults = sourceAndInspectionResults.inspectionResult;
 
-        for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
+        for (const streamSetPreview of uriInspectionResults.streamSetPreviews) {
             jobContext.setCurrentStep("Checking State of " + streamSetPreview.slug);
 
             let sinkState = await sink.getSinkState(
@@ -412,7 +430,7 @@ export async function fetchMultiple(
                 sinkStateKey,
                 source,
                 streamSetPreview,
-                uriInspectionResults: schemaUriInspectionResults
+                uriInspectionResults: uriInspectionResults
             });
         }
     }
