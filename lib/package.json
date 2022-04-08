@@ -15,7 +15,7 @@
         "prebuild": "npm run clean && npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
-        "pretest": "npm run codgen",
+        "pretest": "npm run codegen",
         "test": "gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
     },
     "files": [
