@@ -1,15 +1,10 @@
 import { DPMConfiguration, UpdateMethod, RecordContext, Parameter, ParameterType } from "datapm-lib";
 import Knex from "knex";
-import {
-    StreamSetPreview,
-    SourceErrors,
-    SourceInspectionContext as URIInspectionContext,
-    InspectionResults,
-    Source
-} from "../../Source";
+import { StreamSetPreview, SourceErrors, InspectionResults, Source } from "../../Source";
 import { Transform } from "stream";
 import { table } from "console";
 import { TYPE } from "./PostgresConnectorDescription";
+import { JobContext } from "../../../task/Task";
 
 export class PostgresSource implements Source {
     sourceType(): string {
@@ -80,7 +75,7 @@ export class PostgresSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: URIInspectionContext
+        context: JobContext
     ): Promise<InspectionResults> {
         let remainingParameter = await this.getInspectParameters(
             connectionConfiguration,
@@ -127,7 +122,7 @@ export class PostgresSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        _context: URIInspectionContext
+        _context: JobContext
     ): Promise<StreamSetPreview> {
         if (configuration == null) throw new Error("");
 

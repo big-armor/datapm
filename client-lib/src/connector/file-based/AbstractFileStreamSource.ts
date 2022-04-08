@@ -3,13 +3,14 @@ import chalk from "chalk";
 import { StreamState, DPMConfiguration, UpdateMethod, Parameter, ParameterType } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
-import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source } from "../Source";
+import { StreamSetPreview, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
 import { nameFromFileUris } from "../../util/NameUtil";
 import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
 import path from "path";
+import { JobContext } from "../../task/Task";
 
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;
@@ -31,7 +32,7 @@ export abstract class AbstractFileStreamSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         // Loop over each URI
 
@@ -42,7 +43,7 @@ export abstract class AbstractFileStreamSource implements Source {
         );
 
         while (remainingParameter.length > 0) {
-            await context.parameterPrompt(remainingParameter);
+            await jobContext.parameterPrompt(remainingParameter);
             remainingParameter = await this.getInspectParameters(
                 connectionConfiguration,
                 credentialsConfiguration,
@@ -65,7 +66,12 @@ export abstract class AbstractFileStreamSource implements Source {
             source: this,
             configuration,
             streamSetPreviews: [
-                await this.getRecordStreams(connectionConfiguration, credentialsConfiguration, configuration, context)
+                await this.getRecordStreams(
+                    connectionConfiguration,
+                    credentialsConfiguration,
+                    configuration,
+                    jobContext
+                )
             ]
         };
     }
@@ -74,7 +80,7 @@ export abstract class AbstractFileStreamSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<StreamSetPreview> {
         const fileStreamSummaries = await this.getFileStreams(
             connectionConfiguration,
@@ -93,22 +99,20 @@ export abstract class AbstractFileStreamSource implements Source {
             schemaStates: {}
         });
 
-        if (!context.quiet) {
-            if (fileBufferSummary.fileName) {
-                context.jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
-            }
-            if (fileBufferSummary.fileSize) {
-                const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
-                context.jobContext.print("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
-            }
-            if (fileBufferSummary.detectedMimeType) {
-                context.jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
-            }
+        if (fileBufferSummary.fileName) {
+            jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
+        }
+        if (fileBufferSummary.fileSize) {
+            const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
+            jobContext.print("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
+        }
+        if (fileBufferSummary.detectedMimeType) {
+            jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
         }
 
-        const parser = await findParser(fileBufferSummary, configuration, context);
+        const parser = await findParser(fileBufferSummary, configuration, jobContext);
 
-        const parserInspectionResults = await parser.inspectFile(fileBufferSummary, configuration, context);
+        const parserInspectionResults = await parser.inspectFile(fileBufferSummary, configuration, jobContext);
 
         if (
             parserInspectionResults.updateMethods.length === 1 &&
@@ -122,7 +126,7 @@ export abstract class AbstractFileStreamSource implements Source {
                     UpdateMethod[(configuration.updateMethod as string) as keyof typeof UpdateMethod]
                 )
             ) {
-                await context.parameterPrompt([
+                await jobContext.parameterPrompt([
                     {
                         name: "updateMethod",
                         configuration,
@@ -244,7 +248,7 @@ export async function getFileBufferSummary(
 export async function findParser(
     fileStreamSummary: FileBufferSummary,
     configuration: DPMConfiguration,
-    context: SourceInspectionContext
+    jobContext: JobContext
 ): Promise<Parser> {
     let parser: Maybe<Parser> = null;
 
@@ -254,26 +258,32 @@ export async function findParser(
         parser = await getParser(fileStreamSummary);
     }
 
-    if (context != null && parser == null) {
-        context.print("\n");
-        context.print(chalk.grey("File type details"));
+    if (jobContext != null && parser == null) {
+        jobContext.print("NONE", "\n");
+        jobContext.print("NONE", chalk.grey("File type details"));
 
         if (fileStreamSummary.fileName != null) {
-            context.print(chalk.grey("File Name: ") + chalk.white(fileStreamSummary.fileName));
+            jobContext.print("NONE", chalk.grey("File Name: ") + chalk.white(fileStreamSummary.fileName));
         }
 
         if (fileStreamSummary.reportedMimeType !== fileStreamSummary.detectedMimeType) {
             if (fileStreamSummary.reportedMimeType != null)
-                context.print(chalk.grey("Reported MimeType: ") + chalk.white(fileStreamSummary.reportedMimeType));
+                jobContext.print(
+                    "NONE",
+                    chalk.grey("Reported MimeType: ") + chalk.white(fileStreamSummary.reportedMimeType)
+                );
 
             if (fileStreamSummary.detectedMimeType != null)
-                context.print(chalk.grey("Detected MimeType: ") + chalk.white(fileStreamSummary.detectedMimeType));
+                jobContext.print(
+                    "NONE",
+                    chalk.grey("Detected MimeType: ") + chalk.white(fileStreamSummary.detectedMimeType)
+                );
         } else if (fileStreamSummary.detectedMimeType !== null) {
-            context.print(chalk.grey("MimeType: ") + chalk.white(fileStreamSummary.detectedMimeType));
+            jobContext.print("NONE", chalk.grey("MimeType: ") + chalk.white(fileStreamSummary.detectedMimeType));
         }
 
-        context.print("\n");
-        await context.parameterPrompt([
+        jobContext.print("NONE", "\n");
+        await jobContext.parameterPrompt([
             {
                 configuration,
                 message: "Could not automatically detect file type. Please select one.",

@@ -8,16 +8,12 @@ import { getOAuth2Client, getSpreadsheetMetadata } from "../../../util/GoogleUti
 import { QuoteTransform } from "../../../transforms/QuoteTransform";
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform";
-import {
-    StreamSetPreview,
-    SourceInspectionContext as URIInspectionContext,
-    InspectionResults,
-    Source
-} from "../../Source";
+import { StreamSetPreview, InspectionResults, Source } from "../../Source";
 import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 import { TYPE } from "./GoogleSheetConnectorDescription";
+import { JobContext } from "../../../task/Task";
 
 export class GoogleSheetSource implements Source {
     sourceType(): string {
@@ -28,7 +24,7 @@ export class GoogleSheetSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: URIInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         const uris = connectionConfiguration.uris as string[];
         if (uris != null && uris.length > 1) {
@@ -40,7 +36,7 @@ export class GoogleSheetSource implements Source {
         const titles: string[] = [];
 
         for (const uri of connectionConfiguration.uris as string[]) {
-            const sheetMetadata = await this.getSheetStreams(uri, configuration, context);
+            const sheetMetadata = await this.getSheetStreams(uri, configuration, jobContext);
             titles.push(sheetMetadata.fileName);
 
             spreedsheetStreams = spreedsheetStreams.concat(sheetMetadata.streamSetPreviews);
@@ -57,7 +53,7 @@ export class GoogleSheetSource implements Source {
     async getSheetStreams(
         uri: string,
         configuration: DPMConfiguration,
-        context: URIInspectionContext
+        jobContext: JobContext
     ): Promise<{ streamSetPreviews: StreamSetPreview[]; fileName: string }> {
         // TODO - Support wildcard in paths, to read many files in single batch set
         // A wild card would indicate one set of files for a single stream
@@ -93,11 +89,9 @@ export class GoogleSheetSource implements Source {
                         openStream: async () => {
                             return new Promise((resolve, reject) => {
                                 const request = https.get(sheetUri, async (response) => {
-                                    if (!context.quiet) {
-                                        context.jobContext.log("INFO", `Sheet Name: ${sheetTitle}`);
-                                    }
+                                    jobContext.log("INFO", `Sheet Name: ${sheetTitle}`);
 
-                                    const stream = await this.inspectSheet(response, sheetConfiguration, context);
+                                    const stream = await this.inspectSheet(response, sheetConfiguration, jobContext);
 
                                     return resolve({
                                         stream,
@@ -125,7 +119,7 @@ export class GoogleSheetSource implements Source {
     async inspectSheet(
         stream: Readable,
         sheetConfiguration: DPMConfiguration,
-        context: URIInspectionContext
+        jobContext: JobContext
     ): Promise<Readable> {
         const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(stream, Math.pow(2, 20));
 
@@ -136,13 +130,13 @@ export class GoogleSheetSource implements Source {
                 const shortendLine =
                     line.length > process.stdout.columns ? line.substr(0, process.stdout.columns - 15) + "..." : line;
 
-                context.print(chalk.white("Line " + index + " -> ") + chalk.grey(shortendLine));
+                jobContext.print("NONE", chalk.white("Line " + index + " -> ") + chalk.grey(shortendLine));
 
                 if (index > 11) break;
             }
-            context.print("\n");
+            jobContext.print("NONE", "\n");
 
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     configuration: sheetConfiguration,
                     name: "hasHeaderRow",
@@ -154,7 +148,7 @@ export class GoogleSheetSource implements Source {
         }
 
         if (sheetConfiguration.hasHeaderRow && sheetConfiguration.headerRowNumber == null) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     configuration: sheetConfiguration,
                     message: "Header row line number?",

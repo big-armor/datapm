@@ -4,10 +4,10 @@ import mime from "mime-types";
 import { Readable, Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
 import { findParser } from "../AbstractFileStreamSource";
-import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
 import path from "path";
+import { JobContext } from "../../../task/Task";
 
 export abstract class AbstractPassThroughParser implements Parser {
     abstract getDisplayName(): string;
@@ -50,7 +50,7 @@ export abstract class AbstractPassThroughParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<ParserInspectionResults> {
         const decompressorTransform = this.getPassThroughTransforms(configuration).reduce((prev, current) =>
             prev.pipe(current)
@@ -97,7 +97,7 @@ export abstract class AbstractPassThroughParser implements Parser {
 
         if (configuration.innerFileConfiguration == null) configuration.innerFileConfiguration = {};
 
-        const parser = await findParser(innerFileSummary, configuration, context);
+        const parser = await findParser(innerFileSummary, configuration, jobContext);
 
         configuration.innerFileMimeType = parser.getMimeType();
 
@@ -110,7 +110,7 @@ export abstract class AbstractPassThroughParser implements Parser {
         const innerFileResults = parser.inspectFile(
             innerFileSummary,
             configuration.innerFileConfiguration as DPMConfiguration,
-            context
+            jobContext
         );
 
         return innerFileResults;

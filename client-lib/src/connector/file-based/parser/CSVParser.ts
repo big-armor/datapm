@@ -6,11 +6,11 @@ import { StreamState, DPMConfiguration, DPMRecord, RecordContext, UpdateMethod, 
 import { Transform } from "stream";
 
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
-import { SourceInspectionContext } from "../../Source";
 import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform";
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { Maybe } from "../../../util/Maybe";
 import { DISPLAY_NAME, MIME_TYPE } from "./CSVParserDescription";
+import { JobContext } from "../../../task/Task";
 
 export class CSVParser implements Parser {
     getFileExtensions(): string[] {
@@ -25,27 +25,22 @@ export class CSVParser implements Parser {
         return MIME_TYPE;
     }
 
-    public showPreview(
-        context: SourceInspectionContext,
-        lines: string[],
-        startIndex = 0,
-        paragraphLength = 10
-    ): number {
+    public showPreview(jobContext: JobContext, lines: string[], startIndex = 0, paragraphLength = 10): number {
         const endIndex = Math.min(startIndex + paragraphLength, lines.length);
         for (let index = startIndex; index < endIndex; index += 1) {
             const line = lines[index];
             const shortendLine =
                 line.length > process.stdout.columns ? line.substr(0, process.stdout.columns - 15) + "..." : line;
-            context.print(chalk.white("Line " + (index + 1) + " -> ") + chalk.grey(shortendLine));
+            jobContext.print("NONE", chalk.white("Line " + (index + 1) + " -> ") + chalk.grey(shortendLine));
         }
-        context.print("\n");
+        jobContext.print("NONE", "\n");
         return startIndex + paragraphLength;
     }
 
     public async inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<ParserInspectionResults> {
         const previewLines = fileStreamSummary.buffer.toString().split(/\n/g);
         let previewStartIndex = 0;
@@ -73,7 +68,7 @@ export class CSVParser implements Parser {
             ) {
                 configuration.delimiter = "|";
             } else {
-                await context.parameterPrompt([
+                await jobContext.parameterPrompt([
                     {
                         configuration,
                         message: "Separator character?",
@@ -103,8 +98,8 @@ export class CSVParser implements Parser {
 
         if (configuration.hasHeaderRow == null) {
             while (true) {
-                previewStartIndex += this.showPreview(context, previewLines, previewStartIndex);
-                await context.parameterPrompt([
+                previewStartIndex += this.showPreview(jobContext, previewLines, previewStartIndex);
+                await jobContext.parameterPrompt([
                     {
                         configuration,
                         name: "hasHeaderRow",
@@ -137,7 +132,7 @@ export class CSVParser implements Parser {
             (configuration.hasHeaderRow === "true" || configuration.hasHeaderRow === true) &&
             configuration.headerRowNumber == null
         ) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     configuration,
                     message: "Header row line number?",

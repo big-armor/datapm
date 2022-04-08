@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
-import { InspectionResults, Source, SourceInspectionContext } from "../Source";
+import { InspectionResults, Source } from "../Source";
 import { TYPE, URI } from "./CoinbaseConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
+import { JobContext } from "../../task/Task";
 
 type SubscriptionsMessage = {
     type: "subscriptions";
@@ -77,10 +78,10 @@ export class CoinbaseSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         if (configuration.channels == null) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,
@@ -110,7 +111,7 @@ export class CoinbaseSource implements Source {
         if (configuration.products == null || (configuration.products as string[]).length === 0) {
             const pairs = await this.getPairs();
 
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,

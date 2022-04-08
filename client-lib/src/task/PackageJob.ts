@@ -18,7 +18,6 @@ import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import {
     InspectionResults,
     InspectProgress,
-    SourceInspectionContext,
     SourceStreamsInspectionResult,
     StreamSetPreview,
     Source as SourceImplementation
@@ -187,23 +186,10 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const source = await sourceDescription.getSource();
 
-        const sourceInspectionContext: SourceInspectionContext = {
-            defaults: this.args.defaults || false,
-            quiet: false,
-            jobContext: this.jobContext,
-            print: (message: string) => {
-                this.jobContext.print("NONE", message);
-            },
-            parameterPrompt: async (parameters) => {
-                return this.jobContext.parameterPrompt(parameters);
-            }
-        };
-
         this.jobContext.setCurrentStep(chalk.magenta("Finding Stream Sets"));
 
         const uriInspectionResults = await inspectSource(
             source,
-            sourceInspectionContext,
             this.jobContext,
             connectionConfiguration,
             credentialsConfiguration,
@@ -226,7 +212,6 @@ export class PackageJob extends Job<PackageJobResult> {
             const task = await this.jobContext.startTask("Inspecting Stream Set " + streamSetPreview.slug);
             const sourceStreamInspectionResults = await inspectStreamSet(
                 streamSetPreview,
-                sourceInspectionContext,
                 this.jobContext,
                 sourceConfiguration,
                 this.args.inspectionSeconds || 30
@@ -465,7 +450,6 @@ export function filterBadSchemaProperties(schema: Schema): Properties | undefine
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */
 export async function inspectSource(
     source: SourceImplementation,
-    sourceInspectionContext: SourceInspectionContext,
     jobContext: JobContext,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
@@ -476,7 +460,7 @@ export async function inspectSource(
         connectionConfiguration,
         credentialsConfiguration,
         configuration,
-        sourceInspectionContext
+        jobContext
     );
 
     return uriInspectionResults;
@@ -484,7 +468,6 @@ export async function inspectSource(
 
 export async function inspectStreamSet(
     streamSetPreview: StreamSetPreview,
-    sourceInspectionContext: SourceInspectionContext,
     jobContext: JobContext,
     sourceConfiguration: DPMConfiguration,
     inspectionSeconds: number
@@ -546,7 +529,6 @@ export async function inspectStreamSet(
                     await task.end("SUCCESS", progressText(progress));
                 }
             },
-            sourceInspectionContext,
             sourceConfiguration,
             inspectionSeconds
         );

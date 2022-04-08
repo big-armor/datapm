@@ -124,33 +124,7 @@ export async function inspectSourceConnection(
         source.connectionConfiguration,
         credentialsConfiguration,
         source.configuration || {},
-        {
-            defaults: defaults || false,
-            quiet: false,
-            jobContext,
-            print: (message: string) => {
-                jobContext.print("NONE", message);
-            },
-            parameterPrompt: async (parameters): Promise<ParameterAnswer<string>> => {
-                for (const parameter of parameters) {
-                    if (parameter.defaultValue == null) {
-                        throw new Error(
-                            "SOURCE_CONFIGURATION_NOT_COMPLETE - Missing value for parameter " +
-                                parameter.name +
-                                " from source " +
-                                source.slug +
-                                ", and no default is provided. The package owner needs to run the `datapm update ...` command to make it compatible with this version of datapm"
-                        );
-                    }
-
-                    if (source.configuration == null) source.configuration = {};
-
-                    source.configuration[parameter.name] = parameter.defaultValue;
-                }
-
-                return source.configuration || {};
-            }
-        }
+        jobContext
     );
 
     return sourceInspectResult;

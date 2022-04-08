@@ -16,7 +16,7 @@ import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
 import { RecordSerializerJSONDescription } from "./writer/RecordSerializerJSONDescription";
-import { JobContext } from "../../main";
+import { JobContext } from "../../task/Task";
 
 export abstract class AbstractFileSink implements Sink {
     abstract getType(): string;

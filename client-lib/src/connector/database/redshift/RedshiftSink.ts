@@ -24,7 +24,7 @@ import {
 import { KnexSink } from "../../../connector/database/KnexSink";
 import { DISPLAY_NAME, TYPE } from "./RedshiftConnectorDescription";
 import { WritableWithContext } from "../../../connector/Sink";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
 
 export class RedshiftSink extends KnexSink {
     redshiftClient: Redshift;

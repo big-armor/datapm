@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Writable } from "stream";
 import unzipper, { Entry } from "unzipper";
-import { SourceInspectionContext } from "../../Source";
+import { JobContext } from "../../../task/Task";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
 import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./ZIPParserDescription";
@@ -35,7 +35,7 @@ export class ZIPParser extends AbstractArchiveParser {
     async getInnerFileIterator(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        context: JobContext
     ): Promise<FileIterator> {
         if (configuration.filePattern == null) {
             await context.parameterPrompt([

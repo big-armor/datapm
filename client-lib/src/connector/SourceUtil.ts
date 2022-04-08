@@ -18,7 +18,6 @@ import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
 import {
     ExtendedJSONSchema7TypeName,
     SourceDescription,
-    SourceInspectionContext,
     SourceStreamsInspectionResult,
     StreamAndTransforms,
     StreamSetPreview,
@@ -80,7 +79,6 @@ export async function findRepositoryForSourceUri(uri: string): Promise<Connector
 export async function generateSchemasFromSourceStreams(
     streamSetPreview: StreamSetPreview,
     streamStatusContext: StreamStatusContext,
-    _sourceInspectionContext: SourceInspectionContext,
     _configuration: DPMConfiguration,
     inspectionSeconds: number
 ): Promise<SourceStreamsInspectionResult> {

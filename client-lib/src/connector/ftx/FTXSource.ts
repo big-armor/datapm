@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
-import { InspectionResults, Source, SourceInspectionContext } from "../Source";
+import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./FTXConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { getWebSocketUri } from "./FTXConnector";
+import { JobContext } from "../../task/Task";
 
 type FtxRestResponse<T> = {
     success: boolean;
@@ -103,10 +104,10 @@ export class FTXSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         if (configuration.channels == null) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     name: "channels",
@@ -129,7 +130,7 @@ export class FTXSource implements Source {
         if (configuration.markets == null || (configuration.markets as string[]).length === 0) {
             const pairs = await this.getPairs(configuration);
 
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,
