@@ -108,7 +108,7 @@
     "jsonstream-next": "^3.0.0",
     "knex": "^0.21.2",
     "mime-types": "^2.1.27",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "mongoose": "^5.13.14",
     "mysql": "^2.18.1",
     "node-gyp": "^8.4.1",
