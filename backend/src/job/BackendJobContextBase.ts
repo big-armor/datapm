@@ -16,20 +16,25 @@ export abstract class BackendJobContextBase implements JobContext {
     }
 
     getRepositoryConfigsByType(type: string): RepositoryConfig[] {
-        throw new Error("Method not implemented.");
+        return [];
     }
+
     getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
         throw new Error("Method not implemented.");
     }
+
     saveRepositoryCredential(connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string, credentials: DPMConfiguration): Promise<void> {
         throw new Error("Method not implemented.");
     }
+
     saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
         throw new Error("Method not implemented.");
     }
+
     removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
         throw new Error("Method not implemented.");
     }
+    
     getRepositoryCredential(connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string): Promise<DPMConfiguration> {
         throw new Error("Method not implemented.");
     }

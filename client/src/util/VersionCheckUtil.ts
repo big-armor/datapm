@@ -1,5 +1,6 @@
 import chalk from "chalk";
-import { readDataPMVersion, RegistryStatusDocument } from "datapm-client-lib";
+import { RegistryStatusDocument } from "datapm-client-lib";
+import { DATAPM_VERSION } from "datapm-lib";
 import { Ora } from "ora";
 import { SemVer } from "semver";
 import { createRegistryClient } from "./RegistryClient";
@@ -27,16 +28,14 @@ async function _checkDataPMVersion(oraRef: Ora): Promise<boolean> {
 
     const status = response.data.registryStatus;
 
-    const localDataPMVersion = readDataPMVersion();
-
-    const localSemVer = new SemVer(localDataPMVersion);
+    const localSemVer = new SemVer(DATAPM_VERSION);
 
     const serverSemVer = new SemVer(status.version);
 
     if (localSemVer.compare(serverSemVer) < 0) {
         oraRef.warn(
             chalk.yellow(
-                `There is a new version (${status.version}) of DataPM available. You are using ${localDataPMVersion}.`
+                `There is a new version (${status.version}) of DataPM available. You are using ${localSemVer.format()}.`
             )
         );
         console.log(chalk.green("http://datapm.io/downloads"));

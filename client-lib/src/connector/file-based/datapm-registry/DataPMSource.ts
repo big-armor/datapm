@@ -23,10 +23,11 @@ import { SemVer } from "semver";
 import { Socket } from "socket.io-client";
 import { PassThrough } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { InspectionResults, Source, SourceInspectionContext, StreamSetPreview, StreamSummary } from "../../Source";
+import { InspectionResults, Source, StreamSetPreview, StreamSummary } from "../../Source";
 import { connectSocket } from "./DataPMRepository";
 import { TYPE } from "./DataPMConnectorDescription";
-import { getPackageFromUrl, JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
+import { getPackageFromUrl } from "../../../util/PackageContext";
 
 export class DataPMSource implements Source {
     socket: Socket;
@@ -39,13 +40,13 @@ export class DataPMSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         const url = connectionConfiguration.url + "/" + configuration.catalogSlug + "/" + configuration.packageSlug;
 
-        const packageFileWithContext = await getPackageFromUrl(context.jobContext, url, "modified");
+        const packageFileWithContext = await getPackageFromUrl(jobContext, url, "modified");
 
-        const socket = await this.connectSocket(context.jobContext, connectionConfiguration, credentialsConfiguration);
+        const socket = await this.connectSocket(jobContext, connectionConfiguration, credentialsConfiguration);
 
         const packageStreamsResponse = await new TimeoutPromise<PackageStreamsResponse>(5000, (resolve, reject) => {
             socket.emit(
@@ -98,7 +99,7 @@ export class DataPMSource implements Source {
                                     updateMethod: batch.updateMethod,
                                     openStream: async (streamState: Maybe<StreamState>) => {
                                         const socket = await this.connectSocket(
-                                            context.jobContext,
+                                            jobContext,
                                             connectionConfiguration,
                                             credentialsConfiguration
                                         );

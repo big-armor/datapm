@@ -22,3 +22,5 @@ backend/tmp-registry-server-storage
 backend/tmp-registry-server-storage-*
 
 *.p12
+
+lib/src/DataPMVersion.ts

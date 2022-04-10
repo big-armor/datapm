@@ -1,10 +1,10 @@
 import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod, ParameterType } from "datapm-lib";
 import { Transform } from "stream";
-import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 import XmlParser from "xml-streamer";
 import { DISPLAY_NAME, MIME_TYPE } from "./XMLParserDescription";
+import { JobContext } from "../../../task/Task";
 
 export class XMLParser implements Parser {
     getFileExtensions(): string[] {
@@ -24,7 +24,7 @@ export class XMLParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        context: JobContext
     ): Promise<ParserInspectionResults> {
         if (configuration.xmlPath == null) {
             await context.parameterPrompt([

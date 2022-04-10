@@ -17,7 +17,7 @@ import { Transform } from "stream";
 import { RecordSerializedContext } from "../../../connector/file-based/AbstractFileSink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./StandardOutConnectorDescription";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
 
 export class StandardOutSinkModule implements Sink {
     getSupportedStreamOptions(

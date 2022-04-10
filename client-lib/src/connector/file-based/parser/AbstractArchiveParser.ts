@@ -4,10 +4,10 @@ import mime from "mime-types";
 import { Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
 import { findParser } from "../AbstractFileStreamSource";
-import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser, FileStreamContext } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
 import path from "path";
+import { JobContext } from "../../../task/Task";
 
 export interface FileIterator {
     moveToNextFile(): Promise<FileStreamContext | null>;
@@ -38,7 +38,7 @@ export abstract class AbstractArchiveParser implements Parser {
     abstract getInnerFileIterator(
         fileBufferSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<FileIterator>;
 
     async getTransforms(
@@ -70,9 +70,9 @@ export abstract class AbstractArchiveParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<ParserInspectionResults> {
-        const innerFileIterator = await this.getInnerFileIterator(fileStreamSummary, configuration, context);
+        const innerFileIterator = await this.getInnerFileIterator(fileStreamSummary, configuration, jobContext);
 
         const firstInnerFile = await innerFileIterator.moveToNextFile();
 
@@ -116,7 +116,7 @@ export abstract class AbstractArchiveParser implements Parser {
 
         if (configuration.innerFileConfiguration == null) configuration.innerFileConfiguration = {};
 
-        const parser = await findParser(innerFileSummary, configuration, context);
+        const parser = await findParser(innerFileSummary, configuration, jobContext);
 
         configuration.innerFileMimeType = parser.getMimeType();
 
@@ -129,7 +129,7 @@ export abstract class AbstractArchiveParser implements Parser {
         const innerFileResults = await parser.inspectFile(
             innerFileSummary,
             configuration.innerFileConfiguration as DPMConfiguration,
-            context
+            jobContext
         );
 
         let streamIndex = 0;

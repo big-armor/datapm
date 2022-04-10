@@ -2,8 +2,9 @@ import { DPMConfiguration, RecordContext, UpdateMethod, Parameter, ParameterType
 import fs from "fs";
 import { BigQuery, BigQueryDatetime, BigQueryTimestamp } from "@google-cloud/bigquery";
 import { Transform } from "stream";
-import { SourceInspectionContext, Source, StreamSetPreview, InspectionResults } from "../../Source";
+import { Source, StreamSetPreview, InspectionResults } from "../../Source";
 import { TYPE } from "./BigQueryConnectorDescription";
+import { JobContext } from "../../../task/Task";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqlParser = require("js-sql-parser");
@@ -158,7 +159,7 @@ export class BigQuerySource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         let remainingParameter = await this.getInspectParameters(
             connectionConfiguration,
@@ -167,7 +168,7 @@ export class BigQuerySource implements Source {
         );
 
         while (remainingParameter.length > 0) {
-            await context.parameterPrompt(remainingParameter);
+            await jobContext.parameterPrompt(remainingParameter);
             remainingParameter = await this.getInspectParameters(
                 connectionConfiguration,
                 credentialsConfiguration,
@@ -177,7 +178,7 @@ export class BigQuerySource implements Source {
 
         const streamSetPreviews: StreamSetPreview[] = [];
 
-        const preview = await this.getRecordStream(configuration, context);
+        const preview = await this.getRecordStream(configuration, jobContext);
 
         streamSetPreviews.push(preview);
 
@@ -192,10 +193,7 @@ export class BigQuerySource implements Source {
         };
     }
 
-    async getRecordStream(
-        configuration: DPMConfiguration,
-        _context: SourceInspectionContext
-    ): Promise<StreamSetPreview> {
+    async getRecordStream(configuration: DPMConfiguration, _context: JobContext): Promise<StreamSetPreview> {
         const client = new BigQuery();
 
         const query =

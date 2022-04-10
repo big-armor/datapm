@@ -1,6 +1,6 @@
 import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey, UpdateMethod, Parameter } from "datapm-lib";
 import { Transform } from "stream";
-import { JobContext } from "../main";
+import { JobContext } from "../task/Task";
 import { Maybe } from "../util/Maybe";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 

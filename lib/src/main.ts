@@ -22,3 +22,5 @@ export * from "./capabilities/SourceCategory";
 export * from "./capabilities/SourcesSchema";
 export * from "./capabilities/SourceDescription";
 export * from "./capabilities/CapabilitiesService";
+
+export * from "./DataPMVersion";

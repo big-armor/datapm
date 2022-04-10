@@ -1,12 +1,4 @@
-import {
-    StreamState,
-    DPMConfiguration,
-    Schema,
-    StreamStats,
-    UpdateMethod,
-    Parameter,
-    ParameterAnswer
-} from "datapm-lib";
+import { StreamState, DPMConfiguration, Schema, StreamStats, UpdateMethod } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
@@ -82,24 +74,6 @@ export interface InspectionResults {
     streamSetPreviews: StreamSetPreview[];
 }
 
-export interface SourceInspectionContext {
-    // TODO remove parameterPrompt and print from below. Just use the job context
-    // Maybe this doesn't need to exist at all?
-
-    /** Request information from the user. */
-    parameterPrompt: <T extends string>(parameters: Parameter<T>[]) => Promise<ParameterAnswer<T>>;
-
-    print(message: string): void;
-
-    jobContext: JobContext;
-
-    /** Whether defaults flag is enabled. Sources should then not prompt, but use defaults when possible.  */
-    defaults: boolean;
-
-    /** Whether the quiet flag is enabled - in which no user outputs are allowed. */
-    quiet: boolean;
-}
-
 export interface SourceDescription {
     /** A universally unique identifier for the source implementation. */
     sourceType(): string;
@@ -125,7 +99,7 @@ export interface Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults>;
 }
 

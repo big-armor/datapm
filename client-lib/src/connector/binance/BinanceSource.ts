@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
 import { PassThrough } from "stream";
-import { InspectionResults, Source, SourceInspectionContext } from "../Source";
+import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./BinanceConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { JobContext } from "../../main";
+import { JobContext } from "../../task/Task";
 import { getWebSocketUri } from "./BinanceConnector";
 
 type BinanceSymbol = {
@@ -115,10 +115,10 @@ export class BinanceSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
         if (configuration.channelType == null) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.Select,
                     configuration,
@@ -143,9 +143,9 @@ export class BinanceSource implements Source {
         }
 
         if (configuration.pairs == null || (configuration.pairs as string[]).length === 0) {
-            const pairs = await this.getPairs(context.jobContext, connectionConfiguration);
+            const pairs = await this.getPairs(jobContext, connectionConfiguration);
 
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,

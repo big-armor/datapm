@@ -22,6 +22,7 @@ import {
     ValueTypeStatistics
 } from "./PackageFile-v0.8.1";
 import { PackageFile080 } from "./main";
+import { DATAPM_VERSION } from "./DataPMVersion";
 
 export type DPMRecordValue =
     | number
@@ -561,8 +562,6 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 
     const packageFileContents = fs.readFileSync(packageFilePath).toString();
 
-    validatePackageFile(packageFileContents);
-
     try {
         packageFile = parsePackageFileJSON(packageFileContents);
     } catch (error) {
@@ -594,11 +593,13 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
-        let packageFile = JSON.parse(packageFileString, (key, value) => {
-            if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
+        let packageFile = JSON.parse(packageFileString) as PackageFile;
 
-            return new Date(Date.parse(value));
-        });
+        validatePackageFile(packageFile);
+
+        if (packageFile.updatedDate != null) {
+            packageFile.updatedDate = new Date(packageFile.updatedDate);
+        }
 
         packageFile = upgradePackageFile(packageFile);
 
@@ -798,7 +799,7 @@ export async function validatePackageFileInBrowser(packageFile: string): Promise
 
     const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
 
-    const response = await fetch("/docs/datapm-package-file-schema-v" + schemaVersion + ".json");
+    const response = await fetch("/docs/datapm-package-file-schema-v" + schemaVersion.format() + ".json");
 
     if (response.status > 199 && response.status < 300) {
         packageSchemaFile = await response.text();
@@ -828,7 +829,7 @@ export async function validatePackageFileInBrowser(packageFile: string): Promise
  * legacy values.
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
-export function getSchemaVersionFromPackageFile(packageFileObject: any): string {
+export function getSchemaVersionFromPackageFile(packageFileObject: any): SemVer {
     let packageFileSchemaUrl = packageFileObject.$schema as string;
 
     if (packageFileSchemaUrl == null)
@@ -838,27 +839,25 @@ export function getSchemaVersionFromPackageFile(packageFileObject: any): string 
 
     if (schemaVersion == null) throw new Error("ERROR_SCHEMA_VERSION_NOT_RECOGNIZED - " + packageFileSchemaUrl);
 
-    return schemaVersion[1];
+    return new SemVer(schemaVersion[1]);
 }
 
-export function validatePackageFile(packageFile: string): void {
-    let packageFileObject;
-
-    try {
-        packageFileObject = JSON.parse(packageFile);
-    } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
-    }
-
+export function validatePackageFile(packageFile: PackageFile): void {
     const ajv = new AJV({
         format: false // https://www.npmjs.com/package/ajv#redos-attack
     });
 
     let packageSchemaFile: string;
 
-    const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
+    const schemaVersion = getSchemaVersionFromPackageFile(packageFile);
 
-    const schemaFileName = "packageFileSchema-v" + schemaVersion + ".json";
+    const datapmVersion = new SemVer(DATAPM_VERSION);
+
+    if (schemaVersion.compare(datapmVersion) === 1) {
+        throw new Error("ERROR_SCHEMA_VERSION_TOO_NEW - " + schemaVersion.format());
+    }
+
+    const schemaFileName = "packageFileSchema-v" + schemaVersion.format() + ".json";
 
     try {
         const pathToSchemaFile = path.join(__dirname, "..", schemaFileName);
@@ -888,7 +887,7 @@ export function validatePackageFile(packageFile: string): void {
         throw new Error("ERROR_READING_SCHEMA");
     }
 
-    const response = ajv.validate(schemaObject, packageFileObject);
+    const response = ajv.validate(schemaObject, packageFile);
 
     if (!response) {
         throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));

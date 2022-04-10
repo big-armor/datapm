@@ -26,7 +26,7 @@ import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
 import { isRequestingUserOrAdmin } from "./util/contextHelpers";
-import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
+import { DATAPM_VERSION, parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
     addPackageToCollection,
@@ -221,7 +221,6 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
-import { readDataPMVersion } from "datapm-client-lib";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -333,7 +332,6 @@ export const resolvers: {
             return JSON.stringify(value);
         },
         parseValue: (value: any) => {
-            validatePackageFile(value);
             const packageFileObject = parsePackageFileJSON(value);
 
             return packageFileObject;
@@ -554,7 +552,7 @@ export const resolvers: {
         registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             return {
                 status: RegistryStatus.SERVING_REQUESTS,
-                version: readDataPMVersion(),
+                version: DATAPM_VERSION,
                 registryUrl: process.env["REGISTRY_URL"] as string
             }
         },
