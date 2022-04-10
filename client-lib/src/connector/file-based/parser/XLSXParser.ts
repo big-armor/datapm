@@ -1,7 +1,7 @@
 import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
-import { SourceInspectionContext } from "../../Source";
+import { JobContext } from "../../../task/Task";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { DISPLAY_NAME, MIME_TYPE } from "./XLSXParserDescription";
 
@@ -38,7 +38,7 @@ export class XLSXParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         _configuration: DPMConfiguration,
-        _context: SourceInspectionContext
+        _jobContext: JobContext
     ): Promise<ParserInspectionResults> {
         return {
             schemaPrefix: fileStreamSummary.fileName?.toLowerCase().replace(".xlsx", ""),

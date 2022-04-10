@@ -1,7 +1,7 @@
 import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod, ParameterType } from "datapm-lib";
 import * as jsonStream from "jsonstream-next";
 import { Transform } from "stream";
-import { SourceInspectionContext } from "../../Source";
+import { JobContext } from "../../../task/Task";
 import { DISPLAY_NAME, MIME_TYPE } from "./JSONParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
@@ -23,10 +23,10 @@ export class JSONParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<ParserInspectionResults> {
         if (configuration.jsonPath == null) {
-            await context.parameterPrompt([
+            await jobContext.parameterPrompt([
                 {
                     configuration,
                     message: "JSONPath for data?",

@@ -1,6 +1,6 @@
 import { DPMConfiguration, SocketEvent, TimeoutPromise, Parameter, ParameterType } from "datapm-lib";
 import { io, Socket } from "socket.io-client";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
 import { Connector } from "../../Connector";
 import { TYPE } from "./DataPMConnectorDescription";
 

@@ -1,9 +1,9 @@
 import avro from "avsc";
 import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
-import { SourceInspectionContext } from "../../Source";
 import { DISPLAY_NAME, MIME_TYPE } from "./AVROParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
+import { JobContext } from "../../../task/Task";
 
 class BlockDecoder extends avro.streams.BlockDecoder {
     // eslint-disable-next-line
@@ -34,7 +34,7 @@ export class AVROParser implements Parser {
     async inspectFile(
         fileStreamSummary: FileBufferSummary,
         _configuration: DPMConfiguration,
-        _context: SourceInspectionContext
+        _context: JobContext
     ): Promise<ParserInspectionResults> {
         return {
             schemaPrefix: fileStreamSummary.fileName?.toLowerCase().replace(".avro", ""),

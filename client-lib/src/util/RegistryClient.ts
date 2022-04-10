@@ -23,7 +23,7 @@ import {
     Version
 } from "../generated/graphql";
 import { RegistryConfig } from "../config/Config";
-import { JobContext } from "../main";
+import { JobContext } from "../task/Task";
 
 export class RegistryClient {
     public registryConfig: RegistryConfig;

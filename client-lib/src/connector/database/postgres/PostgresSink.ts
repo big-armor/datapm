@@ -4,7 +4,7 @@ import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { SinkErrors, WritableWithContext } from "../../Sink";
 import { DISPLAY_NAME, TYPE } from "./PostgresConnectorDescription";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
 
 export class PostgresSink extends KnexSink {
     tableExists: boolean;

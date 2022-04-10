@@ -62,11 +62,9 @@ describe("PackageFile checks", () => {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFile.packageSlug += "-";
 
-        const invalidPackageFileString = JSON.stringify(packageFile);
-
         let errorFound = false;
         try {
-            validatePackageFile(invalidPackageFileString);
+            validatePackageFile(packageFile);
         } catch (error) {
             errorFound = true;
         }

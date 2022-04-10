@@ -1,11 +1,10 @@
-import { DPMConfiguration, Parameter } from "datapm-lib";
+import { DATAPM_VERSION, DPMConfiguration, Parameter } from "datapm-lib";
 import http, { IncomingMessage } from "http";
 import https from "https";
 import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
 import { TYPE, DISPLAY_NAME } from "./HTTPConnectorDescription";
 import { fileNameFromUrl } from "../../../util/NameUtil";
-import { readDataPMVersion } from "../../../main";
 
 export class HTTPSource extends AbstractFileStreamSource {
     sourceType(): string {
@@ -63,7 +62,7 @@ export class HTTPSource extends AbstractFileStreamSource {
                                 headers: {
                                     // "User-Agent":
                                     //    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
-                                    "User-Agent": `DataPM/${readDataPMVersion()}`
+                                    "User-Agent": `DataPM/${DATAPM_VERSION}`
                                 }
                             },
                             (response: IncomingMessage) => {
@@ -80,7 +79,7 @@ export class HTTPSource extends AbstractFileStreamSource {
                                                 {
                                                     agent: false,
                                                     headers: {
-                                                        "User-Agent": `DataPM/${readDataPMVersion()}`
+                                                        "User-Agent": `DataPM/${DATAPM_VERSION}`
                                                     }
                                                 },
                                                 (response: IncomingMessage) => {

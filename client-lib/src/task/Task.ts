@@ -1,6 +1,4 @@
 import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration, PackageFile } from "datapm-lib";
-import { SemVer } from "semver";
-import { Writable } from "stream";
 import { RepositoryConfig, RegistryConfig } from "../config/Config";
 import { PackageFileWithContext, PackageIdentifier } from "../main";
 

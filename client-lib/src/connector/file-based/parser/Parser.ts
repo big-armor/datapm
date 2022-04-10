@@ -1,6 +1,6 @@
 import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import { Readable, Transform } from "stream";
-import { SourceInspectionContext } from "../../Source";
+import { JobContext } from "../../../task/Task";
 import { Maybe } from "../../../util/Maybe";
 
 /** A stream as returned by a file parser before being opened */
@@ -46,7 +46,7 @@ export interface Parser {
     inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<ParserInspectionResults>;
 
     /** Returns the transforms necessary parse based on the configuration */

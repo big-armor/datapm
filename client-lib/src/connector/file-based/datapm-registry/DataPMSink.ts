@@ -35,7 +35,7 @@ import { DISPLAY_NAME, TYPE } from "./DataPMConnectorDescription";
 import { Transform } from "stream";
 import { Socket } from "socket.io-client";
 import { connectSocket } from "./DataPMRepository";
-import { JobContext } from "../../../main";
+import { JobContext } from "../../../task/Task";
 
 export class DataPMSink implements Sink {
     serverChannelForRecordKey: Record<string, string> = {};

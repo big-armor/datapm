@@ -9,7 +9,6 @@ import {
     ParameterType
 } from "datapm-lib";
 import { PackageIdentifier } from "../generated/graphql";
-import { SourceInspectionContext } from "../connector/Source";
 import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import { JobContext, Job, JobResult } from "./Task";
 import clone from "rfdc";
@@ -118,18 +117,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
         await task.end("SUCCESS", "Package is canonical");
 
-        const sourceInspectionContext: SourceInspectionContext = {
-            defaults: this.argv.defaults || false,
-            quiet: false,
-            jobContext: this.jobContext,
-            print: (message: string) => {
-                this.jobContext.print("NONE", message);
-            },
-            parameterPrompt: async (parameters) => {
-                return this.jobContext.parameterPrompt(parameters);
-            }
-        };
-
         let newPackageFile: PackageFile = clone()(oldPackageFile);
         newPackageFile.schemas = [];
         newPackageFile.sources = [];
@@ -223,7 +210,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             const uriInspectionResults = await inspectSource(
                 source,
-                sourceInspectionContext,
                 this.jobContext,
                 sourceObject.connectionConfiguration,
                 credentialsConfiguration,
@@ -234,7 +220,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             for (const streamSet of uriInspectionResults.streamSetPreviews) {
                 const streamInspectionResult = await inspectStreamSet(
                     streamSet,
-                    sourceInspectionContext,
                     this.jobContext,
                     sourceObject.configuration || {},
                     this.argv.inspectionSeconds || 30

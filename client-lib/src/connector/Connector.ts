@@ -1,5 +1,5 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
-import { JobContext } from "../main";
+import { JobContext } from "../task/Task";
 import { SinkDescription } from "./Sink";
 import { SourceDescription } from "./Source";
 

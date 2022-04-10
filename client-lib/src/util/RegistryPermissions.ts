@@ -1,5 +1,5 @@
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
-import { JobContext } from "../main";
+import { JobContext } from "../task/Task";
 import { RegistryClient } from "./RegistryClient";
 
 /** Throws a "NOT_AUTHENTICATED or "NOT_AUTHORIZED" error if the user does not have permission. */

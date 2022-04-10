@@ -1,9 +1,10 @@
 import { DPMConfiguration, DPMRecord, UpdateMethod, RecordContext, Parameter, ParameterType } from "datapm-lib";
 import faker from "faker";
 import { Readable } from "stream";
+import { JobContext } from "../../../task/Task";
 import { FakerCategories, FakerTypes } from "../../../util/FakerUtil";
 import { toSentenceCase } from "../../../util/NameUtil";
-import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source, StreamSummary } from "../../Source";
+import { StreamSetPreview, InspectionResults, Source, StreamSummary } from "../../Source";
 import { TYPE } from "./StreamTestConnectorDescription";
 
 interface TestSourceAttribute {
@@ -17,15 +18,12 @@ export class StreamTestSource implements Source {
         return TYPE;
     }
 
-    async getInspectParameters(
-        context: SourceInspectionContext,
-        configuration: DPMConfiguration
-    ): Promise<Parameter[]> {
+    async getInspectParameters(jobContext: JobContext, configuration: DPMConfiguration): Promise<Parameter[]> {
         configuration.attributes = {} as { [key: string]: TestSourceAttribute };
         const attributeNames: string[] = [];
         let attributeCount = 0;
 
-        await context.parameterPrompt([
+        await jobContext.parameterPrompt([
             {
                 type: ParameterType.Number,
                 name: "recordCount",
@@ -37,7 +35,7 @@ export class StreamTestSource implements Source {
         ]);
 
         while (true) {
-            const attributeNameResponse = await context.parameterPrompt([
+            const attributeNameResponse = await jobContext.parameterPrompt([
                 {
                     type: ParameterType.Text,
                     name: "attributeName",
@@ -56,7 +54,7 @@ export class StreamTestSource implements Source {
                 break;
             }
 
-            const attributeCategoryResponse = await context.parameterPrompt([
+            const attributeCategoryResponse = await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoComplete,
                     name: "attributeCategory",
@@ -72,7 +70,7 @@ export class StreamTestSource implements Source {
             const attributeTypes = FakerTypes[attributeCategoryResponse.attributeCategory];
             let attributeType;
             if (attributeTypes.length > 0) {
-                const attributeTypeResponse = await context.parameterPrompt([
+                const attributeTypeResponse = await jobContext.parameterPrompt([
                     {
                         type: ParameterType.AutoComplete,
                         name: "attributeType",
@@ -103,22 +101,19 @@ export class StreamTestSource implements Source {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        jobContext: JobContext
     ): Promise<InspectionResults> {
-        await this.getInspectParameters(context, configuration);
+        await this.getInspectParameters(jobContext, configuration);
 
         return {
             defaultDisplayName: "Test Stream",
             source: this,
             configuration,
-            streamSetPreviews: [await this.getRecordStreams(configuration, context)]
+            streamSetPreviews: [await this.getRecordStreams(configuration, jobContext)]
         };
     }
 
-    async getRecordStreams(
-        configuration: DPMConfiguration,
-        _context: SourceInspectionContext
-    ): Promise<StreamSetPreview> {
+    async getRecordStreams(configuration: DPMConfiguration, _context: JobContext): Promise<StreamSetPreview> {
         const updateHash = new Date().toString();
 
         const streamSummaries: StreamSummary[] = [

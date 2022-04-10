@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Readable } from "stream";
 import tar from "tar-stream";
-import { SourceInspectionContext } from "../../Source";
+import { JobContext } from "../../../task/Task";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
 import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./TARParserDescription";
@@ -28,7 +28,7 @@ export class TARParser extends AbstractArchiveParser {
     async getInnerFileIterator(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,
-        context: SourceInspectionContext
+        context: JobContext
     ): Promise<FileIterator> {
         if (configuration.filePattern == null) {
             await context.parameterPrompt([
