@@ -51,7 +51,7 @@ export class MongoSinkModule implements Sink {
         _sinkState: Maybe<SinkState>
     ): SinkSupportedStreamOptions {
         return {
-            updateMethods: [UpdateMethod.BATCH_FULL_SET],
+            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS],
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET, StreamSetProcessingMethod.PER_STREAM]
         };
     }
