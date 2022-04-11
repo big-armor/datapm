@@ -25,7 +25,7 @@ export class StandardOutSinkModule implements Sink {
         _sinkState: Maybe<SinkState>
     ): SinkSupportedStreamOptions {
         return {
-            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG], /// TODO - Should this be a configuration option chosen by the user?
+            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS], /// TODO - Should this be a configuration option chosen by the user?
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET]
         };
     }

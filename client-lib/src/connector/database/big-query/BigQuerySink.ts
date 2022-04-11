@@ -53,7 +53,7 @@ export class BigQuerySink implements Sink {
             updateMethods:
                 _configuration.insertMethod === "Bulk"
                     ? [UpdateMethod.BATCH_FULL_SET]
-                    : [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG],
+                    : [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS],
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM, StreamSetProcessingMethod.PER_STREAM_SET]
         };
     }

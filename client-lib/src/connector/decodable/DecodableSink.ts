@@ -170,7 +170,7 @@ export class DecodableSink implements Sink {
     getSupportedStreamOptions(): SinkSupportedStreamOptions {
         return {
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET],
-            updateMethods: [UpdateMethod.APPEND_ONLY_LOG]
+            updateMethods: [UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS]
         };
     }
 
