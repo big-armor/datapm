@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON, Schema } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Collection, Package, PackageCollectionsGQL, PackageIdentifierInput, Permission } from "src/generated/graphql";
@@ -72,7 +72,6 @@ export class PackageDescriptionComponent {
 
             const serializedPackageFile = p.package.latestVersion.packageFile;
             if (serializedPackageFile) {
-                validatePackageFileInBrowser(serializedPackageFile);
                 this.packageFile = parsePackageFileJSON(serializedPackageFile);
 
                 if (this.packageFile) {

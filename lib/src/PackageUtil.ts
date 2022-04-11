@@ -595,7 +595,13 @@ export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
         let packageFile = JSON.parse(packageFileString) as PackageFile;
 
-        validatePackageFile(packageFile);
+        const isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+
+        if (isBrowser) {
+            validatePackageFileInBrowser(packageFile);
+        } else {
+            validatePackageFile(packageFile);
+        }
 
         if (packageFile.updatedDate != null) {
             packageFile.updatedDate = new Date(packageFile.updatedDate);
@@ -783,21 +789,14 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
     return packageFileObject as PackageFile;
 }
 
-export async function validatePackageFileInBrowser(packageFile: string): Promise<void> {
+export async function validatePackageFileInBrowser(packageFile: PackageFile): Promise<void> {
     const ajv = new AJV({
         format: false // https://www.npmjs.com/package/ajv#redos-attack
     });
 
     let packageSchemaFile: string;
 
-    let packageFileObject;
-    try {
-        packageFileObject = JSON.parse(packageFile);
-    } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
-    }
-
-    const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
+    const schemaVersion = getSchemaVersionFromPackageFile(packageFile);
 
     const response = await fetch("/docs/datapm-package-file-schema-v" + schemaVersion.format() + ".json");
 
@@ -818,7 +817,7 @@ export async function validatePackageFileInBrowser(packageFile: string): Promise
         throw new Error("ERROR_READING_SCHEMA");
     }
 
-    const ajvResponse = ajv.validate(schemaObject, packageFileObject);
+    const ajvResponse = ajv.validate(schemaObject, packageFile);
 
     if (!ajvResponse) {
         throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));
