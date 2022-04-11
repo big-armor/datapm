@@ -80,7 +80,6 @@ export class GoogleSheetSource implements Source {
 
             const sheetStream: StreamSetPreview = {
                 slug: sheetTitle,
-                configuration: {},
                 updateHash: new Date().toISOString(),
                 streamSummaries: [
                     {

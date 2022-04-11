@@ -177,7 +177,6 @@ export class BinanceSource implements Source {
             streamSetPreviews: [
                 {
                     slug: "binance-websocket",
-                    configuration,
                     updateHash: new Date().toISOString(),
                     streamSummaries: [
                         {

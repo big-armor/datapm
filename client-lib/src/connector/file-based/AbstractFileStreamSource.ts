@@ -153,7 +153,6 @@ export abstract class AbstractFileStreamSource implements Source {
 
         const streamSetPreview: StreamSetPreview = {
             slug: commonFileName as string,
-            configuration: {}, // TODO Probably not needed
             expectedBytesTotal: fileStreamSummaries.reduce((prev, curr) => {
                 return prev + (curr.fileSize || 0);
             }, 0)

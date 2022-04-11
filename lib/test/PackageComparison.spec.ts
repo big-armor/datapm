@@ -348,7 +348,6 @@ describe("Checking VersionUtil", () => {
             },
             streamSets: [
                 {
-                    configuration: {},
                     slug: "streamA",
                     lastUpdateHash: "abc123",
                     schemaTitles: ["A"],
@@ -367,7 +366,6 @@ describe("Checking VersionUtil", () => {
             configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
             streamSets: [
                 {
-                    configuration: {},
                     slug: "streamA",
                     lastUpdateHash: "abc123",
                     schemaTitles: ["A"],
@@ -410,7 +408,6 @@ describe("Checking VersionUtil", () => {
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
-                        configuration: {},
                         slug: "streamA",
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
@@ -431,7 +428,6 @@ describe("Checking VersionUtil", () => {
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
-                        configuration: {},
                         slug: "streamA",
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
@@ -465,7 +461,6 @@ describe("Checking VersionUtil", () => {
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
-                        configuration: {},
                         slug: "streamA",
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
@@ -486,7 +481,6 @@ describe("Checking VersionUtil", () => {
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
-                        configuration: {},
                         slug: "streamA",
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
@@ -515,7 +509,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -536,7 +529,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -573,7 +565,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -597,7 +588,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -627,7 +617,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -649,7 +638,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -678,7 +666,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -702,7 +689,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -731,7 +717,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {
@@ -752,7 +737,6 @@ describe("Checking VersionUtil", () => {
                 streamSets: [
                     {
                         slug: "test",
-                        configuration: {},
                         lastUpdateHash: "abc123",
                         schemaTitles: ["A"],
                         streamStats: {

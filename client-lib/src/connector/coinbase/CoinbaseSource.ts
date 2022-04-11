@@ -142,7 +142,6 @@ export class CoinbaseSource implements Source {
             streamSetPreviews: [
                 {
                     slug: "coinbase-websocket",
-                    configuration,
                     updateHash: new Date().toISOString(),
                     streamSummaries: [
                         {

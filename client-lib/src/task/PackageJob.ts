@@ -236,7 +236,6 @@ export class PackageJob extends Job<PackageJobResult> {
             this.jobContext.print("NONE", "");
             const streamSet: StreamSet = {
                 slug: streamSetPreview.slug,
-                configuration: streamSetPreview.configuration,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 schemaTitles: sourceStreamInspectionResults.schemas.map((s) => s.title!),
                 streamStats: sourceStreamInspectionResults.streamStats,

@@ -58,9 +58,6 @@ export interface StreamSet {
     /** The unique identifier for the stream set in a single source */
     slug: string;
 
-    /** Configuration necessary to access the stream set from the source */
-    configuration: DPMConfiguration;
-
     /** The titles of schemas present in this source. One source produces one or more schemas of data. A schema may be present in more than one source. */
     schemaTitles: string[];
 
@@ -215,7 +212,7 @@ export interface Schema extends JSONSchema7 {
 
 export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
-    $schema = "https://datapm.io/docs/package-file-schema-v0.8.0.json";
+    $schema = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
 
     /** Whether or not this package file is an original umodified copy. If true, the package file should be considered "golden record", and should be saveable. If false
      * this package file should be considered a modified copy.

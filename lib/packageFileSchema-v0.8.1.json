@@ -477,7 +477,6 @@
                             "type": "object",
                             "required": [
                                 "slug",
-                                "configuration",
                                 "schemaTitles",
                                 "updateMethods"
                             ],
@@ -494,16 +493,6 @@
                                     "title": "Last Source Update Hash",
                                     "description": "The update hash reported by the source after generating this package file.",
                                     "default": ""
-                                },
-                                "configuration": {
-                                    "$id": "#/sources/source/streamSet/configuration",
-                                    "type": "object",
-                                    "title": "Source Configuration",
-                                    "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
-                                    "default": {},
-                                    "required": [],
-                                    "properties": {},
-                                    "additionalProperties": true
                                 },
                                 "schemaTitles": {
                                     "$id": "#/sources/source/streamSet/schemaTitle",
