@@ -107,6 +107,7 @@
     "is-number": "^7.0.0",
     "js-sql-parser": "^1.4.1",
     "jsonstream-next": "^3.0.0",
+    "kafkajs": "^1.16.0",
     "knex": "^0.21.2",
     "mime-types": "^2.1.27",
     "moment": "^2.29.2",

@@ -181,6 +181,10 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             sinkType = sinkPromptResult.type;
         }
 
+        if (sinkType == null) {
+            throw new Error("Sink type is required");
+        }
+
         // Prompt parameters
         let sinkConnectionConfiguration: DPMConfiguration = {};
         let sinkCredentialsConfiguration: DPMConfiguration = {};

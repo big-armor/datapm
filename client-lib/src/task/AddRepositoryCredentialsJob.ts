@@ -125,16 +125,18 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
             credentialsConfiguration
         );
 
-        const repositoryIdentifier = await repository.getRepositoryIdentifierFromConfiguration(
-            repositoryConfig.connectionConfiguration
-        );
+        if (credentialsIdentifier != null) {
+            const repositoryIdentifier = await repository.getRepositoryIdentifierFromConfiguration(
+                repositoryConfig.connectionConfiguration
+            );
 
-        await this.jobContext.saveRepositoryCredential(
-            repository.getType(),
-            repositoryIdentifier,
-            credentialsIdentifier,
-            credentialsConfiguration
-        );
+            await this.jobContext.saveRepositoryCredential(
+                repository.getType(),
+                repositoryIdentifier,
+                credentialsIdentifier,
+                credentialsConfiguration
+            );
+        }
 
         this.jobContext.print(
             "SUCCESS",
