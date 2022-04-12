@@ -66,8 +66,8 @@
                             controlName="collectionName"
                             inputStyle="flat"
                             placeholder="Collection"
-                            matInput
                             [matAutocomplete]="collectionAutoComplete"
+                            [error]="form | inputError: 'collectionName' | async"
                         ></app-input>
                         <mat-autocomplete
                             autoActiveFirstOption
@@ -120,7 +120,7 @@
                 <button
                     type="submit"
                     class="ml-auto modal-submit-btn"
-                    [disabled]="form.invalid || !selectedValidCollectionSlug || state == 'LOADING'"
+                    [disabled]="state == 'LOADING'"
                 >
                     <span>Add Package To Collection</span>
                 </button>

@@ -59,7 +59,7 @@ export class AddPackageComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.pattern(/^[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\/[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/)
     ]);
-    public collectionNameControl: FormControl = new FormControl(".*", [Validators.required]);
+    public collectionNameControl: FormControl = new FormControl("", [Validators.required]);
 
     public selectedValidCollectionSlug = false;
     public searchCollectionsTimeout: NodeJS.Timeout;
@@ -148,6 +148,8 @@ export class AddPackageComponent implements OnInit, OnDestroy {
 
     public submit(ev): void {
         ev.preventDefault();
+
+        this.form.updateValueAndValidity()
 
         if (!this.form.valid) {
             return;
