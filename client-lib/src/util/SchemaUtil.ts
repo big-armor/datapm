@@ -691,5 +691,7 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
                 .join(", ");
             jobContext.print("NONE", `    ${chalk.grey("Content:")} ${labels}`);
         }
+
+        jobContext.print("NONE", " ");
     });
 }

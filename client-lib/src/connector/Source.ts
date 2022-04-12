@@ -47,9 +47,6 @@ export interface StreamSetPreview {
     /** The unique identifier for the stream set in a single source */
     slug: string;
 
-    // TODO This may not ever be needed.
-    configuration: DPMConfiguration;
-
     /** The source provides this value to determine whether this particular stream has been updated since it was last read */
     updateHash?: string;
 

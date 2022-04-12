@@ -227,7 +227,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
                 newPackageFile.schemas = [...newPackageFile.schemas, ...streamInspectionResult.schemas];
                 streamSets.push({
-                    configuration: streamSet.configuration,
                     schemaTitles: streamInspectionResult.schemas.map((s: Schema) => s.title as string),
                     slug: streamSet.slug,
                     streamStats: streamInspectionResult.streamStats,

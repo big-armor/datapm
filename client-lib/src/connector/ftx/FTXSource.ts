@@ -162,7 +162,6 @@ export class FTXSource implements Source {
             streamSetPreviews: [
                 {
                     slug: "ftx-websocket",
-                    configuration,
                     updateHash: new Date().toISOString(),
                     streamSummaries: [
                         {

@@ -156,7 +156,6 @@ export class StreamTestSource implements Source {
         return {
             streamSummaries,
             updateHash,
-            configuration: {}, // TODO Probably not needed
             slug: "random"
         };
     }

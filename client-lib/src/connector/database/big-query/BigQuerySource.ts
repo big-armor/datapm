@@ -211,7 +211,6 @@ export class BigQuerySource implements Source {
         const fullPath = this.getFullPathFromConfiguration(configuration);
 
         return {
-            configuration,
             streamSummaries: [
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

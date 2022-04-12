@@ -172,7 +172,6 @@ describe("Package Tests", async () => {
         expect(responsePackageFile.sources[0].configuration!.catalogSlug).equal("testA-registry-proxy");
         expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("congressional-legislators");
         expect(responsePackageFile.sources[0].streamSets[0].slug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
-        expect(responsePackageFile.sources[0].streamSets[0].configuration.streamSetSlug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
         
     });
 

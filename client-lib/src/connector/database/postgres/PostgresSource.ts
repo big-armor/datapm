@@ -148,7 +148,6 @@ export class PostgresSource implements Source {
 
         return {
             slug: tableName,
-            configuration: {}, // TODO Probably not needed?
             updateHash,
             streamSummaries: [
                 {

@@ -145,7 +145,6 @@ export class KrakenSource implements Source {
             streamSetPreviews: [
                 {
                     slug: "kraken-websocket",
-                    configuration,
                     updateHash: new Date().toISOString(),
                     streamSummaries: [
                         {

@@ -14,7 +14,6 @@ import {
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
 import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, PackageStreamsRequest, PackageStreamsResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageSinkStateRequest, PackageSinkStateResponse, UpdateMethod } from "datapm-lib";
 import { describe, it } from "mocha";
-import request = require("superagent");
 import { Socket } from "socket.io-client";
 import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
 
@@ -737,7 +736,6 @@ describe("Data Store on Registry", async () => {
         expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("simple");
         expect(responsePackageFile.sources[0].configuration!.version).equal(1);
         expect(responsePackageFile.sources[0].streamSets[0].slug).equal("simple");
-        expect(responsePackageFile.sources[0].streamSets[0].configuration.schemaSlug).equal("simple");
         
     });
 
