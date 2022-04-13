@@ -54,6 +54,7 @@
                 "faker": "^5.5.3",
                 "gulp": "^4.0.2",
                 "husky": "^4.3.0",
+                "kafkajs": "^1.16.0",
                 "knex": "^0.21.2",
                 "listr2": "^4.0.4",
                 "maildev": "^1.1.0",
@@ -79,7 +80,7 @@
         },
         "../client-lib": {
             "name": "datapm-client-lib",
-            "version": "0.8.103",
+            "version": "0.8.111",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@apollo/client": "^3.3.21",
@@ -110,9 +111,10 @@
                 "is-number": "^7.0.0",
                 "js-sql-parser": "^1.4.1",
                 "jsonstream-next": "^3.0.0",
+                "kafkajs": "^1.16.0",
                 "knex": "^0.21.2",
                 "mime-types": "^2.1.27",
-                "moment": "^2.29.1",
+                "moment": "^2.29.2",
                 "mongoose": "^5.13.14",
                 "mysql": "^2.18.1",
                 "node-gyp": "^8.4.1",
@@ -199,10 +201,9 @@
         },
         "../lib": {
             "name": "datapm-lib",
-            "version": "0.8.103",
+            "version": "0.8.111",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
-                "@types/semver": "^7.3.4",
                 "ajv": "^6.12.6",
                 "base62": "^2.0.1",
                 "cross-fetch": "^3.1.5",
@@ -214,6 +215,7 @@
                 "@types/json-schema": "^7.0.5",
                 "@types/mocha": "^8.0.4",
                 "@types/node": "^16.11.22",
+                "@types/semver": "^7.3.9",
                 "chai": "^4.2.0",
                 "gqlint": "^1.8.0",
                 "gulp": "^4.0.2",
@@ -6544,6 +6546,15 @@
             "dependencies": {
                 "jwa": "^2.0.0",
                 "safe-buffer": "^5.0.1"
+            }
+        },
+        "node_modules/kafkajs": {
+            "version": "1.16.0",
+            "resolved": "https://registry.npmjs.org/kafkajs/-/kafkajs-1.16.0.tgz",
+            "integrity": "sha512-+Rcfu2hyQ/jv5skqRY8xA7Ra+mmRkDAzCaLDYbkGtgsNKpzxPWiLbk8ub0dgr4EbWrN1Zb4BCXHUkD6+zYfdWg==",
+            "dev": true,
+            "engines": {
+                "node": ">=10.13.0"
             }
         },
         "node_modules/kareem": {
@@ -14441,11 +14452,12 @@
                 "is-number": "^7.0.0",
                 "js-sql-parser": "^1.4.1",
                 "jsonstream-next": "^3.0.0",
+                "kafkajs": "^1.16.0",
                 "knex": "^0.21.2",
                 "maildev": "^1.1.0",
                 "mime-types": "^2.1.27",
                 "mocha": "^8.2.0",
-                "moment": "^2.29.1",
+                "moment": "^2.29.2",
                 "mongoose": "^5.13.14",
                 "mysql": "^2.18.1",
                 "node-gyp": "^8.4.1",
@@ -14486,7 +14498,7 @@
                 "@types/json-schema": "^7.0.5",
                 "@types/mocha": "^8.0.4",
                 "@types/node": "^16.11.22",
-                "@types/semver": "^7.3.4",
+                "@types/semver": "^7.3.9",
                 "ajv": "^6.12.6",
                 "base62": "^2.0.1",
                 "chai": "^4.2.0",
@@ -17406,6 +17418,12 @@
                 "jwa": "^2.0.0",
                 "safe-buffer": "^5.0.1"
             }
+        },
+        "kafkajs": {
+            "version": "1.16.0",
+            "resolved": "https://registry.npmjs.org/kafkajs/-/kafkajs-1.16.0.tgz",
+            "integrity": "sha512-+Rcfu2hyQ/jv5skqRY8xA7Ra+mmRkDAzCaLDYbkGtgsNKpzxPWiLbk8ub0dgr4EbWrN1Zb4BCXHUkD6+zYfdWg==",
+            "dev": true
         },
         "kareem": {
             "version": "2.3.2",

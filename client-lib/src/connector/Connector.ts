@@ -57,7 +57,7 @@ export interface Connector {
     getCredentialsIdentifierFromConfiguration(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
-    ): Promise<string | "ANONYMOUS">;
+    ): Promise<string | undefined>;
 
     /** Returns the configuration parameters necessary to complete the basic unauthenticated connection. Called
      * repeatedly until no parameters are returned.

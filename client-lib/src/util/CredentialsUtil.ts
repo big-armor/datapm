@@ -166,14 +166,16 @@ export async function obtainCredentialsConfiguration(
             credentialsConfiguration
         );
 
-        jobContext.saveRepositoryConfig(connector.getType(), repositoryConfig);
+        if (credentialsIdentifier) {
+            jobContext.saveRepositoryConfig(connector.getType(), repositoryConfig);
 
-        await jobContext.saveRepositoryCredential(
-            connector.getType(),
-            repositoryIdentifier,
-            credentialsIdentifier,
-            credentialsConfiguration
-        );
+            await jobContext.saveRepositoryCredential(
+                connector.getType(),
+                repositoryIdentifier,
+                credentialsIdentifier,
+                credentialsConfiguration
+            );
+        }
     }
 
     return { credentialsIdentifier, credentialsConfiguration, parameterCount };

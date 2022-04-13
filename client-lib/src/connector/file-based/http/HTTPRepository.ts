@@ -35,8 +35,8 @@ export class HTTPRepository implements Connector {
     async getCredentialsIdentifierFromConfiguration(
         _connectionConfiguration: DPMConfiguration,
         _credentialsConfiguration: DPMConfiguration
-    ): Promise<string> {
-        return "anonymous"; // TODO implement HTTP auth detection and return parameters;
+    ): Promise<string | undefined> {
+        return undefined; // TODO implement HTTP auth detection and return parameters;
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {

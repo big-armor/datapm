@@ -15,6 +15,7 @@ import { CoinbaseConnectorDescription } from "./coinbase/CoinbaseConnectorDescri
 import { KrakenConnectorDescription } from "./kraken/KrakenConnectorDescription";
 import { FTXConnectorDescription } from "./ftx/FTXConnectorDescription";
 import { BinanceConnectorDescription } from "./binance/BinanceConnectorDescription";
+import { KafkaConnectorDescription } from "./stream/kafka/KafkaConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -30,7 +31,8 @@ export const CONNECTORS: ConnectorDescription[] = [
     new CoinbaseConnectorDescription(),
     new KrakenConnectorDescription(),
     new FTXConnectorDescription(),
-    new BinanceConnectorDescription()
+    new BinanceConnectorDescription(),
+    new KafkaConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
