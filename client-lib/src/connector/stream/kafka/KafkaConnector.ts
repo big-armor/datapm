@@ -108,7 +108,7 @@ export class KafkaConnector implements Connector {
                 {
                     name: "authenticationMechanism",
                     configuration: credentialsConfiguration,
-                    message: "Authentication Mechanism?",
+                    message: "Authentication?",
                     type: ParameterType.Select,
                     options: [
                         {
