@@ -170,9 +170,7 @@ describe("Kafka Sink", () => {
             }
         ];
 
-        const cmdResult = await testCmd("fetch", ["test.datapm.json"], prompts, async (line, index, cmdProcess) => {
-            console.log(line);
-        });
+        const cmdResult = await testCmd("fetch", ["test.datapm.json"], prompts);
 
         expect(cmdResult.code).equals(0);
     });
