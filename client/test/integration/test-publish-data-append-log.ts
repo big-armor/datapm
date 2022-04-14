@@ -14,7 +14,7 @@ import {
 } from "./test-utils";
 import fs from "fs";
 
-const fetchCommandPrompts = ["Connector?", "File format?", "File Location?"];
+const fetchCommandPrompts = ["Sink Connector?", "File format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 

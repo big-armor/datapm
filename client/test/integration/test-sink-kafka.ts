@@ -129,7 +129,7 @@ describe("Kafka Sink", () => {
             isDone?: boolean;
         }> = [
             {
-                message: "Connector?",
+                message: "Sink Connector?",
                 input: `Kafka` + KEYS.ENTER
             },
             {

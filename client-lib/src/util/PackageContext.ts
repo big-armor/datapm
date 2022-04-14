@@ -23,7 +23,7 @@ export function cantSaveReasonToString(reason: CantSaveReasons): string {
 
 export interface PackageFileWithContext {
     packageFile: PackageFile;
-    contextType: "localFile" | "registry" | "http";
+    contextType: "temporary" | "localFile" | "registry" | "http";
     catalogSlug?: string;
     permitsSaving: boolean;
     hasPermissionToSave: boolean;

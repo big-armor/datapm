@@ -1,14 +1,11 @@
 import chalk from "chalk";
 import {
-    DerivedFrom,
     DPMConfiguration,
     nameToSlug,
     PackageFile,
     packageSlugValid,
     Properties,
     Schema,
-    Source,
-    StreamSet,
     ParameterAnswer,
     ParameterType,
     Parameter
@@ -27,15 +24,12 @@ import {
     generateSchemasFromSourceStreams,
     getSourcesDescriptions
 } from "../connector/SourceUtil";
-import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
-import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { Maybe } from "../util/Maybe";
 import { Job, JobContext, JobResult } from "./Task";
-import * as SchemaUtil from "../util/SchemaUtil";
-import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { JSONSchema7TypeName } from "json-schema";
+import { validPackageDisplayName, validShortPackageDescription, validVersion } from "../util/IdentifierUtil";
 import numeral from "numeral";
 import { PackageFileWithContext } from "../main";
+import { configureSource } from "../util/SourceInspectionUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PackageJobResult {
@@ -144,159 +138,36 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        const connector = await maybeConnectorDescription.getConnector();
-        const sourceDescription = await maybeConnectorDescription.getSourceDescription();
-
-        if (sourceDescription == null) {
-            this.jobContext.print(
-                "ERROR",
-                "No source impelementation found for " + maybeConnectorDescription.getType()
-            );
+        if (maybeConnectorDescription == null) {
+            this.jobContext.print("ERROR", "No connector implementation found to inspect this data ");
             return { exitCode: 1 };
         }
 
-        const connectionConfigurationResults = await obtainConnectionConfiguration(
+        const configureSourceResults = await configureSource(
             this.jobContext,
-            connector,
+            maybeConnectorDescription,
             connectionConfiguration,
+            credentialsConfiguration,
+            sourceConfiguration,
             this.args.repositoryIdentifier,
-            this.args.defaults
-        );
-
-        if (connectionConfigurationResults === false) {
-            return { exitCode: 1 };
-        }
-        connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
-
-        const credentialsConfigurationResults = await obtainCredentialsConfiguration(
-            this.jobContext,
-            connector,
-            connectionConfiguration,
-            credentialsConfiguration,
-            false,
             this.args.credentialsIdentifier,
-            this.args.defaults
+            this.args.inspectionSeconds,
+            true
         );
 
-        if (credentialsConfigurationResults === false) {
+        if (configureSourceResults === false) {
             return { exitCode: 1 };
         }
 
-        credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
-
-        const source = await sourceDescription.getSource();
-
-        this.jobContext.setCurrentStep(chalk.magenta("Finding Stream Sets"));
-
-        const uriInspectionResults = await inspectSource(
-            source,
-            this.jobContext,
-            connectionConfiguration,
-            credentialsConfiguration,
-            sourceConfiguration
-        );
-
-        this.jobContext.print("SUCCESS", "Found " + uriInspectionResults.streamSetPreviews.length + " stream sets ");
-
-        const schemas: Record<string, Schema> = {};
-
-        const streamSets: StreamSet[] = [];
-
-        this.jobContext.setCurrentStep(chalk.magenta("Inspecting Stream Sets"));
-        this.jobContext.print(
-            "INFO",
-            "Connecting to " + (await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration))
-        );
-
-        for (const streamSetPreview of uriInspectionResults.streamSetPreviews) {
-            const task = await this.jobContext.startTask("Inspecting Stream Set " + streamSetPreview.slug);
-            const sourceStreamInspectionResults = await inspectStreamSet(
-                streamSetPreview,
-                this.jobContext,
-                sourceConfiguration,
-                this.args.inspectionSeconds || 30
-            );
-
-            await task.end(
-                "SUCCESS",
-                "Found " +
-                    sourceStreamInspectionResults.schemas.length +
-                    " schemas in stream set" +
-                    streamSetPreview.slug
-            );
-
-            sourceStreamInspectionResults.schemas.forEach((schema) => {
-                if (schema.title == null || schema.title === "") throw new Error("SCHEMA_HAS_NO_TITLE");
-
-                schemas[schema.title] = schema;
-
-                schema.properties = filterBadSchemaProperties(schema);
-            });
-
-            this.jobContext.print("NONE", "");
-            const streamSet: StreamSet = {
-                slug: streamSetPreview.slug,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                schemaTitles: sourceStreamInspectionResults.schemas.map((s) => s.title!),
-                streamStats: sourceStreamInspectionResults.streamStats,
-                updateMethods: sourceStreamInspectionResults.updateMethods
-            };
-
-            streamSets.push(streamSet);
-        }
-
-        const sourceObject: Source = {
-            slug: source.sourceType(),
-            streamSets,
-            type: source.sourceType(),
-            connectionConfiguration,
-            configuration: sourceConfiguration
-        };
-
-        if (Object.keys(schemas).length === 0) {
-            this.jobContext.print("ERROR", "No schemas found");
-            return { exitCode: 1 };
-        }
-
-        if (
-            Object.values(schemas).find((s) => {
-                const properties = s.properties;
-
-                if (properties == null) {
-                    return false;
-                }
-
-                if (Object.keys(properties).length === 0) {
-                    return false;
-                }
-
-                return true;
-            }) == null
-        ) {
-            this.jobContext.print("ERROR", "No schemas found with properties");
-            return { exitCode: 1 };
-        }
-
-        for (const key of Object.keys(schemas)) {
-            const schema = schemas[key];
-
-            if (schema.properties == null || Object.keys(schema.properties).length === 0) {
-                delete schemas[key];
-                continue;
-            }
-
-            this.jobContext.setCurrentStep(`${schema.title} Schema Details`);
-
-            SchemaUtil.printSchema(this.jobContext, schema);
-
-            if (!this.args.defaults) await schemaSpecificQuestions(this.jobContext, schema);
-        }
+        const sourceInspectionResults = configureSourceResults.inspectionResults;
+        const schemas = configureSourceResults.filteredSchemas;
+        const sourceObject = configureSourceResults.source;
 
         // Prompt Display Name
         let displayNameResponse: ParameterAnswer<"displayName">;
         if (this.args.defaults) {
             displayNameResponse = {
-                displayName: uriInspectionResults.defaultDisplayName
+                displayName: sourceInspectionResults.defaultDisplayName
             };
             const validateResult = validPackageDisplayName(displayNameResponse.displayName);
             if (validateResult !== true) {
@@ -570,255 +441,4 @@ function validSampleRecordCount(value: string[] | number | string | boolean, par
     if (value == null) return "Number, 0 to 100, required";
     if (value > 100) return "Number less than 100 required";
     return true;
-}
-
-async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
-    let properties = schema.properties as Properties;
-    // Ignore Attributes
-    const ignoreAttributesResponse = await jobContext.parameterPrompt([
-        {
-            type: ParameterType.AutoComplete,
-            name: "ignoreAttributes",
-            configuration: {},
-            message: `Exclude any attributes from ${schema.title}?`,
-            options: [
-                {
-                    title: "No",
-                    value: false,
-                    selected: true
-                },
-                {
-                    title: "Yes",
-                    value: true
-                }
-            ]
-        }
-    ]);
-    if (ignoreAttributesResponse.ignoreAttributes !== "No") {
-        const attributesToIgnoreResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.MultiSelect,
-                name: "attributesToIgnore",
-                configuration: {},
-                message: "Attributes to exclude?",
-                options: Object.keys(schema.properties as Properties).map((attributeName) => ({
-                    title: attributeName,
-                    value: attributeName
-                }))
-            }
-        ]);
-
-        attributesToIgnoreResponse.attributesToIgnore.forEach((attributeName: string) => {
-            properties[attributeName].hidden = true;
-        });
-    }
-
-    // Rename Attributes
-    const renameAttributesResponse = await jobContext.parameterPrompt([
-        {
-            type: ParameterType.AutoComplete,
-            name: "renameAttributes",
-            configuration: {},
-            message: `Rename attributes from ${schema.title}?`,
-            options: [
-                {
-                    title: "No",
-                    value: false,
-                    selected: true
-                },
-                {
-                    title: "Yes",
-                    value: true
-                }
-            ]
-        }
-    ]);
-    if (renameAttributesResponse.renameAttributes !== "No") {
-        const attributeNameMap: Record<string, string> = {};
-        const attributesToRenameResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.MultiSelect,
-                name: "attributesToRename",
-                message: "Attributes to rename?",
-                configuration: {},
-                options: Object.keys(schema.properties as Properties).map((attributeName) => ({
-                    title: attributeName,
-                    value: attributeName
-                }))
-            }
-        ]);
-        for (const attributeName of attributesToRenameResponse.attributesToRename) {
-            const attributeToRenameResponse = await jobContext.parameterPrompt([
-                {
-                    type: ParameterType.Text,
-                    name: "attributeToRename",
-                    configuration: {},
-                    message: `New attribute name for "${attributeName}"?`
-                }
-            ]);
-            attributeNameMap[attributeName] = attributeToRenameResponse.attributeToRename;
-        }
-        attributesToRenameResponse.attributesToRename.forEach((attributeName: string) => {
-            const newAttributeName = attributeNameMap[attributeName];
-            properties[attributeName].title = newAttributeName;
-            if (schema.sampleRecords) {
-                schema.sampleRecords.forEach((record) => {
-                    record[newAttributeName] = record[attributeName];
-                    delete record[attributeName];
-                });
-            }
-        });
-    }
-
-    // Derived from
-    const derivedFrom: DerivedFrom[] = [];
-
-    while (true) {
-        const message =
-            derivedFrom.length === 0
-                ? `Was ${schema.title} derived from other 'upstream data'?`
-                : `Was ${schema.title} derived from additional 'upstream data'?`;
-        const wasDerivedResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.AutoComplete,
-                name: "wasDerived",
-                message: message,
-                configuration: {},
-                options: [
-                    { title: "No", value: false, selected: true },
-                    {
-                        title: "Yes",
-                        value: true
-                    }
-                ]
-            }
-        ]);
-
-        if (wasDerivedResponse.wasDerived === "No") break;
-
-        const derivedFromUrlResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.Text,
-                name: "url",
-                configuration: {},
-                message: "URL for the 'upstream data'?",
-                hint: "Leave blank to end"
-            }
-        ]);
-
-        if (derivedFromUrlResponse.url !== "") {
-            // get the title
-            const displayName = "";
-
-            const derivedFromUrlDisplayNameResponse = await jobContext.parameterPrompt([
-                {
-                    type: ParameterType.Text,
-                    configuration: {},
-                    name: "displayName",
-                    message: "Name of data from above URL?",
-                    defaultValue: displayName
-                }
-            ]);
-
-            derivedFrom.push({
-                url: derivedFromUrlResponse.url,
-                displayName: derivedFromUrlDisplayNameResponse.displayName
-            });
-        } else {
-            break;
-        }
-    }
-
-    let derivedFromDescription = "";
-
-    if (derivedFrom.length > 0) {
-        const derivedFromDescriptionResponse = await jobContext.parameterPrompt([
-            {
-                name: "description",
-                type: ParameterType.Text,
-                message: "What SQL or other process was used to derive this data?",
-                configuration: {},
-                validate: (value: string[] | string | number | boolean) => {
-                    if (typeof value !== "string") {
-                        return "Must be a string";
-                    }
-
-                    if (value.length === 0) return "A description is required.";
-
-                    return true;
-                }
-            }
-        ]);
-
-        derivedFromDescription = derivedFromDescriptionResponse.description;
-
-        schema.derivedFrom = derivedFrom;
-        schema.derivedFromDescription = derivedFromDescription;
-    }
-
-    const recordUnitResponse = await jobContext.parameterPrompt([
-        {
-            type: ParameterType.Text,
-            name: "recordUnit",
-            configuration: {},
-            message: `What does each ${schema.title} record represent?`,
-            validate: validUnit
-        }
-    ]);
-    if (recordUnitResponse.recordUnit) {
-        schema.unit = recordUnitResponse.recordUnit;
-    }
-    // Prompt Column Unit per "number" Type Column
-    properties = schema.properties as Properties;
-
-    const keys = Object.keys(properties).filter((key) => {
-        const property = properties[key] as Schema;
-        const type = property.type as JSONSchema7TypeName[];
-        const types = type.filter((type) => type !== "null");
-        return types.length === 1 && types[0] === "number";
-    });
-
-    let promptForNumberUnits = true;
-
-    if (keys.length >= 3) {
-        const confirmContinueResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.AutoComplete,
-                name: "confirm",
-                message: `Do you want to specify units for the ${keys.length} number properties?`,
-                configuration: {},
-                options: [
-                    {
-                        title: "No",
-                        value: false
-                    },
-                    {
-                        title: "Yes",
-                        value: true
-                    }
-                ]
-            }
-        ]);
-        if (confirmContinueResponse.confirm !== true) {
-            promptForNumberUnits = false;
-        }
-    }
-
-    if (promptForNumberUnits) {
-        for (const key of keys) {
-            const property = properties[key] as Schema;
-            const columnUnitResponse = await jobContext.parameterPrompt([
-                {
-                    type: ParameterType.Text,
-                    name: "columnUnit",
-                    configuration: {},
-                    message: `Unit for attribute '${property.title}'?`,
-                    validate: validUnit
-                }
-            ]);
-            if (columnUnitResponse.columnUnit) {
-                property.unit = columnUnitResponse.columnUnit;
-            }
-        }
-    }
 }

@@ -108,7 +108,7 @@ describe("Kraken Source", () => {
             ["kraken-eth-usd-spread.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

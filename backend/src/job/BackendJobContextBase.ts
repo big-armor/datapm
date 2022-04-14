@@ -15,6 +15,8 @@ export abstract class BackendJobContextBase implements JobContext {
     constructor(public jobId: string, private context: Context) {
     }
 
+    abstract useDefaults(): boolean;
+
     getRepositoryConfigsByType(type: string): RepositoryConfig[] {
         return [];
     }

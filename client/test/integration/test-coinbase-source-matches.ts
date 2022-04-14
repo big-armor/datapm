@@ -107,7 +107,7 @@ describe("Coinbase Matches Source", () => {
             ["coinbase-btc-usd-matches.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {
@@ -163,7 +163,7 @@ describe("Coinbase Matches Source", () => {
             ["coinbase-btc-usd-matches.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

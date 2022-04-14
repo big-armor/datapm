@@ -1,15 +1,19 @@
-import { JobContext, MessageType, PackageFileWithContext, PackageIdentifier, RegistryConfig, RepositoryConfig, Task, TaskStatus } from "datapm-client-lib";
-import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
-import { SemVer } from "semver";
-import { Writable } from "stream";
+import { MessageType, Task, TaskStatus } from "datapm-client-lib";
+import { Parameter, ParameterAnswer } from "datapm-lib";
 import { Context } from "../context";
 import { BackendJobContextBase } from "./BackendJobContextBase";
 
 /** For jobs that are run without direct user interaction */
 export class HeadlessJobContext extends BackendJobContextBase{
 
+
     constructor(public jobId: string, context:Context) {
         super(jobId, context )
+    }
+
+
+    useDefaults(): boolean {
+        return true;
     }
 
 

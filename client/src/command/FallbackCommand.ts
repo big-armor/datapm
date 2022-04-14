@@ -70,7 +70,7 @@ export class FallbackCommand implements Command {
                     name: "command",
                     message: "What action would you like to take?",
                     choices: [
-                        { title: "Fetch specific data", value: Commands.FETCH },
+                        { title: "Fetch data", value: Commands.FETCH },
                         { title: "Search for data", value: Commands.SEARCH },
                         { title: "Create new package and publish", value: Commands.PACKAGE },
                         { title: "Pubish existing package", value: Commands.PUBLISH },

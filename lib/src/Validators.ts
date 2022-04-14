@@ -1,3 +1,7 @@
+export const PACKAGE_SLUG_REGEX = /^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?$/;
+export const COLLECTION_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+export const CATALOG_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+
 export function usernameValid(
     username: string | undefined
 ): "USERNAME_REQUIRED" | "USERNAME_TOO_LONG" | "INVALID_CHARACTERS" | true {
@@ -31,9 +35,7 @@ export function catalogSlugValid(
 
     if (slug.length > 38) return `CATALOG_SLUG_TOO_LONG`;
 
-    const regExp = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
-
-    if (!slug.match(regExp)) return `CATALOG_SLUG_INVALID`;
+    if (!slug.match(CATALOG_SLUG_REGEX)) return `CATALOG_SLUG_INVALID`;
 
     return true;
 }
@@ -48,9 +50,7 @@ export function packageSlugValid(
 
     if (slug.length > 38) return `PACKAGE_SLUG_TOO_LONG`;
 
-    const regExp = /^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?$/;
-
-    if (!slug.match(regExp)) return "PACKAGE_SLUG_INVALID";
+    if (!slug.match(PACKAGE_SLUG_REGEX)) return "PACKAGE_SLUG_INVALID";
 
     return true;
 }
@@ -64,9 +64,7 @@ export function collectionSlugValid(
 
     if (slug.length > 100) return `COLLECTION_SLUG_TOO_LONG`;
 
-    const regExp = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
-
-    if (!slug.match(regExp)) return `COLLECTION_SLUG_INVALID`;
+    if (!slug.match(COLLECTION_SLUG_REGEX)) return `COLLECTION_SLUG_INVALID`;
 
     return true;
 }

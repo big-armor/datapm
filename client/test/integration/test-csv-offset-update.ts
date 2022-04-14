@@ -128,7 +128,7 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {
@@ -171,7 +171,7 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {

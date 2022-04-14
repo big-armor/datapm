@@ -113,7 +113,7 @@ describe("FTX Source", () => {
             ["ftx-btc-usd-trades.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {
@@ -170,7 +170,7 @@ describe("FTX Source", () => {
             ["ftx-btc-usd-trades.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

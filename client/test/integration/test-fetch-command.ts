@@ -15,7 +15,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const fetchCommandPrompts = ["Connector?", "File format?", "File Location?"];
+const fetchCommandPrompts = ["Sink Connector?", "File format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
@@ -64,7 +64,7 @@ describe("Fetch Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("fetch", ["invalid"], prompts, async (line: string) => {
-            if (line.includes("is either not a valid package identifier")) {
+            if (line.includes("Could not find package or source by the reference")) {
                 results.messageFound = true;
             }
         });
