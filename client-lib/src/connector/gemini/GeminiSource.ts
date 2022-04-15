@@ -91,12 +91,12 @@ export class GeminiSource implements Source {
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<InspectionResults> {
-        if (configuration.channels == null) {
+        if (configuration.events == null) {
             await jobContext.parameterPrompt([
                 {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,
-                    name: "channels",
+                    name: "events",
                     message: "Select events",
                     validate: (value) => {
                         if ((value as string[]).length === 0) {
@@ -123,7 +123,7 @@ export class GeminiSource implements Source {
             ]);
         }
 
-        if (configuration.products == null || (configuration.products as string[]).length === 0) {
+        if (configuration.symbols == null || (configuration.symbols as string[]).length === 0) {
             const pairs = await this.getPairs();
 
             await jobContext.parameterPrompt([
@@ -241,9 +241,9 @@ export class GeminiSource implements Source {
         return new Promise((resolve, reject) => {
             const queryOptions: string[] = [];
 
-            const channels = configuration.channels as string[];
+            const events = configuration.events as string[];
 
-            if (channels.includes("ticker")) {
+            if (events.includes("ticker")) {
                 queryOptions.push("top_of_book=true");
                 queryOptions.push("bids=true");
                 queryOptions.push("offers=true");
@@ -253,13 +253,13 @@ export class GeminiSource implements Source {
                 queryOptions.push("offers=false");
             }
 
-            if (channels.includes("trades")) {
+            if (events.includes("trades")) {
                 queryOptions.push("trades=true");
             } else {
                 queryOptions.push("trades=false");
             }
 
-            if (channels.includes("auctions")) {
+            if (events.includes("auctions")) {
                 queryOptions.push("auctions=true");
             } else {
                 queryOptions.push("auctions=false");
