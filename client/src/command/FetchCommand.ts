@@ -10,8 +10,8 @@ export class FetchArguments {
     sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
-    repository?: string;
-    credentials?: string;
+    sinkRepository?: string;
+    sinkAccount?: string;
 }
 
 export class FetchCommand implements Command {
@@ -41,16 +41,25 @@ export class FetchCommand implements Command {
                     .option("sinkConfig", {
                         type: "string"
                     })
+                    .option("sourceConnectionConfig", {
+                        type: "string"
+                    })
+                    .option("sourceCredentialsConfig", {
+                        type: "string"
+                    })
+                    .option("sourceConfig", {
+                        type: "string"
+                    })
                     .option("sinkConnectionConfig", {
                         type: "string"
                     })
                     .option("sinkCredentialsConfig", {
                         type: "string"
                     })
-                    .option("repository", {
+                    .option("sinkRepository", {
                         type: "string"
                     })
-                    .option("credentials", {
+                    .option("sinkAccount", {
                         type: "string"
                     })
                     .help();
@@ -65,8 +74,8 @@ export async function fetchPackage(args: FetchArguments): Promise<void> {
 
         await fetchCommand.fetchPackage({
             ...args,
-            repositoryIdentifier: args.repository,
-            credentialsIdentifier: args.credentials
+            repositoryIdentifier: args.sinkRepository,
+            credentialsIdentifier: args.sinkAccount
         });
     } catch (e) {
         console.error(e);

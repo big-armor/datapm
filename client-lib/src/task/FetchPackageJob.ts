@@ -36,10 +36,16 @@ import { ApolloQueryResult } from "@apollo/client";
 export interface FetchPackageJobResult {
     parameterCount: number;
     sink: Sink;
+    sinkCredentialsIdentifier: string | undefined;
+    sinkRepositoryIdentifier: string | undefined;
+    sinkConnectionConfiguration: DPMConfiguration;
     sinkConfiguration: DPMConfiguration;
     packageFileWithContext: PackageFileWithContext;
-    credentialsIdentifier: string | undefined;
-    repositoryIdentifier: string | undefined;
+
+    sourceConnectionConfiguration: DPMConfiguration;
+    sourceConfiguration: DPMConfiguration;
+    sourceCredentialsIdentiifier: string | undefined;
+    sourceRepositoryIdentifier: string | undefined;
 }
 
 export class FetchArguments {
@@ -156,10 +162,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
                         returnValue.push(
                             ...sortedPackageIdentifiers.map<ParameterOption>((p) => {
-                                let title = p.catalogSlug + "/" + p.packageSlug;
-                                if (registries.length > 1) {
-                                    title += " " + chalk.gray(p.registryURL.replace(/^https?:\/\//, ""));
-                                }
+                                const title =
+                                    p.catalogSlug +
+                                    "/" +
+                                    p.packageSlug +
+                                    " " +
+                                    chalk.gray(p.registryURL.replace(/^https?:\/\//, ""));
 
                                 return {
                                     title,
@@ -261,6 +269,18 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 if (configureSourceResults === false) {
                     return { exitCode: 1 };
                 }
+
+                const sourceConector = await sourceConnectorDescription?.getConnector();
+
+                if (sourceConector.requiresCredentialsConfiguration()) {
+                    this.args.sourceCredentialsIdentifier = await sourceConector.getCredentialsIdentifierFromConfiguration(
+                        sourceConnectionConfiguration,
+                        sourceCredentialsConfiguration
+                    );
+                }
+
+                this.args.sourceConnectionConfig = JSON.stringify(sourceConnectionConfiguration);
+                this.args.sourceConfig = JSON.stringify(sourceConfiguration);
 
                 packageFileWithContext = {
                     cantSaveReason: "SAVE_NOT_AVAILABLE",
@@ -415,7 +435,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         let parameterCount = 0;
 
-        const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
+        const obtainSinkConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
             sinkConnector,
             sinkConnectionConfiguration,
@@ -423,16 +443,16 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.args.defaults
         );
 
-        if (obtainConnectionConfigurationResult === false) {
+        if (obtainSinkConfigurationResult === false) {
             this.jobContext.print("ERROR", "User canceled");
             return {
                 exitCode: 1
             };
         }
 
-        sinkConnectionConfiguration = obtainConnectionConfigurationResult.connectionConfiguration;
+        sinkConnectionConfiguration = obtainSinkConfigurationResult.connectionConfiguration;
 
-        parameterCount += obtainConnectionConfigurationResult.parameterCount;
+        parameterCount += obtainSinkConfigurationResult.parameterCount;
 
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
@@ -541,9 +561,16 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 packageFileWithContext,
                 parameterCount,
                 sink,
+                sinkConnectionConfiguration: obtainSinkConfigurationResult.connectionConfiguration,
                 sinkConfiguration,
-                repositoryIdentifier: obtainConnectionConfigurationResult.repositoryIdentifier,
-                credentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier
+                sinkRepositoryIdentifier: obtainSinkConfigurationResult.repositoryIdentifier,
+                sinkCredentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier,
+                sourceConnectionConfiguration: this.args.sourceConnectionConfig
+                    ? JSON.parse(this.args.sourceConnectionConfig)
+                    : undefined,
+                sourceCredentialsIdentiifier: this.args.sourceCredentialsConfig,
+                sourceConfiguration: this.args.sourceConfig ? JSON.parse(this.args.sourceConfig) : undefined,
+                sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier
             }
         };
     }

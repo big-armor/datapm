@@ -43,11 +43,11 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         console.log("");
         console.log(chalk.grey("Next time you can run this same configuration in a single command."));
 
-        const defaultRemovedParameterValues: DPMConfiguration = { ...jobResult.result.sinkConfiguration };
+        const sinkConfigRemovedParameterValues: DPMConfiguration = { ...jobResult.result.sinkConfiguration };
         jobResult.result?.sink.filterDefaultConfigValues(
             jobResult.result.packageFileWithContext.catalogSlug,
             jobResult.result.packageFileWithContext.packageFile,
-            defaultRemovedParameterValues
+            sinkConfigRemovedParameterValues
         );
         // This prints the password on the console :/
 
@@ -55,14 +55,28 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         if (jobResult.result.sink.getType() === STANDARD_OUT_SINK_TYPE) {
             command += "--quiet ";
         }
+
+        if (jobResult.result.sourceConnectionConfiguration) {
+            command += `--sourceConnectionConfig '${JSON.stringify(jobResult.result.sourceConnectionConfiguration)}' `;
+        }
+
+        if (jobResult.result.sourceConfiguration) {
+            command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
+        }
+
+        NEEDS TO INCLUDE SCHEMA CUSTOMIZATION OPTIONS
+
         command += `--sink ${jobResult.result.sink.getType()}`;
 
-        if (jobResult.result.repositoryIdentifier) command += " --repository " + jobResult.result.repositoryIdentifier;
+        if (jobResult.result.sinkRepositoryIdentifier)
+            command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;
 
-        if (jobResult.result.credentialsIdentifier)
-            command += " --credentials " + jobResult.result.credentialsIdentifier;
+        command += ` --sinkConnectionConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
 
-        command += ` --sinkConfig '${JSON.stringify(defaultRemovedParameterValues)}'`;
+        if (jobResult.result.sinkCredentialsIdentifier)
+            command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;
+
+        command += ` --sinkConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
 
         if (argv.defaults) command += " --defaults";
 
