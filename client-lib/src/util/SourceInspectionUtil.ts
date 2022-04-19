@@ -16,7 +16,9 @@ export async function configureSource(
     repositoryIdentifier: string | undefined,
     credentialsIdentifier: string | undefined,
     inspectionSeconds = 30,
-    includePackagingQuestions = true
+    includePackagingQuestions = true,
+    excludedSchemaProperties: ExcludeSchemaProperties = {},
+    renamedSchemaProperties: RenameSchemaProperties = {}
 ): Promise<{ source: Source; inspectionResults: InspectionResults; filteredSchemas: Record<string, Schema> } | false> {
     const connector = await connectorDescription.getConnector();
     const sourceDescription = await connectorDescription.getSourceDescription();
@@ -157,7 +159,11 @@ export async function configureSource(
 
         SchemaUtil.printSchema(jobContext, schema);
 
-        if (!jobContext.useDefaults()) await schemaSpecificQuestions(jobContext, schema, includePackagingQuestions);
+        if (includePackagingQuestions && !jobContext.useDefaults()) {
+            await excludeSchemaPropertyQuestions(jobContext, schema, excludedSchemaProperties);
+            await renameSchemaPropertyQuestions(jobContext, schema, renamedSchemaProperties);
+            await schemaSpecificQuestions(jobContext, schema);
+        }
     }
 
     return {
@@ -167,105 +173,161 @@ export async function configureSource(
     };
 }
 
-async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema, includePackagingQuestion: boolean) {
-    let properties = schema.properties as Properties;
-    // Ignore Attributes
-    const ignoreAttributesResponse = await jobContext.parameterPrompt([
-        {
-            type: ParameterType.AutoComplete,
-            name: "ignoreAttributes",
-            configuration: {},
-            message: `Exclude any attributes from ${schema.title}?`,
-            options: [
-                {
-                    title: "No",
-                    value: false,
-                    selected: true
-                },
-                {
-                    title: "Yes",
-                    value: true
-                }
-            ]
-        }
-    ]);
-    if (ignoreAttributesResponse.ignoreAttributes !== "No") {
-        const attributesToIgnoreResponse = await jobContext.parameterPrompt([
+type ExcludeSchemaProperties = { [schemaTitle: string]: string[] };
+type RenameSchemaProperties = { [schemaTitle: string]: { [propertyTitle: string]: string } };
+
+/** Modifies the schema and the excludedSchemaProperties arguments
+ */
+export async function excludeSchemaPropertyQuestions(
+    jobContext: JobContext,
+    schema: Schema,
+    excludeSchemaProperties: ExcludeSchemaProperties = {}
+): Promise<void> {
+    const properties = schema.properties as Properties;
+
+    if (!jobContext.useDefaults() && Object.keys(excludeSchemaProperties || {}).length === 0) {
+        let promptExcludeProperties = false;
+
+        // Ignore Attributes
+        const excludeAttributesResponse = await jobContext.parameterPrompt([
             {
-                type: ParameterType.MultiSelect,
-                name: "attributesToIgnore",
+                type: ParameterType.AutoComplete,
+                name: "excludeProperties",
                 configuration: {},
-                message: "Attributes to exclude?",
-                options: Object.keys(schema.properties as Properties).map((attributeName) => ({
-                    title: attributeName,
-                    value: attributeName
-                }))
+                message: `Exclude any attributes from ${schema.title}?`,
+                options: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: true
+                    },
+                    {
+                        title: "Yes",
+                        value: true
+                    }
+                ]
             }
         ]);
+        promptExcludeProperties = excludeAttributesResponse.excludeProperties === true;
 
-        attributesToIgnoreResponse.attributesToIgnore.forEach((attributeName: string) => {
-            properties[attributeName].hidden = true;
-        });
-    }
-
-    // Rename Attributes
-    const renameAttributesResponse = await jobContext.parameterPrompt([
-        {
-            type: ParameterType.AutoComplete,
-            name: "renameAttributes",
-            configuration: {},
-            message: `Rename attributes from ${schema.title}?`,
-            options: [
+        if (promptExcludeProperties) {
+            const propertiesToExcludeResponse = await jobContext.parameterPrompt([
                 {
-                    title: "No",
-                    value: false,
-                    selected: true
-                },
-                {
-                    title: "Yes",
-                    value: true
-                }
-            ]
-        }
-    ]);
-    if (renameAttributesResponse.renameAttributes !== "No") {
-        const attributeNameMap: Record<string, string> = {};
-        const attributesToRenameResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.MultiSelect,
-                name: "attributesToRename",
-                message: "Attributes to rename?",
-                configuration: {},
-                options: Object.keys(schema.properties as Properties).map((attributeName) => ({
-                    title: attributeName,
-                    value: attributeName
-                }))
-            }
-        ]);
-        for (const attributeName of attributesToRenameResponse.attributesToRename) {
-            const attributeToRenameResponse = await jobContext.parameterPrompt([
-                {
-                    type: ParameterType.Text,
-                    name: "attributeToRename",
+                    type: ParameterType.MultiSelect,
+                    name: "attributesToExclude",
                     configuration: {},
-                    message: `New attribute name for "${attributeName}"?`
+                    message: "Attributes to exclude?",
+                    options: Object.keys(schema.properties as Properties).map((attributeName) => ({
+                        title: attributeName,
+                        value: attributeName,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        selected: excludeSchemaProperties?.[schema.title!]?.includes(attributeName) ?? false
+                    }))
                 }
             ]);
-            attributeNameMap[attributeName] = attributeToRenameResponse.attributeToRename;
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            excludeSchemaProperties![schema.title!] = propertiesToExcludeResponse.attributesToExclude;
         }
-        attributesToRenameResponse.attributesToRename.forEach((attributeName: string) => {
-            const newAttributeName = attributeNameMap[attributeName];
-            properties[attributeName].title = newAttributeName;
-            if (schema.sampleRecords) {
-                schema.sampleRecords.forEach((record) => {
-                    record[newAttributeName] = record[attributeName];
-                    delete record[attributeName];
-                });
-            }
-        });
     }
 
-    if (!includePackagingQuestion) return;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    excludeSchemaProperties[schema.title!].forEach((attributeName: string) => {
+        properties[attributeName].hidden = true;
+    });
+}
+
+/** Modifies the schema and the excludedSchemaProperties arguments
+ */
+export async function renameSchemaPropertyQuestions(
+    jobContext: JobContext,
+    schema: Schema,
+    renameSchemaProperties: RenameSchemaProperties = {}
+): Promise<void> {
+    const properties = schema.properties as Properties;
+
+    let promptToRenameAttributes = false;
+
+    if (!jobContext.useDefaults() && Object.keys(renameSchemaProperties || {}).length === 0) {
+        const renameAttributesResponse = await jobContext.parameterPrompt([
+            {
+                type: ParameterType.AutoComplete,
+                name: "renameAttributes",
+                configuration: {},
+                message: `Rename attributes from ${schema.title}?`,
+                options: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: Object.keys(renameSchemaProperties || {}).length === 0
+                    },
+                    {
+                        title: "Yes",
+                        value: true,
+                        selected: Object.keys(renameSchemaProperties || {}).length >= 0
+                    }
+                ]
+            }
+        ]);
+
+        promptToRenameAttributes = renameAttributesResponse.renameAttributes !== "No";
+
+        if (promptToRenameAttributes) {
+            const attributeNameMap: Record<string, string> = {};
+            const attributesToRenameResponse = await jobContext.parameterPrompt([
+                {
+                    type: ParameterType.MultiSelect,
+                    name: "attributesToRename",
+                    message: "Attributes to rename?",
+                    configuration: {},
+                    options: Object.keys(schema.properties as Properties).map((attributeName) => ({
+                        title: attributeName,
+                        value: attributeName,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        selected: renameSchemaProperties?.[schema.title!]?.[attributeName] != null
+                    }))
+                }
+            ]);
+            for (const attributeName of attributesToRenameResponse.attributesToRename) {
+                const attributeToRenameResponse = await jobContext.parameterPrompt([
+                    {
+                        type: ParameterType.Text,
+                        name: "attributeToRename",
+                        configuration: {},
+                        message: `New attribute name for "${attributeName}"?`,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        defaultValue: renameSchemaProperties?.[schema.title!]?.[attributeName] ?? attributeName
+                    }
+                ]);
+                attributeNameMap[attributeName] = attributeToRenameResponse.attributeToRename;
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            renameSchemaProperties[schema.title!] = {};
+
+            attributesToRenameResponse.attributesToRename.forEach((attributeName: string) => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                renameSchemaProperties[schema.title!][attributeName] = attributeNameMap[attributeName];
+            });
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    Object.keys(renameSchemaProperties[schema.title!]).forEach((attributeName: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const newAttributeName = renameSchemaProperties[schema.title!][attributeName];
+        properties[attributeName].title = newAttributeName;
+        if (schema.sampleRecords) {
+            schema.sampleRecords.forEach((record) => {
+                record[newAttributeName] = record[attributeName];
+                delete record[attributeName];
+            });
+        }
+    });
+}
+
+async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
+    let properties = schema.properties as Properties;
 
     // Derived from
     const derivedFrom: DerivedFrom[] = [];

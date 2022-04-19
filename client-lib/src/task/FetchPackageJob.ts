@@ -29,7 +29,11 @@ import { inspectSourceConnection } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
 import { Job, JobContext, JobResult } from "./Task";
 import numeral from "numeral";
-import { configureSource } from "../util/SourceInspectionUtil";
+import {
+    configureSource,
+    excludeSchemaPropertyQuestions,
+    renameSchemaPropertyQuestions
+} from "../util/SourceInspectionUtil";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { ApolloQueryResult } from "@apollo/client";
 
@@ -46,6 +50,9 @@ export interface FetchPackageJobResult {
     sourceConfiguration: DPMConfiguration;
     sourceCredentialsIdentiifier: string | undefined;
     sourceRepositoryIdentifier: string | undefined;
+
+    excludedSchemaProperties: { [key: string]: string[] };
+    renamedSchemaProperties: { [key: string]: { [propertyKey: string]: string } };
 }
 
 export class FetchArguments {
@@ -65,6 +72,8 @@ export class FetchArguments {
     sourceRepositoryIdentifier?: string;
     sourceCredentialsIdentifier?: string;
     inspectionSeconds?: number;
+    excludeSchemaProperties?: string;
+    renameSchemaProperties?: string;
 }
 
 export class FetchPackageJob extends Job<FetchPackageJobResult> {
@@ -79,6 +88,17 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         if (this.args.credentialsIdentifier != null && this.args.sinkCredentialsConfig != null) {
             throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
+        }
+
+        let excludedSchemaProperties: { [key: string]: string[] } = {};
+        let renamedSchemaProperties: { [key: string]: { [propertyKey: string]: string } } = {};
+
+        if (this.args.excludeSchemaProperties != null) {
+            excludedSchemaProperties = JSON.parse(this.args.excludeSchemaProperties);
+        }
+
+        if (this.args.renameSchemaProperties != null) {
+            renamedSchemaProperties = JSON.parse(this.args.renameSchemaProperties);
         }
 
         this.jobContext.setCurrentStep("Inspecting Package");
@@ -230,6 +250,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             }
         }
 
+        // If the package file was not found, we need to create it
+        // this assumes the user selected a source connector by its type() value
         if (packageFileWithContext == null) {
             // find a source connector by reference
             const sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
@@ -270,6 +292,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     return { exitCode: 1 };
                 }
 
+                const schemas = Object.values(configureSourceResults.filteredSchemas);
+
                 const sourceConector = await sourceConnectorDescription?.getConnector();
 
                 if (sourceConector.requiresCredentialsConfiguration()) {
@@ -282,6 +306,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 this.args.sourceConnectionConfig = JSON.stringify(sourceConnectionConfiguration);
                 this.args.sourceConfig = JSON.stringify(sourceConfiguration);
 
+                // Build a temporary in memory package file
                 packageFileWithContext = {
                     cantSaveReason: "SAVE_NOT_AVAILABLE",
                     contextType: "temporary",
@@ -301,12 +326,37 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                         displayName: "Temp Package",
                         generatedBy: "datapm fetch command",
                         packageSlug: "tmp-package",
-                        schemas: Object.values(configureSourceResults.filteredSchemas),
+                        schemas,
                         sources: [configureSourceResults.source],
                         updatedDate: new Date(),
                         version: "0.0.0"
                     }
                 };
+
+                for (const schema of packageFileWithContext.packageFile.schemas) {
+                    if (schema.title == null)
+                        throw new Error("Schema title is null, during excluded properties inspection");
+
+                    const schemaPropertes = schema.properties || {};
+                    for (const propertyKey of Object.keys(schemaPropertes)) {
+                        const property = schemaPropertes[propertyKey];
+                        if (property.hidden === true) {
+                            if (excludedSchemaProperties[schema.title] == null)
+                                excludedSchemaProperties[schema.title] = [];
+                            excludedSchemaProperties[schema.title].push(propertyKey);
+                        }
+
+                        if (property.title !== propertyKey) {
+                            if (property.title == null)
+                                throw new Error("Property title is null, during renamed properties inspection");
+
+                            if (renamedSchemaProperties[schema.title] == null)
+                                renamedSchemaProperties[schema.title] = {};
+
+                            renamedSchemaProperties[schema.title][propertyKey] = property.title;
+                        }
+                    }
+                }
             }
         }
 
@@ -344,6 +394,55 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         recordCountText = `${schemaCount} schemas with ${recordCountText} records`;
         this.jobContext.print("INFO", recordCountText);
 
+        /** PROMPT USER TO EXCLUDE AND RENAME PROPERTIES IN SCHEMAS */
+
+        const excludedSchemaPropertiesDefined = Object.keys(excludedSchemaProperties).length > 0;
+        const renamedSchemaPropertiesDefined = Object.keys(renamedSchemaProperties).length > 0;
+
+        for (const schema of packageFile.schemas) {
+            this.jobContext.setCurrentStep(schema.title + " Schema Options");
+
+            await excludeSchemaPropertyQuestions(this.jobContext, schema, excludedSchemaProperties);
+
+            if (this.jobContext.useDefaults() || excludedSchemaPropertiesDefined) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                if (Object.values(excludedSchemaProperties[schema.title!]).length === 0) {
+                    this.jobContext.print("SUCCESS", "No properties excluded");
+                } else {
+                    this.jobContext.print(
+                        "SUCCESS",
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        "Will exclude these properties: " + excludedSchemaProperties[schema.title!].join(", ")
+                    );
+                }
+            }
+
+            await renameSchemaPropertyQuestions(this.jobContext, schema, renamedSchemaProperties);
+
+            if (this.jobContext.useDefaults() || renamedSchemaPropertiesDefined) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                if (Object.values(renamedSchemaProperties[schema.title!]).length === 0) {
+                    this.jobContext.print("SUCCESS", "No properties will be renamed");
+                } else {
+                    this.jobContext.print(
+                        "SUCCESS",
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        "Will rename these properties:"
+                    );
+
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    for (const propertyKey of Object.keys(renamedSchemaProperties[schema.title!])) {
+                        this.jobContext.print(
+                            "NONE",
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            `\t${propertyKey} to ${renamedSchemaProperties[schema.title!][propertyKey]}`
+                        );
+                    }
+                }
+            }
+        }
+
+        /** INSPECT SOURCES */
         const sourcesAndInspectionResults: {
             source: Source;
             inspectionResult: InspectionResults;
@@ -570,7 +669,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     : undefined,
                 sourceCredentialsIdentiifier: this.args.sourceCredentialsConfig,
                 sourceConfiguration: this.args.sourceConfig ? JSON.parse(this.args.sourceConfig) : undefined,
-                sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier
+                sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier,
+                excludedSchemaProperties,
+                renamedSchemaProperties
             }
         };
     }

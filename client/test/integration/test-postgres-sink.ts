@@ -540,15 +540,16 @@ describe("Postgres Sink Test", function () {
                 "--forceUpdate",
                 "--sink",
                 "postgres",
-                "--repository",
+                "--sinkRepository",
                 postgresHost + ":" + postgresPort,
-                "--credentials",
+                "--sinkAccount",
                 "postgres",
                 "--sinkConfig",
                 '{"database":"postgres","schema":"local_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'
             ],
             [],
             async (line: string) => {
+                console.log(line);
                 if (line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }

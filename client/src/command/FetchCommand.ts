@@ -12,6 +12,8 @@ export class FetchArguments {
     forceUpdate?: boolean;
     sinkRepository?: string;
     sinkAccount?: string;
+    excludeSchemaProperties?: string;
+    renameSchemaProperties?: string;
 }
 
 export class FetchCommand implements Command {
@@ -60,6 +62,12 @@ export class FetchCommand implements Command {
                         type: "string"
                     })
                     .option("sinkAccount", {
+                        type: "string"
+                    })
+                    .option("excludeSchemaProperties", {
+                        type: "string"
+                    })
+                    .option("renameSchemaProperties", {
                         type: "string"
                     })
                     .help();

@@ -49,7 +49,6 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             jobResult.result.packageFileWithContext.packageFile,
             sinkConfigRemovedParameterValues
         );
-        // This prints the password on the console :/
 
         let command = `datapm fetch ${argv.reference} `;
         if (jobResult.result.sink.getType() === STANDARD_OUT_SINK_TYPE) {
@@ -64,7 +63,13 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
         }
 
-        NEEDS TO INCLUDE SCHEMA CUSTOMIZATION OPTIONS
+        if (Object.values(jobResult.result.excludedSchemaProperties).length > 0) {
+            command += `--excludeSchemaProperties '${JSON.stringify(jobResult.result.excludedSchemaProperties)}' `;
+        }
+
+        if (Object.values(jobResult.result.renamedSchemaProperties).length > 0) {
+            command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;
+        }
 
         command += `--sink ${jobResult.result.sink.getType()}`;
 
@@ -76,7 +81,9 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         if (jobResult.result.sinkCredentialsIdentifier)
             command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;
 
-        command += ` --sinkConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
+        if (Object.values(sinkConfigRemovedParameterValues).length > 0) {
+            command += ` --sinkConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
+        }
 
         if (argv.defaults) command += " --defaults";
 
