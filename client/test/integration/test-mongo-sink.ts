@@ -13,7 +13,15 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const mongoSinkPrompts = ["Hostname or IP?", "Port?", "Username?", "Password?", "Database?"];
+const mongoSinkPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Hostname or IP?",
+    "Port?",
+    "Username?",
+    "Password?",
+    "Database?"
+];
 
 const getMongoSinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(mongoSinkPrompts, inputs, skip, count);
@@ -84,7 +92,15 @@ describe("Mongo Sink Test", function () {
     it("Can't connect to mongo URI with wrong credential", async function () {
         resetConfiguration();
 
-        const prompts = getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "username", "password", ""]);
+        const prompts = getMongoSinkPromptInputs([
+            "No",
+            "No",
+            mongoHost,
+            mongoPort.toString(),
+            "username",
+            "password",
+            ""
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -108,7 +124,7 @@ describe("Mongo Sink Test", function () {
     it("Should import data without error", async function () {
         resetConfiguration();
 
-        const prompts = getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "", "", ""]);
+        const prompts = getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -154,7 +170,7 @@ describe("Mongo Sink Test", function () {
     it("Should not rewrite if there isn't any new records", async function () {
         resetConfiguration();
 
-        const prompts = getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "", "", ""]);
+        const prompts = getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -190,7 +206,7 @@ describe("Mongo Sink Test", function () {
     it("Should import data again if force-update flag set", async function () {
         resetConfiguration();
 
-        const prompts = getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "", "", ""]);
+        const prompts = getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -227,7 +243,7 @@ describe("Mongo Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "", "", ""]),
+            ...getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]),
             {
                 message: "Integer_Float has integer and number values.",
                 input: `${KEYS.ENTER}`
@@ -292,7 +308,7 @@ describe("Mongo Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getMongoSinkPromptInputs([mongoHost, mongoPort.toString(), "", "", ""]),
+            ...getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`

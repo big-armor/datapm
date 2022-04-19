@@ -15,7 +15,13 @@ import {
 import fs from "fs";
 import { UpdateCatalogDocument, UpdatePackageDocument } from "datapm-client-lib";
 
-const fetchCommandPrompts = ["Sink Connector?", "File format?", "File Location?"];
+const fetchCommandPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Sink Connector?",
+    "File format?",
+    "File Location?"
+];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
@@ -142,7 +148,7 @@ describe("Publish Data Batch Tests", async function () {
     });
 
     it("Should download the data", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -229,7 +235,7 @@ describe("Publish Data Batch Tests", async function () {
     });
 
     it("Should download all records", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -257,7 +263,7 @@ describe("Publish Data Batch Tests", async function () {
     it("Should not allow anonymous user to fetch non-public data", async function () {
         removeRegistry(`http://localhost:${registryServerPort}`);
 
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -303,7 +309,7 @@ describe("Publish Data Batch Tests", async function () {
             }
         });
 
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false

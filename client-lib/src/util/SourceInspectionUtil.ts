@@ -232,7 +232,7 @@ export async function excludeSchemaPropertyQuestions(
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    excludeSchemaProperties[schema.title!].forEach((attributeName: string) => {
+    excludeSchemaProperties[schema.title!]?.forEach((attributeName: string) => {
         properties[attributeName].hidden = true;
     });
 }
@@ -313,7 +313,7 @@ export async function renameSchemaPropertyQuestions(
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    Object.keys(renameSchemaProperties[schema.title!]).forEach((attributeName: string) => {
+    Object.keys(renameSchemaProperties[schema.title!] ?? {}).forEach((attributeName: string) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const newAttributeName = renameSchemaProperties[schema.title!][attributeName];
         properties[attributeName].title = newAttributeName;

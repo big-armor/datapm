@@ -15,7 +15,13 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const fetchCommandPrompts = ["Sink Connector?", "File format?", "File Location?"];
+const fetchCommandPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Sink Connector?",
+    "File format?",
+    "File Location?"
+];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
@@ -134,7 +140,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package with invalid sink configuration", async function () {
-        const prompts = getFetchCommandPromptInputs([]);
+        const prompts = getFetchCommandPromptInputs(["No", "No"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -177,7 +183,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Fetch package with file sink", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -264,7 +270,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false

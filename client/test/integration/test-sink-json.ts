@@ -5,7 +5,7 @@ import fs from "fs";
 describe("JSON Sink", function () {
     let packageAFilePath: string;
 
-    const jsonSinkPrompts = ["File Location?"];
+    const jsonSinkPrompts = ["Exclude any attributes from", "Rename attributes from", "File Location?"];
 
     const getJSONSinkPrompts = (inputs?: string[], skip = 0, count = 20) =>
         getPromptInputs(jsonSinkPrompts, inputs, skip, count);
@@ -22,7 +22,7 @@ describe("JSON Sink", function () {
     });
 
     it("Should write JSON output", async () => {
-        const prompts = getJSONSinkPrompts(["./"]);
+        const prompts = getJSONSinkPrompts(["No", "No", "./"]);
 
         const cmdResult = await testCmd(
             "fetch",

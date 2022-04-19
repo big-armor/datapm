@@ -108,6 +108,14 @@ describe("Kraken Source", () => {
             ["kraken-eth-usd-ticker.datapm.json"],
             [
                 {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
                     message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },

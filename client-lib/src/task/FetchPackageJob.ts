@@ -332,31 +332,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                         version: "0.0.0"
                     }
                 };
-
-                for (const schema of packageFileWithContext.packageFile.schemas) {
-                    if (schema.title == null)
-                        throw new Error("Schema title is null, during excluded properties inspection");
-
-                    const schemaPropertes = schema.properties || {};
-                    for (const propertyKey of Object.keys(schemaPropertes)) {
-                        const property = schemaPropertes[propertyKey];
-                        if (property.hidden === true) {
-                            if (excludedSchemaProperties[schema.title] == null)
-                                excludedSchemaProperties[schema.title] = [];
-                            excludedSchemaProperties[schema.title].push(propertyKey);
-                        }
-
-                        if (property.title !== propertyKey) {
-                            if (property.title == null)
-                                throw new Error("Property title is null, during renamed properties inspection");
-
-                            if (renamedSchemaProperties[schema.title] == null)
-                                renamedSchemaProperties[schema.title] = {};
-
-                            renamedSchemaProperties[schema.title][propertyKey] = property.title;
-                        }
-                    }
-                }
             }
         }
 
@@ -396,17 +371,18 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         /** PROMPT USER TO EXCLUDE AND RENAME PROPERTIES IN SCHEMAS */
 
-        const excludedSchemaPropertiesDefined = Object.keys(excludedSchemaProperties).length > 0;
-        const renamedSchemaPropertiesDefined = Object.keys(renamedSchemaProperties).length > 0;
+        const excludedSchemaPropertiesDefined = this.args.excludeSchemaProperties != null;
+        const renamedSchemaPropertiesDefined = this.args.renameSchemaProperties != null;
 
         for (const schema of packageFile.schemas) {
             this.jobContext.setCurrentStep(schema.title + " Schema Options");
 
-            await excludeSchemaPropertyQuestions(this.jobContext, schema, excludedSchemaProperties);
+            if (!excludedSchemaPropertiesDefined)
+                await excludeSchemaPropertyQuestions(this.jobContext, schema, excludedSchemaProperties);
 
             if (this.jobContext.useDefaults() || excludedSchemaPropertiesDefined) {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                if (Object.values(excludedSchemaProperties[schema.title!]).length === 0) {
+                if (Object.values(excludedSchemaProperties[schema.title!] ?? []).length === 0) {
                     this.jobContext.print("SUCCESS", "No properties excluded");
                 } else {
                     this.jobContext.print(
@@ -417,11 +393,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 }
             }
 
-            await renameSchemaPropertyQuestions(this.jobContext, schema, renamedSchemaProperties);
+            if (!renamedSchemaPropertiesDefined)
+                await renameSchemaPropertyQuestions(this.jobContext, schema, renamedSchemaProperties);
 
             if (this.jobContext.useDefaults() || renamedSchemaPropertiesDefined) {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                if (Object.values(renamedSchemaProperties[schema.title!]).length === 0) {
+                if (Object.values(renamedSchemaProperties[schema.title!] ?? {}).length === 0) {
                     this.jobContext.print("SUCCESS", "No properties will be renamed");
                 } else {
                     this.jobContext.print(

@@ -13,7 +13,15 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const mysqlSinkPrompts = ["Hostname or IP?", "Port?", "Username?", "Password?", "Database?"];
+const mysqlSinkPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Hostname or IP?",
+    "Port?",
+    "Username?",
+    "Password?",
+    "Database?"
+];
 
 const getMySQLSinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(mysqlSinkPrompts, inputs, skip, count);
@@ -73,7 +81,7 @@ describe("MySQL Sink Test", function () {
 
     it("Can't connect to invalid URI", async function () {
         resetConfiguration();
-        const prompts = getMySQLSinkPromptInputs(["invalid hostname", "", "", "", ""]);
+        const prompts = getMySQLSinkPromptInputs(["No", "No", "invalid hostname", "", "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -97,7 +105,15 @@ describe("MySQL Sink Test", function () {
     it("Can't connect to database with wrong credential", async function () {
         resetConfiguration();
 
-        const prompts = getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "username", "password", ""]);
+        const prompts = getMySQLSinkPromptInputs([
+            "No",
+            "No",
+            mysqlHost,
+            mysqlPort.toString(),
+            "username",
+            "password",
+            ""
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -154,7 +170,7 @@ describe("MySQL Sink Test", function () {
     it("Should import data without error", async function () {
         resetConfiguration();
 
-        const prompts = getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "", "", ""]);
+        const prompts = getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -217,7 +233,7 @@ describe("MySQL Sink Test", function () {
     it("Should not rewrite if there isn't any new records", async function () {
         resetConfiguration();
 
-        const prompts = getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "", "", ""]);
+        const prompts = getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -250,7 +266,7 @@ describe("MySQL Sink Test", function () {
     it("Should import data again if force-update flag set", async function () {
         resetConfiguration();
 
-        const prompts = getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "", "", ""]);
+        const prompts = getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -284,7 +300,7 @@ describe("MySQL Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "", "", ""]),
+            ...getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]),
             {
                 message: "Integer_Float has integer and number values.",
                 input: `${KEYS.ENTER}`
@@ -410,7 +426,7 @@ describe("MySQL Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getMySQLSinkPromptInputs([mysqlHost, mysqlPort.toString(), "", "", ""]),
+            ...getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`

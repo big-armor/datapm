@@ -107,6 +107,14 @@ describe("Gemini Ticker Source", () => {
             ["gemini-btc-usd-ticker.datapm.json"],
             [
                 {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
                     message: "Connector?",
                     input: "Local File" + KEYS.ENTER
                 },

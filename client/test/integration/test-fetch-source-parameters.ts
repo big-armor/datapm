@@ -83,6 +83,14 @@ describe("Fetch Missing Source Parameters", function () {
             ["airports-small.datapm.json"],
             [
                 {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
                     message: "Header row line number?",
                     input: "1" + KEYS.ENTER
                 },

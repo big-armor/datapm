@@ -34,7 +34,10 @@ describe("AVRO Sink Test", function () {
     });
 
     it("Should write AVRO output", async () => {
-        const prompts = getPromptInputs(["File Location?"], ["."]);
+        const prompts = getPromptInputs(
+            ["Exclude any attributes from", "Rename attributes from", "File Location?"],
+            ["No", "No", "."]
+        );
         const cmdResult = await testCmd(
             "fetch",
             [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
@@ -65,7 +68,10 @@ describe("AVRO Sink Test", function () {
     });
 
     it("Should write AVRO output - even with weird headers", async () => {
-        const prompts = getPromptInputs(["File Location?"], ["."]);
+        const prompts = getPromptInputs(
+            ["Exclude any attributes from", "Rename attributes from", "File Location?"],
+            ["No", "No", "."]
+        );
         const cmdResult = await testCmd(
             "fetch",
             [packageBFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
@@ -95,11 +101,13 @@ describe("AVRO Sink Test", function () {
     it("Should write AVRO with floating point numbers", async () => {
         const prompts = getPromptInputs(
             [
+                "Exclude any attributes from",
+                "Rename attributes from",
                 "File Location?",
                 "Column1 has integer and number values",
                 "Column2 has integer and number values. How should this output be handled?"
             ],
-            [".", KEYS.ENTER, KEYS.ENTER]
+            ["No", "No", ".", KEYS.ENTER, KEYS.ENTER]
         );
         const cmdResult = await testCmd(
             "fetch",
