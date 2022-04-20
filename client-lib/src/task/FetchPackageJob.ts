@@ -260,6 +260,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     await task.end("SUCCESS", "Not a package file. Will try to find file type.");
                 } else {
                     await task.end("ERROR", error.message);
+                    return {
+                        exitCode: 1
+                    };
                 }
             }
         }

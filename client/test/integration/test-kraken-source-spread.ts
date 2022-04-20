@@ -4,7 +4,7 @@ import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
-describe("Kraken Source", () => {
+describe("Kraken Spread Source", () => {
     after(() => {
         if (fs.existsSync("kraken-eth-usd-spread.datapm.json")) {
             fs.unlinkSync("kraken-eth-usd-spread.datapm.json");

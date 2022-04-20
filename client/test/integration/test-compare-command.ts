@@ -157,7 +157,8 @@ describe("Compare Command Tests", async function () {
             ["https://google.com", packageAFilePath],
             [],
             async (line: string) => {
-                if (line.includes("ERROR_PARSING_PACKAGE_FILE")) {
+                console.log(line);
+                if (line.includes("NOT_A_PACKAGE_FILE")) {
                     results.messageFound = true;
                 }
             }

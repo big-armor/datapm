@@ -56,7 +56,6 @@ describe("Fetch CLI Options", () => {
                 }
             ],
             async (line) => {
-                console.log(line);
                 if (line.match("datapm fetch file")) {
                     fetchLine = line;
                 }
