@@ -157,7 +157,6 @@ describe("Compare Command Tests", async function () {
             ["https://google.com", packageAFilePath],
             [],
             async (line: string) => {
-                console.log(line);
                 if (line.includes("NOT_A_PACKAGE_FILE")) {
                     results.messageFound = true;
                 }

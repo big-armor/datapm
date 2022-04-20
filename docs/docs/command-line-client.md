@@ -62,13 +62,23 @@ datapm publish --help
 
 To publish packages or perform any authenticated tasks, you'll need to add an API key to your command line client. Here are the instructions to generate an API Key.
 
-#### Login with Command Line Client
-
 Use the following command to login directly from the command line client.
 
 ```
 datapm registry login
 ```
+
+### Alternatively, set an API key
+
+If your user account requires SSO, you can manually create an API and apply it to your command line client.
+
+1. Login to the registry you wish to use.
+2. Click on your user icon at the top right.
+3. Click on "My Profile"
+4. Scroll down to "API Keys".
+5. Enter a new API key name, such as your machine name.
+6. Click "Create API Key".
+7. Copy the API key and paste it into the command line client.
 
 ## Search Registries
 
@@ -82,7 +92,13 @@ Your search result will include packages with titles, descriptions, or keywords 
 
 ## Consume Data
 
-Use the following command to retrieve a batch data package from the datapm.io public registry.
+Use the datapm fetch command without any options to see all the source connectors and to quickly search packages on registries.
+
+```text
+datapm fetch
+```
+
+Use the following command to retrieve a data package from the datapm.io public registry.
 
 ```text
 datapm fetch datapm/example
@@ -92,6 +108,13 @@ You can also fetch packages from other registries by specifying the package URL.
 
 ```text
 datapm fetch https://datapm-example.company.com/catalog/package
+```
+
+You can also use the datapm fetch command to download data directly from source files, and other supported sources.
+
+```text
+datapm fetch ./data/example.csv
+datapm fetch http://my-web-server.com/data/example-data.zip
 ```
 
 ## Publish Data
