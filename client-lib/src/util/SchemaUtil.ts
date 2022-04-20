@@ -120,7 +120,7 @@ export async function inspectSourceConnection(
 
     jobContext.print("INFO", "Connecting to " + repositoryIdentifier);
 
-    const sourceInspectResult = await sourceImplementation.inspectURIs(
+    const sourceInspectResult = await sourceImplementation.inspectData(
         source.connectionConfiguration,
         credentialsConfiguration,
         source.configuration || {},

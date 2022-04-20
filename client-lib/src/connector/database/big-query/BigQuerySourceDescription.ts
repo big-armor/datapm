@@ -1,4 +1,4 @@
-import { SourceDescription, Source } from "../../Source";
+import { SourceDescription, Source, ConnectorConfigurationSet } from "../../Source";
 import { TYPE, DISPLAY_NAME } from "./BigQueryConnectorDescription";
 
 export class BigQuerySourceDescription implements SourceDescription {
@@ -11,8 +11,17 @@ export class BigQuerySourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("bigQuery://");
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("bigQuery://")) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
+        }
+        return false;
     }
 
     async getSource(): Promise<Source> {

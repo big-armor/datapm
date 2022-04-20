@@ -31,6 +31,10 @@ export class CLIJobContext implements JobContext {
 
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
 
+    useDefaults(): boolean {
+        return this.argv.defaults || false;
+    }
+
     getPackageFile(
         reference: string | PackageIdentifier,
         modifiedOrCanonical: "modified" | "canonicalIfAvailable"

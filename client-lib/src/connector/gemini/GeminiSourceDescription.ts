@@ -10,8 +10,8 @@ export class GeminiSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith(URI_BASE);
+    supportsURI(uri: string): false {
+        return false;
     }
 
     async getSource(): Promise<Source> {

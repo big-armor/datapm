@@ -7,11 +7,16 @@ import {
     SinkState,
     SinkStateKey,
     Source,
-    ParameterType
+    ParameterType,
+    ParameterOption,
+    CATALOG_SLUG_REGEX,
+    PACKAGE_SLUG_REGEX,
+    CURRENT_PACKAGE_FILE_SCHEMA_URL
 } from "datapm-lib";
+import { Package, SearchPackagesResult, PackageIdentifier } from "../generated/graphql";
 import ON_DEATH from "death";
 import { SemVer } from "semver";
-import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
+import { getConnectorDescriptionByType, CONNECTORS } from "../connector/ConnectorUtil";
 import { Sink } from "../connector/Sink";
 import { getSinkDescriptions } from "../connector/SinkUtil";
 import { InspectionResults, StreamSetPreview } from "../connector/Source";
@@ -24,14 +29,30 @@ import { inspectSourceConnection } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
 import { Job, JobContext, JobResult } from "./Task";
 import numeral from "numeral";
+import {
+    configureSource,
+    excludeSchemaPropertyQuestions,
+    renameSchemaPropertyQuestions
+} from "../util/SourceInspectionUtil";
+import { getRegistryClientWithConfig } from "../util/RegistryClient";
+import { ApolloQueryResult } from "@apollo/client";
 
 export interface FetchPackageJobResult {
     parameterCount: number;
     sink: Sink;
+    sinkCredentialsIdentifier: string | undefined;
+    sinkRepositoryIdentifier: string | undefined;
+    sinkConnectionConfiguration: DPMConfiguration;
     sinkConfiguration: DPMConfiguration;
     packageFileWithContext: PackageFileWithContext;
-    credentialsIdentifier: string | undefined;
-    repositoryIdentifier: string | undefined;
+
+    sourceConnectionConfiguration: DPMConfiguration;
+    sourceConfiguration: DPMConfiguration;
+    sourceCredentialsIdentiifier: string | undefined;
+    sourceRepositoryIdentifier: string | undefined;
+
+    excludedSchemaProperties: { [key: string]: string[] };
+    renamedSchemaProperties: { [key: string]: { [propertyKey: string]: string } };
 }
 
 export class FetchArguments {
@@ -45,6 +66,14 @@ export class FetchArguments {
     sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
+    sourceConnectionConfig?: string;
+    sourceCredentialsConfig?: string;
+    sourceConfig?: string;
+    sourceRepositoryIdentifier?: string;
+    sourceCredentialsIdentifier?: string;
+    inspectionSeconds?: number;
+    excludeSchemaProperties?: string;
+    renameSchemaProperties?: string;
 }
 
 export class FetchPackageJob extends Job<FetchPackageJobResult> {
@@ -61,18 +90,113 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
         }
 
-        this.jobContext.setCurrentStep("Inspecting Package");
+        let excludedSchemaProperties: { [key: string]: string[] } = {};
+        let renamedSchemaProperties: { [key: string]: { [propertyKey: string]: string } } = {};
+
+        if (this.args.excludeSchemaProperties != null) {
+            excludedSchemaProperties = JSON.parse(this.args.excludeSchemaProperties);
+        }
+
+        if (this.args.renameSchemaProperties != null) {
+            renamedSchemaProperties = JSON.parse(this.args.renameSchemaProperties);
+        }
+
+        this.jobContext.setCurrentStep("Source Selection");
 
         if (this.args.reference == null) {
+            const sourceConnectors = CONNECTORS.filter((c) => c.hasSource());
+
             const referencePromptResult = await this.jobContext.parameterPrompt([
                 {
-                    type: ParameterType.Text,
+                    type: ParameterType.AutoComplete,
                     configuration: {},
                     name: "reference",
-                    message: "What is the package name, url, or file name?",
+                    allowFreeFormInput: true,
+                    message: "Source package or connector name?",
+                    // TODO - callback for autocomplete so that we can search for packages by reference
+                    options: sourceConnectors
+                        .map<ParameterOption>((c) => {
+                            return {
+                                title: c.getDisplayName(),
+                                value: c.getType()
+                            };
+                        })
+                        .sort((a, b) => a.title.localeCompare(b.title)),
                     validate: (value) => {
-                        if (!value) return "Package file name or url required";
+                        if (!value) return "Required";
                         return true;
+                    },
+                    onChange: async (input: string, currentChoices: ParameterOption[]): Promise<ParameterOption[]> => {
+                        if (input == null || input.trim().length === 0) {
+                            return currentChoices;
+                        }
+
+                        const returnValue: ParameterOption[] = sourceConnectors
+                            .filter((c) => c.getDisplayName().toLowerCase().startsWith(input.toLowerCase()))
+                            .map((c) => {
+                                return {
+                                    title: c.getDisplayName(),
+                                    value: c.getType()
+                                };
+                            });
+
+                        if (returnValue.length > 9) {
+                            return returnValue;
+                        }
+
+                        const registries = this.jobContext.getRegistryConfigs();
+
+                        if (registries.find((r) => r.url === "https://datapm.io") == null) {
+                            registries.push({
+                                url: "https://datapm.io"
+                            });
+                        }
+
+                        const searchPromises: Promise<
+                            ApolloQueryResult<{ searchPackages: SearchPackagesResult }>
+                        >[] = [];
+                        for (const registry of registries) {
+                            const client = getRegistryClientWithConfig(this.jobContext, registry);
+                            const searchPromise = client.searchPackages(input, 10, 0);
+                            searchPromises.push(searchPromise);
+                        }
+
+                        const results = await Promise.allSettled(searchPromises);
+
+                        const packages: Package[] = [];
+                        for (const result of results) {
+                            if (result.status === "rejected") continue;
+
+                            if (result.value.data.searchPackages.packages)
+                                packages.push(...result.value.data.searchPackages.packages);
+                        }
+
+                        const packageIdentifiers: PackageIdentifier[] = packages.map((p) => p.identifier);
+
+                        const sortedPackageIdentifiers = packageIdentifiers.sort((a, b) => {
+                            const aI = a.catalogSlug + "/" + b.packageSlug;
+                            const bI = b.catalogSlug + "/" + b.packageSlug;
+
+                            return aI.localeCompare(bI);
+                        });
+
+                        returnValue.push(
+                            ...sortedPackageIdentifiers.map<ParameterOption>((p) => {
+                                const title =
+                                    p.catalogSlug +
+                                    "/" +
+                                    p.packageSlug +
+                                    " " +
+                                    chalk.gray(p.registryURL.replace(/^https?:\/\//, ""));
+
+                                return {
+                                    title,
+                                    value: p.registryURL + "/" + p.catalogSlug + "/" + p.packageSlug
+                                };
+                            })
+                        );
+
+                        return returnValue;
                     }
                 }
             ]);
@@ -80,31 +204,186 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.args.reference = referencePromptResult.reference;
         }
 
-        if (this.args.reference == null) throw new Error("The package file path or URL is required");
+        if (this.args.reference == null) throw new Error("The 'reference' value is required");
 
-        // Finding package
-        let task = await this.jobContext.startTask("Finding package " + this.args.reference);
+        let packageFileWithContext: PackageFileWithContext | undefined;
 
-        let packageFileWithContext: PackageFileWithContext;
+        if (
+            this.args.reference.toLowerCase().endsWith(".json") ||
+            this.args.reference.startsWith("http") ||
+            this.args.reference.startsWith("https") ||
+            (this.args.reference.split("/").length === 2 &&
+                this.args.reference.split("/")[0].match(CATALOG_SLUG_REGEX) &&
+                this.args.reference.split("/")[1].match(PACKAGE_SLUG_REGEX))
+        ) {
+            // Finding package
+            const task = await this.jobContext.startTask("Finding package " + this.args.reference);
 
-        try {
-            packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
-        } catch (error) {
-            if (typeof error.message === "string" && error.message.includes("ERROR_SCHEMA_VERSION_TOO_NEW")) {
-                await task.end("ERROR", "The package file was created by a newer version of the datapm client.");
+            try {
+                packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
+                task.end("SUCCESS", "Found package " + this.args.reference);
+            } catch (error) {
+                if (typeof error.message === "string" && error.message.includes("ERROR_SCHEMA_VERSION_TOO_NEW")) {
+                    await task.end("ERROR", "The package file was created by a newer version of the datapm client.");
 
-                this.jobContext.print("INFO", "Update the datapm client to the latest version to use this package.");
-                this.jobContext.print("NONE", "https://datapm.io/downloads");
+                    this.jobContext.print(
+                        "INFO",
+                        "Update the datapm client to the latest version to use this package."
+                    );
+                    this.jobContext.print("NONE", "https://datapm.io/downloads");
+
+                    return {
+                        exitCode: 1
+                    };
+                } else if (typeof error.message === "string" && error.message.includes("CATALOG_NOT_FOUND")) {
+                    await task.end("ERROR", "The catalog was not found.");
+
+                    return {
+                        exitCode: 1
+                    };
+                } else if (typeof error.message === "string" && error.message.includes("PACKAGE_NOT_FOUND")) {
+                    await task.end("ERROR", "The package was not found.");
+
+                    return {
+                        exitCode: 1
+                    };
+                } else if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
+                    await task.end("ERROR", "You are not logged in to the registry.");
+
+                    this.jobContext.print("INFO", "Use the following command to authenticate.");
+                    this.jobContext.print("NONE", chalk.green("datapm registry login"));
+
+                    return {
+                        exitCode: 1
+                    };
+                } else if (typeof error.message === "string" && error.message.includes("NOT_A_PACKAGE_FILE")) {
+                    await task.end("SUCCESS", "Not a package file. Will try to find file type.");
+                } else {
+                    await task.end("ERROR", error.message);
+                    return {
+                        exitCode: 1
+                    };
+                }
             }
-            if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
-                await task.end("ERROR", "You are not logged in to the registry.");
+        }
 
-                this.jobContext.print("INFO", "Use the following command to authenticate.");
-                this.jobContext.print("NONE", chalk.green("datapm registry login"));
-            } else {
-                await task.end("ERROR", error.message);
+        // If the package file was not found, we need to create it
+        // this assumes the user selected a source connector by its type() value
+        if (packageFileWithContext == null) {
+            // Prompt parameters
+            let sourceConnectionConfiguration: DPMConfiguration = {};
+            let sourceCredentialsConfiguration: DPMConfiguration = {};
+            let sourceConfiguration: DPMConfiguration = {};
+
+            if (this.args.sourceConnectionConfig) {
+                sourceConnectionConfiguration = JSON.parse(this.args.sourceConnectionConfig);
             }
 
+            if (this.args.sourceCredentialsConfig) {
+                sourceCredentialsConfiguration = JSON.parse(this.args.sourceCredentialsConfig);
+            }
+
+            if (this.args.sourceConfig) {
+                sourceConfiguration = JSON.parse(this.args.sourceConfig);
+            }
+
+            // find a source connector by reference
+            let sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
+                (c) => c.getType() === this.args.reference
+            );
+
+            if (sourceConnectorDescription == null) {
+                for (const testConnector of CONNECTORS.filter((c) => c.hasSource())) {
+                    const supportsUri =
+                        (await testConnector.getSourceDescription())?.supportsURI(this.args.reference) ?? false;
+
+                    if (supportsUri === false) continue;
+
+                    sourceConnectionConfiguration = {
+                        ...supportsUri.connectionConfiguration,
+                        ...sourceConnectionConfiguration
+                    };
+
+                    sourceCredentialsConfiguration = {
+                        ...supportsUri.credentialsConfiguration,
+                        ...sourceCredentialsConfiguration
+                    };
+
+                    sourceConfiguration = {
+                        ...supportsUri.configuration,
+                        ...sourceConfiguration
+                    };
+
+                    sourceConnectorDescription = testConnector;
+                    break;
+                }
+            }
+
+            if (sourceConnectorDescription != null) {
+                const configureSourceResults = await configureSource(
+                    this.jobContext,
+                    sourceConnectorDescription,
+                    sourceConnectionConfiguration,
+                    sourceCredentialsConfiguration,
+                    sourceConfiguration,
+                    this.args.sourceRepositoryIdentifier,
+                    this.args.sourceCredentialsIdentifier,
+                    this.args.inspectionSeconds,
+                    false
+                );
+
+                if (configureSourceResults === false) {
+                    return { exitCode: 1 };
+                }
+
+                const schemas = Object.values(configureSourceResults.filteredSchemas);
+
+                const sourceConector = await sourceConnectorDescription?.getConnector();
+
+                if (sourceConector.requiresCredentialsConfiguration()) {
+                    this.args.sourceCredentialsIdentifier = await sourceConector.getCredentialsIdentifierFromConfiguration(
+                        sourceConnectionConfiguration,
+                        sourceCredentialsConfiguration
+                    );
+                }
+
+                this.args.sourceConnectionConfig = JSON.stringify(sourceConnectionConfiguration);
+                this.args.sourceConfig = JSON.stringify(sourceConfiguration);
+
+                // Build a temporary in memory package file
+                packageFileWithContext = {
+                    cantSaveReason: "SAVE_NOT_AVAILABLE",
+                    contextType: "temporary",
+                    hasPermissionToSave: false,
+                    licenseFileUrl: "",
+                    readmeFileUrl: "",
+                    packageFileUrl: "",
+                    permitsSaving: false,
+                    save: () => {
+                        throw new Error("Save not available");
+                    },
+                    catalogSlug: "",
+                    packageFile: {
+                        $schema: CURRENT_PACKAGE_FILE_SCHEMA_URL,
+                        canonical: true,
+                        description: "temporary package file generated by datapm fetch command",
+                        displayName: "Temp Package",
+                        generatedBy: "datapm fetch command",
+                        packageSlug: "tmp-package",
+                        schemas,
+                        sources: [configureSourceResults.source],
+                        updatedDate: new Date(),
+                        version: "0.0.0"
+                    }
+                };
+            }
+        }
+
+        if (packageFileWithContext == null) {
+            this.jobContext.print(
+                "ERROR",
+                "Could not find package or source by the reference '" + this.args.reference + "'"
+            );
             return {
                 exitCode: 1
             };
@@ -125,8 +404,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 return leastPrecise(prev, curr);
             });
 
-        await task.end("SUCCESS", `Found ${packageFile.displayName}`);
-
         let recordCountText = numeral(schemaDescriptionRecordCount).format("0a") + "";
         if (recordCountPrecision === CountPrecision.APPROXIMATE) {
             recordCountText = `approximpately ${recordCountText} `;
@@ -136,6 +413,65 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         recordCountText = `${schemaCount} schemas with ${recordCountText} records`;
         this.jobContext.print("INFO", recordCountText);
 
+        /** PROMPT USER TO EXCLUDE AND RENAME PROPERTIES IN SCHEMAS */
+
+        const excludedSchemaPropertiesDefined = this.args.excludeSchemaProperties != null;
+        const renamedSchemaPropertiesDefined = this.args.renameSchemaProperties != null;
+
+        for (const schema of packageFile.schemas) {
+            this.jobContext.setCurrentStep(schema.title + " Schema Options");
+
+            await excludeSchemaPropertyQuestions(
+                this.jobContext,
+                schema,
+                excludedSchemaPropertiesDefined, // do not prompt if the exclude properties argument was defined
+                excludedSchemaProperties
+            );
+
+            if (this.jobContext.useDefaults() || excludedSchemaPropertiesDefined) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                if (Object.values(excludedSchemaProperties[schema.title!] ?? []).length === 0) {
+                    this.jobContext.print("SUCCESS", "No properties excluded");
+                } else {
+                    this.jobContext.print(
+                        "SUCCESS",
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        "Will exclude these properties: " + excludedSchemaProperties[schema.title!].join(", ")
+                    );
+                }
+            }
+
+            await renameSchemaPropertyQuestions(
+                this.jobContext,
+                schema,
+                renamedSchemaPropertiesDefined, // do not prompt if the renmaed properties argument was defined
+                renamedSchemaProperties
+            );
+
+            if (this.jobContext.useDefaults() || renamedSchemaPropertiesDefined) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                if (Object.values(renamedSchemaProperties[schema.title!] ?? {}).length === 0) {
+                    this.jobContext.print("SUCCESS", "No properties will be renamed");
+                } else {
+                    this.jobContext.print(
+                        "SUCCESS",
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        "Will rename these properties:"
+                    );
+
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    for (const propertyKey of Object.keys(renamedSchemaProperties[schema.title!])) {
+                        this.jobContext.print(
+                            "NONE",
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            `\t${propertyKey} to ${renamedSchemaProperties[schema.title!][propertyKey]}`
+                        );
+                    }
+                }
+            }
+        }
+
+        /** INSPECT SOURCES */
         const sourcesAndInspectionResults: {
             source: Source;
             inspectionResult: InspectionResults;
@@ -168,7 +504,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     type: ParameterType.AutoComplete,
                     configuration: {},
                     name: "type",
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     options: sinkDescriptions.map((sink) => {
                         return {
                             title: sink.getDisplayName(),
@@ -213,11 +549,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         }
 
         // Finding sink
-        task = await this.jobContext.startTask(`Finding the sink named ${sinkType}`);
+        const task = await this.jobContext.startTask(`Finding the sink named ${sinkType}`);
 
         const sinkConnectorDescription = getConnectorDescriptionByType(sinkType);
 
-        if (sinkConnectorDescription == null) throw new Error("Could not find repository description for " + sinkType);
+        if (sinkConnectorDescription == null) throw new Error("Could not find connector for type " + sinkType);
 
         const sinkConnector = await sinkConnectorDescription?.getConnector();
 
@@ -227,7 +563,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         let parameterCount = 0;
 
-        const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
+        const obtainSinkConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
             sinkConnector,
             sinkConnectionConfiguration,
@@ -235,16 +571,16 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.args.defaults
         );
 
-        if (obtainConnectionConfigurationResult === false) {
+        if (obtainSinkConfigurationResult === false) {
             this.jobContext.print("ERROR", "User canceled");
             return {
                 exitCode: 1
             };
         }
 
-        sinkConnectionConfiguration = obtainConnectionConfigurationResult.connectionConfiguration;
+        sinkConnectionConfiguration = obtainSinkConfigurationResult.connectionConfiguration;
 
-        parameterCount += obtainConnectionConfigurationResult.parameterCount;
+        parameterCount += obtainSinkConfigurationResult.parameterCount;
 
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
@@ -284,7 +620,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             try {
                 sinkConfiguration = JSON.parse(this.args.sinkConfig);
             } catch (error) {
-                this.jobContext.print("ERROR", "ERROR_PARSING_SINK_CONFIG");
+                console.log("sink config is: " + this.args.sinkConfig);
+                this.jobContext.print("ERROR", "ERROR_PARSING_SINK_CONFIG: " + error.message);
                 return {
                     exitCode: 1
                 };
@@ -294,7 +631,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         const sink = await sinkDescription.loadSinkFromModule();
 
         this.jobContext.setCurrentStep(sinkConnectorDescription.getDisplayName() + " Configuration");
-        parameterCount += await repeatedlyPromptParameters(
+        const sinkParameterCount = await repeatedlyPromptParameters(
             this.jobContext,
             async () => {
                 return sink.getParameters(
@@ -309,6 +646,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             },
             this.args.defaults || false
         );
+
+        parameterCount += sinkParameterCount;
+
+        if (sinkParameterCount === 0) {
+            this.jobContext.print("SUCCESS", "No parameters to configure");
+        }
 
         // Write records
         let interupted: false | string = false;
@@ -353,9 +696,18 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 packageFileWithContext,
                 parameterCount,
                 sink,
+                sinkConnectionConfiguration: obtainSinkConfigurationResult.connectionConfiguration,
                 sinkConfiguration,
-                repositoryIdentifier: obtainConnectionConfigurationResult.repositoryIdentifier,
-                credentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier
+                sinkRepositoryIdentifier: obtainSinkConfigurationResult.repositoryIdentifier,
+                sinkCredentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier,
+                sourceConnectionConfiguration: this.args.sourceConnectionConfig
+                    ? JSON.parse(this.args.sourceConnectionConfig)
+                    : undefined,
+                sourceCredentialsIdentiifier: this.args.sourceCredentialsConfig,
+                sourceConfiguration: this.args.sourceConfig ? JSON.parse(this.args.sourceConfig) : undefined,
+                sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier,
+                excludedSchemaProperties,
+                renamedSchemaProperties
             }
         };
     }
@@ -416,6 +768,8 @@ export async function fetchMultiple(
                 }
 
                 await task.end("SUCCESS", "New records may be available");
+            } else {
+                jobContext.print("SUCCESS", "Force update enabled, not checking state");
             }
 
             const streamSet = source.streamSets.find((s) => s.slug === streamSetPreview.slug);
@@ -449,12 +803,18 @@ export async function fetchMultiple(
 
         let fetchStatus: FetchStatus = FetchStatus.OPENING_STREAM;
 
+        let lastFetchStatus: FetchStatus | undefined;
+
         const fetchPromise = fetch(
             jobContext,
             {
                 state: (state) => {
                     fetchStatus = state.resource.status;
-                    task.setMessage(state.resource.status.toString() + " " + state.resource.name);
+
+                    if (lastFetchStatus !== fetchStatus) {
+                        task.setMessage(state.resource.status.toString() + " " + state.resource.name);
+                    }
+                    lastFetchStatus = fetchStatus;
                 },
                 progress: async (state) => {
                     latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =

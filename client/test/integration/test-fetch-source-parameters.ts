@@ -83,11 +83,19 @@ describe("Fetch Missing Source Parameters", function () {
             ["airports-small.datapm.json"],
             [
                 {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
                     message: "Header row line number?",
                     input: "1" + KEYS.ENTER
                 },
                 {
-                    message: "Connector?",
+                    message: "Sink Connector?",
                     input: "Local " + KEYS.ENTER
                 },
                 {
@@ -98,10 +106,7 @@ describe("Fetch Missing Source Parameters", function () {
                     message: "File Location?",
                     input: "tmp-files/airports-small" + KEYS.ENTER
                 }
-            ],
-            async (line: string) => {
-                console.log(line);
-            }
+            ]
         );
 
         expect(result.code).eq(0);

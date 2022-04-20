@@ -112,8 +112,16 @@ describe("FTX Source", () => {
             "fetch",
             ["ftx-btc-usd-trades.datapm.json"],
             [
+                                {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
                 {
-                    message: "Connector?",
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {
@@ -169,8 +177,16 @@ describe("FTX Source", () => {
             "fetch",
             ["ftx-btc-usd-trades.datapm.json"],
             [
+                                {
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
                 {
-                    message: "Connector?",
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

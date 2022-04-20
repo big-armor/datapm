@@ -43,26 +43,50 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         console.log("");
         console.log(chalk.grey("Next time you can run this same configuration in a single command."));
 
-        const defaultRemovedParameterValues: DPMConfiguration = { ...jobResult.result.sinkConfiguration };
+        const sinkConfigRemovedParameterValues: DPMConfiguration = { ...jobResult.result.sinkConfiguration };
         jobResult.result?.sink.filterDefaultConfigValues(
             jobResult.result.packageFileWithContext.catalogSlug,
             jobResult.result.packageFileWithContext.packageFile,
-            defaultRemovedParameterValues
+            sinkConfigRemovedParameterValues
         );
-        // This prints the password on the console :/
 
         let command = `datapm fetch ${argv.reference} `;
         if (jobResult.result.sink.getType() === STANDARD_OUT_SINK_TYPE) {
             command += "--quiet ";
         }
+
+        if (
+            jobResult.result.sourceConnectionConfiguration &&
+            Object.keys(jobResult.result.sourceConnectionConfiguration).length > 0
+        ) {
+            command += `--sourceConnectionConfig '${JSON.stringify(jobResult.result.sourceConnectionConfiguration)}' `;
+        }
+
+        if (jobResult.result.sourceConfiguration && Object.keys(jobResult.result.sourceConfiguration).length > 0) {
+            command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
+        }
+
+        if (Object.values(jobResult.result.excludedSchemaProperties).length > 0) {
+            command += `--excludeSchemaProperties '${JSON.stringify(jobResult.result.excludedSchemaProperties)}' `;
+        }
+
+        if (Object.values(jobResult.result.renamedSchemaProperties).length > 0) {
+            command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;
+        }
+
         command += `--sink ${jobResult.result.sink.getType()}`;
 
-        if (jobResult.result.repositoryIdentifier) command += " --repository " + jobResult.result.repositoryIdentifier;
+        if (jobResult.result.sinkRepositoryIdentifier)
+            command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;
 
-        if (jobResult.result.credentialsIdentifier)
-            command += " --credentials " + jobResult.result.credentialsIdentifier;
+        command += ` --sinkConnectionConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
 
-        command += ` --sinkConfig '${JSON.stringify(defaultRemovedParameterValues)}'`;
+        if (jobResult.result.sinkCredentialsIdentifier)
+            command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;
+
+        if (Object.values(sinkConfigRemovedParameterValues).length > 0) {
+            command += ` --sinkConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
+        }
 
         if (argv.defaults) command += " --defaults";
 

@@ -129,7 +129,15 @@ describe("Kafka Sink", () => {
             isDone?: boolean;
         }> = [
             {
-                message: "Connector?",
+                message: "Exclude any attributes from",
+                input: "No" + KEYS.ENTER
+            },
+            {
+                message: "Rename attributes from",
+                input: "No" + KEYS.ENTER
+            },
+            {
+                message: "Sink Connector?",
                 input: `Kafka` + KEYS.ENTER
             },
             {

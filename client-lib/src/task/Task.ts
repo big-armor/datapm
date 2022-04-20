@@ -82,6 +82,10 @@ export interface JobContext {
         reference: string | PackageIdentifier,
         modifiedOrCanonical: "modified" | "canonicalIfAvailable"
     ): Promise<PackageFileWithContext>;
+
+    /* Whether the user opted for default values for this job. Not always possible, but 
+    should be honored if possible */
+    useDefaults(): boolean;
 }
 
 export interface JobResult<T> {

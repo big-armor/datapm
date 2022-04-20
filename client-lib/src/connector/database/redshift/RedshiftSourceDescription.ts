@@ -1,4 +1,5 @@
 import { SourceDescription, Source } from "../../../connector/Source";
+import { ConnectorConfigurationSet } from "../../../main";
 import { TYPE, DISPLAY_NAME } from "./RedshiftConnectorDescription";
 
 export class RedshiftSourceDescription implements SourceDescription {
@@ -11,8 +12,17 @@ export class RedshiftSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("redshift://");
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("redshift://")) {
+            return {
+                connectionConfiguration: {
+                    uris: [uri]
+                },
+                credentialsConfiguration: {},
+                configuration: {}
+            };
+        }
+        return false;
     }
 
     async getSource(): Promise<Source> {

@@ -56,6 +56,21 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 initial: promptParameter.defaultValue,
                 choices: promptParameter.options.filter((o) => o.disabled !== true),
                 min: promptParameter.numberMinimumValue,
+                suggest: promptParameter.onChange,
+                // onState allows the user to enter text not related to an option
+                // which makes more sense for autocomplete
+                onState: function () {
+                    if (promptParameter.allowFreeFormInput === true) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const self = this as any;
+                        self.fallback = { title: self.input, description: `Selects ${self.input}`, value: self.input };
+
+                        // Check to make sure there are no suggestions so we do not override a suggestion
+                        if (self.suggestions.length === 0) {
+                            self.value = self.input;
+                        }
+                    }
+                },
                 validate: (value) => validatePromptResponse(value, promptParameter)
             };
         }

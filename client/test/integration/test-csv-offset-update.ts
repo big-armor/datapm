@@ -128,7 +128,15 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {
@@ -171,7 +179,15 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local" + KEYS.ENTER
                 },
                 {

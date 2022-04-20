@@ -16,6 +16,21 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
+const postgresSinkPromptInputs = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Hostname or IP?",
+    "Port?",
+    "Username?",
+    "Password?",
+    "Database?",
+    "Schema?",
+    "Tables?"
+];
+
+const getPostgresSinkPromptInputs = (inputs?: Array<string | null>, skip = 0, lastIndex = 20) =>
+    getPromptInputs(postgresSinkPromptInputs, inputs, skip, lastIndex);
+
 const postgresSourcePrompts = ["Hostname or IP?", "Port?", "Username?", "Password?", "Database?", "Schema?", "Tables?"];
 
 const getPostgresSourcePromptInputs = (inputs?: Array<string | null>, skip = 0, lastIndex = 20) =>
@@ -60,7 +75,9 @@ describe("Postgres Source Test", function () {
 
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE1, true);
         const prompts = [
-            ...getPostgresSourcePromptInputs([
+            ...getPostgresSinkPromptInputs([
+                "No",
+                "No",
                 postgresHost,
                 postgresPort.toString(),
                 "postgres",

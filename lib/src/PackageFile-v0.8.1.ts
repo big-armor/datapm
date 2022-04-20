@@ -2,6 +2,8 @@ import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { UpdateMethod } from "./DataHandlingUtil";
 import { DPMConfiguration } from "./main";
 
+export const CURRENT_PACKAGE_FILE_SCHEMA_URL = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
+
 export enum CountPrecision {
     EXACT = "EXACT",
     APPROXIMATE = "APPROXIMATE",
@@ -212,7 +214,7 @@ export interface Schema extends JSONSchema7 {
 
 export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
-    $schema = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
+    $schema = CURRENT_PACKAGE_FILE_SCHEMA_URL;
 
     /** Whether or not this package file is an original umodified copy. If true, the package file should be considered "golden record", and should be saveable. If false
      * this package file should be considered a modified copy.

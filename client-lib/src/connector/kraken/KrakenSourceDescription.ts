@@ -11,8 +11,8 @@ export class KrakenSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith(URI);
+    supportsURI(uri: string): false {
+        return false;
     }
 
     async getSource(): Promise<Source> {

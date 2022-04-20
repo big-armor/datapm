@@ -14,12 +14,28 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const postgresSinkPrompts = ["Hostname or IP?", "Port?", "Username?", "Password?", "Database?", "Schema?"];
+const postgresSinkPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Hostname or IP?",
+    "Port?",
+    "Username?",
+    "Password?",
+    "Database?",
+    "Schema?"
+];
 
 const getPostgresSinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(postgresSinkPrompts, inputs, skip, count);
 
-const postgresSinkPromptsWithRepository = ["Repository?", "Credentials?", "Database?", "Schema?"];
+const postgresSinkPromptsWithRepository = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Repository?",
+    "Credentials?",
+    "Database?",
+    "Schema?"
+];
 
 const getPostgresSinkPromptInputsWithRepository = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(postgresSinkPromptsWithRepository, inputs, skip, count);
@@ -82,7 +98,15 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Can't connect to invalid URI", async function () {
-        const prompts = getPostgresSinkPromptInputs(["invalid-hostname", "postgres", "password", "test-db", "schema"]);
+        const prompts = getPostgresSinkPromptInputs([
+            "No",
+            "No",
+            "invalid-hostname",
+            "postgres",
+            "password",
+            "test-db",
+            "schema"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -107,6 +131,8 @@ describe("Postgres Sink Test", function () {
         resetConfiguration();
 
         const prompts = getPostgresSinkPromptInputs([
+            "No",
+            "No",
             postgresHost,
             postgresPort.toString(),
             "username",
@@ -169,7 +195,14 @@ describe("Postgres Sink Test", function () {
     it("Should import data without error", async function () {
         resetConfiguration();
 
-        const prompts = getPostgresSinkPromptInputs([postgresHost, postgresPort.toString(), "postgres", "postgres"]);
+        const prompts = getPostgresSinkPromptInputs([
+            "No",
+            "No",
+            postgresHost,
+            postgresPort.toString(),
+            "postgres",
+            "postgres"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -237,7 +270,14 @@ describe("Postgres Sink Test", function () {
     it("Should not rewrite if there isn't any new records", async function () {
         resetConfiguration();
 
-        const prompts = getPostgresSinkPromptInputs([postgresHost, postgresPort.toString(), "postgres", "postgres"]);
+        const prompts = getPostgresSinkPromptInputs([
+            "No",
+            "No",
+            postgresHost,
+            postgresPort.toString(),
+            "postgres",
+            "postgres"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -271,6 +311,8 @@ describe("Postgres Sink Test", function () {
         resetConfiguration();
 
         const prompts = getPostgresSinkPromptInputs([
+            "No",
+            "No",
             postgresHost,
             postgresPort.toString(),
             "postgres",
@@ -311,7 +353,16 @@ describe("Postgres Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getPostgresSinkPromptInputs([postgresHost, postgresPort.toString(), "postgres", "postgres", "", ""]),
+            ...getPostgresSinkPromptInputs([
+                "No",
+                "No",
+                postgresHost,
+                postgresPort.toString(),
+                "postgres",
+                "postgres",
+                "",
+                ""
+            ]),
             {
                 message: "Integer_Float has integer and number values.",
                 input: `${KEYS.ENTER}`
@@ -448,7 +499,16 @@ describe("Postgres Sink Test", function () {
         resetConfiguration();
 
         const prompts = [
-            ...getPostgresSinkPromptInputs([postgresHost, postgresPort.toString(), "postgres", "postgres", "", ""]),
+            ...getPostgresSinkPromptInputs([
+                "No",
+                "No",
+                postgresHost,
+                postgresPort.toString(),
+                "postgres",
+                "postgres",
+                "",
+                ""
+            ]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
@@ -501,7 +561,7 @@ describe("Postgres Sink Test", function () {
 
     it("Should use saved repository config to connect again", async function () {
         const prompts = [
-            ...getPostgresSinkPromptInputsWithRepository([postgresHost, "postgres"]),
+            ...getPostgresSinkPromptInputsWithRepository(["No", "No", postgresHost, "postgres"]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
@@ -538,11 +598,15 @@ describe("Postgres Sink Test", function () {
             [
                 packageCFilePath,
                 "--forceUpdate",
+                "--excludeSchemaProperties",
+                "{}",
+                "--renameSchemaProperties",
+                "{}",
                 "--sink",
                 "postgres",
-                "--repository",
+                "--sinkRepository",
                 postgresHost + ":" + postgresPort,
-                "--credentials",
+                "--sinkAccount",
                 "postgres",
                 "--sinkConfig",
                 '{"database":"postgres","schema":"local_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'

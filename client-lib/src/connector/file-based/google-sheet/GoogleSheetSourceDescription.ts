@@ -1,4 +1,5 @@
 import { SourceDescription, Source } from "../../../connector/Source";
+import { ConnectorConfigurationSet } from "../../../main";
 import { TYPE, DISPLAY_NAME } from "./GoogleSheetConnectorDescription";
 
 export class GoogleSheetSourceDescription implements SourceDescription {
@@ -11,8 +12,17 @@ export class GoogleSheetSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("https://docs.google.com/spreadsheets") && getSpreadsheetID(uri) != null;
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("https://docs.google.com/spreadsheets") && getSpreadsheetID(uri) != null) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
+        }
+        return false;
     }
 
     async getSource(): Promise<Source> {

@@ -15,7 +15,13 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const fetchCommandPrompts = ["Connector?", "File format?", "File Location?"];
+const fetchCommandPrompts = [
+    "Exclude any attributes from",
+    "Rename attributes from",
+    "Sink Connector?",
+    "File format?",
+    "File Location?"
+];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
@@ -64,7 +70,7 @@ describe("Fetch Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("fetch", ["invalid"], prompts, async (line: string) => {
-            if (line.includes("is either not a valid package identifier")) {
+            if (line.includes("Could not find package or source by the reference")) {
                 results.messageFound = true;
             }
         });
@@ -111,7 +117,7 @@ describe("Fetch Command Tests", async function () {
         expect(results.messageFound, "Found error message").equals(true);
     });
 
-    it("Can't fetch package from non-existing registry", async function () {
+    it("Can't fetch package from non-existing catalog", async function () {
         const prompts = undefined;
         const results: TestResults = {
             exitCode: -1,
@@ -123,7 +129,7 @@ describe("Fetch Command Tests", async function () {
             [`http://localhost:${registryServerPort}/some-invalid-catalog/test-data`],
             prompts,
             async (line: string) => {
-                if (line.includes("CATALOG_NOT_FOUND")) {
+                if (line.includes("The catalog was not found")) {
                     results.messageFound = true;
                 }
             }
@@ -134,7 +140,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package with invalid sink configuration", async function () {
-        const prompts = getFetchCommandPromptInputs([]);
+        const prompts = getFetchCommandPromptInputs(["No", "No"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -177,7 +183,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Fetch package with file sink", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -264,7 +270,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["No", "No", "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false

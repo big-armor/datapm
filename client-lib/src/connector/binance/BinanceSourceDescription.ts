@@ -1,4 +1,4 @@
-import { Source, SourceDescription } from "../Source";
+import { ConnectorConfigurationSet, Source, SourceDescription } from "../Source";
 import { DISPLAY_NAME, TYPE } from "./BinanceConnectorDescription";
 
 export const URI = "wss://ws.binance.com";
@@ -12,8 +12,8 @@ export class BinanceSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith(URI);
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        return false;
     }
 
     async getSource(): Promise<Source> {

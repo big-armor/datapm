@@ -4,7 +4,7 @@ import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
-describe("Kraken Source", () => {
+describe("Kraken Ticker Source", () => {
     after(() => {
         if (fs.existsSync("kraken-eth-usd-ticker.datapm.json")) {
             fs.unlinkSync("kraken-eth-usd-ticker.datapm.json");
@@ -108,7 +108,15 @@ describe("Kraken Source", () => {
             ["kraken-eth-usd-ticker.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

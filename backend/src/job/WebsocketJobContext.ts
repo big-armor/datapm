@@ -7,8 +7,13 @@ import { BackendJobContextBase } from "./BackendJobContextBase";
 
 export class WebsocketJobContext extends BackendJobContextBase {
 
+
     constructor(public jobId:string, private socketContext:SocketContext, private socket: SocketIO.Socket, private channelName: string) {
         super(jobId, socketContext);
+    }
+
+    useDefaults(): boolean {
+        return false; // TODO make this optional?
     }
 
     parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {

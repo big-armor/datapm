@@ -9,6 +9,7 @@ export class PackageCommandArguments {
     references?: string[];
     catalogSlug?: string;
     inspectionSeconds?: number;
+    sourceConnectionConfiguration?: string;
 }
 export class PackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {

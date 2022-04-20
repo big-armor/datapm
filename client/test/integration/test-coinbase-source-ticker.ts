@@ -107,7 +107,15 @@ describe("Coinbase Ticker Source", () => {
             ["coinbase-btc-usd-ticker.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {
@@ -163,7 +171,15 @@ describe("Coinbase Ticker Source", () => {
             ["coinbase-btc-usd-ticker.datapm.json"],
             [
                 {
-                    message: "Connector?",
+                    message: "Exclude any attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Rename attributes from",
+                    input: "No" + KEYS.ENTER
+                },
+                {
+                    message: "Sink Connector?",
                     input: "Local File" + KEYS.ENTER
                 },
                 {

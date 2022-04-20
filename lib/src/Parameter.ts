@@ -31,7 +31,11 @@ export interface Parameter<T extends string = string> {
     numberMaximumValue?: number;
     stringMinimumLength?: number;
     stringMaximumLength?: number;
+    allowFreeFormInput?: boolean;
     stringRegExp?: { pattern: RegExp; message: string };
+    /** Should return the full list of choices */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onChange?: (input: string, currentOptions: ParameterOption[]) => Promise<ParameterOption[]>;
     validate?: (value: string[] | string | number | boolean, parameter: Parameter) => true | string;
 
     /** The configuration object on which the parameter value should be set. Required because
