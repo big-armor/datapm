@@ -12,7 +12,13 @@ export class PostgresSourceDescription implements SourceDescription {
     }
 
     supportsURI(uri: string): false | ConnectorConfigurationSet {
-        // TODO Implement Postgres URI parsing
+        if (uri.startsWith("postgres://")) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {}
+            };
+        }
         return false;
     }
 

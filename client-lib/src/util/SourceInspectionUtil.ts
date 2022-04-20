@@ -163,7 +163,7 @@ export async function configureSource(
         await excludeSchemaPropertyQuestions(jobContext, schema, !includePackagingQuestions, excludedSchemaProperties);
         await renameSchemaPropertyQuestions(jobContext, schema, !includePackagingQuestions, renamedSchemaProperties);
 
-        if (!jobContext.useDefaults()) await schemaSpecificQuestions(jobContext, schema);
+        if (!jobContext.useDefaults() && includePackagingQuestions) await schemaSpecificQuestions(jobContext, schema);
     }
 
     return {
