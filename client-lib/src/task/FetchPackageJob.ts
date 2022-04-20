@@ -101,7 +101,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             renamedSchemaProperties = JSON.parse(this.args.renameSchemaProperties);
         }
 
-        this.jobContext.setCurrentStep("Inspecting Package");
+        this.jobContext.setCurrentStep("Source Selection");
 
         if (this.args.reference == null) {
             const sourceConnectors = CONNECTORS.filter((c) => c.hasSource());
@@ -235,6 +235,23 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                         exitCode: 1
                     };
                 }
+
+                if (typeof error.message === "string" && error.message.includes("CATALOG_NOT_FOUND")) {
+                    await task.end("ERROR", "The catalog was not found.");
+
+                    return {
+                        exitCode: 1
+                    };
+                }
+
+                if (typeof error.message === "string" && error.message.includes("PACKAGE_NOT_FOUND")) {
+                    await task.end("ERROR", "The package was not found.");
+
+                    return {
+                        exitCode: 1
+                    };
+                }
+
                 if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
                     await task.end("ERROR", "You are not logged in to the registry.");
 
@@ -253,11 +270,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         // If the package file was not found, we need to create it
         // this assumes the user selected a source connector by its type() value
         if (packageFileWithContext == null) {
-            // find a source connector by reference
-            const sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
-                (c) => c.getType() === this.args.reference
-            );
-
             // Prompt parameters
             let sourceConnectionConfiguration: DPMConfiguration = {};
             let sourceCredentialsConfiguration: DPMConfiguration = {};
@@ -273,6 +285,35 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
             if (this.args.sourceConfig) {
                 sourceConfiguration = JSON.parse(this.args.sourceConfig);
+            }
+
+            // find a source connector by reference
+            let sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
+                (c) => c.getType() === this.args.reference
+            );
+
+            if (sourceConnectorDescription == null) {
+                if (this.args.reference.match(/^https?:\/\//)) {
+                    sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
+                        (c) => c.getType() === "http"
+                    );
+
+                    sourceConnectionConfiguration = {
+                        ...sourceConnectionConfiguration,
+                        uris: [this.args.reference]
+                    };
+                }
+
+                if (this.args.reference.startsWith("file://")) {
+                    sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
+                        (c) => c.getType() === "file"
+                    );
+
+                    sourceConfiguration = {
+                        ...sourceConfiguration,
+                        uris: [this.args.reference]
+                    };
+                }
             }
 
             if (sourceConnectorDescription != null) {
@@ -377,8 +418,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         for (const schema of packageFile.schemas) {
             this.jobContext.setCurrentStep(schema.title + " Schema Options");
 
-            if (!excludedSchemaPropertiesDefined)
-                await excludeSchemaPropertyQuestions(this.jobContext, schema, excludedSchemaProperties);
+            await excludeSchemaPropertyQuestions(
+                this.jobContext,
+                schema,
+                excludedSchemaPropertiesDefined, // do not prompt if the exclude properties argument was defined
+                excludedSchemaProperties
+            );
 
             if (this.jobContext.useDefaults() || excludedSchemaPropertiesDefined) {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -393,8 +438,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 }
             }
 
-            if (!renamedSchemaPropertiesDefined)
-                await renameSchemaPropertyQuestions(this.jobContext, schema, renamedSchemaProperties);
+            await renameSchemaPropertyQuestions(
+                this.jobContext,
+                schema,
+                renamedSchemaPropertiesDefined, // do not prompt if the renmaed properties argument was defined
+                renamedSchemaProperties
+            );
 
             if (this.jobContext.useDefaults() || renamedSchemaPropertiesDefined) {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -568,7 +617,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             try {
                 sinkConfiguration = JSON.parse(this.args.sinkConfig);
             } catch (error) {
-                this.jobContext.print("ERROR", "ERROR_PARSING_SINK_CONFIG");
+                console.log("sink config is: " + this.args.sinkConfig);
+                this.jobContext.print("ERROR", "ERROR_PARSING_SINK_CONFIG: " + error.message);
                 return {
                     exitCode: 1
                 };
@@ -578,7 +628,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         const sink = await sinkDescription.loadSinkFromModule();
 
         this.jobContext.setCurrentStep(sinkConnectorDescription.getDisplayName() + " Configuration");
-        parameterCount += await repeatedlyPromptParameters(
+        const sinkParameterCount = await repeatedlyPromptParameters(
             this.jobContext,
             async () => {
                 return sink.getParameters(
@@ -593,6 +643,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             },
             this.args.defaults || false
         );
+
+        parameterCount += sinkParameterCount;
+
+        if (sinkParameterCount === 0) {
+            this.jobContext.print("SUCCESS", "No parameters to configure");
+        }
 
         // Write records
         let interupted: false | string = false;
@@ -709,6 +765,8 @@ export async function fetchMultiple(
                 }
 
                 await task.end("SUCCESS", "New records may be available");
+            } else {
+                jobContext.print("SUCCESS", "Force update enabled, not checking state");
             }
 
             const streamSet = source.streamSets.find((s) => s.slug === streamSetPreview.slug);

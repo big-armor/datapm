@@ -65,7 +65,7 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
 
         const paths = configuration.uris as string[];
 
-        for (let i = 0; i < paths.length; i++) {
+        for (let i = 0; i < (paths?.length ?? []); i++) {
             const path = paths[i];
 
             if (!path.startsWith("file://")) {

@@ -117,7 +117,7 @@ describe("Fetch Command Tests", async function () {
         expect(results.messageFound, "Found error message").equals(true);
     });
 
-    it("Can't fetch package from non-existing registry", async function () {
+    it("Can't fetch package from non-existing catalog", async function () {
         const prompts = undefined;
         const results: TestResults = {
             exitCode: -1,
@@ -129,7 +129,7 @@ describe("Fetch Command Tests", async function () {
             [`http://localhost:${registryServerPort}/some-invalid-catalog/test-data`],
             prompts,
             async (line: string) => {
-                if (line.includes("CATALOG_NOT_FOUND")) {
+                if (line.includes("The catalog was not found")) {
                     results.messageFound = true;
                 }
             }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DerivedFrom, DPMConfiguration, ParameterType, Properties, Schema, Source, StreamSet } from "datapm-lib";
 import { ConnectorDescription } from "../connector/Connector";
 import { filterBadSchemaProperties, InspectionResults, inspectSource, inspectStreamSet, JobContext } from "../main";
@@ -159,11 +160,10 @@ export async function configureSource(
 
         SchemaUtil.printSchema(jobContext, schema);
 
-        if (includePackagingQuestions && !jobContext.useDefaults()) {
-            await excludeSchemaPropertyQuestions(jobContext, schema, excludedSchemaProperties);
-            await renameSchemaPropertyQuestions(jobContext, schema, renamedSchemaProperties);
-            await schemaSpecificQuestions(jobContext, schema);
-        }
+        await excludeSchemaPropertyQuestions(jobContext, schema, !includePackagingQuestions, excludedSchemaProperties);
+        await renameSchemaPropertyQuestions(jobContext, schema, !includePackagingQuestions, renamedSchemaProperties);
+
+        if (!jobContext.useDefaults()) await schemaSpecificQuestions(jobContext, schema);
     }
 
     return {
@@ -176,39 +176,49 @@ export async function configureSource(
 type ExcludeSchemaProperties = { [schemaTitle: string]: string[] };
 type RenameSchemaProperties = { [schemaTitle: string]: { [propertyTitle: string]: string } };
 
-/** Modifies the schema and the excludedSchemaProperties arguments
+/** Using the predefined exlcudeSchemaProperties, asks the user
+ * whether additional properties should be excluded.
+ *
+ * Modifies the schema and the excludedSchemaProperties arguments
+ *
+ * @skipQuestions - if true, skips the questions and applies the excludeSchemaProperties values to the schema
  */
 export async function excludeSchemaPropertyQuestions(
     jobContext: JobContext,
     schema: Schema,
+    skipQuestions = false,
     excludeSchemaProperties: ExcludeSchemaProperties = {}
 ): Promise<void> {
     const properties = schema.properties as Properties;
 
-    if (!jobContext.useDefaults() && Object.keys(excludeSchemaProperties || {}).length === 0) {
+    if (!jobContext.useDefaults() && !skipQuestions) {
         let promptExcludeProperties = false;
 
-        // Ignore Attributes
-        const excludeAttributesResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.AutoComplete,
-                name: "excludeProperties",
-                configuration: {},
-                message: `Exclude any attributes from ${schema.title}?`,
-                options: [
-                    {
-                        title: "No",
-                        value: false,
-                        selected: true
-                    },
-                    {
-                        title: "Yes",
-                        value: true
-                    }
-                ]
-            }
-        ]);
-        promptExcludeProperties = excludeAttributesResponse.excludeProperties === true;
+        if (Object.values(excludeSchemaProperties[schema.title!] ?? []).length === 0) {
+            // Ignore Attributes
+            const excludeAttributesResponse = await jobContext.parameterPrompt([
+                {
+                    type: ParameterType.AutoComplete,
+                    name: "excludeProperties",
+                    configuration: {},
+                    message: `Exclude any attributes from ${schema.title}?`,
+                    options: [
+                        {
+                            title: "No",
+                            value: false,
+                            selected: true
+                        },
+                        {
+                            title: "Yes",
+                            value: true
+                        }
+                    ]
+                }
+            ]);
+            promptExcludeProperties = excludeAttributesResponse.excludeProperties === true;
+        } else {
+            promptExcludeProperties = true;
+        }
 
         if (promptExcludeProperties) {
             const propertiesToExcludeResponse = await jobContext.parameterPrompt([
@@ -237,40 +247,48 @@ export async function excludeSchemaPropertyQuestions(
     });
 }
 
-/** Modifies the schema and the excludedSchemaProperties arguments
+/** Using the renameSchemaProperties argument as state,
+ * prompts the user whether to rename an properties.
+ *
+ * Modifies the schema and the excludedSchemaProperties arguments
  */
 export async function renameSchemaPropertyQuestions(
     jobContext: JobContext,
     schema: Schema,
+    skipQuestions = false,
     renameSchemaProperties: RenameSchemaProperties = {}
 ): Promise<void> {
     const properties = schema.properties as Properties;
 
     let promptToRenameAttributes = false;
 
-    if (!jobContext.useDefaults() && Object.keys(renameSchemaProperties || {}).length === 0) {
-        const renameAttributesResponse = await jobContext.parameterPrompt([
-            {
-                type: ParameterType.AutoComplete,
-                name: "renameAttributes",
-                configuration: {},
-                message: `Rename attributes from ${schema.title}?`,
-                options: [
-                    {
-                        title: "No",
-                        value: false,
-                        selected: Object.keys(renameSchemaProperties || {}).length === 0
-                    },
-                    {
-                        title: "Yes",
-                        value: true,
-                        selected: Object.keys(renameSchemaProperties || {}).length >= 0
-                    }
-                ]
-            }
-        ]);
+    if (!jobContext.useDefaults() && !skipQuestions) {
+        if (Object.keys(renameSchemaProperties[schema.title!] ?? {}).length === 0) {
+            const renameAttributesResponse = await jobContext.parameterPrompt([
+                {
+                    type: ParameterType.AutoComplete,
+                    name: "renameAttributes",
+                    configuration: {},
+                    message: `Rename attributes from ${schema.title}?`,
+                    options: [
+                        {
+                            title: "No",
+                            value: false,
+                            selected: Object.keys(renameSchemaProperties || {}).length === 0
+                        },
+                        {
+                            title: "Yes",
+                            value: true,
+                            selected: Object.keys(renameSchemaProperties || {}).length >= 0
+                        }
+                    ]
+                }
+            ]);
 
-        promptToRenameAttributes = renameAttributesResponse.renameAttributes !== "No";
+            promptToRenameAttributes = renameAttributesResponse.renameAttributes !== "No";
+        } else {
+            promptToRenameAttributes = true;
+        }
 
         if (promptToRenameAttributes) {
             const attributeNameMap: Record<string, string> = {};

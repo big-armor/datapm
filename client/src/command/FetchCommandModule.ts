@@ -55,11 +55,14 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += "--quiet ";
         }
 
-        if (jobResult.result.sourceConnectionConfiguration) {
+        if (
+            jobResult.result.sourceConnectionConfiguration &&
+            Object.keys(jobResult.result.sourceConnectionConfiguration).length > 0
+        ) {
             command += `--sourceConnectionConfig '${JSON.stringify(jobResult.result.sourceConnectionConfiguration)}' `;
         }
 
-        if (jobResult.result.sourceConfiguration) {
+        if (jobResult.result.sourceConfiguration && Object.keys(jobResult.result.sourceConfiguration).length > 0) {
             command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
         }
 
