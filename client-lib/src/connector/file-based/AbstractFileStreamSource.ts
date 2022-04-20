@@ -28,7 +28,7 @@ export abstract class AbstractFileStreamSource implements Source {
         configuration: DPMConfiguration
     ): Promise<Parameter[]>;
 
-    async inspectURIs(
+    async inspectData(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,

@@ -74,7 +74,7 @@ export class CoinbaseSource implements Source {
         return TYPE;
     }
 
-    async inspectURIs(
+    async inspectData(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,

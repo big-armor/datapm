@@ -56,6 +56,7 @@ export class StatsTransform extends Transform {
             const progressCallbackResult = this.progressCallBack(this.recordCount, this.recordsInspected);
 
             if (progressCallbackResult === "END") {
+                callback(null);
                 this.end();
                 return;
             }

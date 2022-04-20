@@ -232,6 +232,13 @@ export async function getPackageFromUrl(
         }
         if (!http.ok) throw new Error(`Failed to obtain: HTTP code ${http.status} HTTP status ${http.statusText}`);
 
+        if (
+            !http.headers.get("content-type")?.includes("application/json") &&
+            !http.headers.get("content-type")?.includes("text/plain")
+        ) {
+            throw new Error("NOT_A_PACKAGE_FILE");
+        }
+
         const packageFile = parsePackageFileJSON(await http.text());
         return new HttpPackageFileContext(packageFile, identifier);
     } else if (typeof identifier === "string" && isValidPackageIdentifier(identifier) !== false) {

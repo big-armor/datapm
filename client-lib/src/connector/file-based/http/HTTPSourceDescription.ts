@@ -1,4 +1,5 @@
 import { SourceDescription, Source } from "../../../connector/Source";
+import { ConnectorConfigurationSet } from "../../../main";
 import { TYPE, DISPLAY_NAME } from "./HTTPConnectorDescription";
 export class HTTPSourceDescription implements SourceDescription {
     sourceType(): string {
@@ -9,8 +10,17 @@ export class HTTPSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("http://") || uri.startsWith("https://");
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("http://") || uri.startsWith("https://")) {
+            return {
+                connectionConfiguration: {
+                    uris: [uri]
+                },
+                credentialsConfiguration: {},
+                configuration: {}
+            };
+        }
+        return false;
     }
 
     async getSource(): Promise<Source> {

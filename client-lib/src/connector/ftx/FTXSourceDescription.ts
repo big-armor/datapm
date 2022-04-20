@@ -10,8 +10,8 @@ export class FTXSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith(URI) || uri.startsWith(URI_US);
+    supportsURI(uri: string): false {
+        return false;
     }
 
     async getSource(): Promise<Source> {

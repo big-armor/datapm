@@ -1,4 +1,5 @@
 import { SourceDescription, Source } from "../../../connector/Source";
+import { ConnectorConfigurationSet } from "../../../main";
 import { TYPE, DISPLAY_NAME } from "./StreamTestConnectorDescription";
 
 export class StreamTestSourceDescription implements SourceDescription {
@@ -11,8 +12,17 @@ export class StreamTestSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("test://");
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("test://")) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
+        }
+        return false;
     }
 
     async getSource(): Promise<Source> {

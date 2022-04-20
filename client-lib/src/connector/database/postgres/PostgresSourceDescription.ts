@@ -1,4 +1,4 @@
-import { SourceDescription, Source } from "../../Source";
+import { SourceDescription, Source, ConnectorConfigurationSet } from "../../Source";
 import { TYPE, DISPLAY_NAME } from "./PostgresConnectorDescription";
 
 export class PostgresSourceDescription implements SourceDescription {
@@ -11,8 +11,9 @@ export class PostgresSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("postgres://");
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        // TODO Implement Postgres URI parsing
+        return false;
     }
 
     async getSource(): Promise<Source> {

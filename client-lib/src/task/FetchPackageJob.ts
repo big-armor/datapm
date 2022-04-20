@@ -221,6 +221,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
             try {
                 packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference, "modified");
+                task.end("SUCCESS", "Found package " + this.args.reference);
             } catch (error) {
                 if (typeof error.message === "string" && error.message.includes("ERROR_SCHEMA_VERSION_TOO_NEW")) {
                     await task.end("ERROR", "The package file was created by a newer version of the datapm client.");
@@ -234,25 +235,19 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     return {
                         exitCode: 1
                     };
-                }
-
-                if (typeof error.message === "string" && error.message.includes("CATALOG_NOT_FOUND")) {
+                } else if (typeof error.message === "string" && error.message.includes("CATALOG_NOT_FOUND")) {
                     await task.end("ERROR", "The catalog was not found.");
 
                     return {
                         exitCode: 1
                     };
-                }
-
-                if (typeof error.message === "string" && error.message.includes("PACKAGE_NOT_FOUND")) {
+                } else if (typeof error.message === "string" && error.message.includes("PACKAGE_NOT_FOUND")) {
                     await task.end("ERROR", "The package was not found.");
 
                     return {
                         exitCode: 1
                     };
-                }
-
-                if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
+                } else if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
                     await task.end("ERROR", "You are not logged in to the registry.");
 
                     this.jobContext.print("INFO", "Use the following command to authenticate.");
@@ -261,6 +256,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     return {
                         exitCode: 1
                     };
+                } else if (typeof error.message === "string" && error.message.includes("NOT_A_PACKAGE_FILE")) {
+                    await task.end("SUCCESS", "Not a package file. Will try to find file type.");
                 } else {
                     await task.end("ERROR", error.message);
                 }
@@ -293,26 +290,29 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             );
 
             if (sourceConnectorDescription == null) {
-                if (this.args.reference.match(/^https?:\/\//)) {
-                    sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
-                        (c) => c.getType() === "http"
-                    );
+                for (const testConnector of CONNECTORS.filter((c) => c.hasSource())) {
+                    const supportsUri =
+                        (await testConnector.getSourceDescription())?.supportsURI(this.args.reference) ?? false;
+
+                    if (supportsUri === false) continue;
 
                     sourceConnectionConfiguration = {
-                        ...sourceConnectionConfiguration,
-                        uris: [this.args.reference]
+                        ...supportsUri.connectionConfiguration,
+                        ...sourceConnectionConfiguration
                     };
-                }
 
-                if (this.args.reference.startsWith("file://")) {
-                    sourceConnectorDescription = CONNECTORS.filter((c) => c.hasSource()).find(
-                        (c) => c.getType() === "file"
-                    );
+                    sourceCredentialsConfiguration = {
+                        ...supportsUri.credentialsConfiguration,
+                        ...sourceCredentialsConfiguration
+                    };
 
                     sourceConfiguration = {
-                        ...sourceConfiguration,
-                        uris: [this.args.reference]
+                        ...supportsUri.configuration,
+                        ...sourceConfiguration
                     };
+
+                    sourceConnectorDescription = testConnector;
+                    break;
                 }
             }
 
@@ -800,12 +800,18 @@ export async function fetchMultiple(
 
         let fetchStatus: FetchStatus = FetchStatus.OPENING_STREAM;
 
+        let lastFetchStatus: FetchStatus | undefined;
+
         const fetchPromise = fetch(
             jobContext,
             {
                 state: (state) => {
                     fetchStatus = state.resource.status;
-                    task.setMessage(state.resource.status.toString() + " " + state.resource.name);
+
+                    if (lastFetchStatus !== fetchStatus) {
+                        task.setMessage(state.resource.status.toString() + " " + state.resource.name);
+                    }
+                    lastFetchStatus = fetchStatus;
                 },
                 progress: async (state) => {
                     latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =

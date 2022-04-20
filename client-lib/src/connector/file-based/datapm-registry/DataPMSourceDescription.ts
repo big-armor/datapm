@@ -10,8 +10,8 @@ export class DataPMSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        return uri.indexOf("http://") === 0 || uri.indexOf("https://") === 0;
+    supportsURI(uri: string): false {
+        return false;
     }
 
     async getSource(): Promise<Source> {

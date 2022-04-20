@@ -3,6 +3,7 @@ import isGlob from "is-glob";
 import { SourceDescription, Source } from "../../../connector/Source";
 import fs from "fs";
 import { TYPE, DISPLAY_NAME } from "./LocalFileConnectorDescription";
+import { ConnectorConfigurationSet } from "../../../main";
 
 export class LocalFileSourceDescription implements SourceDescription {
     sourceType(): string {
@@ -14,12 +15,37 @@ export class LocalFileSourceDescription implements SourceDescription {
         return DISPLAY_NAME;
     }
 
-    supportsURI(uri: string): boolean {
-        if (uri.startsWith("file://")) return true;
+    supportsURI(uri: string): false | ConnectorConfigurationSet {
+        if (uri.startsWith("file://"))
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
 
-        if (isGlob(uri) && fs.existsSync(globParent(uri))) return true;
+        if (isGlob(uri) && fs.existsSync(globParent(uri))) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
+        }
 
-        return fs.existsSync(uri);
+        if (fs.existsSync(uri)) {
+            return {
+                connectionConfiguration: {},
+                credentialsConfiguration: {},
+                configuration: {
+                    uris: [uri]
+                }
+            };
+        }
+
+        return false;
     }
 
     async getSource(): Promise<Source> {

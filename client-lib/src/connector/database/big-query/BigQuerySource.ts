@@ -155,7 +155,7 @@ export class BigQuerySource implements Source {
         return parameters;
     }
 
-    async inspectURIs(
+    async inspectData(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,

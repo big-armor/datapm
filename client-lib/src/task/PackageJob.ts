@@ -326,7 +326,7 @@ export async function inspectSource(
     configuration: DPMConfiguration
 ): Promise<InspectionResults> {
     // Inspecting URL
-    const uriInspectionResults = await source.inspectURIs(
+    const uriInspectionResults = await source.inspectData(
         connectionConfiguration,
         credentialsConfiguration,
         configuration,

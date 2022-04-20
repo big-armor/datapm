@@ -101,7 +101,7 @@ export class StreamTestSource implements Source {
         return [];
     }
 
-    async inspectURIs(
+    async inspectData(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,

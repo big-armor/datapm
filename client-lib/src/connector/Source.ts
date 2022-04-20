@@ -71,6 +71,12 @@ export interface InspectionResults {
     streamSetPreviews: StreamSetPreview[];
 }
 
+export type ConnectorConfigurationSet = {
+    connectionConfiguration: DPMConfiguration;
+    credentialsConfiguration: DPMConfiguration;
+    configuration: DPMConfiguration;
+};
+
 export interface SourceDescription {
     /** A universally unique identifier for the source implementation. */
     sourceType(): string;
@@ -81,7 +87,7 @@ export interface SourceDescription {
     /** Given a full or partial URI, return a boolean as to whether it could be supported. Example, a MySQL implementation
      * would return true for the string 'mysql://` or even just `mysql.
      */
-    supportsURI(uri: string): boolean;
+    supportsURI(uri: string): false | ConnectorConfigurationSet;
 
     /** Returns an instance of the source. Use a delayed import pattern to ensure that loading of dependencies is
      * delayed until the source is actually used. */
@@ -92,7 +98,7 @@ export interface Source {
     sourceType(): string;
 
     /** Inspects a given URI and returns an InspectionResult, which includes stream set previews */
-    inspectURIs(
+    inspectData(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
