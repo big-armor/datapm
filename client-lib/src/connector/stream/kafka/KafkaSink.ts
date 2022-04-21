@@ -184,7 +184,16 @@ export class KafkaSink implements Sink {
 
         const kafka = new Kafka({
             brokers,
-            clientId: configuration.clientId
+            clientId: configuration.clientId,
+            ssl: connectionConfiguration.useSsl === true,
+            sasl:
+                credentialsConfiguration.authenticationMechanism === "plain"
+                    ? {
+                          mechanism: "plain",
+                          username: credentialsConfiguration.username as string,
+                          password: credentialsConfiguration.password as string
+                      }
+                    : undefined
         });
 
         if (configuration.createTopics === true) {
@@ -198,15 +207,27 @@ export class KafkaSink implements Sink {
 
             const existingTopics = await kafka.admin().listTopics();
             if (!existingTopics.includes(topic)) {
-                await kafka.admin().createTopics({
-                    topics: [
-                        {
-                            topic,
-                            numPartitions: configuration.numParitions,
-                            replicationFactor: configuration.replicationFactor
+                try {
+                    await kafka.admin().createTopics({
+                        topics: [
+                            {
+                                topic,
+                                numPartitions: configuration.numParitions,
+                                replicationFactor: configuration.replicationFactor
+                            }
+                        ]
+                    });
+                } catch (error) {
+                    jobContext.print("ERROR", "Error while creating topic: " + error.message);
+
+                    if (error.errors && error.errors.length > 0) {
+                        for (const err of error.errors as { message: string }[]) {
+                            jobContext.print("ERROR", err.message);
                         }
-                    ]
-                });
+                    }
+                    console.log(JSON.stringify(error));
+                    throw error;
+                }
             }
         }
 

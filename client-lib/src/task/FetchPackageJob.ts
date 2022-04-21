@@ -317,6 +317,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     sourceConnectorDescription = testConnector;
                     break;
                 }
+            } else {
+                this.jobContext.print(
+                    "SUCCESS",
+                    "Using source connector " + sourceConnectorDescription.getDisplayName()
+                );
             }
 
             if (sourceConnectorDescription != null) {
