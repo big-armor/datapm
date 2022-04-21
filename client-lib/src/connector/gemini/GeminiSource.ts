@@ -6,7 +6,6 @@ import { TYPE, URI_BASE } from "./GeminiConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { JobContext } from "../../task/Task";
-import { Update } from "aws-sdk/clients/dynamodb";
 
 type ChangeEvent = {
     type: "change";
@@ -189,6 +188,7 @@ export class GeminiSource implements Source {
                                         const recordContexts: RecordContext[] = [];
 
                                         for (const event of data.events) {
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             let eventData: any;
 
                                             if (event.type === "change") {
