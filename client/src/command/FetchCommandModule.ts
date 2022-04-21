@@ -66,22 +66,19 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
         }
 
-        if (Object.values(jobResult.result.excludedSchemaProperties).length > 0) {
-            command += `--excludeSchemaProperties '${JSON.stringify(jobResult.result.excludedSchemaProperties)}' `;
-        }
+        command += `--excludeSchemaProperties '${JSON.stringify(jobResult.result.excludedSchemaProperties)}' `;
 
-        if (Object.values(jobResult.result.renamedSchemaProperties).length > 0) {
-            command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;
-        }
+        command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;
 
         command += `--sink ${jobResult.result.sink.getType()}`;
 
         if (jobResult.result.sinkRepositoryIdentifier)
             command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;
 
-        command += ` --sinkConnectionConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
+        if (jobResult.result.sinkCredentialsIdentifier === undefined)
+            command += ` --sinkConnectionConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
 
-        if (jobResult.result.sinkCredentialsIdentifier)
+        if (jobResult.result.sinkCredentialsIdentifier !== undefined)
             command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;
 
         if (Object.values(sinkConfigRemovedParameterValues).length > 0) {
