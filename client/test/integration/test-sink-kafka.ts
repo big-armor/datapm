@@ -173,6 +173,14 @@ describe("Kafka Sink", () => {
                 input: "1" + KEYS.ENTER
             },
             {
+                message: "Max batch size?",
+                input: "100" + KEYS.ENTER
+            },
+            {
+                message: "Max batch wait milliseconds?",
+                input: "100" + KEYS.ENTER
+            },
+            {
                 message: "Format?",
                 input: "json" + KEYS.ENTER
             }

@@ -76,7 +76,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;
 
         if (jobResult.result.sinkCredentialsIdentifier === undefined)
-            command += ` --sinkConnectionConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
+            command += ` --sinkConnectionConfig '${JSON.stringify(jobResult.result.sinkConnectionConfiguration)}'`;
 
         if (jobResult.result.sinkCredentialsIdentifier !== undefined)
             command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;

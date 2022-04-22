@@ -118,10 +118,7 @@ export async function generateSchemasFromSourceStreams(
         });
     }, 1000);
 
-    const MAX_INSPECT_RECORDS = 50000;
-    const MAX_COUNT_RECORDS = 250000;
-
-    let flushingFinalRecords = false;
+    const flushingFinalRecords = false;
 
     let returnPromiseReject: (error: Error) => void;
     let returnPromiseResolve: (value: SourceStreamsInspectionResult) => void;
@@ -182,16 +179,6 @@ export async function generateSchemasFromSourceStreams(
                 currentStreamRecordCount = transformRecordCount;
                 currentStreamInspectedCount = transformRecordsInspectedCount;
 
-                if (completedStreamsRecordCount + currentStreamRecordCount >= MAX_COUNT_RECORDS) {
-                    if (!flushingFinalRecords) {
-                        flushingFinalRecords = true;
-                    }
-
-                    return "END";
-                } else if (completedStreamsRecordCount + currentStreamRecordCount >= MAX_INSPECT_RECORDS) {
-                    return "COUNT";
-                }
-
                 return "INSPECT";
             },
             schemas,
@@ -228,19 +215,17 @@ export async function generateSchemasFromSourceStreams(
 
         lastTransform = lastTransform.pipe(new BatchingTransform(1000, 100));
 
-        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(timeoutMs));
-
         lastTransform = lastTransform.pipe(statsTransform);
 
-        statsTransform.on("error", (error) => {
-            if (!flushingFinalRecords) {
-                console.error("statsTransform Error");
+        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(timeoutMs));
 
+        lastTransform.on("error", (error) => {
+            if (!flushingFinalRecords) {
                 returnPromiseReject(error);
             }
         });
 
-        statsTransform.on("end", async () => {
+        lastTransform.on("end", async () => {
             await moveToNextStream();
         });
 
