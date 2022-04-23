@@ -131,7 +131,7 @@ export class KafkaSink implements Sink {
             return [
                 {
                     name: "maxBatchWaitMs",
-                    message: "Max batch wait ms?",
+                    message: "Max batch wait milliseconds?",
                     type: ParameterType.Number,
                     numberMinimumValue: 1,
                     defaultValue: 100,
