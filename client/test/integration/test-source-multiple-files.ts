@@ -1,4 +1,12 @@
-import { createApiKey, createTestPackage, createTestUser, removePackageFiles, KEYS } from "./test-utils";
+import {
+    createApiKey,
+    createTestPackage,
+    createTestUser,
+    removePackageFiles,
+    KEYS,
+    getPromptInputs,
+    testCmd
+} from "./test-utils";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -48,23 +56,22 @@ describe("Multiple CSV Tests", function () {
     it("Should read multiple zip files with csvs", async () => {
         removePackageFiles(["non-profits"]);
 
-        const packageFilePath = await createTestPackage(
-            ["file://./test/sources/non-profits-1.zip", "file://./test/sources/non-profits-2-4.zip"],
-            true,
-            "non profits from zips",
-            "US based non profits",
-            "",
-            [
-                {
-                    message: "Is there a header line above?",
-                    input: "yes\n"
-                }
-            ]
+        const generatePackageCommandPrompts = ["Filename Regex?", "Is there a header line above?"];
+
+        const prompts = getPromptInputs(generatePackageCommandPrompts, ["\\.csv", "yes"]);
+
+        const exitCode = await testCmd(
+            "package",
+            ["--defaults", "file://./test/sources/non-profits-1.zip", "file://./test/sources/non-profits-2-4.zip"],
+            prompts,
+            async (line) => {
+                console.log(line);
+            }
         );
+        expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk(packageFilePath);
+        const packageFile = loadPackageFileFromDisk("non-profits.datapm.json");
 
-        expect(packageFilePath.endsWith("non-profits.datapm.json")).eq(true);
         expect(packageFile.displayName).equal("non-profits");
         expect(packageFile.schemas[0].recordCount).equal(396);
     });

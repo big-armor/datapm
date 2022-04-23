@@ -38,13 +38,14 @@ export class ZIPParser extends AbstractArchiveParser {
         context: JobContext
     ): Promise<FileIterator> {
         if (configuration.fileRegex == null) {
+            context.print("INFO", "Inspecting files in " + fileStreamSummary.fileName + "...");
+
             await context.parameterPrompt([
                 {
                     configuration,
                     type: ParameterType.Text,
                     name: "fileRegex",
-                    message: "Filename Regex?",
-                    defaultValue: ".*"
+                    message: "Filename Regex?"
                 }
             ]);
         }

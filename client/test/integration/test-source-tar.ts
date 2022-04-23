@@ -14,7 +14,7 @@ describe("TAR File Tests", function () {
             "Header row line number?"
         ];
 
-        const prompts = getPromptInputs(generatePackageCommandPrompts, ["leg-*.csv", "", "0"]);
+        const prompts = getPromptInputs(generatePackageCommandPrompts, ["leg-.*\\.csv", "", "0"]);
 
         const exitCode = await testCmd("package", ["--defaults", TEST_SOURCE_FILES.FILE25], prompts);
         expect(exitCode.code).equal(0);
