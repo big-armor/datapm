@@ -20,6 +20,10 @@ export class UpdateCommand implements Command {
                     .option("forceUpdate", {
                         type: "boolean",
                         describe: "Do not check state"
+                    })
+                    .option("inspectionSeconds", {
+                        type: "number",
+                        describe: "Number of seconds to wait for inspection to complete"
                     });
             },
             handler: updateCommandHandler

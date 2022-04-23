@@ -16,7 +16,7 @@ describe("Multiple CSV Tests", function () {
     });
 
     after(() => {
-        removePackageFiles(["non-profits-1"]);
+        removePackageFiles(["non-profits"]);
     });
 
     it("Should read multiple CSV files", async () => {
@@ -34,6 +34,30 @@ describe("Multiple CSV Tests", function () {
                 {
                     message: "Do you want to specify ",
                     input: KEYS.ENTER
+                }
+            ]
+        );
+
+        const packageFile = loadPackageFileFromDisk(packageFilePath);
+
+        expect(packageFilePath.endsWith("non-profits.datapm.json")).eq(true);
+        expect(packageFile.displayName).equal("non-profits");
+        expect(packageFile.schemas[0].recordCount).equal(396);
+    });
+
+    it("Should read multiple zip files with csvs", async () => {
+        removePackageFiles(["non-profits"]);
+
+        const packageFilePath = await createTestPackage(
+            ["file://./test/sources/non-profits-1.zip", "file://./test/sources/non-profits-2-4.zip"],
+            true,
+            "non profits from zips",
+            "US based non profits",
+            "",
+            [
+                {
+                    message: "Is there a header line above?",
+                    input: "yes\n"
                 }
             ]
         );

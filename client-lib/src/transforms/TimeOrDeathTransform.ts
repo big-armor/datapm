@@ -7,13 +7,13 @@ export class TimeOrDeathTransform extends Transform {
     timeout: NodeJS.Timeout | undefined;
     cancelDeath: (() => void) | undefined;
 
-    constructor(maxTimeMs: number) {
+    constructor(maxTimeMs: number, private timeToDieCallback: () => void) {
         super({ objectMode: true });
         this.maxTimeMs = maxTimeMs;
 
         this.timeout = setTimeout(() => {
             this.timeout = undefined;
-            this.end();
+            this.timeToDieCallback();
         }, this.maxTimeMs);
 
         this.cancelDeath = ON_DEATH((signal) => {
@@ -27,7 +27,7 @@ export class TimeOrDeathTransform extends Transform {
                 this.cancelDeath = undefined;
             }
 
-            this.end();
+            this.timeToDieCallback();
         });
     }
 

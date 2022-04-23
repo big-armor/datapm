@@ -217,7 +217,11 @@ export async function generateSchemasFromSourceStreams(
 
         lastTransform = lastTransform.pipe(statsTransform);
 
-        lastTransform = lastTransform.pipe(new TimeOrDeathTransform(timeoutMs));
+        lastTransform = lastTransform.pipe(
+            new TimeOrDeathTransform(timeoutMs, () => {
+                finalize(false);
+            })
+        );
 
         lastTransform.on("error", (error) => {
             if (!flushingFinalRecords) {

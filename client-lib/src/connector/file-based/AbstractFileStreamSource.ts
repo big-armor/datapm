@@ -226,7 +226,7 @@ async function inspectFileStreamSummary(
         schemaStates: {}
     });
 
-    if (fileBufferSummary.fileName) {
+    /* if (fileBufferSummary.fileName) {
         jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
     }
     if (fileBufferSummary.fileSize) {
@@ -235,7 +235,7 @@ async function inspectFileStreamSummary(
     }
     if (fileBufferSummary.detectedMimeType) {
         jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
-    }
+    } */
 
     const parser = await findParser(fileBufferSummary, configuration, jobContext);
 
