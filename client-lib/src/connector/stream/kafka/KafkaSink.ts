@@ -114,6 +114,32 @@ export class KafkaSink implements Sink {
             }
         }
 
+        if (configuration.maxBatchSize == null) {
+            return [
+                {
+                    name: "maxBatchSize",
+                    message: "Max batch size?",
+                    type: ParameterType.Number,
+                    numberMinimumValue: 1,
+                    defaultValue: 100,
+                    configuration
+                }
+            ];
+        }
+
+        if (configuration.maxBatchWaitMs == null) {
+            return [
+                {
+                    name: "maxBatchWaitMs",
+                    message: "Max batch wait milliseconds?",
+                    type: ParameterType.Number,
+                    numberMinimumValue: 1,
+                    defaultValue: 100,
+                    configuration
+                }
+            ];
+        }
+
         if (configuration.format == null) {
             return [
                 {
@@ -261,7 +287,9 @@ export class KafkaSink implements Sink {
             outputLocation: "kafka://" + brokers[0] + "/" + topic,
             writable,
             getCommitKeys: () => [],
-            transforms: [new BatchingTransform(10, 100)]
+            transforms: [
+                new BatchingTransform(configuration.maxBatchSize as number, configuration.maxBatchWaitMs as number)
+            ]
         };
     }
 

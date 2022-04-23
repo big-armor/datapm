@@ -786,6 +786,17 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         }
     }
 
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.8.1.json") {
+        const packageFile = (packageFileObject as unknown) as PackageFile;
+
+        for (const source of packageFile.sources) {
+            if (source.configuration?.filePattern != null) {
+                source.configuration.fileRegex = source.configuration.filePattern;
+                delete source.configuration.filePattern;
+            }
+        }
+    }
+
     return packageFileObject as PackageFile;
 }
 

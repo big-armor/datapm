@@ -14,10 +14,10 @@ export class StatsTransform extends Transform {
     schemas: Record<string, Schema>;
     contentLabelDetector: ContentLabelDetector;
 
-    progressCallBack: (recordCount: number, recordsInspectedCount: number) => "INSPECT" | "COUNT" | "END";
+    progressCallBack: (recordCount: number, recordsInspectedCount: number) => void;
 
     constructor(
-        progressCallback: (recordCount: number, recordsInspectedCount: number) => "INSPECT" | "COUNT" | "END",
+        progressCallback: (recordCount: number, recordsInspectedCount: number) => void,
         schemas: Record<string, Schema>,
         contentLabelDetector: ContentLabelDetector,
         opts?: TransformOptions
@@ -53,18 +53,7 @@ export class StatsTransform extends Transform {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             schema.recordCount!++;
 
-            const progressCallbackResult = this.progressCallBack(this.recordCount, this.recordsInspected);
-
-            if (progressCallbackResult === "END") {
-                callback(null);
-                this.end();
-                return;
-            }
-
-            if (progressCallbackResult === "COUNT") {
-                callback();
-                return;
-            }
+            this.progressCallBack(this.recordCount, this.recordsInspected);
 
             const typeConvertedRecord: DPMRecord = {};
 

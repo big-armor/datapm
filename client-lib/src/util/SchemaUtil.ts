@@ -31,7 +31,6 @@ import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { JobContext } from "../task/Task";
-import ON_DEATH from "death";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",

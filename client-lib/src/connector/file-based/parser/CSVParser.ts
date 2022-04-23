@@ -206,6 +206,12 @@ export class CSVParser implements Parser {
                         });
                     } catch (error) {
                         callback(error);
+                        return;
+                    }
+
+                    if (records == null) {
+                        callback();
+                        return;
                     }
 
                     if (!headerFound) {

@@ -37,13 +37,15 @@ export class ZIPParser extends AbstractArchiveParser {
         configuration: DPMConfiguration,
         context: JobContext
     ): Promise<FileIterator> {
-        if (configuration.filePattern == null) {
+        if (configuration.fileRegex == null) {
+            context.print("INFO", "Inspecting files in " + fileStreamSummary.fileName + "...");
+
             await context.parameterPrompt([
                 {
                     configuration,
                     type: ParameterType.Text,
-                    name: "filePattern",
-                    message: "Inner File Pattern?"
+                    name: "fileRegex",
+                    message: "Filename Regex?"
                 }
             ]);
         }
@@ -55,7 +57,7 @@ export class ZIPParser extends AbstractArchiveParser {
             .on("entry", (entry: Entry) => {
                 if (
                     entry.type !== "Directory" &&
-                    this.isFileNameMatched(entry.path, configuration.filePattern as string)
+                    this.isFileNameMatched(entry.path, configuration.fileRegex as string)
                 ) {
                     pendingEntries.push(entry);
                 } else {
@@ -93,11 +95,11 @@ export class ZIPParser extends AbstractArchiveParser {
         };
     }
 
-    /** Check if file name is matched with filePattern */
-    isFileNameMatched(filePath: string, filePattern: string): boolean {
+    /** Check if file name is matched with fileRegex */
+    isFileNameMatched(filePath: string, fileRegex: string): boolean {
         const segments = filePath.split("/");
         const fileName = segments[segments.length - 1];
-        const regExp = new RegExp(filePattern.replace(/\*/g, ".*"));
+        const regExp = new RegExp(fileRegex);
         return regExp.test(fileName);
     }
 }

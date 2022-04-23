@@ -7,10 +7,11 @@ import { StreamSetPreview, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
 import { nameFromFileUris } from "../../util/NameUtil";
-import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
+import { FileBufferSummary, FileStreamContext, Parser, ParserInspectionResults } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
 import path from "path";
 import { JobContext } from "../../task/Task";
+import { parser } from "@apollo/client";
 
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;
@@ -94,25 +95,14 @@ export abstract class AbstractFileStreamSource implements Source {
             throw new Error("NO_FILE_STREAM_FOUND");
         }
 
-        const fileStreamSummary = fileStreamSummaries[0];
-        const fileBufferSummary: FileBufferSummary = await getFileBufferSummary(fileStreamSummary, {
-            schemaStates: {}
-        });
+        let uriIndex = 0;
+        const fileStreamSummary = fileStreamSummaries[uriIndex];
 
-        if (fileBufferSummary.fileName) {
-            jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
-        }
-        if (fileBufferSummary.fileSize) {
-            const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
-            jobContext.print("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
-        }
-        if (fileBufferSummary.detectedMimeType) {
-            jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
-        }
-
-        const parser = await findParser(fileBufferSummary, configuration, jobContext);
-
-        const parserInspectionResults = await parser.inspectFile(fileBufferSummary, configuration, jobContext);
+        let { parserInspectionResults, parser } = await inspectFileStreamSummary(
+            jobContext,
+            configuration,
+            fileStreamSummary
+        );
 
         if (
             parserInspectionResults.updateMethods.length === 1 &&
@@ -180,22 +170,41 @@ export abstract class AbstractFileStreamSource implements Source {
             });
         } else {
             streamSetPreview.moveToNextStream = async () => {
-                const fileInspectionResult = await parserInspectionResults.moveToNextStream?.();
-                if (!fileInspectionResult) {
-                    return null;
+                let currentFileStreamContext = await parserInspectionResults.moveToNextStream?.();
+
+                if (!currentFileStreamContext) {
+                    uriIndex++;
+
+                    if (fileStreamSummaries.length <= uriIndex) {
+                        return null;
+                    }
+
+                    ({ parserInspectionResults } = await inspectFileStreamSummary(
+                        jobContext,
+                        configuration,
+                        fileStreamSummaries[uriIndex++]
+                    ));
+
+                    currentFileStreamContext = await parserInspectionResults.moveToNextStream?.();
                 }
 
+                if (!currentFileStreamContext) return null;
+
                 return {
-                    name: fileInspectionResult.fileName as string,
-                    expectedTotalRawBytes: fileInspectionResult.fileSize,
+                    name: currentFileStreamContext.fileName as string,
+                    expectedTotalRawBytes: currentFileStreamContext.fileSize,
                     updateMethod,
-                    updateHash: fileInspectionResult.lastUpdatedHash,
+                    updateHash: currentFileStreamContext.lastUpdatedHash,
                     openStream: async (sinkState: Maybe<StreamState>) => {
-                        const fileStream = await fileInspectionResult.openStream(sinkState);
+                        if (currentFileStreamContext == null) {
+                            throw new Error("currentFileStreamContext is null");
+                        }
+
+                        const fileStream = await currentFileStreamContext.openStream(sinkState);
                         return {
                             stream: fileStream.stream,
                             transforms: await parser.getTransforms(streamSetPreview.slug, configuration, {
-                                schemaStates: {}
+                                schemaStates: {} // TODO this seems like it would break resumable streams
                             }),
                             expectedTotalRawBytes: fileStream.fileSize
                         };
@@ -206,6 +215,33 @@ export abstract class AbstractFileStreamSource implements Source {
 
         return streamSetPreview;
     }
+}
+
+async function inspectFileStreamSummary(
+    jobContext: JobContext,
+    configuration: DPMConfiguration,
+    fileStreamSummary: FileStreamContext
+): Promise<{ parserInspectionResults: ParserInspectionResults; parser: Parser }> {
+    const fileBufferSummary: FileBufferSummary = await getFileBufferSummary(fileStreamSummary, {
+        schemaStates: {}
+    });
+
+    /* if (fileBufferSummary.fileName) {
+        jobContext.print("INFO", `File Name: ${fileBufferSummary.fileName}`);
+    }
+    if (fileBufferSummary.fileSize) {
+        const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
+        jobContext.print("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
+    }
+    if (fileBufferSummary.detectedMimeType) {
+        jobContext.print("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
+    } */
+
+    const parser = await findParser(fileBufferSummary, configuration, jobContext);
+
+    const parserInspectionResults = await parser.inspectFile(fileBufferSummary, configuration, jobContext);
+
+    return { parserInspectionResults, parser };
 }
 
 export async function getFileBufferSummary(
