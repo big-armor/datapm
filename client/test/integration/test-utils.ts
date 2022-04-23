@@ -418,7 +418,6 @@ export async function createTestPackage(
 
     if (defaults) {
         await testCmd("package", options, defaultPromptInputsForCSVs, async (line: string) => {
-            console.log(line);
             if (line.includes("datapm publish ")) {
                 const matches = line.match(/datapm\spublish\s(.*)/);
                 if (matches == null) throw new Error("No matches");
