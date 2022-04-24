@@ -63,10 +63,7 @@ describe("Multiple CSV Tests", function () {
         const exitCode = await testCmd(
             "package",
             ["--defaults", "file://./test/sources/non-profits-1.zip", "file://./test/sources/non-profits-2-4.zip"],
-            prompts,
-            async (line) => {
-                console.log(line);
-            }
+            prompts
         );
         expect(exitCode.code).equal(0);
 
