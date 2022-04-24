@@ -25,8 +25,6 @@ export const CONNECTORS: ConnectorDescription[] = [
     new PostgresConnectorDescription(),
     new RedshiftConnectorDescription(),
     new GoogleSheetConnectorDescription(),
-    new HTTPConnectorDescription(),
-    new LocalFileConnectorDescription(),
     new StandardOutConnectorDescription(),
     new DecodableConnectorDescription(),
     new CoinbaseConnectorDescription(),
@@ -34,7 +32,14 @@ export const CONNECTORS: ConnectorDescription[] = [
     new FTXConnectorDescription(),
     new BinanceConnectorDescription(),
     new KafkaConnectorDescription(),
-    new GeminiConnectorDescription()
+    new GeminiConnectorDescription(),
+
+    // These generic file-based connectos should always be at the bottom of the list
+    // so that more specific services are tried first during the "supportsUrl"
+    // checks
+
+    new HTTPConnectorDescription(),
+    new LocalFileConnectorDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
