@@ -152,7 +152,11 @@ export abstract class KnexSink implements Sink {
             for (const key of keys) {
                 const property = this.schema.properties[key];
 
-                const value: DPMRecordValue = chunk.recordContext.record[key];
+                if (property.title == null) throw new Error(`Property ${key} has no title`);
+
+                let propertyTtile = this.getSafeColumnName(property.title);
+
+                const value: DPMRecordValue = chunk.recordContext.record[propertyTtile];
 
                 if (value == null || value === "") {
                     // "" values are turned into nulls. Is that the right thing to do?
@@ -160,8 +164,6 @@ export abstract class KnexSink implements Sink {
                 }
 
                 const formats = (property.format || "").split(",").filter((type) => type !== "null");
-
-                let dbKey = this.getSafeTableName(key);
 
                 let valueType = discoverValueType(value);
                 if (formats.length === 1) {
@@ -178,12 +180,18 @@ export abstract class KnexSink implements Sink {
                     } else if (typeAppend === "date" && !formats.includes("date")) {
                         typeAppend = "date-time";
                     }
-                    dbKey += "-" + typeAppend;
+                    propertyTtile += "-" + typeAppend;
                 }
-                insertRecord[dbKey] = convertValueByValueType(value, valueType);
+                insertRecord[propertyTtile] = convertValueByValueType(value, valueType);
             }
 
             this.pendingInserts.push({ insertRecord: insertRecord, originalRecord: chunk });
+
+            if (this.pendingInserts.length >= 100) {
+                await this.flushPendingInserts(transform);
+
+                this.pendingInserts = [];
+            }
         }
 
         if (this.pendingInserts.length >= 100) {
@@ -204,12 +212,14 @@ export abstract class KnexSink implements Sink {
     buildTableFromSchema(tableBuilder: CreateTableBuilder, schema: Schema): void {
         if (schema.properties == null) throw new Error("Schema properties are required for " + tableBuilder);
 
-        const propertyTitles = Object.keys(schema.properties);
+        const propertyKeys = Object.keys(schema.properties);
 
-        for (const propertyTitle of propertyTitles) {
-            const property = schema.properties[propertyTitle];
+        for (const propertyKey of propertyKeys) {
+            const property = schema.properties[propertyKey];
 
-            const key = this.getSafeTableName(propertyTitle);
+            if (property.title == null) throw new Error("Property title is required for " + propertyKey);
+
+            const title = this.getSafeTableName(property.title);
 
             if (property.type === undefined) {
                 // Log a warning
@@ -234,17 +244,17 @@ export abstract class KnexSink implements Sink {
                         throw new Error("relationships not yet supported!");
                     }
                     if (format === "boolean") {
-                        tableBuilder.boolean(key + typeAppend);
+                        tableBuilder.boolean(title + typeAppend);
                     } else if (format === "number") {
-                        tableBuilder.double(key + typeAppend);
+                        tableBuilder.double(title + typeAppend);
                     } else if (format === "integer") {
-                        tableBuilder.bigInteger(key + typeAppend);
+                        tableBuilder.bigInteger(title + typeAppend);
                     } else if (format === "date") {
-                        tableBuilder.date(key + typeAppend);
+                        tableBuilder.date(title + typeAppend);
                     } else if (format === "date-time") {
-                        tableBuilder.dateTime(key + typeAppend, { useTz: false });
+                        tableBuilder.dateTime(title + typeAppend, { useTz: false });
                     } else if (format === "string") {
-                        tableBuilder.text(key + typeAppend);
+                        tableBuilder.text(title + typeAppend);
                         // TODO use string length determine if it should be an indexable varchar
                     }
                 }
