@@ -1,6 +1,6 @@
 # DataPM
 
-[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data management platform. Use DataPM to quickly create accurate data catalogs, publish high quality data sets, and ETL data into your production systems.
+[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data distribution platform. Use DataPM to quickly create data catalogs. The DataPM client can quickly ETL the cataloged data directly into many databases, file systems, cloud platforms, etc. 
 
 See the [backend/README.md](backend/README.md) file for server side development instructions.
 
