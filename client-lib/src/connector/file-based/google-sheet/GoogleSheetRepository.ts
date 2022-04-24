@@ -25,8 +25,8 @@ export class GoogleSheetRepository implements Connector {
         return "Google Sheets"; // TODO Should probably move these from Source and Sink implementations to here
     }
 
-    async getCredentialsIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
-        return "OAuth"; // TODO Figure out how to use the Oauth token to extract a username if necessary
+    async getCredentialsIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string | undefined> {
+        return undefined; // return "OAuth"; // TODO Figure out how to use the Oauth token to extract a username if necessary
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {

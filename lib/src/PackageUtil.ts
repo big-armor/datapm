@@ -90,7 +90,7 @@ export enum DifferenceType {
     CHANGE_STREAM_UPDATE_METHOD = "CHANGE_STREAM_UPDATE_METHOD",
     CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS", // APPLIES ONLY TO PackageFileV040 and earlier
     CHANGE_STREAM_STATS = "CHANGE_STREAM_STATS",
-    CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
+    CHANGE_STREAM_UPDATE_HASH = "CHANGE_STREAM_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     HIDE_PROPERTY = "HIDE_PROPERTY",
     UNHIDE_PROPERTY = "UNHIDE_PROPERTY",
@@ -501,6 +501,7 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
             case DifferenceType.CHANGE_STREAM_UPDATE_METHOD:
+            case DifferenceType.CHANGE_SOURCE_CREDENTIALS:
                 // nothing to do
                 break;
 
