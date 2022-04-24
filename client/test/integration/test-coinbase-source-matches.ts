@@ -84,6 +84,7 @@ describe("Coinbase Matches Source", () => {
                 }
             ],
             async (line: string) => {
+                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     messageFound = true;
                 }
