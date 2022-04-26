@@ -608,6 +608,7 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
         if (valueType.format === "number") return value;
         if (valueType.type === "boolean") return typeConvertedValue ? "1.0" : "0.0";
         if (valueType.format === "integer") return `${typeConvertedValue}.0`;
+        if (valueType.type === "binary") return typeConvertedValue ? "1.0" : "0.0";
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE) {
         if (valueType.type === "date") return value;
