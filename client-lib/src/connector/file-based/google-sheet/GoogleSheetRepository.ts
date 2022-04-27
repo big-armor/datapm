@@ -3,7 +3,7 @@ import { authorize, getSpreadsheetMetadata, initOAuth2Client, setCredentials } f
 import { Connector } from "../../Connector";
 import { TYPE } from "./GoogleSheetConnectorDescription";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
-
+import { JobContext } from "../../../task/Task";
 export class GoogleSheetRepository implements Connector {
     getType(): string {
         return TYPE;
@@ -57,7 +57,8 @@ export class GoogleSheetRepository implements Connector {
 
     async getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
-        authenticationConfiguration: DPMConfiguration
+        authenticationConfiguration: DPMConfiguration,
+        jobContext: JobContext
     ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 
@@ -69,8 +70,8 @@ export class GoogleSheetRepository implements Connector {
         }
 
         if (!isAllPublic) {
-            if (process.env.GOOGLE_OAUTH_CODE == null) {
-                authorize();
+            if (authenticationConfiguration.GOOGLE_OAUTH_CODE == null) {
+                authorize(jobContext);
 
                 parameters.push({
                     configuration: authenticationConfiguration,
@@ -82,7 +83,7 @@ export class GoogleSheetRepository implements Connector {
                 return parameters;
             }
 
-            await setCredentials();
+            await setCredentials(authenticationConfiguration);
         }
 
         return parameters;
