@@ -1,7 +1,6 @@
 import bufferPeek from "buffer-peek-stream";
 import chalk from "chalk";
 import { StreamState, DPMConfiguration, UpdateMethod, Parameter, ParameterType } from "datapm-lib";
-import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
 import { StreamSetPreview, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
@@ -11,7 +10,6 @@ import { FileBufferSummary, FileStreamContext, Parser, ParserInspectionResults }
 import { asyncMap } from "../../util/AsyncUtils";
 import path from "path";
 import { JobContext } from "../../task/Task";
-import { parser } from "@apollo/client";
 
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;

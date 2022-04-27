@@ -1,7 +1,9 @@
 import chalk from "chalk";
 import fetch from "cross-fetch";
+import { DPMConfiguration } from "datapm-lib";
 import { google } from "googleapis";
 import open from "open";
+import { JobContext } from "../main";
 
 const API_KEY_FILE_URI = "https://storage.googleapis.com/datapm-public-assets/datapm-client-google-api-keys.json";
 const SCOPES = ["https://www.googleapis.com/auth/drive.readonly"];
@@ -21,18 +23,19 @@ export async function initOAuth2Client(): Promise<void> {
     oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUris[0]);
 }
 
-export function authorize(): void {
+export function authorize(jobContext: JobContext): void {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: "offline",
         scope: SCOPES
     });
-    console.log("Authorize DataPM by visiting this url:", authUrl); // TODO This will not work well for the UI version of the client
+    jobContext.print("NONE", "Authorize DataPM by visiting this url: " + authUrl);
+    // TODO GUI client will need a special parameter prompt for OAuth
     open(authUrl);
 }
 
-export async function setCredentials(): Promise<void> {
+export async function setCredentials(credentialsConfiguration: DPMConfiguration): Promise<void> {
     try {
-        const { tokens } = await oAuth2Client.getToken(process.env.GOOGLE_OAUTH_CODE as string);
+        const { tokens } = await oAuth2Client.getToken(credentialsConfiguration.GOOGLE_OAUTH_CODE as string);
         oAuth2Client.setCredentials(tokens);
     } catch (error) {
         console.log(chalk.red(error.message));
