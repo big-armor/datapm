@@ -25,6 +25,50 @@
                                     <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
                                 </mat-option>
                                 <ng-container *ngIf="autoCompleteResult">
+                                    
+                                    <mat-option *ngFor="let option of autoCompleteResult.catalogs"
+                                        [value]="option.identifier.catalogSlug">
+                                        <div class="d-flex">
+                                            <div>
+                                                <app-avatar
+                                                    class="align-top user-img"
+                                                    [catalog]="option"
+                                                    [size]="40">
+                                                </app-avatar>
+                                            </div>
+                                    
+                                            <div class="autocomplete-contents">
+                                                <div class="autocomplete-title">
+                                                    <a href="javascript:void(0)">{{
+                                                        option.identifier.catalogSlug
+                                                        }}</a>
+                                                </div>
+                                    
+                                                <div class="autocomplete-description">{{ option.description }}</div>
+                                            </div>
+                                        </div>
+                                    </mat-option>
+                                    
+
+                                    <mat-option *ngFor="let option of autoCompleteResult.collections" [value]="'collection/' + option.identifier.collectionSlug">
+                                        <div class="d-flex">
+
+                                            <div style="width:40px; height: 40px;">
+                                                &nbsp;
+                                            </div>
+                                   
+                                            <div class="autocomplete-contents">
+                                                <div class="autocomplete-title">
+                                                    <a href="javascript:void(0)">collection/{{
+                                                        option.name
+                                                        }}</a>
+                                                </div>
+                                    
+                                                <div class="autocomplete-description">{{ option.description }}</div>
+                                            </div>
+                                        </div>
+                                    </mat-option>
+
                                     <mat-option
                                         *ngFor="let option of autoCompleteResult.packages"
                                         [value]="option.identifier.catalogSlug + '/' + option.identifier.packageSlug"
@@ -41,11 +85,11 @@
 
                                             <div class="autocomplete-contents">
                                                 <div class="autocomplete-title">
-                                                    {{
+                                                    <a href="javascript:void(0)">{{
                                                         option.identifier.catalogSlug +
-                                                            " / " +
+                                                            "/" +
                                                             option.identifier.packageSlug
-                                                    }}
+                                                    }}</a>
                                                 </div>
 
                                                 <div class="autocomplete-description">{{ option.description }}</div>
