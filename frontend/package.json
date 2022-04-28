@@ -8,6 +8,7 @@
         "prestart": "npm run codegen",
         "start": "ng serve --aot --proxy-config proxy.conf.js ",
         "start:test": "npm run codegen && ng serve --aot --proxy-config proxy.test.conf.json ",
+        "start:prod": "npm run codegen && ng serve --aot --proxy-config proxy.prod.conf.js ",
         "prebuild": "npm run clean; npm run codegen",
         "build": "NODE_OPTIONS=--max-old-space-size=4096 npx ng build --prod",
         "pretest": "npm run codegen",

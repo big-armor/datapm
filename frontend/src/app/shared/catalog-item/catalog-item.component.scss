@@ -7,6 +7,7 @@
     box-shadow: none !important;
     background-color: var(--gray-7-color);
     transition: background-color 0.5s ease;
+    padding: 16px;
 
     &:hover {
         background-color: var(--custom-secondary-color);

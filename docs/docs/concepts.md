@@ -13,6 +13,10 @@ The registry holds packages, and the client performs actions such as searching f
 
 This document explains the details of each component and important associated concepts.
 
+## Demo Video
+
+<iframe width="675" height="380" src="https://www.youtube.com/embed/YHd8e1J4jS4?modestbranding=1;showinfo=0;rel=0" frameborder="0"  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Registries
 
 The public global registry is available at [datapm.io](https://datapm.io) - and this is where you should start. Data publishers push data packages to this global public registry. The public registry supports both public and private data access use cases.

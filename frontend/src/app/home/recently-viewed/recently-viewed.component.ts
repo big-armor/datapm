@@ -10,6 +10,7 @@ import { LimitAndOffset } from "src/app/shared/package-and-collection/limit-and-
 import { map } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { CollectionsResponse } from "src/app/shared/package-and-collection/collections-response";
+import { CatalogsResponse } from "src/app/shared/package-and-collection/catalogs-response";
 @Component({
     selector: "recently-viewed",
     templateUrl: "./recently-viewed.component.html",
@@ -18,6 +19,7 @@ import { CollectionsResponse } from "src/app/shared/package-and-collection/colle
 export class RecentlyViewedComponent implements OnInit {
     public collectionsQuery: Observable<CollectionsResponse>;
     public packagesQuery: Observable<PackagesResponse>;
+    public catalogsQuery: Observable<CatalogsResponse>;
 
     constructor(
         private recentlyViewedCollectionsQuery: MyRecentlyViewedCollectionsGQL,
@@ -27,6 +29,19 @@ export class RecentlyViewedComponent implements OnInit {
 
     public ngOnInit(): void {
         this.cdr.detectChanges();
+    }
+
+    public updateCatalogsFetchingQuery(limitAndOffset: LimitAndOffset): void {
+        this.catalogsQuery = new Observable((s)=> {
+            setTimeout(() => {
+                s.next({
+                    catalogs: [],
+                    hasMore: false,
+                    shouldResetCatalogs: true
+                });
+                s.complete();
+            },1);
+        });
     }
 
     public updatePackageFetchingQuery(limitAndOffset: LimitAndOffset): void {

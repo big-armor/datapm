@@ -1,10 +1,13 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { Collection, Package } from "src/generated/graphql";
+import { Catalog, Collection, Package } from "src/generated/graphql";
 import { LimitAndOffset } from "./limit-and-offset";
 import { PackagesResponse } from "./packages-response";
 import { CollectionsResponse } from "./collections-response";
 import { Observable } from "rxjs";
 import { finalize } from "rxjs/operators";
+import { CatalogsResponse } from "./catalogs-response";
+import { I } from "@angular/cdk/keycodes";
+import { Router } from "@angular/router";
 
 @Component({
     selector: "app-package-and-collection",
@@ -14,6 +17,17 @@ import { finalize } from "rxjs/operators";
 export class PackageAndCollectionComponent implements OnInit, OnChanges {
     public collections: Collection[] = [];
     public packages: Package[] = [];
+    public catalogs: Catalog[] = [];
+
+
+    constructor(
+        private router: Router,
+
+    ) {
+    }
+
+    @Input()
+    public catalogsQuery: Observable<CatalogsResponse>;
 
     @Input()
     public packagesQuery: Observable<PackagesResponse>;
@@ -33,23 +47,34 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
     @Input()
     public packagesLimit: number = 10;
 
+    @Input()
+    public catalogsLimit: number = 10;
+
     @Output()
     public onLoadCollectionsClick = new EventEmitter<LimitAndOffset>();
 
     @Output()
     public onLoadPackagesClick = new EventEmitter<LimitAndOffset>();
 
+
+    @Output()
+    public onLoadCatalogsClick = new EventEmitter<LimitAndOffset>();
+
     public loadingCollections: boolean = false;
     public loadingPackages: boolean = false;
+    public loadingCatalogs: boolean = false;
 
     public hasMoreCollections: boolean = false;
     public hasMorePackages: boolean = false;
+    public hasMoreCatalogs: boolean = false;
 
     public hasCollectionsErrors: boolean = false;
     public hasPackageErrors: boolean = false;
+    public hasCatalogErrorrs: boolean = false;
 
     public loadedCollectionsInitially: boolean = false;
     public loadedPackagesInitially: boolean = false;
+    public loadedCatalogsInitially: boolean = false;
 
     public ngOnInit(): void {
         if (!this.subtitlesPrefix) {
@@ -58,6 +83,7 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
 
         this.requestMorePackages();
         this.requestMoreCollections();
+        this.requestMoreCatalogs();
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -67,6 +93,10 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
 
         if (changes.packagesQuery && changes.packagesQuery.currentValue) {
             this.loadMorePackages();
+        }
+
+        if (changes.catalogsQuery && changes.catalogsQuery.currentValue) {
+            this.loadMoreCatalogs();
         }
     }
 
@@ -112,6 +142,27 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
             });
     }
 
+    private loadMoreCatalogs(): void {
+        this.loadingCatalogs = true;
+        this.catalogsQuery
+            .pipe(
+                finalize(() => {
+                    this.loadingCatalogs = false;
+                    this.loadedCatalogsInitially = true;
+                })
+            )
+            .subscribe((response) => {
+                if (response.catalogs) {
+                    this.catalogs = response.shouldResetCatalogs
+                        ? response.catalogs
+                        : this.catalogs.concat(response.catalogs);
+                    this.hasMorePackages = response.hasMore;
+                }
+
+                this.hasCatalogErrorrs = response.errors != null;
+            });
+    }
+
     public requestMoreCollections(): void {
         if (this.loadingCollections) {
             return;
@@ -132,5 +183,22 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
             limit: this.packagesLimit,
             offset: this.packages.length
         });
+    }
+
+    public requestMoreCatalogs(): void {        
+        if (this.loadingCatalogs) {
+            return;
+        }
+
+        this.onLoadCatalogsClick.emit({
+            limit: this.catalogsLimit,
+            offset: this.catalogs.length
+        });
+
+    }
+
+    public catalogClick(catalog: Catalog): void {
+        this.router.navigate([catalog.identifier.catalogSlug]);
+        setTimeout(() => (document.body.scrollTop = 0), 100);
     }
 }

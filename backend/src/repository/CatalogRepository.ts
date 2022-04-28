@@ -345,7 +345,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
 
         const count = this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
-                `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike))`,
+                `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike)`,
                 {
                     query,
                     queryLike: query + "%"

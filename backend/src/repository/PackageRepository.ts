@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions, Repository, Connection } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository, Connection, Brackets } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";
@@ -473,18 +473,27 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "autoCompletePackage";
 
         const queryArray = startsWith
+            .replace(process.env["REGISTRY_URL"] as string,"")
             .trim()
             .toLowerCase()
             .split(/\s+/)
             .map((s) => `%${s}%`);
 
-        const entities = await this.createQueryBuilderWithUserConditions(user)
-            .andWhere(
-                `(LOWER("PackageEntity"."slug") LIKE :startsWith OR LOWER("PackageEntity"."displayName") like all (array[:...queryArray]))`,
+        const queryBuilder = this.createQueryBuilderWithUserConditions(user);
+
+        const entities = await queryBuilder
+
+            .andWhere(new Brackets((qb) => {
+                  qb.where(`(LOWER("PackageEntity"."slug") LIKE :startsWith OR LOWER("PackageEntity"."displayName") like all (array[:...queryArray]))`,
                 {
                     startsWith: startsWith.trim().toLowerCase() + "%",
                     queryArray: queryArray
-                }
+                })
+                .orWhere(`"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :startsWith)`, {
+                    startsWith: startsWith.trim().toLowerCase() + "%"
+            
+                })
+            }) 
             )
             .addRelations(ALIAS, relations)
             .getMany();
@@ -508,11 +517,16 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
-                {
-                    query,
-                    queryLike: "%" + query + "%"
-                }
+                new Brackets((qb) => {
+                    qb.where(`(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
+                        {
+                            query,
+                            queryLike: "%" + query + "%"
+                        })
+                        .orWhere(`"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :queryLike)`, {
+                            queryLike: "%" + query + "%"
+                        })
+                })
             )
             .limit(limit)
             .offset(offSet)

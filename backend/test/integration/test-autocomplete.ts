@@ -131,7 +131,21 @@ describe("Autocomplete tests", async () => {
         );
     });
 
-    it("Should return packages display name", async function () {
+    it("Should return packages by reference", async function () {
+        let response = await userAClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "catalog-auto-complete-test-v1/package-auto-complete-test-v1"
+            }
+        });
+
+        expect(response.data?.autoComplete?.packages?.length).to.equal(1);
+        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal(
+            "package-auto-complete-test-v1"
+        );
+    });
+
+    it("Should return packages by display name", async function () {
         let response = await userAClient.query({
             query: AutoCompleteDocument,
             variables: {

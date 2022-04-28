@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { Collection, GetLatestCollectionsGQL, GetLatestPackagesGQL, Package } from "src/generated/graphql";
 import { LimitAndOffset } from "src/app/shared/package-and-collection/limit-and-offset";
-import { Observable } from "rxjs";
+import { Observable, Subscriber } from "rxjs";
 import { map } from "rxjs/operators";
 import { PackagesResponse } from "src/app/shared/package-and-collection/packages-response";
 import { CollectionsResponse } from "src/app/shared/package-and-collection/collections-response";
+import { CatalogsResponse } from "src/app/shared/package-and-collection/catalogs-response";
 @Component({
     selector: "latest",
     templateUrl: "./latest.component.html"
@@ -12,6 +13,8 @@ import { CollectionsResponse } from "src/app/shared/package-and-collection/colle
 export class LatestComponent implements OnInit {
     public packagesQuery: Observable<PackagesResponse>;
     public collectionsQuery: Observable<CollectionsResponse>;
+    public catalogsQuery: Observable<CatalogsResponse>
+    public catalogsSubscriber: Subscriber<CatalogsResponse>;
 
     constructor(
         private latestCollections: GetLatestCollectionsGQL,
@@ -21,6 +24,19 @@ export class LatestComponent implements OnInit {
 
     public ngOnInit(): void {
         this.cdr.detectChanges();
+    }
+
+    public updateCatalogsFetchingQuery(limitAndOffset: LimitAndOffset): void {
+        this.catalogsQuery = new Observable((s)=> {
+            setTimeout(() => {
+                s.next({
+                    catalogs: [],
+                    hasMore: false,
+                    shouldResetCatalogs: true
+                });
+                s.complete();
+            },1);
+        });
     }
 
     public updatePackageFetchingQuery(limitAndOffset: LimitAndOffset): void {
