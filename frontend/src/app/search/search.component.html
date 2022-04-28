@@ -9,8 +9,10 @@
                     <app-package-and-collection
                         [title]="'Packages'"
                         [subtitlesPrefix]="'Matching'"
+                        [catalogsQuery]="catalogsQuery"
                         [packagesQuery]="packagesQuery"
                         [collectionsQuery]="collectionsQuery"
+                        (onLoadCatalogsClick)="updateCatalogsFetchingQuery($event)"
                         (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
                         (onLoadCollectionsClick)="updateCollectionsFetchingQuery($event)"
                     >

@@ -7,6 +7,8 @@
                         [title]="'Recently Viewed'"
                         [packagesQuery]="packagesQuery"
                         [collectionsQuery]="collectionsQuery"
+                        [catalogsQuery]="catalogsQuery"
+                        (onLoadCatalogsClick)="updateCatalogsFetchingQuery($event)"
                         (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
                         (onLoadCollectionsClick)="updateCollectionsFetchingQuery($event)"
                     >

@@ -1,9 +1,26 @@
-<ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially; else pageLoader">
-        <div *ngIf="collections?.length">
-            <div class="container">
-                <div class="text-main-title mt-4 text-left no-pd-mobile">Collections</div>
-                <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+<ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially && loadedCatalogsInitially; else pageLoader">
+
+    <div *ngIf="catalogs?.length">
+        <div class="container mt-5">
+            <div class="text-main-title text-left no-pd-mobile">Catalogs</div>
+            <div *ngFor="let catalog of catalogs">
+                <app-catalog-item [item]="catalog" (click)="catalogClick(catalog)"></app-catalog-item>
             </div>
+    
+            <div *ngIf="hasMoreCatalogs" class="container text-center">
+                <button class="app-outlined-button ctaButton" [class.disabled]="loadingCatalogs"
+                    (click)="requestMoreCatalogs()">
+                    Load More
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="collections?.length">
+        <div class="container">
+            <div class="text-main-title mt-4 text-left no-pd-mobile">Collections</div>
+            <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+        </div>
     </div>
 
     <div *ngIf="packages.length">
@@ -29,7 +46,7 @@
         <mat-spinner [diameter]="50"></mat-spinner>
     </div>
 
-    <div *ngIf="!loadingPackages && !packages.length && !hasPackageErrors">
+    <div *ngIf="!loadingPackages && !packages.length && !collections.length && !catalogs.length && !hasPackageErrors">
         <ng-container *ngTemplateOutlet="emptyStateTemplate"></ng-container>
     </div>
 

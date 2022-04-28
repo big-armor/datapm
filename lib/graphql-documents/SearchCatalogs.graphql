@@ -6,6 +6,9 @@ query SearchCatalogs($query: String!, $limit: Int!, $offset: Int!) {
             }
             displayName
             description
+            myPermissions
         }
+        hasMore
+        count
     }
 }

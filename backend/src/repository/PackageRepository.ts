@@ -517,11 +517,16 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
-                {
-                    query,
-                    queryLike: "%" + query + "%"
-                }
+                new Brackets((qb) => {
+                    qb.where(`(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
+                        {
+                            query,
+                            queryLike: "%" + query + "%"
+                        })
+                        .orWhere(`"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :queryLike)`, {
+                            queryLike: "%" + query + "%"
+                        })
+                })
             )
             .limit(limit)
             .offset(offSet)

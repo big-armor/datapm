@@ -7,6 +7,8 @@
                         [title]="'Recently Updated'"
                         [packagesQuery]="packagesQuery"
                         [collectionsQuery]="collectionsQuery"
+                        [catalogsQuery]="catalogsQuery"
+                        (onLoadCatalogsClick)="updateCatalogsFetchingQuery($event)"
                         (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
                         (onLoadCollectionsClick)="updateCollectionFetchingQuery($event)"
                     >
