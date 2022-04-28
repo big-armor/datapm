@@ -17,6 +17,7 @@ import { FTXConnectorDescription } from "./ftx/FTXConnectorDescription";
 import { BinanceConnectorDescription } from "./binance/BinanceConnectorDescription";
 import { KafkaConnectorDescription } from "./stream/kafka/KafkaConnectorDescription";
 import { GeminiConnectorDescription } from "./gemini/GeminiConnectorDescription";
+import { TimeplusConnectorDescription } from "./timeplus/TimeplusConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -33,6 +34,7 @@ export const CONNECTORS: ConnectorDescription[] = [
     new BinanceConnectorDescription(),
     new KafkaConnectorDescription(),
     new GeminiConnectorDescription(),
+    new TimeplusConnectorDescription(),
 
     // These generic file-based connectos should always be at the bottom of the list
     // so that more specific services are tried first during the "supportsUrl"
