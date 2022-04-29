@@ -4,7 +4,7 @@ This guide describes DataPM Connectors, and how to create them.
 
 ## Quick Start
 
-The code for connectors is located in the [client-lib/src/connectors](client-lib/src/connectors) directory. There you can find many example connectors for reference.
+The code for connectors is located in the [client-lib/src/connector](src/connector) directory. There you can find many example connectors for reference.
 
 ## Important Notes
 
