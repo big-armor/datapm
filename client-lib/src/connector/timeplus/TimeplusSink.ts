@@ -9,7 +9,8 @@ import {
     SinkStateKey,
     SchemaIdentifier,
     RecordStreamContext,
-    ParameterType
+    ParameterType,
+    DPMRecord
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
@@ -26,18 +27,12 @@ import { BatchingTransform } from "../../transforms/BatchingTransform";
 type TimeplusColumn = {
     name: string;
     type: string;
-    // nullable
-    // default
-    // alias
-    // comment
 };
 
 type TimeplusColumns = Array<TimeplusColumn>;
 
 type TimeplusStream = {
     name: string;
-    // engine: string;
-    // ttl: string;
     columns: TimeplusColumns;
 };
 
@@ -45,8 +40,6 @@ type ListStreamsResponse = Array<TimeplusStream>;
 
 export class TimeplusSink implements Sink {
     activeStream: string;
-    // streamIds: Map<string, string> = new Map();
-    // connectorIds: Map<string, string> = new Map();
 
     getType(): string {
         return TYPE;
@@ -136,6 +129,9 @@ export class TimeplusSink implements Sink {
 
         if (schema.title == null) throw new Error("Schema has no title");
 
+        if (schema.properties == null) throw new Error("Schema properties not definied, and are required");
+        const keys = Object.keys(schema.properties);
+
         const authToken = getAuthToken(credentialsConfiguration);
 
         return {
@@ -153,7 +149,27 @@ export class TimeplusSink implements Sink {
                     callback: (error?: Error | null, data?: RecordStreamContext) => void
                 ) => {
                     const events = records.map((r) => r.recordContext.record);
-                    const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/${
+
+                    const columns: string[] = [];
+                    const rows: (string | undefined)[][] = [];
+                    for (let i = 0; i < events.length; i++) {
+                        const event: DPMRecord = events[i];
+                        const row = [];
+                        for (const key of keys) {
+                            const columnName = key;
+                            const columnValue = event[key];
+                            if (i === 0) {
+                                columns.push(columnName);
+                            }
+                            row.push(columnValue?.toString());
+                        }
+                        rows.push(row);
+                    }
+                    const data = {
+                        columns: columns,
+                        data: rows
+                    };
+                    const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/streams/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
                     jobContext.print("INFO", `ingestURL: ${ingestURL}`);
@@ -164,18 +180,13 @@ export class TimeplusSink implements Sink {
                             "Content-Type": "application/json",
                             Accept: "application/json"
                         },
-                        body: JSON.stringify({
-                            events
-                        })
+                        body: JSON.stringify(data)
                     });
 
-                    if (response.status !== 202) {
+                    // shall we use 202?
+                    if (response.status !== 200) {
                         callback(
-                            new Error(
-                                `Unexpected response status ${response.status} body ${JSON.stringify(
-                                    await response.json()
-                                )}`
-                            )
+                            new Error(`Unexpected response status ${response.status} body ${await response.text()}`)
                         );
                         return;
                     }
@@ -212,7 +223,6 @@ export class TimeplusSink implements Sink {
         return null;
     }
 
-    /** returns the Timeplus stream id */
     async getOrCreateStream(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
@@ -294,7 +304,7 @@ export class TimeplusSink implements Sink {
 
         return Object.keys(schema.properties).map((propertyName) => {
             const property = schema.properties?.[propertyName];
-            console.log("[debug] propertyName:" + propertyName + " property:" + JSON.stringify(property));
+            // console.log("[debug] propertyName:" + propertyName + " property:" + JSON.stringify(property));
 
             if (property == null) {
                 throw new Error("Schema property " + propertyName + " is not found");
@@ -313,7 +323,7 @@ export class TimeplusSink implements Sink {
     }
 
     getTimeplusType(types: string[], format?: string): string {
-        console.log("[debug] type:" + types + " format:" + format);
+        // console.log("[debug] type:" + types + " format:" + format);
         const removedNull = types.filter((t) => t !== "null");
 
         if (removedNull.length > 1) {
