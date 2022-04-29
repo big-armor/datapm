@@ -85,7 +85,7 @@ export class TimeplusConnector implements Connector {
     ): Promise<string | true> {
         const authToken = getAuthToken(credentialsConfiguration);
         const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-        console.log(`[jove]: loading ${url} with token ${authToken}`);
+        // console.log(`[debug] loading ${url} with token ${authToken}`);
 
         const resp = await fetch(url, {
             headers: {
@@ -93,9 +93,7 @@ export class TimeplusConnector implements Connector {
                 Accept: "application/json"
             }
         });
-        console.log(
-            `[jove]: HTTP code for testCredentials ${resp.status}, response body ${JSON.stringify(resp.json())}`
-        );
+        // console.log(`[debug]: HTTP code for testCredentials ${resp.status}, response body ${JSON.stringify(resp.json())}`);
 
         if (resp.status !== 200) {
             return "Received status code " + resp.status + " from Timeplus.";

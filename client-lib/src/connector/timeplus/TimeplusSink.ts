@@ -26,17 +26,22 @@ import { BatchingTransform } from "../../transforms/BatchingTransform";
 type TimeplusColumn = {
     name: string;
     type: string;
+    // nullable
+    // default
+    // alias
+    // comment
 };
 
 type TimeplusColumns = Array<TimeplusColumn>;
 
 type TimeplusStream = {
     name: string;
+    // engine: string;
+    // ttl: string;
+    columns: TimeplusColumns;
 };
 
-type ListStreamsResponse = {
-    items: TimeplusStream[];
-};
+type ListStreamsResponse = Array<TimeplusStream>;
 
 export class TimeplusSink implements Sink {
     activeStream: string;
@@ -97,7 +102,7 @@ export class TimeplusSink implements Sink {
                 ];
             }
 
-            this.getOrCreateStream(
+            await this.getOrCreateStream(
                 schema,
                 connectionConfiguration,
                 credentialsConfiguration,
@@ -151,7 +156,7 @@ export class TimeplusSink implements Sink {
                     const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
-                    console.log(` ingestURL: ${ingestURL}`);
+                    jobContext.print("INFO", ` ingestURL: ${ingestURL}`);
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
@@ -221,7 +226,7 @@ export class TimeplusSink implements Sink {
 
         while (true) {
             const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-            console.log("[jove]sending GET to " + url);
+            jobContext.print("INFO", "Sending GET to " + url);
 
             const response = await fetch(url, {
                 method: "GET",
@@ -230,15 +235,16 @@ export class TimeplusSink implements Sink {
                     Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                 }
             });
-            console.log("[jove]Got response with HTTP code " + response.status + " and response " + response.body);
+            const rv = await response.json();
+            jobContext.print("INFO", "Got response with HTTP code " + response.status);
 
             if (response.status !== 200) {
                 throw new Error("Failed to list Timeplus streams: " + response.statusText);
             }
 
-            const listStreamsResponse = (await response.json()) as ListStreamsResponse;
+            const listStreamsResponse = rv as ListStreamsResponse;
 
-            stream = listStreamsResponse.items.find((s) => s.name === timeplusStreamName);
+            stream = listStreamsResponse.find((s) => s.name === timeplusStreamName);
 
             if (stream) {
                 break;
