@@ -6,26 +6,25 @@ Read the [Command Line Client](https://datapm.io/docs/command-line-client/) docs
 
 # Developer Guide
 
-Use Node version 14 to build and test this client.
+Use Node version in the top level .nvmrc file (or use the `nvm use` command if you have nvm installed).
 
 ```
-# From the "client" directory
+# From the top level directory
 npm ci
-npm run build
+npm run prepare-dev-environment
 ```
 
-### How to test this client without building
-
-Use the following command to build and run the client in developer mode.
+Use the following commands to run the client.
 
 ```
+cd client
 npm run start
 ```
 
-For example you can run the search command like this:
+You can append arguments to the command as well. For example you can run the search command like this:
 
 ```
-npm run start search weather
+npm run start search tickers
 ```
 
 If you need to use command line arguments, add -- as an escape for the tailing arguments. Like this:
@@ -37,3 +36,7 @@ npm run start -- fetch noaa/weather --forceUpdate
 ## Debugging
 
 To debug, simply open this project in VSCode. Install the recommend extensions (should see a popup on first open). Then open a Javascript Debug Terminal and run any command as shown above. The debugger should automatically start and attach.
+
+## Creating a Connector
+
+Read the [CONNECTORS.md](../client-lib/CONNECTORS.md) file in the client-lib directory for information about creating source and sink connectors.
