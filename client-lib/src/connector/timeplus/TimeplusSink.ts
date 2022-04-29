@@ -110,7 +110,7 @@ export class TimeplusSink implements Sink {
     getSupportedStreamOptions(): SinkSupportedStreamOptions {
         return {
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET],
-            updateMethods: [UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS]
+            updateMethods: [UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.CONTINUOUS, UpdateMethod.BATCH_FULL_SET]
         };
     }
 
