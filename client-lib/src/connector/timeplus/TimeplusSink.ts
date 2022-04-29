@@ -156,7 +156,7 @@ export class TimeplusSink implements Sink {
                     const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
-                    jobContext.print("INFO", ` ingestURL: ${ingestURL}`);
+                    jobContext.print("INFO", `ingestURL: ${ingestURL}`);
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
@@ -172,7 +172,9 @@ export class TimeplusSink implements Sink {
                     if (response.status !== 202) {
                         callback(
                             new Error(
-                                `Unexpected response status ${response.status} body ${JSON.stringify(response.json())}`
+                                `Unexpected response status ${response.status} body ${JSON.stringify(
+                                    await response.json()
+                                )}`
                             )
                         );
                         return;
@@ -224,32 +226,26 @@ export class TimeplusSink implements Sink {
 
         let stream: TimeplusStream | undefined;
 
-        while (true) {
-            const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-            jobContext.print("INFO", "Sending GET to " + url);
+        const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
+        jobContext.print("INFO", "Sending GET to " + url);
 
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
-                }
-            });
-            const rv = await response.json();
-            jobContext.print("INFO", "Got response with HTTP code " + response.status);
-
-            if (response.status !== 200) {
-                throw new Error("Failed to list Timeplus streams: " + response.statusText);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
             }
+        });
+        const rv = await response.json();
+        jobContext.print("INFO", "Got response with HTTP code " + response.status);
 
-            const listStreamsResponse = rv as ListStreamsResponse;
-
-            stream = listStreamsResponse.find((s) => s.name === timeplusStreamName);
-
-            if (stream) {
-                break;
-            }
+        if (response.status !== 200) {
+            throw new Error("Failed to list Timeplus streams: " + response.statusText);
         }
+
+        const listStreamsResponse = rv as ListStreamsResponse;
+
+        stream = listStreamsResponse.find((s) => s.name === timeplusStreamName);
 
         if (!stream) {
             task.setMessage("Timeplus Stream " + timeplusStreamName + " does not exist, creating");
@@ -298,6 +294,7 @@ export class TimeplusSink implements Sink {
 
         return Object.keys(schema.properties).map((propertyName) => {
             const property = schema.properties?.[propertyName];
+            console.log("[debug] propertyName:" + propertyName + " property:" + JSON.stringify(property));
 
             if (property == null) {
                 throw new Error("Schema property " + propertyName + " is not found");
@@ -316,6 +313,7 @@ export class TimeplusSink implements Sink {
     }
 
     getTimeplusType(types: string[], format?: string): string {
+        console.log("[debug] type:" + types + " format:" + format);
         const removedNull = types.filter((t) => t !== "null");
 
         if (removedNull.length > 1) {
