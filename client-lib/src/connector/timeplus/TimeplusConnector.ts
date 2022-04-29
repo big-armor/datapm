@@ -84,22 +84,21 @@ export class TimeplusConnector implements Connector {
         credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
         const authToken = getAuthToken(credentialsConfiguration);
+        const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
+        console.log(`[jove]: loading ${url} with token ${authToken}`);
 
-        const accountsResponse = await fetch(`https://${connectionConfiguration.host}/api/v1beta1/streams`, {
+        const resp = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${authToken}`,
                 Accept: "application/json"
             }
         });
+        console.log(
+            `[jove]: HTTP code for testCredentials ${resp.status}, response body ${JSON.stringify(resp.json())}`
+        );
 
-        if (accountsResponse.status !== 200) {
-            return "Received status code " + accountsResponse.status + " from Timeplus.";
-        }
-
-        const accounts = await accountsResponse.json();
-
-        if (accounts.length === 0) {
-            return "No accounts found in Timeplus.";
+        if (resp.status !== 200) {
+            return "Received status code " + resp.status + " from Timeplus.";
         }
 
         return true;

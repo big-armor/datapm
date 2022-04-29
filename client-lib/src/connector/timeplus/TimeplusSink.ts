@@ -23,12 +23,12 @@ import { fetch } from "cross-fetch";
 import { SemVer } from "semver";
 import { BatchingTransform } from "../../transforms/BatchingTransform";
 
-type TimeplusSchemaProperty = {
+type TimeplusColumn = {
     name: string;
     type: string;
 };
 
-type TimeplusSchema = Array<TimeplusSchemaProperty>;
+type TimeplusColumns = Array<TimeplusColumn>;
 
 type TimeplusStream = {
     name: string;
@@ -148,22 +148,21 @@ export class TimeplusSink implements Sink {
                     callback: (error?: Error | null, data?: RecordStreamContext) => void
                 ) => {
                     const events = records.map((r) => r.recordContext.record);
-                    const response = await fetch(
-                        `https://${connectionConfiguration.host}/api/v1beta1/${
-                            configuration["stream-name-" + schema.title]
-                        }/ingest`,
-                        {
-                            method: "POST",
-                            headers: {
-                                Authorization: `Bearer ${authToken}`,
-                                "Content-Type": "application/json",
-                                Accept: "application/json"
-                            },
-                            body: JSON.stringify({
-                                events
-                            })
-                        }
-                    );
+                    const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/${
+                        configuration["stream-name-" + schema.title]
+                    }/ingest`;
+                    console.log(` ingestURL: ${ingestURL}`);
+                    const response = await fetch(ingestURL, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${authToken}`,
+                            "Content-Type": "application/json",
+                            Accept: "application/json"
+                        },
+                        body: JSON.stringify({
+                            events
+                        })
+                    });
 
                     if (response.status !== 202) {
                         callback(
@@ -214,15 +213,15 @@ export class TimeplusSink implements Sink {
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<void> {
-        const TimeplusStreamName = (configuration as Record<string, string>)[("stream-name-" + schema.title) as string];
+        const timeplusStreamName = (configuration as Record<string, string>)[("stream-name-" + schema.title) as string];
 
-        const task = await jobContext.startTask("Finding existing Timeplus Stream for " + TimeplusStreamName);
+        const task = await jobContext.startTask("Finding existing Timeplus Stream for " + timeplusStreamName);
 
         let stream: TimeplusStream | undefined;
 
         while (true) {
             const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-            task.setMessage("sending GET to " + url);
+            console.log("[jove]sending GET to " + url);
 
             const response = await fetch(url, {
                 method: "GET",
@@ -231,7 +230,7 @@ export class TimeplusSink implements Sink {
                     Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
                 }
             });
-            task.setMessage("Got response with HTTP code " + response.status + " and response " + response.body);
+            console.log("[jove]Got response with HTTP code " + response.status + " and response " + response.body);
 
             if (response.status !== 200) {
                 throw new Error("Failed to list Timeplus streams: " + response.statusText);
@@ -239,7 +238,7 @@ export class TimeplusSink implements Sink {
 
             const listStreamsResponse = (await response.json()) as ListStreamsResponse;
 
-            stream = listStreamsResponse.items.find((s) => s.name === TimeplusStreamName);
+            stream = listStreamsResponse.items.find((s) => s.name === timeplusStreamName);
 
             if (stream) {
                 break;
@@ -247,14 +246,14 @@ export class TimeplusSink implements Sink {
         }
 
         if (!stream) {
-            task.setMessage("Timeplus Stream " + TimeplusStreamName + " does not exist, creating");
+            task.setMessage("Timeplus Stream " + timeplusStreamName + " does not exist, creating");
 
-            const TimeplusSchema = this.getTimeplusSchema(schema);
+            const timeplusColumns = this.getTimeplusColumns(schema);
 
             const requestBody = JSON.stringify({
-                name: TimeplusStreamName,
+                name: timeplusStreamName,
                 // description: "Created by DataPM",
-                columns: TimeplusSchema
+                columns: timeplusColumns
             });
 
             const response = await fetch(`https://${connectionConfiguration.host}/api/v1beta1/streams`, {
@@ -280,13 +279,13 @@ export class TimeplusSink implements Sink {
 
             stream = (await response.json()) as TimeplusStream;
 
-            task.end("SUCCESS", "Created Timeplus Stream " + TimeplusStreamName);
+            task.end("SUCCESS", "Created Timeplus Stream " + timeplusStreamName);
         } else {
-            task.end("SUCCESS", "Found Timeplus Stream " + TimeplusStreamName);
+            task.end("SUCCESS", "Found Timeplus Stream " + timeplusStreamName);
         }
     }
 
-    getTimeplusSchema(schema: Schema): TimeplusSchema {
+    getTimeplusColumns(schema: Schema): TimeplusColumns {
         if (schema.properties == null) {
             throw new Error("Schema must have properties");
         }
@@ -303,6 +302,7 @@ export class TimeplusSink implements Sink {
             }
 
             return {
+                // column definition
                 name: property.title,
                 type: this.getTimeplusType(property.type as JSONSchema7TypeName[], property.format)
             };
