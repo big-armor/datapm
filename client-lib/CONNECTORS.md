@@ -4,11 +4,15 @@ This guide describes DataPM Connectors, and how to create them.
 
 ## Quick Start
 
-The code for a connectors is located in the `client-lib/src/connectors` directory. There you can find many example connectors for reference.
+The code for connectors is located in the [client-lib/src/connectors](client-lib/src/connectors) directory. There you can find many example connectors for reference.
 
-## Job Context
+## Important Notes
 
-You will notice the presence of "JobContext" the connector code. It is important to note that Connectors are used not only by the command line client, but also by the DataPM server. And may be used in other contexts in the future. The JobContext is how you should print messages, prompt the user for input, and so on.
+Do not use `console.log(...)`. Instead, use the `jobContext.print(...)` function.
+
+JobContext also contains methods for prompting the user for input, and getting information about where the job is being run. Jobs may be run not only in the client, but on the server, and other contexts in the future.
+
+Also be aware that while Connectors are implemented as classes, you can not expect a single instance of a class to be re-used across multiple jobs, or even in the same job. This is why the same configuration and jobContext arguments are spread across the method arguments. Treat each method call as independent from all other method calls - even though they are in the same class.
 
 ## Descriptor Class Pattern
 
