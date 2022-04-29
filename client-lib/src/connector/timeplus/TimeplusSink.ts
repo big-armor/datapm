@@ -172,7 +172,7 @@ export class TimeplusSink implements Sink {
                     const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/streams/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
-                    jobContext.print("INFO", `ingestURL: ${ingestURL}`);
+                    // jobContext.print("INFO", `ingestURL: ${ingestURL}`);
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
