@@ -193,6 +193,9 @@ jobs:
               with:
                   node-version: "16.14.2"
 
+            - name: Do not allow debootstrap to be installed
+              run: apt-mark hold debootstrap
+
             - name: Install Build Tools
               run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint
 
