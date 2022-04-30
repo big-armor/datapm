@@ -136,6 +136,7 @@ export class FTXSource implements Source {
                     configuration,
                     name: "markets",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs.result
                         .filter((pair) => pair.enabled && pair.type === "spot")
                         .map((asset) => {
