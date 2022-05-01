@@ -237,7 +237,7 @@ export class TimeplusSink implements Sink {
         let stream: TimeplusStream | undefined;
 
         const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-        jobContext.print("INFO", "Sending GET to " + url);
+        // jobContext.print("INFO", "Sending GET to " + url);
 
         const response = await fetch(url, {
             method: "GET",
@@ -246,7 +246,7 @@ export class TimeplusSink implements Sink {
                 Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
             }
         });
-        jobContext.print("INFO", "Got response with HTTP code " + response.status);
+        // jobContext.print("INFO", "Got response with HTTP code " + response.status);
 
         if (response.status !== 200) {
             throw new Error("Failed to list Timeplus streams: " + response.statusText);
@@ -278,13 +278,10 @@ export class TimeplusSink implements Sink {
             });
 
             if (response.status !== 201) {
-                jobContext.print("INFO", "Timeplus Request Body Below");
-                jobContext.print("INFO", requestBody);
+                // jobContext.print("INFO", "Timeplus Request Body Below");
+                // jobContext.print("INFO", requestBody);
                 throw new Error(
-                    "Unable to create Timeplus stream. Response code: " +
-                        response.status +
-                        " body: " +
-                        JSON.stringify(response.json())
+                    "Unable to create Timeplus stream. Response code: " + response.status + " body: " + response.text()
                 );
             }
 

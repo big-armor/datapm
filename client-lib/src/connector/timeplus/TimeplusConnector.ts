@@ -2,11 +2,7 @@
 import { DPMConfiguration, nameToSlug, Parameter, ParameterType } from "datapm-lib";
 import { Connector } from "../Connector";
 import { TYPE } from "./TimeplusConnectorDescription";
-import yaml from "js-yaml";
-import fs from "fs";
-import path from "path";
 import fetch from "cross-fetch";
-import os from "os";
 import { JobContext } from "../../task/Task";
 
 const printedTimeplusLoginMessage = false;
@@ -95,7 +91,6 @@ export class TimeplusConnector implements Connector {
     ): Promise<string | true> {
         const authToken = getAuthToken(credentialsConfiguration);
         const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-        // console.log(`[debug] loading ${url} with token ${authToken}`);
 
         const resp = await fetch(url, {
             headers: {
@@ -103,7 +98,6 @@ export class TimeplusConnector implements Connector {
                 Accept: "application/json"
             }
         });
-        // console.log(`[debug]: HTTP code for testCredentials ${resp.status}, response body ${JSON.stringify(resp.json())}`);
 
         if (resp.status !== 200) {
             return "Received status code " + resp.status + " from Timeplus.";
