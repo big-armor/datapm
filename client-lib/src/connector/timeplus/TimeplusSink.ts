@@ -246,13 +246,12 @@ export class TimeplusSink implements Sink {
                 Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
             }
         });
-        const rv = await response.json();
         jobContext.print("INFO", "Got response with HTTP code " + response.status);
 
         if (response.status !== 200) {
             throw new Error("Failed to list Timeplus streams: " + response.statusText);
         }
-
+        const rv = await response.json();
         const listStreamsResponse = rv as ListStreamsResponse;
 
         stream = listStreamsResponse.find((s) => s.name === timeplusStreamName);

@@ -21,22 +21,32 @@ export class TimeplusConnector implements Connector {
     }
 
     userSelectableConnectionHistory(): boolean {
-        return false;
+        return true;
     }
 
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
 
-    async getRepositoryIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
-        return "stream";
+    async getRepositoryIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string> {
+        if (typeof connectionConfiguration.host !== "string") {
+            throw new Error("Timeplus host not set");
+        }
+        return connectionConfiguration.host;
     }
 
-    getCredentialsIdentifierFromConfiguration(
+    async getCredentialsIdentifierFromConfiguration(
         _connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
-    ): Promise<string> {
-        throw new Error("Method not implemented.");
+    ): Promise<string | undefined> {
+        if (credentialsConfiguration.token != null) {
+            const token = credentialsConfiguration.token as string;
+            return token;
+            // only show the first 4 chars and the last 4 chars
+            // return token.substring(0, 4) + "**" + token.substring(token.length - 3);
+        }
+
+        return undefined;
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
