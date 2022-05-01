@@ -119,6 +119,7 @@ export class KrakenSource implements Source {
                     configuration,
                     name: "products",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: Object.keys(pairs.result)
                         .map((assetName) => {
                             const asset = pairs.result[assetName];

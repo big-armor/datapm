@@ -151,6 +151,7 @@ export class BinanceSource implements Source {
                     configuration,
                     name: "pairs",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs
                         .filter((p) => p.status === "TRADING")
                         .map((pair) => {

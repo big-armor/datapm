@@ -117,6 +117,7 @@ export class CoinbaseSource implements Source {
                     configuration,
                     name: "products",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs
                         .map((p) => {
                             return {

@@ -36,7 +36,7 @@ export const CONNECTORS: ConnectorDescription[] = [
     new GeminiConnectorDescription(),
     new TimeplusConnectorDescription(),
 
-    // These generic file-based connectos should always be at the bottom of the list
+    // These generic file-based connectors should always be at the bottom of the list
     // so that more specific services are tried first during the "supportsUrl"
     // checks
 
