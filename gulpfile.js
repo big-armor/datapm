@@ -15,7 +15,6 @@ function readPackageVersion() {
     return packageFile.version;
 }
 
-
 function installLibDependencies() {
     return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
 }

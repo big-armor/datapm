@@ -130,6 +130,7 @@ export class GeminiSource implements Source {
                     type: ParameterType.AutoCompleteMultiSelect,
                     configuration,
                     name: "symbols",
+                    multiSelectMinimumCount: 1,
                     message: "Select target pairs (symbols)",
                     options: pairs
                         .map((p) => {

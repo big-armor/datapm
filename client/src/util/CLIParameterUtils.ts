@@ -55,7 +55,8 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 hint: promptParameter.hint,
                 initial: promptParameter.defaultValue,
                 choices: promptParameter.options.filter((o) => o.disabled !== true),
-                min: promptParameter.numberMinimumValue,
+                min: promptParameter.multiSelectMinimumCount,
+                max: promptParameter.multiSelectMaximumCount,
                 suggest: promptParameter.onChange,
                 // onState allows the user to enter text not related to an option
                 // which makes more sense for autocomplete
@@ -70,8 +71,7 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                             self.value = self.input;
                         }
                     }
-                },
-                validate: (value) => validatePromptResponse(value, promptParameter)
+                }
             };
         }
 
@@ -133,6 +133,26 @@ function validatePromptResponse(value: any, parameter: Parameter): string | true
             return "Must be greater than " + parameter.numberMinimumValue;
         }
     }
+
+    if (parameter.type === ParameterType.AutoCompleteMultiSelect || parameter.type === ParameterType.MultiSelect) {
+        if (parameter.multiSelectMinimumCount != null) {
+            if (value === undefined || value.length < parameter.multiSelectMinimumCount) {
+                return (
+                    `Must select at least ${parameter.multiSelectMinimumCount} option` +
+                    (parameter.multiSelectMinimumCount > 1 ? "s" : "")
+                );
+            }
+        }
+        if (parameter.multiSelectMaximumCount != null) {
+            if (value === undefined || value.length > parameter.multiSelectMaximumCount) {
+                return (
+                    `Must select at less than ${parameter.multiSelectMinimumCount} option` +
+                    (parameter.multiSelectMaximumCount > 1 ? "s" : "")
+                );
+            }
+        }
+    }
+
     return true;
 }
 

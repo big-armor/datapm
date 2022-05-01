@@ -31,6 +31,8 @@ export interface Parameter<T extends string = string> {
     numberMaximumValue?: number;
     stringMinimumLength?: number;
     stringMaximumLength?: number;
+    multiSelectMinimumCount?: number;
+    multiSelectMaximumCount?: number;
     allowFreeFormInput?: boolean;
     stringRegExp?: { pattern: RegExp; message: string };
     /** Should return the full list of choices */
