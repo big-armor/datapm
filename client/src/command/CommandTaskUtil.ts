@@ -29,7 +29,13 @@ export class CLIJobContext implements JobContext {
 
     currentTask: Task | undefined;
 
+    parameterCount = 0;
+
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
+
+    getParameterCount(): number {
+        return this.parameterCount;
+    }
 
     useDefaults(): boolean {
         return this.argv.defaults || false;
@@ -80,6 +86,8 @@ export class CLIJobContext implements JobContext {
         const answers = await cliHandleParameters(this.argv.defaults || false, parameters);
 
         if (this.currentOraSpinner) this.currentOraSpinner.start();
+
+        this.parameterCount += parameters.length;
 
         return answers;
     }

@@ -11,7 +11,9 @@ import {
     ParameterOption,
     CATALOG_SLUG_REGEX,
     PACKAGE_SLUG_REGEX,
-    CURRENT_PACKAGE_FILE_SCHEMA_URL
+    CURRENT_PACKAGE_FILE_SCHEMA_URL,
+    Parameter,
+    ParameterAnswer
 } from "datapm-lib";
 import { Package, SearchPackagesResult, PackageIdentifier } from "../generated/graphql";
 import ON_DEATH from "death";
@@ -25,7 +27,7 @@ import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { formatRemainingTime } from "../util/DateUtil";
 import { PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageContext";
 import { repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
-import { inspectSourceConnection } from "../util/SchemaUtil";
+import { inspectSourceConnection, SourceInspectionResultInternal } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
 import { Job, JobContext, JobResult } from "./Task";
 import numeral from "numeral";
@@ -46,10 +48,15 @@ export interface FetchPackageJobResult {
     sinkConfiguration: DPMConfiguration;
     packageFileWithContext: PackageFileWithContext;
 
+    // For fetching a single source outside a package
     sourceConnectionConfiguration: DPMConfiguration;
     sourceConfiguration: DPMConfiguration;
     sourceCredentialsIdentiifier: string | undefined;
     sourceRepositoryIdentifier: string | undefined;
+
+    // For fetching from a package that requires additional
+    // source configuration
+    packageSourceConfiguration: { [sourceSlug: string]: DPMConfiguration };
 
     excludedSchemaProperties: { [key: string]: string[] };
     renamedSchemaProperties: { [key: string]: { [propertyKey: string]: string } };
@@ -66,6 +73,9 @@ export class FetchArguments {
     sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
+
+    packageSourceConfig?: string;
+
     sourceConnectionConfig?: string;
     sourceCredentialsConfig?: string;
     sourceConfig?: string;
@@ -479,11 +489,23 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         /** INSPECT SOURCES */
         const sourcesAndInspectionResults: {
             source: Source;
-            inspectionResult: InspectionResults;
+            inspectionResult: SourceInspectionResultInternal;
         }[] = [];
+
+        const packageSourceConfig: { [sourceSlug: string]: DPMConfiguration } = JSON.parse(
+            this.args.packageSourceConfig ?? "{}"
+        );
 
         for (const source of packageFile.sources) {
             this.jobContext.setCurrentStep("Inspecting " + source.slug);
+
+            if (Object.keys(packageSourceConfig).indexOf(source.slug) !== -1) {
+                source.configuration = {
+                    ...source.configuration,
+                    ...packageSourceConfig[source.slug]
+                };
+            }
+
             const inspectionResult = await inspectSourceConnection(this.jobContext, source, this.args.defaults);
 
             sourcesAndInspectionResults.push({
@@ -566,8 +588,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         await task.end("SUCCESS", `Found the connector named ${sinkType}`);
 
-        let parameterCount = 0;
-
         const obtainSinkConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
             sinkConnector,
@@ -584,8 +604,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         }
 
         sinkConnectionConfiguration = obtainSinkConfigurationResult.connectionConfiguration;
-
-        parameterCount += obtainSinkConfigurationResult.parameterCount;
 
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
@@ -605,8 +623,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         }
 
         sinkCredentialsConfiguration = obtainCredentialsConfigurationResult.credentialsConfiguration;
-
-        parameterCount += obtainCredentialsConfigurationResult.parameterCount;
 
         const sinkDescription = await sinkConnectorDescription.getSinkDescription();
 
@@ -651,8 +667,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             },
             this.args.defaults || false
         );
-
-        parameterCount += sinkParameterCount;
 
         if (sinkParameterCount === 0) {
             this.jobContext.print("SUCCESS", "No parameters to configure");
@@ -699,7 +713,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             exitCode: 0,
             result: {
                 packageFileWithContext,
-                parameterCount,
+                parameterCount: this.jobContext.getParameterCount(),
                 sink,
                 sinkConnectionConfiguration: obtainSinkConfigurationResult.connectionConfiguration,
                 sinkConfiguration,
@@ -714,7 +728,14 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 sourceConfiguration: this.args.sourceConfig ? JSON.parse(this.args.sourceConfig) : undefined,
                 sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier,
                 excludedSchemaProperties,
-                renamedSchemaProperties
+                renamedSchemaProperties,
+
+                packageSourceConfiguration: sourcesAndInspectionResults.reduce((prev, curr) => {
+                    return {
+                        ...prev,
+                        [curr.source.slug]: curr.inspectionResult.additionalConfiguration
+                    };
+                }, {})
             }
         };
     }

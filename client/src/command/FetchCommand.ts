@@ -36,13 +36,6 @@ export class FetchCommand implements Command {
                         type: "boolean",
                         describe: "Run fetch without checking state"
                     })
-                    .option("sink", {
-                        type: "string", // TODO make each sink and source a module with a light-weight description
-                        describe: "destination"
-                    })
-                    .option("sinkConfig", {
-                        type: "string"
-                    })
                     .option("sourceConnectionConfig", {
                         type: "string"
                     })
@@ -50,6 +43,16 @@ export class FetchCommand implements Command {
                         type: "string"
                     })
                     .option("sourceConfig", {
+                        type: "string"
+                    })
+                    .option("packageSourceConfig", {
+                        type: "string"
+                    })
+                    .option("sink", {
+                        type: "string", // TODO make each sink and source a module with a light-weight description
+                        describe: "destination"
+                    })
+                    .option("sinkConfig", {
                         type: "string"
                     })
                     .option("sinkConnectionConfig", {

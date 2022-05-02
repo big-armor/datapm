@@ -66,6 +66,13 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
         }
 
+        if (
+            jobResult.result.packageSourceConfiguration &&
+            Object.values(jobResult.result.packageSourceConfiguration).find((v) => Object.keys(v).length > 0) != null
+        ) {
+            command += `--packageSourceConfig '${JSON.stringify(jobResult.result.packageSourceConfiguration)}' `;
+        }
+
         command += `--excludeSchemaProperties '${JSON.stringify(jobResult.result.excludedSchemaProperties)}' `;
 
         command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;

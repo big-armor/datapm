@@ -86,6 +86,9 @@ export interface JobContext {
     /* Whether the user opted for default values for this job. Not always possible, but 
     should be honored if possible */
     useDefaults(): boolean;
+
+    /** returns the number parameters answered by the user */
+    getParameterCount(): number;
 }
 
 export interface JobResult<T> {

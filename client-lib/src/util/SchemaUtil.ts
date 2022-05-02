@@ -12,7 +12,8 @@ import {
     ParameterOption,
     ParameterAnswer,
     DPMRecordValue,
-    Parameter
+    Parameter,
+    DPMConfiguration
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -59,6 +60,10 @@ export interface RecordStreamEventContext {
     bytesReceived(streamSlug: string, byteCount: number): void;
 }
 
+export type SourceInspectionResultInternal = InspectionResults & {
+    additionalConfiguration: DPMConfiguration;
+};
+
 /** Given a source, run an inspection. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
  */
@@ -66,7 +71,7 @@ export async function inspectSourceConnection(
     jobContext: JobContext,
     source: Source,
     defaults: boolean | undefined
-): Promise<InspectionResults> {
+): Promise<SourceInspectionResultInternal> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
     if (connectorDescription == null) throw new Error(`Unable to find connector for type ${source.type}`);
@@ -121,14 +126,31 @@ export async function inspectSourceConnection(
 
     jobContext.print("INFO", "Connecting to " + repositoryIdentifier);
 
+    let additionalParametersAnswered: DPMConfiguration = {};
+
     const sourceInspectResult = await sourceImplementation.inspectData(
         source.connectionConfiguration,
         credentialsConfiguration,
         source.configuration || {},
-        jobContext
+        {
+            ...jobContext,
+            async parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
+                const answer = await jobContext.parameterPrompt(parameters);
+
+                additionalParametersAnswered = {
+                    ...additionalParametersAnswered,
+                    ...answer
+                };
+
+                return answer;
+            }
+        }
     );
 
-    return sourceInspectResult;
+    return {
+        ...sourceInspectResult,
+        additionalConfiguration: additionalParametersAnswered
+    };
 }
 
 export async function streamRecords(
