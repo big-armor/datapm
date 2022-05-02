@@ -126,17 +126,17 @@ export async function getRepositoryCredential(
     repositoryType: string,
     repositoryIdentifier: string,
     credentialsIdentifier: string
-): Promise<DPMConfiguration> {
+): Promise<DPMConfiguration | undefined> {
     const repositoryConfig = getRepositoryConfig(repositoryType, repositoryIdentifier);
 
     if (!repositoryConfig) {
-        throw new Error(`No repository configuration found for ${repositoryType} ${repositoryIdentifier}`);
+        return undefined;
     }
 
     const credentials = repositoryConfig.credentials?.find((c) => c.identifier === credentialsIdentifier);
 
     if (!credentials) {
-        throw new Error(`No credentials found for ${repositoryType} ${repositoryIdentifier} ${credentialsIdentifier}`);
+        return undefined;
     }
 
     const secretKey = await getCredentialSecretKey();

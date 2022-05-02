@@ -45,7 +45,7 @@ export interface JobContext {
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
-    ): Promise<DPMConfiguration>;
+    ): Promise<DPMConfiguration | undefined>;
 
     /** return all configured registries */
     getRegistryConfigs(): RegistryConfig[];

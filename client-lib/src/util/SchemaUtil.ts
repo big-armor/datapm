@@ -92,11 +92,12 @@ export async function inspectSourceConnection(
 
     if (source.credentialsIdentifier) {
         try {
-            credentialsConfiguration = await jobContext.getRepositoryCredential(
-                connector.getType(),
-                repositoryIdentifier,
-                source.credentialsIdentifier
-            );
+            credentialsConfiguration =
+                (await jobContext.getRepositoryCredential(
+                    connector.getType(),
+                    repositoryIdentifier,
+                    source.credentialsIdentifier
+                )) ?? {};
         } catch (error) {
             jobContext.print("WARN", "The credential " + source.credentialsIdentifier + " could not be found or read.");
         }

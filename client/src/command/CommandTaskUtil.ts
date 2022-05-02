@@ -210,7 +210,7 @@ export class CLIJobContext implements JobContext {
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
-    ): Promise<DPMConfiguration> {
+    ): Promise<DPMConfiguration | undefined> {
         return getRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier);
     }
 

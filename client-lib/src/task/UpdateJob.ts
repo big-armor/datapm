@@ -170,11 +170,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             if (sourceObject.credentialsIdentifier) {
                 try {
-                    credentialsConfiguration = await this.jobContext.getRepositoryCredential(
-                        connector.getType(),
-                        repositoryIdentifier,
-                        sourceObject.credentialsIdentifier
-                    );
+                    credentialsConfiguration =
+                        (await this.jobContext.getRepositoryCredential(
+                            connector.getType(),
+                            repositoryIdentifier,
+                            sourceObject.credentialsIdentifier
+                        )) ?? {};
                 } catch (error) {
                     this.jobContext.print(
                         "ERROR",
