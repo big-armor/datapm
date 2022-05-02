@@ -60,7 +60,7 @@ export class FetchArguments {
     sink?: string;
     defaults?: boolean;
     sinkConfig?: string;
-    repositoryIdentifier?: string;
+    sinkRepository?: string;
     credentialsIdentifier?: string;
     sinkConnectionConfig?: string;
     sinkCredentialsConfig?: string;
@@ -82,8 +82,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
     }
 
     async _execute(): Promise<JobResult<FetchPackageJobResult>> {
-        if (this.args.repositoryIdentifier != null && this.args.sinkConnectionConfig != null) {
-            throw new Error("Cannot specify both repositoryIdentifier and sinkConnectionConfig");
+        if (this.args.sinkRepository != null && this.args.sinkConnectionConfig != null) {
+            throw new Error("Cannot specify both sinkRepository and sinkConnectionConfig");
         }
 
         if (this.args.credentialsIdentifier != null && this.args.sinkCredentialsConfig != null) {
@@ -572,7 +572,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.jobContext,
             sinkConnector,
             sinkConnectionConfiguration,
-            this.args.repositoryIdentifier,
+            this.args.sinkRepository,
             this.args.defaults
         );
 
@@ -703,7 +703,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 sink,
                 sinkConnectionConfiguration: obtainSinkConfigurationResult.connectionConfiguration,
                 sinkConfiguration,
-                sinkRepositoryIdentifier: obtainSinkConfigurationResult.repositoryIdentifier,
+                sinkRepositoryIdentifier: sinkConnector.userSelectableConnectionHistory()
+                    ? obtainSinkConfigurationResult.repositoryIdentifier
+                    : undefined,
                 sinkCredentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier,
                 sourceConnectionConfiguration: this.args.sourceConnectionConfig
                     ? JSON.parse(this.args.sourceConnectionConfig)

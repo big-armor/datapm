@@ -31,6 +31,7 @@ import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { JobContext } from "../task/Task";
+import { JSONSchema7TypeName } from "json-schema";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -91,11 +92,12 @@ export async function inspectSourceConnection(
 
     if (source.credentialsIdentifier) {
         try {
-            credentialsConfiguration = await jobContext.getRepositoryCredential(
-                connector.getType(),
-                repositoryIdentifier,
-                source.credentialsIdentifier
-            );
+            credentialsConfiguration =
+                (await jobContext.getRepositoryCredential(
+                    connector.getType(),
+                    repositoryIdentifier,
+                    source.credentialsIdentifier
+                )) ?? {};
         } catch (error) {
             jobContext.print("WARN", "The credential " + source.credentialsIdentifier + " could not be found or read.");
         }
@@ -574,7 +576,18 @@ export function updateSchemaWithDeconflictOptions(
         } else {
             format = deconflictRules[deconflictOption];
         }
-        property.format = property.format && property.format?.includes("null") ? `null,${format}` : format;
+
+        const nullIncluded = property.format && property.format?.includes("null");
+
+        property.format = nullIncluded ? `null,${format}` : format;
+
+        if (property.format === "string") {
+            property.type = ["string"];
+        }
+
+        if (nullIncluded) {
+            (property.type as JSONSchema7TypeName[]).push("null");
+        }
     }
 }
 

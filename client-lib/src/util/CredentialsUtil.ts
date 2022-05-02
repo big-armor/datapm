@@ -135,11 +135,12 @@ export async function obtainCredentialsConfiguration(
 
         if (credentialsPromptResult.credentialsIdentifier !== "**NEW**") {
             try {
-                credentialsConfiguration = await jobContext.getRepositoryCredential(
-                    connector.getType(),
-                    repositoryIdentifier,
-                    credentialsPromptResult.credentialsIdentifier
-                );
+                credentialsConfiguration =
+                    (await jobContext.getRepositoryCredential(
+                        connector.getType(),
+                        repositoryIdentifier,
+                        credentialsPromptResult.credentialsIdentifier
+                    )) ?? {};
             } catch (error) {
                 jobContext.print(
                     "WARN",

@@ -42,22 +42,22 @@ export class DecodableConnector implements Connector {
     }
 
     userSelectableConnectionHistory(): boolean {
-        return false;
+        return true;
     }
 
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
 
-    async getRepositoryIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
-        return "stream";
+    async getRepositoryIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string> {
+        return connectionConfiguration.account as string;
     }
 
-    getCredentialsIdentifierFromConfiguration(
-        _connectionConfiguration: DPMConfiguration,
+    async getCredentialsIdentifierFromConfiguration(
+        connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
     ): Promise<string> {
-        throw new Error("Method not implemented.");
+        return credentialsConfiguration.profile as string;
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {

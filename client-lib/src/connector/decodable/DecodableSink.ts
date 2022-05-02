@@ -70,9 +70,6 @@ type ListConnectionsResponse = {
 };
 
 export class DecodableSink implements Sink {
-    streamIds: Map<string, string> = new Map();
-    connectorIds: Map<string, string> = new Map();
-
     getType(): string {
         return TYPE;
     }
@@ -138,30 +135,6 @@ export class DecodableSink implements Sink {
                     }
                 ];
             }
-
-            if (this.streamIds.get(schema.title) == null) {
-                const streamId = await this.getOrCreateStream(
-                    schema,
-                    connectionConfiguration,
-                    credentialsConfiguration,
-                    configuration,
-                    jobContext
-                );
-                this.streamIds.set(schema.title, streamId);
-            }
-
-            if (this.connectorIds.get(schema.title) == null) {
-                const connectorId = await this.getOrCreateConnection(
-                    this.streamIds.get(schema.title) as string,
-                    schema,
-                    connectionConfiguration,
-                    credentialsConfiguration,
-                    configuration,
-                    jobContext
-                );
-
-                this.connectorIds.set(schema.title, connectorId);
-            }
         }
 
         return [] as Parameter[];
@@ -191,7 +164,34 @@ export class DecodableSink implements Sink {
 
         const authToken = getAuthToken(credentialsConfiguration);
 
-        const connectionId = this.connectorIds.get(schema.title);
+        const streamIds: Map<string, string> = new Map();
+        const connectorIds: Map<string, string> = new Map();
+
+        if (streamIds.get(schema.title) == null) {
+            const streamId = await this.getOrCreateStream(
+                schema,
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration,
+                jobContext
+            );
+            streamIds.set(schema.title, streamId);
+        }
+
+        if (connectorIds.get(schema.title) == null) {
+            const connectorId = await this.getOrCreateConnection(
+                streamIds.get(schema.title) as string,
+                schema,
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration,
+                jobContext
+            );
+
+            connectorIds.set(schema.title, connectorId);
+        }
+
+        const connectionId = connectorIds.get(schema.title);
 
         return {
             getCommitKeys: () => {
@@ -522,12 +522,12 @@ export class DecodableSink implements Sink {
 
             return {
                 name: property.title,
-                type: this.getDecodableType(property.type as JSONSchema7TypeName[], property.format)
+                type: this.getDecodableType(property.format as string, property.type as JSONSchema7TypeName[])
             };
         });
     }
 
-    getDecodableType(types: string[], format?: string): string {
+    getDecodableType(format: string, types: JSONSchema7TypeName[]): string {
         const removedNull = types.filter((t) => t !== "null");
 
         if (removedNull.length > 1) {

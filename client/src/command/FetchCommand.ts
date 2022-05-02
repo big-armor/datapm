@@ -82,7 +82,7 @@ export async function fetchPackage(args: FetchArguments): Promise<void> {
 
         await fetchCommand.fetchPackage({
             ...args,
-            repositoryIdentifier: args.sinkRepository,
+            sinkRepository: args.sinkRepository,
             credentialsIdentifier: args.sinkAccount
         });
     } catch (e) {
