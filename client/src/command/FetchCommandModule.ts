@@ -74,17 +74,12 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
         if (jobResult.result.sinkRepositoryIdentifier)
             command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;
-
-        if (jobResult.result.sinkCredentialsIdentifier === undefined)
-            command += ` --sinkConnectionConfig '${JSON.stringify(jobResult.result.sinkConnectionConfiguration)}'`;
+        else command += ` --sinkConnectionConfig '${JSON.stringify(jobResult.result.sinkConnectionConfiguration)}'`;
 
         if (jobResult.result.sinkCredentialsIdentifier !== undefined)
             command += " --sinkAccount " + jobResult.result.sinkCredentialsIdentifier;
 
-        if (
-            jobResult.result.sinkRepositoryIdentifier == null &&
-            Object.values(sinkConfigRemovedParameterValues).length > 0
-        ) {
+        if (Object.values(sinkConfigRemovedParameterValues).length > 0) {
             command += ` --sinkConfig '${JSON.stringify(sinkConfigRemovedParameterValues)}'`;
         }
 
