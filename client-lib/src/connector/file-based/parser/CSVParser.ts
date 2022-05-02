@@ -10,7 +10,7 @@ import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { Maybe } from "../../../util/Maybe";
 import { DISPLAY_NAME, MIME_TYPE } from "./CSVParserDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class CSVParser implements Parser {
     getFileExtensions(): string[] {

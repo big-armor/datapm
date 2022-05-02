@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Writable } from "stream";
 import unzipper, { Entry } from "unzipper";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
 import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./ZIPParserDescription";

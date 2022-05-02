@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Readable } from "stream";
 import tar from "tar-stream";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
 import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./TARParserDescription";

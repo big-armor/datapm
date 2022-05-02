@@ -13,7 +13,7 @@ import {
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 import { Maybe } from "../../util/Maybe";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";

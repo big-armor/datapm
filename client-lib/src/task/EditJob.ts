@@ -1,4 +1,5 @@
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 import { JSONSchema7TypeName } from "json-schema";
 import {
     comparePackages,

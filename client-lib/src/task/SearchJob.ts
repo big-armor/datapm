@@ -1,6 +1,7 @@
 import { ParameterType } from "datapm-lib";
 import { RegistryConfig } from "../config/Config";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 
 import chalk from "chalk";

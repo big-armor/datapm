@@ -2,7 +2,7 @@ import { StreamState, DPMConfiguration, Schema, StreamStats, UpdateMethod } from
 import { JSONSchema7TypeName } from "json-schema";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 
 export enum SourceErrors {
     AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED",

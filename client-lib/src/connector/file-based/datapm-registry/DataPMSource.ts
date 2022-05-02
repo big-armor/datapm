@@ -26,7 +26,7 @@ import { Maybe } from "../../../util/Maybe";
 import { InspectionResults, Source, StreamSetPreview, StreamSummary } from "../../Source";
 import { connectSocket } from "./DataPMRepository";
 import { TYPE } from "./DataPMConnectorDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { getPackageFromUrl } from "../../../util/PackageContext";
 
 export class DataPMSource implements Source {

@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import fetch from "cross-fetch";
 import os from "os";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type DecodableAuthConfig = {
     tokens: {

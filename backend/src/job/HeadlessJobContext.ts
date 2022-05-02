@@ -17,7 +17,9 @@ export class HeadlessJobContext extends BackendJobContextBase{
     }
 
 
-    async parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
+    async _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
+        this.parameterCount += parameters.length;
+
         const answers: ParameterAnswer<T> = {} as ParameterAnswer<T>;
 
         for (const parameter of parameters) {

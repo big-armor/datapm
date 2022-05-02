@@ -12,7 +12,6 @@ import {
     CATALOG_SLUG_REGEX,
     PACKAGE_SLUG_REGEX,
     CURRENT_PACKAGE_FILE_SCHEMA_URL,
-    Parameter,
     ParameterAnswer
 } from "datapm-lib";
 import { Package, SearchPackagesResult, PackageIdentifier } from "../generated/graphql";
@@ -27,9 +26,10 @@ import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { formatRemainingTime } from "../util/DateUtil";
 import { PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageContext";
 import { repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
-import { inspectSourceConnection, SourceInspectionResultInternal } from "../util/SchemaUtil";
+import { inspectSourceConnection } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult, MessageType, Task } from "./Task";
+import { JobContext } from "./JobContext";
 import numeral from "numeral";
 import {
     configureSource,
@@ -56,6 +56,7 @@ export interface FetchPackageJobResult {
 
     // For fetching from a package that requires additional
     // source configuration
+    packageSourceConnectionConfiguration: { [sourceSlug: string]: DPMConfiguration };
     packageSourceConfiguration: { [sourceSlug: string]: DPMConfiguration };
 
     excludedSchemaProperties: { [key: string]: string[] };
@@ -74,6 +75,7 @@ export class FetchArguments {
     quiet?: boolean;
     forceUpdate?: boolean;
 
+    packageSourceConnectionConfig?: string;
     packageSourceConfig?: string;
 
     sourceConnectionConfig?: string;
@@ -489,16 +491,22 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         /** INSPECT SOURCES */
         const sourcesAndInspectionResults: {
             source: Source;
-            inspectionResult: SourceInspectionResultInternal;
+            inspectionResult: InspectionResults;
         }[] = [];
 
+        // get all user entered source configuration
         const packageSourceConfig: { [sourceSlug: string]: DPMConfiguration } = JSON.parse(
             this.args.packageSourceConfig ?? "{}"
+        );
+
+        const packageSourceConnectionConfig: { [sourceSlug: string]: DPMConfiguration } = JSON.parse(
+            this.args.packageSourceConnectionConfig ?? "{}"
         );
 
         for (const source of packageFile.sources) {
             this.jobContext.setCurrentStep("Inspecting " + source.slug);
 
+            // Apply command argument source configuration
             if (Object.keys(packageSourceConfig).indexOf(source.slug) !== -1) {
                 source.configuration = {
                     ...source.configuration,
@@ -507,6 +515,14 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             }
 
             const inspectionResult = await inspectSourceConnection(this.jobContext, source, this.args.defaults);
+
+            if (Object.keys(inspectionResult.additionalConnectionConfiguration).length > 0) {
+                packageSourceConnectionConfig[source.slug] = inspectionResult.additionalConnectionConfiguration;
+            }
+
+            if (Object.keys(inspectionResult.additionalConfiguration).length > 0) {
+                packageSourceConfig[source.slug] = inspectionResult.additionalConfiguration;
+            }
 
             sourcesAndInspectionResults.push({
                 source,
@@ -730,12 +746,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 excludedSchemaProperties,
                 renamedSchemaProperties,
 
-                packageSourceConfiguration: sourcesAndInspectionResults.reduce((prev, curr) => {
-                    return {
-                        ...prev,
-                        [curr.source.slug]: curr.inspectionResult.additionalConfiguration
-                    };
-                }, {})
+                packageSourceConfiguration: packageSourceConfig,
+                packageSourceConnectionConfiguration: packageSourceConnectionConfig
             }
         };
     }

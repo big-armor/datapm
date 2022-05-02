@@ -13,7 +13,7 @@ import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 import { TYPE } from "./GoogleSheetConnectorDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class GoogleSheetSource implements Source {
     sourceType(): string {

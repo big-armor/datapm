@@ -4,7 +4,7 @@ import { BigQuery, BigQueryDatetime, BigQueryTimestamp } from "@google-cloud/big
 import { Transform } from "stream";
 import { Source, StreamSetPreview, InspectionResults } from "../../Source";
 import { TYPE } from "./BigQueryConnectorDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqlParser = require("js-sql-parser");

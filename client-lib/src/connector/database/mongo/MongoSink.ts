@@ -19,7 +19,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoConnectorDescription";
 import { CommitKey, Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;

@@ -10,9 +10,10 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
-export abstract class BackendJobContextBase implements JobContext {
+export abstract class BackendJobContextBase extends JobContext {
 
     constructor(public jobId: string, private context: Context) {
+        super();
     }
 
     abstract useDefaults(): boolean;
@@ -58,7 +59,7 @@ export abstract class BackendJobContextBase implements JobContext {
         throw new Error("Method not implemented.");
     }
 
-    abstract parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>>;
+    abstract _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>>;
     abstract updateSteps(steps: string[]): void;
     abstract setCurrentStep(step: string): void;
     abstract print(type: MessageType, message: string): void;

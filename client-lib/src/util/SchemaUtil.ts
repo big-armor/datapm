@@ -31,8 +31,10 @@ import { mergeValueFormats } from "../connector/SourceUtil";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 import { JSONSchema7TypeName } from "json-schema";
+import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
+import { obtainConnectionConfiguration } from "./ConnectionUtil";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -60,7 +62,8 @@ export interface RecordStreamEventContext {
     bytesReceived(streamSlug: string, byteCount: number): void;
 }
 
-export type SourceInspectionResultInternal = InspectionResults & {
+type InternalSourceInspectionResults = InspectionResults & {
+    additionalConnectionConfiguration: DPMConfiguration;
     additionalConfiguration: DPMConfiguration;
 };
 
@@ -71,22 +74,31 @@ export async function inspectSourceConnection(
     jobContext: JobContext,
     source: Source,
     defaults: boolean | undefined
-): Promise<SourceInspectionResultInternal> {
+): Promise<InternalSourceInspectionResults> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
     if (connectorDescription == null) throw new Error(`Unable to find connector for type ${source.type}`);
 
     const connector = await connectorDescription.getConnector();
 
-    let connectionParameters: Parameter<string>[] = [];
+    const connectionParameters: Parameter<string>[] = [];
 
-    if (connector.requiresConnectionConfiguration())
-        connectionParameters = await connector.getConnectionParameters(source.connectionConfiguration);
+    let additionalConnectionConfiguration: DPMConfiguration = {};
 
-    if (connectionParameters.length > 0) {
-        throw new Error(
-            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to provide more connection information."
-        );
+    if (connector.requiresConnectionConfiguration()) {
+        // Listen for answers during the inspection, and add these to the source configuration
+        const promptAnswerListener = (answers: ParameterAnswer<string>) => {
+            additionalConnectionConfiguration = {
+                ...additionalConnectionConfiguration,
+                ...answers
+            };
+        };
+
+        jobContext.addAnswerListener(promptAnswerListener);
+
+        await obtainConnectionConfiguration(jobContext, connector, source.connectionConfiguration, undefined, defaults);
+
+        jobContext.removeAnswerListener(promptAnswerListener);
     }
 
     const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
@@ -126,33 +138,32 @@ export async function inspectSourceConnection(
 
     jobContext.print("INFO", "Connecting to " + repositoryIdentifier);
 
-    let additionalParametersAnswered: DPMConfiguration = {};
+    let additionalConfiguration: DPMConfiguration = {};
+    // Listen for answers during the inspection, and add these to the source configuration
+    const promptAnswerListener = (answers: ParameterAnswer<string>) => {
+        additionalConfiguration = {
+            ...additionalConfiguration,
+            ...answers
+        };
+    };
 
-    const sourceInspectResult = await sourceImplementation.inspectData(
+    jobContext.addAnswerListener(promptAnswerListener);
+
+    const inspectionResults = await sourceImplementation.inspectData(
         source.connectionConfiguration,
         credentialsConfiguration,
         source.configuration || {},
-        {
-            ...jobContext,
-            async parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
-                const answer = await jobContext.parameterPrompt(parameters);
-
-                additionalParametersAnswered = {
-                    ...additionalParametersAnswered,
-                    ...answer
-                };
-
-                return answer;
-            }
-        }
+        jobContext
     );
 
+    jobContext.removeAnswerListener(promptAnswerListener);
+
     return {
-        ...sourceInspectResult,
-        additionalConfiguration: additionalParametersAnswered
+        ...inspectionResults,
+        additionalConnectionConfiguration,
+        additionalConfiguration
     };
 }
-
 export async function streamRecords(
     source: Source,
     streamSetPreview: StreamSetPreview,

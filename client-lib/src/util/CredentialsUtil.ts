@@ -2,8 +2,7 @@ import { DPMConfiguration, ParameterOption, ParameterType, Source } from "datapm
 import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
-import { JobContext } from "../task/Task";
-import { of } from "zen-observable";
+import { JobContext, SilentJobContext } from "../task/JobContext";
 
 /** Requests from the user credentials for each source - without saving those credentials to any configuration file */
 export async function obtainCredentials(jobContext: JobContext, source: Source): Promise<DPMConfiguration> {
@@ -88,13 +87,7 @@ export async function obtainCredentialsConfiguration(
     const pendingParameters = await connector.getCredentialsParameters(
         connectionConfiguration,
         credentialsConfiguration,
-        {
-            ...jobContext,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            print: () => {}, // Eat these because we're about to do it for real in a moment
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            log: () => {}
-        }
+        new SilentJobContext(jobContext) // silent, because we don't want to prompt for credentials
     );
 
     if (

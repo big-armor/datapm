@@ -67,9 +67,16 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         }
 
         if (
-            jobResult.result.packageSourceConfiguration &&
-            Object.values(jobResult.result.packageSourceConfiguration).find((v) => Object.keys(v).length > 0) != null
+            Object.values(jobResult.result.packageSourceConnectionConfiguration).find(
+                (v) => Object.keys(v).length > 0
+            ) != null
         ) {
+            command += `--packageSourceConnectionConfig '${JSON.stringify(
+                jobResult.result.packageSourceConnectionConfiguration
+            )}' `;
+        }
+
+        if (Object.values(jobResult.result.packageSourceConfiguration).find((v) => Object.keys(v).length > 0) != null) {
             command += `--packageSourceConfig '${JSON.stringify(jobResult.result.packageSourceConfiguration)}' `;
         }
 
