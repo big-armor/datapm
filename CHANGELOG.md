@@ -1,3 +1,9 @@
+#### 0.8.133 (2022-05-03)
+
+##### New Features
+
+*  Added TimePlus.com Sink Connector ([63adf43d](https://github.com/big-armor/datapm/commit/63adf43d9552f6620c04aa6030efe16301227527))
+
 #### 0.8.132 (2022-05-03)
 
 #### 0.8.131 (2022-05-03)
