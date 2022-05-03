@@ -24,7 +24,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/big-armor/datapm-registery.git"
+        "url": "git+https://github.com/big-armor/datapm.git",
+        "directory": "backend"
     },
     "author": "Travis Collins",
     "license": "https://datapm.io/docs/license",

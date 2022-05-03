@@ -2,6 +2,11 @@
     "name": "datapm-registry-frontend",
     "version": "0.8.127",
     "license": "https://datapm.io/docs/license",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/big-armor/datapm.git",
+        "directory": "frontend"
+    },
     "scripts": {
         "clean": "gulp clean",
         "ng": "ng",

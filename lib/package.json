@@ -3,6 +3,11 @@
     "version": "0.8.127",
     "description": "Definitions and utilities for managing datapm package files.",
     "main": "src/main.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/big-armor/datapm.git",
+        "directory": "lib"
+    },
     "engines": {
         "node": ">=16.14.2",
         "npm": ">=8.1.2"
