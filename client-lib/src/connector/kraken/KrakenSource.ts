@@ -6,7 +6,7 @@ import { TYPE } from "./KrakenConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { URI } from "./KrakenConnector";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type KrakenTickerMessage = {
     a: [string, number, string];
@@ -119,6 +119,7 @@ export class KrakenSource implements Source {
                     configuration,
                     name: "products",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: Object.keys(pairs.result)
                         .map((assetName) => {
                             const asset = pairs.result[assetName];

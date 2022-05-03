@@ -9,7 +9,7 @@ import { nameFromFileUris } from "../../util/NameUtil";
 import { FileBufferSummary, FileStreamContext, Parser, ParserInspectionResults } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
 import path from "path";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;

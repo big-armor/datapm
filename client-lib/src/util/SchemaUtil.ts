@@ -12,7 +12,8 @@ import {
     ParameterOption,
     ParameterAnswer,
     DPMRecordValue,
-    Parameter
+    Parameter,
+    DPMConfiguration
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -30,7 +31,10 @@ import { mergeValueFormats } from "../connector/SourceUtil";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
+import { JSONSchema7TypeName } from "json-schema";
+import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
+import { obtainConnectionConfiguration } from "./ConnectionUtil";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -58,6 +62,11 @@ export interface RecordStreamEventContext {
     bytesReceived(streamSlug: string, byteCount: number): void;
 }
 
+type InternalSourceInspectionResults = InspectionResults & {
+    additionalConnectionConfiguration: DPMConfiguration;
+    additionalConfiguration: DPMConfiguration;
+};
+
 /** Given a source, run an inspection. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
  */
@@ -65,22 +74,31 @@ export async function inspectSourceConnection(
     jobContext: JobContext,
     source: Source,
     defaults: boolean | undefined
-): Promise<InspectionResults> {
+): Promise<InternalSourceInspectionResults> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
     if (connectorDescription == null) throw new Error(`Unable to find connector for type ${source.type}`);
 
     const connector = await connectorDescription.getConnector();
 
-    let connectionParameters: Parameter<string>[] = [];
+    const connectionParameters: Parameter<string>[] = [];
 
-    if (connector.requiresConnectionConfiguration())
-        connectionParameters = await connector.getConnectionParameters(source.connectionConfiguration);
+    let additionalConnectionConfiguration: DPMConfiguration = {};
 
-    if (connectionParameters.length > 0) {
-        throw new Error(
-            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to provide more connection information."
-        );
+    if (connector.requiresConnectionConfiguration()) {
+        // Listen for answers during the inspection, and add these to the source configuration
+        const promptAnswerListener = (answers: ParameterAnswer<string>) => {
+            additionalConnectionConfiguration = {
+                ...additionalConnectionConfiguration,
+                ...answers
+            };
+        };
+
+        jobContext.addAnswerListener(promptAnswerListener);
+
+        await obtainConnectionConfiguration(jobContext, connector, source.connectionConfiguration, undefined, defaults);
+
+        jobContext.removeAnswerListener(promptAnswerListener);
     }
 
     const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
@@ -91,11 +109,12 @@ export async function inspectSourceConnection(
 
     if (source.credentialsIdentifier) {
         try {
-            credentialsConfiguration = await jobContext.getRepositoryCredential(
-                connector.getType(),
-                repositoryIdentifier,
-                source.credentialsIdentifier
-            );
+            credentialsConfiguration =
+                (await jobContext.getRepositoryCredential(
+                    connector.getType(),
+                    repositoryIdentifier,
+                    source.credentialsIdentifier
+                )) ?? {};
         } catch (error) {
             jobContext.print("WARN", "The credential " + source.credentialsIdentifier + " could not be found or read.");
         }
@@ -119,16 +138,32 @@ export async function inspectSourceConnection(
 
     jobContext.print("INFO", "Connecting to " + repositoryIdentifier);
 
-    const sourceInspectResult = await sourceImplementation.inspectData(
+    let additionalConfiguration: DPMConfiguration = {};
+    // Listen for answers during the inspection, and add these to the source configuration
+    const promptAnswerListener = (answers: ParameterAnswer<string>) => {
+        additionalConfiguration = {
+            ...additionalConfiguration,
+            ...answers
+        };
+    };
+
+    jobContext.addAnswerListener(promptAnswerListener);
+
+    const inspectionResults = await sourceImplementation.inspectData(
         source.connectionConfiguration,
         credentialsConfiguration,
         source.configuration || {},
         jobContext
     );
 
-    return sourceInspectResult;
-}
+    jobContext.removeAnswerListener(promptAnswerListener);
 
+    return {
+        ...inspectionResults,
+        additionalConnectionConfiguration,
+        additionalConfiguration
+    };
+}
 export async function streamRecords(
     source: Source,
     streamSetPreview: StreamSetPreview,
@@ -574,7 +609,18 @@ export function updateSchemaWithDeconflictOptions(
         } else {
             format = deconflictRules[deconflictOption];
         }
-        property.format = property.format && property.format?.includes("null") ? `null,${format}` : format;
+
+        const nullIncluded = property.format && property.format?.includes("null");
+
+        property.format = nullIncluded ? `null,${format}` : format;
+
+        if (property.format === "string") {
+            property.type = ["string"];
+        }
+
+        if (nullIncluded) {
+            (property.type as JSONSchema7TypeName[]).push("null");
+        }
     }
 }
 

@@ -1,12 +1,12 @@
 {
     "name": "datapm-client",
     "description": "The DataPM client which is used to create and fetch packages.",
-    "version": "0.8.127",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/big-armor/datapm.git",
         "directory": "client"
     },
+    "version": "0.8.131",
     "engines": {
         "node": ">=16.14.2",
         "npm": ">=8.1.2"

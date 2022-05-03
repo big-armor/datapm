@@ -21,7 +21,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryConnectorDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class BigQuerySink implements Sink {
     client: BigQuery;

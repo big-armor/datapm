@@ -1,7 +1,7 @@
 import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { DISPLAY_NAME, MIME_TYPE } from "./XLSXParserDescription";
 

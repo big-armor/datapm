@@ -3,7 +3,7 @@ import { authorize, getSpreadsheetMetadata, initOAuth2Client, setCredentials } f
 import { Connector } from "../../Connector";
 import { TYPE } from "./GoogleSheetConnectorDescription";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 export class GoogleSheetRepository implements Connector {
     getType(): string {
         return TYPE;

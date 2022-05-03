@@ -4,6 +4,9 @@ import { getRepositoryConfigs, resetConfiguration } from "../../src/util/ConfigU
 import { KEYS, testCmd } from "./test-utils";
 
 describe("Repository Command Tests", async function () {
+    const updateRepositoryLogLines: string[] = [];
+    const addRepositoryLogLines: string[] = [];
+
     before(async () => {
         resetConfiguration();
     });
@@ -37,7 +40,10 @@ describe("Repository Command Tests", async function () {
                     message: "Password?",
                     input: "postgres" + KEYS.ENTER
                 }
-            ]
+            ],
+            async (line) => {
+                addRepositoryLogLines.push(line);
+            }
         );
 
         const repositories = getRepositoryConfigs(POSTGRES_TYPE);
@@ -81,7 +87,10 @@ describe("Repository Command Tests", async function () {
                     message: "Password",
                     input: "testing" + KEYS.ENTER
                 }
-            ]
+            ],
+            async (line) => {
+                updateRepositoryLogLines.push(line);
+            }
         );
 
         expect(exitCode.code).equal(0);
@@ -95,6 +104,8 @@ describe("Repository Command Tests", async function () {
     });
 
     it("Add Credential", async function () {
+        const logLines: string[] = [];
+
         const exitCode = await testCmd(
             "repository",
             ["credential", "add"],
@@ -115,10 +126,36 @@ describe("Repository Command Tests", async function () {
                     message: "Password",
                     input: "testing" + KEYS.ENTER
                 }
-            ]
+            ],
+            async (line) => {
+                logLines.push(line);
+            }
         );
 
-        expect(exitCode.code).equal(0);
+        try {
+            expect(exitCode.code).equal(0);
+        } catch (e) {
+            console.log("Error during add credentials");
+
+            console.log("");
+            console.log("Add Repository Logs");
+            for (const line of addRepositoryLogLines) {
+                console.log(line);
+            }
+
+            console.log("");
+            console.log("Update Repository Logs");
+            for (const line of updateRepositoryLogLines) {
+                console.log(line);
+            }
+
+            console.log("");
+            console.log("Add Credential Logs");
+            for (const line of logLines) {
+                console.log(line);
+            }
+            throw e;
+        }
         const repositories = getRepositoryConfigs(POSTGRES_TYPE);
 
         expect(repositories.length).equal(1);

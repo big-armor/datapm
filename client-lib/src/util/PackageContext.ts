@@ -1,6 +1,6 @@
 import { parsePackageFileJSON, catalogSlugValid, packageSlugValid, PackageFile, RegistryReference } from "datapm-lib";
 import { Package, PackageIdentifierInput, Permission } from "../generated/graphql";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 import { publishPackageFile } from "./PackageUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import fetch from "cross-fetch";

@@ -16,7 +16,9 @@ export class WebsocketJobContext extends BackendJobContextBase {
         return false; // TODO make this optional?
     }
 
-    parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
+    _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
+        
+        this.parameterCount += parameters.length;
         
         const request = new JobMessageRequest(JobRequestType.PROMPT);
         request.prompts = parameters;

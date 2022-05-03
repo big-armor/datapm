@@ -1,5 +1,5 @@
 import { DPMConfiguration, Parameter } from "datapm-lib";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 /** Continuously calls the call back until it returns no parameters. Returns the number of prompts completed */
 export async function repeatedlyPromptParameters(

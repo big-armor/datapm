@@ -6,7 +6,7 @@ import { TYPE } from "./FTXConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { getWebSocketUri } from "./FTXConnector";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type FtxRestResponse<T> = {
     success: boolean;
@@ -136,6 +136,7 @@ export class FTXSource implements Source {
                     configuration,
                     name: "markets",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs.result
                         .filter((pair) => pair.enabled && pair.type === "spot")
                         .map((asset) => {

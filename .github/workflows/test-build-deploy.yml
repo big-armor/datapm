@@ -193,6 +193,11 @@ jobs:
               with:
                   node-version: "16.14.2"
 
+              # This debootstrap package is related to installing debian, and the correct version is missing as of 4/29/2022
+              # This command instructs apt-get to not install the package as a depedency in the build tools below
+            - name: Do not allow debootstrap to be installed
+              run: sudo apt-mark hold debootstrap
+
             - name: Install Build Tools
               run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint
 

@@ -7,7 +7,7 @@ import { findParser } from "../AbstractFileStreamSource";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
 import path from "path";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export abstract class AbstractPassThroughParser implements Parser {
     abstract getDisplayName(): string;

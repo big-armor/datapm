@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 import { RepositoryConfig } from "../config/Config";
 import { getConnectorDescriptionByType } from "../main";
 
@@ -26,12 +26,14 @@ export async function obtainConnectionConfiguration(
     if (repositoryIdentifier != null) {
         const repository = jobContext.getRepositoryConfig(connector.getType(), repositoryIdentifier);
 
-        if (repository == null) throw new Error(`Could not find repository with identifier ${repositoryIdentifier}`);
+        if (repository != null) {
+            // purposefully made connectionConfiguration overwrite the saved repostiory config
+            connectionConfiguration = { ...repository.connectionConfiguration, ...connectionConfiguration };
 
-        // purposefully made connectionConfiguration overwrite the saved repostiory config
-        connectionConfiguration = { ...repository.connectionConfiguration, ...connectionConfiguration };
-
-        jobContext.print("INFO", "Using saved connection info for " + repositoryIdentifier);
+            jobContext.print("INFO", "Using saved connection info for " + repositoryIdentifier);
+        } else {
+            jobContext.print("WARN", "Could not find saved connection info for " + repositoryIdentifier);
+        }
     }
 
     let parameterCount = 0;

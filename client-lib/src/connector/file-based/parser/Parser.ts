@@ -1,6 +1,6 @@
 import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import { Readable, Transform } from "stream";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { Maybe } from "../../../util/Maybe";
 
 /** A stream as returned by a file parser before being opened */
@@ -42,7 +42,9 @@ export interface Parser {
     /** The file extensions supported by this parser */
     getFileExtensions(): string[];
 
-    /** Returns a set of parameters based on the provided uri and configuration */
+    /** Returns a set of parameters based on the provided uri and configuration. This is called
+     * at inspection time, usually in the "package" command.
+     */
     inspectFile(
         fileStreamSummary: FileBufferSummary,
         configuration: DPMConfiguration,

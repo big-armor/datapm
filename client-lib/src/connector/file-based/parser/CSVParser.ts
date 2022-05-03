@@ -10,7 +10,7 @@ import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { Maybe } from "../../../util/Maybe";
 import { DISPLAY_NAME, MIME_TYPE } from "./CSVParserDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class CSVParser implements Parser {
     getFileExtensions(): string[] {
@@ -142,7 +142,13 @@ export class CSVParser implements Parser {
                     numberMinimumValue: 1
                 }
             ]);
-            configuration.headerRowNumber = configuration.headerRowNumber ? +configuration.headerRowNumber - 1 : 0;
+
+            configuration.version = 1;
+        }
+
+        if (configuration.version == null) {
+            configuration.version = 1;
+            (configuration.headerRowNumber as number) += 1;
         }
 
         return {
@@ -201,7 +207,7 @@ export class CSVParser implements Parser {
                             trim: true,
                             from_line:
                                 !headerFound && (configuration?.hasHeaderRow as boolean)
-                                    ? (configuration?.headerRowNumber as number) + 1
+                                    ? (configuration?.headerRowNumber as number)
                                     : 1
                         });
                     } catch (error) {

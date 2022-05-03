@@ -5,7 +5,7 @@ import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./BinanceConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 import { getWebSocketUri } from "./BinanceConnector";
 
 type BinanceSymbol = {
@@ -151,6 +151,7 @@ export class BinanceSource implements Source {
                     configuration,
                     name: "pairs",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs
                         .filter((p) => p.status === "TRADING")
                         .map((pair) => {

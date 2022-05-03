@@ -23,7 +23,7 @@ import {
     updateSchemaWithDeconflictOptions
 } from "./SchemaUtil";
 import { SinkStateWritable } from "./transforms/SinkStateWritable";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 
 export interface FetchResult {
     recordsTotal: number;

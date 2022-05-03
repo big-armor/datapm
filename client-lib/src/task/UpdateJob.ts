@@ -10,7 +10,8 @@ import {
 } from "datapm-lib";
 import { PackageIdentifier } from "../generated/graphql";
 import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
-import { JobContext, Job, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 import clone from "rfdc";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { getSourceByType } from "../connector/SourceUtil";
@@ -170,11 +171,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             if (sourceObject.credentialsIdentifier) {
                 try {
-                    credentialsConfiguration = await this.jobContext.getRepositoryCredential(
-                        connector.getType(),
-                        repositoryIdentifier,
-                        sourceObject.credentialsIdentifier
-                    );
+                    credentialsConfiguration =
+                        (await this.jobContext.getRepositoryCredential(
+                            connector.getType(),
+                            repositoryIdentifier,
+                            sourceObject.credentialsIdentifier
+                        )) ?? {};
                 } catch (error) {
                     this.jobContext.print(
                         "ERROR",

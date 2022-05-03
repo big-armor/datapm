@@ -12,6 +12,16 @@ Use the link below to join our Slack community, where we chat about DataPM, data
 
 https://communityinviter.com/apps/datapm-io/datapm
 
+# Developer Guides
+
+See the [client-lib/CONNECTORS.md](client-lib/CONNECTORS.md) file for creating source and sink connectors.
+
+See the [client/README.md](client/README.md) file for client developer instructions.
+
+See the [backend/README.md](backend/README.md) file for server side development instructions.
+
+See the [frontend/README.md](frontend/README.md) file for frontend developer instructions.
+
 # Full Project Build Instructions
 
 To build the entire project, use the following commands. This will produce a docker image.

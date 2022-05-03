@@ -5,7 +5,7 @@ import { InspectionResults, Source } from "../Source";
 import { TYPE, URI } from "./CoinbaseConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type SubscriptionsMessage = {
     type: "subscriptions";
@@ -117,6 +117,7 @@ export class CoinbaseSource implements Source {
                     configuration,
                     name: "products",
                     message: "Select target pairs",
+                    multiSelectMinimumCount: 1,
                     options: pairs
                         .map((p) => {
                             return {
