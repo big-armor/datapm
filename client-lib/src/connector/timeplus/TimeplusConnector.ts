@@ -5,8 +5,6 @@ import { TYPE } from "./TimeplusConnectorDescription";
 import fetch from "cross-fetch";
 import { JobContext } from "../../task/JobContext";
 
-const printedTimeplusLoginMessage = false;
-
 export class TimeplusConnector implements Connector {
     getType(): string {
         return TYPE;
