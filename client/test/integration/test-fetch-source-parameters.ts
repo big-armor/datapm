@@ -71,6 +71,8 @@ describe("Fetch Missing Source Parameters", function () {
         expect(packageFile.schemas[0].recordCount).equal(99);
     });
 
+    let fetchSuggestCommand = "";
+
     it("Should prompt for missing parameters", async () => {
         const packageFile = loadPackageFileFromDisk(packageFilePath);
 
@@ -106,8 +108,58 @@ describe("Fetch Missing Source Parameters", function () {
                     message: "File Location?",
                     input: "tmp-files/airports-small" + KEYS.ENTER
                 }
-            ]
+            ],
+            async (line) => {
+                if (line.includes("datapm fetch airports-small.datapm.json")) {
+                    fetchSuggestCommand = line;
+                }
+            }
         );
+
+        expect(result.code).eq(0);
+
+        const dataDirectory = path.join(process.cwd(), "tmp-files", "airports-small");
+        const dataFilePath = path.join(dataDirectory, "airports-small.json");
+
+        const lineCount = await new Promise<number>((resolve, reject) => {
+            let count = 0;
+            fs.createReadStream(dataFilePath)
+                .on("data", function (chunk) {
+                    for (let i = 0; i < chunk.length; ++i) if (chunk[i] === 10) count++;
+                })
+                .on("error", function (error) {
+                    reject(error);
+                })
+                .on("end", function () {
+                    resolve(count);
+                });
+        });
+
+        expect(lineCount).eq(99);
+
+        const lines = fetchSuggestCommand.split("\n");
+        const targetLine = lines.find((line) => line.startsWith("datapm fetch airports-small.datapm.json"));
+
+        expect(targetLine).not.eq(undefined);
+        expect(targetLine).include('--packageSourceConfig \'{"file":{"headerRowNumber":1}}\'');
+
+        fetchSuggestCommand = targetLine as string;
+
+        fs.rmSync(dataDirectory, { recursive: true });
+    });
+
+    it("Should not prompt for any parameters", async () => {
+        const allCommandParts = fetchSuggestCommand.split(" ");
+        const argumentParts = allCommandParts.slice(2);
+        const argumentsQuoteStripped = argumentParts.map((part) => part.trim().replace(/^'/g, "").replace(/'$/g, ""));
+
+        const packageFile = loadPackageFileFromDisk(packageFilePath);
+
+        delete packageFile.sources[0].configuration?.headerRowNumber;
+
+        fs.writeFileSync("airports-small.datapm.json", JSON.stringify(packageFile, null, 2));
+
+        const result = await testCmd("fetch", argumentsQuoteStripped, []);
 
         expect(result.code).eq(0);
 

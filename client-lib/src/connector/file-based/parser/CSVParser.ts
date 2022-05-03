@@ -142,7 +142,6 @@ export class CSVParser implements Parser {
                     numberMinimumValue: 1
                 }
             ]);
-            configuration.headerRowNumber = configuration.headerRowNumber ? +configuration.headerRowNumber - 1 : 0;
         }
 
         return {
@@ -201,7 +200,7 @@ export class CSVParser implements Parser {
                             trim: true,
                             from_line:
                                 !headerFound && (configuration?.hasHeaderRow as boolean)
-                                    ? (configuration?.headerRowNumber as number) + 1
+                                    ? (configuration?.headerRowNumber as number)
                                     : 1
                         });
                     } catch (error) {

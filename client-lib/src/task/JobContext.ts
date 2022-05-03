@@ -42,10 +42,10 @@ export abstract class JobContext {
     /** return specific registry configuration */
     abstract getRegistryConfig(url: string): RegistryConfig | undefined;
 
-    public readonly parameterPrompt = <T extends string = string>(
+    public readonly parameterPrompt = async <T extends string = string>(
         parameters: Array<Parameter<T>>
     ): Promise<ParameterAnswer<T>> => {
-        const answers = this._parameterPrompt(parameters);
+        const answers = await this._parameterPrompt(parameters);
         this.parameterCount += parameters.length;
 
         this.answerListeners.forEach((listener) => listener(answers));
