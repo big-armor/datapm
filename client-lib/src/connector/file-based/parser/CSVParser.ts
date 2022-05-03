@@ -142,6 +142,13 @@ export class CSVParser implements Parser {
                     numberMinimumValue: 1
                 }
             ]);
+
+            configuration.version = 1;
+        }
+
+        if (configuration.version == null) {
+            configuration.version = 1;
+            (configuration.headerRowNumber as number) += 1;
         }
 
         return {
