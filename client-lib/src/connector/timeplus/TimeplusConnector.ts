@@ -3,7 +3,7 @@ import { DPMConfiguration, nameToSlug, Parameter, ParameterType } from "datapm-l
 import { Connector } from "../Connector";
 import { TYPE } from "./TimeplusConnectorDescription";
 import fetch from "cross-fetch";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 const printedTimeplusLoginMessage = false;
 
