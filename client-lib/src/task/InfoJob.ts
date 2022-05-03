@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { Schema } from "datapm-lib";
-import { Job, JobContext, JobResult } from "../task/Task";
+import { Job, JobResult } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 import { printSchema } from "../util/SchemaUtil";
 export class InfoJobArguments {
     reference: string;

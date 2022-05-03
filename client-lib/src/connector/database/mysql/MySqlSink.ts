@@ -4,7 +4,7 @@ import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { DISPLAY_NAME, TYPE } from "./MySqlConnectorDescription";
 import { Sink, SinkErrors, WritableWithContext } from "../../Sink";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class MySqlSink extends KnexSink implements Sink {
     tablePrefix: string;

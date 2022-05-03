@@ -7,7 +7,7 @@ import { findParser } from "../AbstractFileStreamSource";
 import { FileBufferSummary, ParserInspectionResults, Parser, FileStreamContext } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
 import path from "path";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export interface FileIterator {
     moveToNextFile(): Promise<FileStreamContext | null>;

@@ -19,7 +19,7 @@ describe("Checking transforms", () => {
             "test",
             {
                 hasHeaderRow: "true",
-                headerRowNumber: 0,
+                headerRowNumber: 1,
                 delimiter: ","
             },
             {

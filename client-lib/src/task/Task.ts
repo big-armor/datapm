@@ -1,6 +1,5 @@
-import { TimeoutPromise, Parameter, ParameterAnswer, DPMConfiguration, PackageFile } from "datapm-lib";
-import { RepositoryConfig, RegistryConfig } from "../config/Config";
-import { PackageFileWithContext, PackageIdentifier } from "../main";
+import { TimeoutPromise } from "datapm-lib";
+import { JobContext } from "./JobContext";
 
 export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
 
@@ -19,75 +18,6 @@ export interface Task {
     // addSubTask(message: string): Task;
 }
 
-/** A JobContext is given to a Job. The context is an implementation specific to
- * where the task is executing (server, command line client, etc). The context implementation
- * contains the logic on how to prompt the user for input, provide access to data, etc.
- */
-export interface JobContext {
-    /** Should return all of the repository configs for a given repository type */
-    getRepositoryConfigsByType(type: string): RepositoryConfig[];
-
-    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined;
-
-    /** Should save a repository credential */
-    saveRepositoryCredential(
-        connectorType: string,
-        repositoryIdentifier: string,
-        credentialsIdentifier: string,
-        credentials: DPMConfiguration
-    ): Promise<void>;
-
-    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void;
-
-    removeRepositoryConfig(type: string, repositoryIdentifer: string): void;
-
-    getRepositoryCredential(
-        connectorType: string,
-        repositoryIdentifier: string,
-        credentialsIdentifier: string
-    ): Promise<DPMConfiguration | undefined>;
-
-    /** return all configured registries */
-    getRegistryConfigs(): RegistryConfig[];
-
-    /** return specific registry configuration */
-    getRegistryConfig(url: string): RegistryConfig | undefined;
-
-    /** Should prompt the user with the given parameter inputs */
-    parameterPrompt<T extends string = string>(parameters: Array<Parameter<T>>): Promise<ParameterAnswer<T>>;
-
-    /** Sets the names of the steps to be performed during the task. Can be updated at any
-     * time throughout the task lifecycle.
-     */
-    updateSteps(steps: string[]): void;
-
-    /** Sets the current step. Must be in the updateSteps(...) previously set */
-    setCurrentStep(step: string): void;
-
-    /** Sends a message to the user */
-    print(type: MessageType, message: string): void;
-
-    startTask(message: string): Promise<Task>;
-
-    /** Outputs to the logs (not intended for the user console) */
-    log(level: "ERROR" | "WARN" | "INFO" | "DEBUG", message: string): void;
-
-    /** Saves a given package file and returns the PackageFileWithContext */
-    saveNewPackageFile(catalogSlug: string | undefined, packagefile: PackageFile): Promise<PackageFileWithContext>;
-
-    /** Returns a packageFileWithContext reference specific to the context in which
-     * the package is being requested.
-     */
-    getPackageFile(
-        reference: string | PackageIdentifier,
-        modifiedOrCanonical: "modified" | "canonicalIfAvailable"
-    ): Promise<PackageFileWithContext>;
-
-    /* Whether the user opted for default values for this job. Not always possible, but 
-    should be honored if possible */
-    useDefaults(): boolean;
-}
-
 export interface JobResult<T> {
     exitCode: number;
     result?: T | undefined;
@@ -99,7 +29,7 @@ export abstract class Job<T> {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
     // eslint-disable-next-line no-useless-constructor
-    constructor(private context: JobContext) {}
+    constructor(private _jobContext: JobContext) {}
 
     /** Run the task and return an exit code */
     abstract _execute(): Promise<JobResult<T>>;

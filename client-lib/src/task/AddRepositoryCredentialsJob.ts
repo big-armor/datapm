@@ -1,7 +1,8 @@
 import { ParameterType } from "datapm-lib";
 import { getConnectorDescriptionByType, getConnectorDescriptions } from "../connector/ConnectorUtil";
 import { promptForCredentials } from "../util/CredentialsUtil";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 
 export class AddRepositoryCredentialsJobResult {}
 

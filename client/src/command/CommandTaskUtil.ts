@@ -2,13 +2,13 @@ import chalk from "chalk";
 import ora from "ora";
 import path from "path";
 import {
-    JobContext,
     Task,
     RepositoryConfig,
     RegistryConfig,
     PackageFileWithContext,
     PackageIdentifier,
-    TaskStatus
+    TaskStatus,
+    JobContext
 } from "datapm-client-lib";
 import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
@@ -24,12 +24,20 @@ import {
 import { LocalPackageFileContext } from "../util/LocalPackageFileContext";
 import { getPackage } from "../util/GetPackageUtil";
 
-export class CLIJobContext implements JobContext {
+export class CLIJobContext extends JobContext {
     currentOraSpinner: ora.Ora | undefined;
 
     currentTask: Task | undefined;
 
-    constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
+    parameterCount = 0;
+
+    constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {
+        super();
+    }
+
+    getParameterCount(): number {
+        return this.parameterCount;
+    }
 
     useDefaults(): boolean {
         return this.argv.defaults || false;
@@ -74,12 +82,14 @@ export class CLIJobContext implements JobContext {
         return getRepositoryConfigs(type);
     }
 
-    async parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
+    async _parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
         if (this.currentOraSpinner) this.currentOraSpinner.stop();
 
         const answers = await cliHandleParameters(this.argv.defaults || false, parameters);
 
         if (this.currentOraSpinner) this.currentOraSpinner.start();
+
+        this.parameterCount += parameters.length;
 
         return answers;
     }

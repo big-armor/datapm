@@ -25,7 +25,8 @@ import {
     getSourcesDescriptions
 } from "../connector/SourceUtil";
 import { Maybe } from "../util/Maybe";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 import { validPackageDisplayName, validShortPackageDescription, validVersion } from "../util/IdentifierUtil";
 import numeral from "numeral";
 import { PackageFileWithContext } from "../main";

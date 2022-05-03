@@ -1,5 +1,5 @@
 import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { Connector } from "../../Connector";
 import { TYPE } from "./KafkaConnectorDescription";
 

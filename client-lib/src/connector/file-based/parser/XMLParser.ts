@@ -4,7 +4,7 @@ import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 import XmlParser from "xml-streamer";
 import { DISPLAY_NAME, MIME_TYPE } from "./XMLParserDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class XMLParser implements Parser {
     getFileExtensions(): string[] {

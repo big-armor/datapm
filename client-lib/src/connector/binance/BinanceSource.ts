@@ -5,7 +5,7 @@ import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./BinanceConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 import { getWebSocketUri } from "./BinanceConnector";
 
 type BinanceSymbol = {

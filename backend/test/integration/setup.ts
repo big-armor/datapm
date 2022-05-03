@@ -49,14 +49,20 @@ export interface ActivityLogLine {
 
 
 export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
-    if (!line.startsWith("{")) return false;
+    const lines = line.split("\n");
 
-    try {
-        const lineObject = JSON.parse(line) as ActivityLogLine;
-        if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
-    } catch (e) {
-        console.log("Error parsing line: " + line);
+    for(const splitLine of lines) { 
+        const trimmedLine = splitLine.trim();
+        if (trimmedLine.length === 0 || !trimmedLine.startsWith("{")) continue;
+        try {
+            const lineObject = JSON.parse(trimmedLine) as ActivityLogLine;
+            if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+        } catch (e) {
+            console.log("Error parsing line: " + trimmedLine);
+            console.log(e.message);
+        }
     }
+
 
 
     return false;

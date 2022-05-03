@@ -3,7 +3,7 @@ import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm
 import { Transform, TransformCallback } from "stream";
 import { DISPLAY_NAME, MIME_TYPE } from "./AVROParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 class BlockDecoder extends avro.streams.BlockDecoder {
     // eslint-disable-next-line

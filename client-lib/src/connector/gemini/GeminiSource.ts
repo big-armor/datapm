@@ -5,7 +5,7 @@ import { InspectionResults, Source } from "../Source";
 import { TYPE, URI_BASE } from "./GeminiConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type ChangeEvent = {
     type: "change";

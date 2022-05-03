@@ -1,7 +1,7 @@
 import { DPMConfiguration, ParameterType } from "datapm-lib";
 import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
-import { JobContext } from "../task/Task";
+import { JobContext } from "../task/JobContext";
 import { RepositoryConfig } from "../config/Config";
 import { getConnectorDescriptionByType } from "../main";
 

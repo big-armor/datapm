@@ -6,7 +6,7 @@ import { TYPE } from "./FTXConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { getWebSocketUri } from "./FTXConnector";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type FtxRestResponse<T> = {
     success: boolean;

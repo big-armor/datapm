@@ -2,6 +2,7 @@ export * from "./generated/graphql";
 
 /** Jobs and Tasks */
 export * from "./task/Task";
+export * from "./task/JobContext";
 export * from "./task/AddRepositoryCredentialsJob";
 export * from "./task/AddRepositoryJob";
 export * from "./task/EditJob";

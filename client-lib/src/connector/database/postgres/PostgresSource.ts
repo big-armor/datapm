@@ -4,7 +4,7 @@ import { StreamSetPreview, SourceErrors, InspectionResults, Source } from "../..
 import { Transform } from "stream";
 import { table } from "console";
 import { TYPE } from "./PostgresConnectorDescription";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 
 export class PostgresSource implements Source {
     sourceType(): string {

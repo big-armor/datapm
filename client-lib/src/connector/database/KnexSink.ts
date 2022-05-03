@@ -16,7 +16,7 @@ import { ExtendedJSONSchema7TypeName } from "../Source";
 import { convertValueByValueType, discoverValueType } from "../../transforms/StatsTransform";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 export abstract class KnexSink implements Sink {
     client: Knex;

@@ -4,7 +4,8 @@ import { Catalog } from "../generated/graphql";
 import { RegistryPackageFileContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
 import { publishPackageFile } from "../util/PackageUtil";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 import { RegistryConfig } from "../config/Config";
 
 export class PublishJobResult {

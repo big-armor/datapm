@@ -2,7 +2,7 @@ import { DPMConfiguration, DPMRecord, UpdateMethod, RecordContext, Parameter, Pa
 import faker from "faker";
 import { Readable } from "stream";
 import { string } from "yargs";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { FakerCategories, FakerTypes } from "../../../util/FakerUtil";
 import { toSentenceCase } from "../../../util/NameUtil";
 import { StreamSetPreview, InspectionResults, Source, StreamSummary } from "../../Source";

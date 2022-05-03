@@ -6,7 +6,7 @@ import { TYPE } from "./KrakenConnectorDescription";
 import WebSocket from "ws";
 import fetch from "cross-fetch";
 import { URI } from "./KrakenConnector";
-import { JobContext } from "../../task/Task";
+import { JobContext } from "../../task/JobContext";
 
 type KrakenTickerMessage = {
     a: [string, number, string];

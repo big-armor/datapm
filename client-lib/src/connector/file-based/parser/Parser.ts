@@ -1,6 +1,6 @@
 import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import { Readable, Transform } from "stream";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { Maybe } from "../../../util/Maybe";
 
 /** A stream as returned by a file parser before being opened */

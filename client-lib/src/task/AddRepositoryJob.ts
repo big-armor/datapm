@@ -3,7 +3,8 @@ import { Connector, ConnectorDescription } from "../connector/Connector";
 import { getConnectorDescriptionByType, getConnectorDescriptions } from "../connector/ConnectorUtil";
 import { promptForConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
-import { Job, JobContext, JobResult } from "./Task";
+import { Job, JobResult } from "./Task";
+import { JobContext } from "./JobContext";
 
 export class AddRepositoryJobResult {
     connector: Connector;

@@ -9,7 +9,7 @@ import {
     ParameterType,
     RecordStreamContext
 } from "datapm-lib";
-import { JobContext } from "../../../task/Task";
+import { JobContext } from "../../../task/JobContext";
 import { Maybe } from "../../../util/Maybe";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
