@@ -272,7 +272,7 @@ describe("Update Package Command Tests", async () => {
 
         expect(cmdResult.code, "Exit code").equals(0);
 
-        expect(newPackageFile.sources[0].configuration?.headerRowNumber).equals(0);
+        expect(newPackageFile.sources[0].configuration?.headerRowNumber).equals(1);
     });
 
     it("Should preserve README and LICENSE files", async () => {
