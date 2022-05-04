@@ -122,7 +122,7 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
         const credentialsConfiguration = credentialsResult.credentialsConfiguration;
 
         const credentialsIdentifier = await repository.getCredentialsIdentifierFromConfiguration(
-            credentialsResult.credentialsConfiguration,
+            repositoryConfig.connectionConfiguration,
             credentialsConfiguration
         );
 

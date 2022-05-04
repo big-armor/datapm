@@ -32,6 +32,8 @@ export const enum Commands {
 
 export class RepositoryDefaultArguments {}
 
+export class CredentialDefaultArguments {}
+
 export class RepositoryRemoveArguments {
     repositoryType?: string;
     repositoryIdentifier?: string;
@@ -131,7 +133,7 @@ export class RepositoryCommand implements Command {
                                     handler: removeCredentials
                                 });
                         },
-                        handler: removeRepository
+                        handler: defaultCredentialsCommand
                     });
             },
             handler: defaultRepositoryCommand
@@ -143,6 +145,16 @@ export async function defaultRepositoryCommand(args: RepositoryDefaultArguments)
     try {
         const module = await import("./RepositoryCommandModule");
         await module.defaultRepositoryCommandHandler(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
+}
+
+export async function defaultCredentialsCommand(args: CredentialDefaultArguments): Promise<void> {
+    try {
+        const module = await import("./RepositoryCommandModule");
+        await module.defaultCredentialCommandHandler(args);
     } catch (e) {
         console.error(e);
         process.exit(1);

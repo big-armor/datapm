@@ -14,6 +14,7 @@ import {
 import { getRepositoryConfigs, removeCredentialsConfig, removeRepositoryConfig } from "../util/ConfigUtil";
 import {
     Commands,
+    CredentialDefaultArguments,
     CredentialsRemoveArguments,
     RepositoryDefaultArguments,
     RepositoryRemoveArguments
@@ -24,6 +25,27 @@ import { CLIJobContext } from "./CommandTaskUtil";
 
 import { defaultPromptOptions } from "../util/DefaultParameterOptions";
 
+export async function defaultCredentialCommandHandler(argv: CredentialDefaultArguments): Promise<void> {
+    printDataPMVersion(argv);
+
+    const commandPromptResult = await prompts({
+        type: "autocomplete",
+        name: "command",
+        message: "Action?",
+        choices: [
+            { title: "Add Credentials", value: Commands.ADD_CREDENTIALS },
+            { title: "Remove Credentials", value: Commands.REMOVE_CREDENTIALS }
+        ],
+        initial: 0
+    });
+
+    if (commandPromptResult.command === Commands.REMOVE_CREDENTIALS) {
+        await removeCredentials(argv as CredentialsRemoveArguments);
+    } else if (commandPromptResult.command === Commands.ADD_CREDENTIALS) {
+        await addCredentials(argv as CredentialsAddArguments);
+    }
+}
+
 export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArguments): Promise<void> {
     printDataPMVersion(argv);
 
@@ -32,10 +54,10 @@ export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArg
         name: "command",
         message: "Action?",
         choices: [
-            { title: "Add a Repository or Credentials", value: Commands.ADD },
+            { title: "Add a Repository", value: Commands.ADD },
             { title: "Update a Repository", value: Commands.UPDATE },
             { title: "Remove a Repository", value: Commands.REMOVE },
-            { title: "Update Credentials", value: Commands.UPDATE_CREDENTIALS },
+            { title: "Add Credentials", value: Commands.ADD_CREDENTIALS },
             { title: "Remove Credentials", value: Commands.REMOVE_CREDENTIALS }
         ],
         initial: 0
@@ -48,7 +70,9 @@ export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArg
     } else if (commandPromptResult.command === Commands.REMOVE) {
         await removeRepository(argv as RepositoryRemoveArguments);
     } else if (commandPromptResult.command === Commands.REMOVE_CREDENTIALS) {
-        // await removeRegistryCommand(args as RegistryRemoveArguments);
+        await removeCredentials(argv as CredentialsRemoveArguments);
+    } else if (commandPromptResult.command === Commands.ADD_CREDENTIALS) {
+        await addCredentials(argv as CredentialsAddArguments);
     }
 }
 
