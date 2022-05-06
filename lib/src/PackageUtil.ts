@@ -24,6 +24,18 @@ import {
 import { PackageFile080 } from "./main";
 import { DATAPM_VERSION } from "./DataPMVersion";
 
+export type DPMPropertyTypes =
+    | "string"
+    | "number"
+    | "integer"
+    | "boolean"
+    | "date"
+    | "date-time"
+    | "object"
+    | "array"
+    | "null"
+    | "binary"; // Binary not actually used
+
 export type DPMRecordValue =
     | number
     | string
@@ -592,21 +604,37 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
     return packageFile;
 }
 
+function massagePackageFile(packageFile: PackageFile): void {
+    if (typeof packageFile.updatedDate === "string") {
+        packageFile.updatedDate = new Date(packageFile.updatedDate);
+    }
+}
+
+export async function parsePackageFileJSONInBrowser(packageFileString: string): Promise<PackageFile> {
+    try {
+        let packageFile = JSON.parse(packageFileString) as PackageFile;
+
+        await validatePackageFileInBrowser(packageFile);
+
+        massagePackageFile(packageFile);
+
+        packageFile = upgradePackageFile(packageFile);
+
+        return packageFile;
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
+    }
+}
+
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
         let packageFile = JSON.parse(packageFileString) as PackageFile;
 
         const isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
 
-        if (isBrowser) {
-            validatePackageFileInBrowser(packageFile);
-        } else {
-            validatePackageFile(packageFile);
-        }
+        validatePackageFile(packageFile);
 
-        if (packageFile.updatedDate != null) {
-            packageFile.updatedDate = new Date(packageFile.updatedDate);
-        }
+        massagePackageFile(packageFile);
 
         packageFile = upgradePackageFile(packageFile);
 

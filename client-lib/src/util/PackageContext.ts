@@ -11,7 +11,7 @@ export type CantSaveReasons = "NOT_AUTHENTICATED" | "SAVE_NOT_AVAILABLE" | "NOT_
 export function cantSaveReasonToString(reason: CantSaveReasons): string {
     switch (reason) {
         case "NOT_AUTHENTICATED":
-            return "You are not logged in to the registry. Use the `datapm login` command to authenticate.";
+            return "You are not logged in to the registry. Use the `datapm registry login` command to authenticate.";
         case "SAVE_NOT_AVAILABLE":
             return "Saving is not available for this package";
         case "NOT_AUTHORIZED":

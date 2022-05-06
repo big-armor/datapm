@@ -392,6 +392,12 @@ export function mergeValueTypes(types: ExtendedJSONSchema7TypeName[]): JSONSchem
     if (mergedTypes.includes("binary")) {
         if (mergedTypes.includes("number")) {
             mergedTypes = mergedTypes.join(",").replace("binary", "number").split(",") as ExtendedJSONSchema7TypeName[];
+        }
+        if (mergedTypes.includes("integer")) {
+            mergedTypes = mergedTypes
+                .join(",")
+                .replace("binary", "integer")
+                .split(",") as ExtendedJSONSchema7TypeName[];
         } else {
             mergedTypes = mergedTypes
                 .join(",")
@@ -444,6 +450,26 @@ export function mergeValueTypeStats(property: Schema): void {
             );
             valueTypes.number.numberMinValue = Math.min(
                 valueTypes.number.numberMinValue || Number.MAX_VALUE,
+                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
+            );
+        }
+        if (types.includes("integer")) {
+            const numberCount = valueTypes.integer.recordCount || 0;
+            valueTypes.integer = {
+                ...valueTypes.binary,
+                ...valueTypes.integer,
+                recordCount: binaryCount + numberCount,
+                stringOptions: {
+                    ...valueTypes.binary.stringOptions,
+                    ...valueTypes.integer.stringOptions
+                }
+            };
+            valueTypes.integer.numberMaxValue = Math.max(
+                valueTypes.integer.numberMaxValue || Number.MIN_VALUE,
+                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
+            );
+            valueTypes.integer.numberMinValue = Math.min(
+                valueTypes.integer.numberMinValue || Number.MAX_SAFE_INTEGER,
                 ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
             );
         } else if (types.includes("boolean")) {

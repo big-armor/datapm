@@ -183,7 +183,7 @@ describe("Postgres Source Test", function () {
             },
             bigint: {
                 format: ["integer"],
-                type: ["number"]
+                type: ["integer"]
             },
             real: {
                 format: ["number"],

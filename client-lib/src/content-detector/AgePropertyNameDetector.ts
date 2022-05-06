@@ -1,9 +1,10 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const AGE_LABEL = "age";
 export class AgePropertyNameDetector extends PropertyNameDetectorBase {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
-        return ["number"];
+    getApplicableTypes(): DPMPropertyTypes[] {
+        return ["integer"];
     }
 
     getPropertyNameMatches(): RegExp[] {

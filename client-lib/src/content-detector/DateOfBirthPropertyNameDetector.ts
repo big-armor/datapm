@@ -1,8 +1,9 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const DOB_LABEL = "birthdate";
 export class DateOfBirthPropertyNameDetector extends PropertyNameDetectorBase {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+    getApplicableTypes(): DPMPropertyTypes[] {
         return ["string", "date"];
     }
 

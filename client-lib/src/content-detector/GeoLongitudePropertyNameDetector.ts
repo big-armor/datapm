@@ -1,9 +1,10 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const GEO_LONGITUDE_LABEL = "geo_latitude";
 
 export class GeoLongitudePropertyNameDetector extends PropertyNameDetectorBase {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+    getApplicableTypes(): DPMPropertyTypes[] {
         return ["number"];
     }
 

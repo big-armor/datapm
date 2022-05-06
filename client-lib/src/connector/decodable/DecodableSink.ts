@@ -9,7 +9,8 @@ import {
     SinkStateKey,
     SchemaIdentifier,
     RecordStreamContext,
-    ParameterType
+    ParameterType,
+    DPMPropertyTypes
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
@@ -527,7 +528,7 @@ export class DecodableSink implements Sink {
         });
     }
 
-    getDecodableType(format: string, types: JSONSchema7TypeName[]): string {
+    getDecodableType(format: string, types: DPMPropertyTypes[]): string {
         const removedNull = types.filter((t) => t !== "null");
 
         if (removedNull.length > 1) {
@@ -544,16 +545,13 @@ export class DecodableSink implements Sink {
             case "integer":
                 return "BIGINT";
             case "number":
-                switch (format) {
-                    case "float":
-                        return "FLOAT";
-                    case "integer":
-                        return "BIGINT";
-                    default:
-                        return "DOUBLE";
-                }
+                return "DECIMAL";
             case "boolean":
                 return "BOOLEAN";
+            case "date":
+                return "DATE";
+            case "date-time":
+                return "TIMESTAMP";
             default:
                 throw new Error("Unsupported Decodable type: " + removedNull[0]);
         }

@@ -1,11 +1,12 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { RegexDetector } from "./RegexDetector";
 
 export const SOCIAL_SECURITY_NUMBER_LABEL = "social_security_number";
 
 /** Applies the 'phone_number' label when any single phone number is found in any value */
 export class SocialSecurityNumberDetector extends RegexDetector {
-    getApplicableTypes(): ("string" | "number")[] {
-        return ["string", "number"];
+    getApplicableTypes(): DPMPropertyTypes[] {
+        return ["string", "integer"];
     }
 
     getRegExp(): RegExp {

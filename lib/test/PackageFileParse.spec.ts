@@ -8,14 +8,14 @@ describe("PackageFile checks", () => {
         expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.8.1.json");
     });
 
-    it("Should parse dates", function () {
+    it("Should parse dates", async function () {
         const packageFileString = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json");
         const packageFile = parsePackageFileJSON(packageFileString.toString());
 
         expect(packageFile.updatedDate.getTime()).equals(1601560469442);
     });
 
-    it("Should load readme and license files", function () {
+    it("Should load readme and license files", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.updatedDate.getTime()).equals(1601560469442);
 
@@ -23,7 +23,7 @@ describe("PackageFile checks", () => {
         expect(packageFile.licenseMarkdown).contains("This is not a real license. Just a test.");
     });
 
-    it("Should have v0.3.0 sources array separate from schemas", function () {
+    it("Should have v0.3.0 sources array separate from schemas", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.sources.length).equal(1);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -34,7 +34,7 @@ describe("PackageFile checks", () => {
         );
     });
 
-    it("Should have v0.4.0 max and min number values from schemas", function () {
+    it("Should have v0.4.0 max and min number values from schemas", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.schemas.length).equal(1);
         expect(
@@ -58,7 +58,7 @@ describe("PackageFile checks", () => {
         expect(packageFile.schemas[0].properties!.district.valueTypes!.number.numberMaxValue === 0);
     });
 
-    it("Should throw invalid package file error", function () {
+    it("Should throw invalid package file error", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFile.packageSlug += "-";
 
@@ -72,7 +72,7 @@ describe("PackageFile checks", () => {
         expect(errorFound).equal(true);
     });
 
-    it("Should have v0.8.0 canonical value true", function () {
+    it("Should have v0.8.0 canonical value true", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.canonical).equal(true);
     });

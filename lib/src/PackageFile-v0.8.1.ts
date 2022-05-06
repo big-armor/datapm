@@ -131,6 +131,16 @@ export interface ValueTypeStatistics {
     stringMinLength?: number;
     numberMaxValue?: number;
     numberMinValue?: number;
+
+    /** The maximum observed count of digits in a number (before and after the decimal) */
+    numberMaxPrecision?: number;
+
+    /** The maximum observed count of digits to the right of the decimal.  */
+    numberMaxScale?: number;
+
+    booleanTrueCount?: number;
+    booleanFalseCount?: number;
+
     dateMaxValue?: Date;
     dateMinValue?: Date;
     stringOptions?: { [key: string]: number };

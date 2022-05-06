@@ -51,6 +51,14 @@ describe("XML Tests", function () {
             {
                 message: "What does each country-currencies record represent?",
                 input: "country\n"
+            },
+            {
+                message: "Unit for attribute 'CcyNbr'?",
+                input: "\n"
+            },
+            {
+                message: "Unit for attribute 'CcyMnrUnts'?",
+                input: "\n"
             }
         ];
 

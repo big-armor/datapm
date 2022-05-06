@@ -111,52 +111,52 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "tot_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "conf_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "prob_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "new_case",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "pnew_case",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "tot_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "conf_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "prob_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "new_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "pnew_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
@@ -207,17 +207,17 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "Confirmed",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "Deaths",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "Recovered",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             }
         ];

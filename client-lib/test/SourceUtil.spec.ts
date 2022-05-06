@@ -8,8 +8,11 @@ import {
 } from "../src/transforms/StatsTransform";
 
 describe("String value type checks", () => {
-    test("string detect number", () => {
-        expect(discoverValueTypeFromString("0").type).equal("binary");
+    test("string detect integer", () => {
+        expect(discoverValueTypeFromString("-324234234").type).equal("integer");
+        expect(discoverValueTypeFromString("234234234").format).equal("integer");
+        expect(discoverValueTypeFromString("1").type).equal("integer");
+        expect(discoverValueTypeFromString("0").type).equal("integer");
     });
 
     test("strings that start with zero longer than a single character are strings, not numbers", () => {
@@ -20,7 +23,7 @@ describe("String value type checks", () => {
         expect(discoverValueTypeFromString("-7.32").type).equal("number");
         expect(discoverValueTypeFromString("-7.32").format).equal("number");
     });
-    test("string detect boolean", () => {
+    test("string detect booleans correctly", () => {
         expect(discoverValueTypeFromString("tRuE").type).equal("boolean");
         expect(discoverValueTypeFromString("FalSE").type).equal("boolean");
 
@@ -59,7 +62,7 @@ describe("detect type check", function () {
         expect(discoverValueType(1.2).type).equal("number");
     });
     test("integer", () => {
-        expect(discoverValueType(100).type).equal("number");
+        expect(discoverValueType(100).type).equal("integer");
     });
     test("boolean", () => {
         expect(discoverValueType(true).type).equal("boolean");
@@ -75,10 +78,10 @@ describe("detect type check", function () {
         expect(discoverValueType("1.2").format).equal("number");
 
         expect(discoverValueType("1.0").type).equal("number");
-        expect(discoverValueType("1.0").type).equal("number");
+        expect(discoverValueType("1.0").format).equal("number");
 
-        expect(discoverValueType(1.0).type).equal("number");
-        expect(discoverValueType(1.0).type).equal("number");
+        expect(discoverValueType(1.0).type).equal("integer");
+        expect(discoverValueType(1.0).format).equal("integer");
     });
 });
 

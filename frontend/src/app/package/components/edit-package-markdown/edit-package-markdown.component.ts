@@ -4,10 +4,9 @@ import {
     Compability,
     comparePackages,
     diffCompatibility,
-    getSchemaVersionFromPackageFile,
     nextVersion,
     PackageFile,
-    parsePackageFileJSON
+    parsePackageFileJSONInBrowser
 } from "datapm-lib";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { CreateVersionGQL, Package } from "src/generated/graphql";
@@ -53,11 +52,11 @@ export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.pageState = "LOADING";
 
-        this.packageService.package.subscribe((p) => {
+        this.packageService.package.subscribe(async (p) => {
             this.package = p.package;
 
-            this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
-            this.modifiedPackageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
+            this.packageFile = await parsePackageFileJSONInBrowser(p.package.latestVersion.packageFile);
+            this.modifiedPackageFile = await parsePackageFileJSONInBrowser(p.package.latestVersion.packageFile);
 
             const field = this.route.snapshot.url[0].path;
             if (field === "readme") {

@@ -641,10 +641,12 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_BOOLEAN) {
         if (valueType.type === "boolean") return typeConvertedValue;
-        if (valueType.type === "number") return ((typeConvertedValue as number) > 0).toString();
+        if (valueType.type === "number" || valueType.type === "integer")
+            return ((typeConvertedValue as number) > 0).toString();
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_INTEGER) {
-        if (valueType.format === "integer") return value;
+        if (valueType.type === "integer") return value;
+        if (valueType.type === "number") return Math.round(typeConvertedValue as number);
         if (valueType.type === "boolean") return typeConvertedValue ? "1" : "0";
         if (valueType.type === "date") {
             return (typeConvertedValue as Date).getTime().toString();

@@ -1,4 +1,4 @@
-import { ContentLabel } from "datapm-lib";
+import { ContentLabel, DPMPropertyTypes } from "datapm-lib";
 import { ContentLabelDetectorInterface } from "./ContentLabelDetector";
 import * as peopleNames from "people-names";
 
@@ -9,7 +9,7 @@ export class PersonNameDetector implements ContentLabelDetectorInterface {
     valueTestedCount = 0;
     foundCount = 0;
 
-    getApplicableTypes(): ["string" | "number" | "boolean" | "date" | "date-time"] {
+    getApplicableTypes(): DPMPropertyTypes[] {
         return ["string"];
     }
 

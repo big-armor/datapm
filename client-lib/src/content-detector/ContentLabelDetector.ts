@@ -1,4 +1,4 @@
-import { ContentLabel, Schema } from "datapm-lib";
+import { ContentLabel, DPMPropertyTypes, DPMRecordValue, Schema } from "datapm-lib";
 import { EmailAddressDetector } from "./EmailContentDetector";
 import { PersonNameDetector } from "./PersonNameDetector";
 import { PhoneNumberDetector } from "./PhoneNumberDetector";
@@ -17,6 +17,7 @@ import { PassportPropertyNameDetector } from "./PassportPropertyNameDetector";
 import { DriversLicensePropertyNameDetector } from "./DriversLicensePropertyNameDetector";
 import { GeoLatitudePropertyNameDetector } from "./GeoLatitudePropertyNameDetector";
 import { GeoLongitudePropertyNameDetector } from "./GeoLongitudePropertyNameDetector";
+import { discoverValueType } from "../transforms/StatsTransform";
 
 declare type Class<T extends ContentLabelDetectorInterface> = new () => T;
 
@@ -47,7 +48,7 @@ export const ContentLabelDetectors: Class<ContentLabelDetectorInterface>[] = [
 ];
 
 export interface ContentLabelDetectorInterface {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
+    getApplicableTypes(): DPMPropertyTypes[];
 
     /** Given a value, return a list of the labels present
      */
@@ -64,14 +65,14 @@ export interface ContentLabelDetectorInterface {
     getContentLabels(propertyName: string, existingLabels: ContentLabel[]): ContentLabel[];
 }
 
-export function getContentLabelDetectorsForValueType(valueType: string): ContentLabelDetectorInterface[] {
+export function getContentLabelDetectorsForValueType(valueType: DPMPropertyTypes): ContentLabelDetectorInterface[] {
     const returnValue: ContentLabelDetectorInterface[] = [];
 
     for (const detector of ContentLabelDetectors) {
         // eslint-disable-next-line new-cap
         const instance = new detector();
 
-        if (instance.getApplicableTypes().includes(valueType as "string" | "number")) returnValue.push(instance);
+        if (instance.getApplicableTypes().includes(valueType)) returnValue.push(instance);
     }
 
     return returnValue;
@@ -84,15 +85,17 @@ export class ContentLabelDetector {
         this.contentLabelDetectors = {};
     }
 
-    inspectValue(_schemaSlug: string, propertyName: string, value: unknown): void {
-        const valueType = typeof value;
+    inspectValue(_schemaSlug: string, propertyName: string, value: DPMRecordValue): void {
+        const valueType = discoverValueType(value);
 
         if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};
 
-        if (this.contentLabelDetectors[propertyName][valueType] == null)
-            this.contentLabelDetectors[propertyName][valueType] = getContentLabelDetectorsForValueType(valueType);
+        if (this.contentLabelDetectors[propertyName][valueType.type] == null)
+            this.contentLabelDetectors[propertyName][valueType.type] = getContentLabelDetectorsForValueType(
+                valueType.type
+            );
 
-        for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType]) {
+        for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType.type]) {
             const valueTestedCount = contentLabelDetector.getValueTestCount();
 
             let inspect = true;

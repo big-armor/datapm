@@ -72,8 +72,9 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                 const propertyTypes = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
                 let propertyType = propertyTypes[0] as string;
                 if (propertyTypes.includes("number")) {
-                    if (property.format?.includes("number")) propertyType = "double";
-                    else propertyType = "int";
+                    propertyType = "double";
+                } else if (propertyTypes.includes("integer")) {
+                    propertyType = "int";
                 }
 
                 if (property.title == null) {
@@ -132,7 +133,7 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                             if (recordData[validKey] === null) {
                                 if (valueType.type === "string") {
                                     recordData[validKey] = "";
-                                } else if (valueType.type === "number") {
+                                } else if (valueType.type === "number" || valueType.type === "integer") {
                                     recordData[validKey] = 0;
                                 }
                             }
