@@ -17,7 +17,7 @@ import { PassportPropertyNameDetector } from "./PassportPropertyNameDetector";
 import { DriversLicensePropertyNameDetector } from "./DriversLicensePropertyNameDetector";
 import { GeoLatitudePropertyNameDetector } from "./GeoLatitudePropertyNameDetector";
 import { GeoLongitudePropertyNameDetector } from "./GeoLongitudePropertyNameDetector";
-import { discoverValueType } from "../transforms/StatsTransform";
+import { discoverValueType } from "../util/SchemaUtil";
 
 declare type Class<T extends ContentLabelDetectorInterface> = new () => T;
 

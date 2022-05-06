@@ -13,10 +13,10 @@ import Knex, { CreateTableBuilder, Ref, Transaction } from "knex";
 import { Transform } from "stream";
 import { Maybe } from "../../util/Maybe";
 import { ExtendedJSONSchema7TypeName } from "../Source";
-import { convertValueByValueType, discoverValueType } from "../../transforms/StatsTransform";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 import { JobContext } from "../../task/JobContext";
+import { convertValueByValueType, discoverValueType } from "../../util/SchemaUtil";
 
 export abstract class KnexSink implements Sink {
     client: Knex;

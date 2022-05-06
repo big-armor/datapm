@@ -6,11 +6,13 @@ import {
     Schema,
     UpdateMethod,
     RecordStreamContext,
-    Parameter
+    Parameter,
+    DPMPropertyTypes
 } from "datapm-lib";
-import { JSONSchema7TypeName } from "json-schema";
 import { Transform, TransformCallback, Writable } from "stream";
-import { convertValueByValueType } from "../../../transforms/StatsTransform";
+// eslint-disable-next-line node/no-deprecated-api
+import { isDate } from "util";
+import { convertValueByValueType } from "../../../util/SchemaUtil";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializer";
 import { DISPLAY_NAME, EXTENSION, MIME_TYPE } from "./RecordSerializerAVRODescription";
@@ -69,12 +71,26 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
             name: this.sanitizeName(schema.title as string),
             type: "record",
             fields: Object.values(schema.properties as Properties).map((property) => {
-                const propertyTypes = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
+                if (property.valueTypes == null) {
+                    throw new Error("Property " + property.title + " does not have valueTypes defined");
+                }
+
+                const propertyTypes = Object.keys(property.valueTypes).filter((type) => type !== "null");
                 let propertyType = propertyTypes[0] as string;
                 if (propertyTypes.includes("number")) {
                     propertyType = "double";
                 } else if (propertyTypes.includes("integer")) {
                     propertyType = "int";
+                } else if (propertyTypes.includes("date-time")) {
+                    return {
+                        name: this.sanitizeName(property.title as string),
+                        type: "long"
+                    };
+                } else if (propertyTypes.includes("date")) {
+                    return {
+                        name: this.sanitizeName(property.title as string),
+                        type: "string"
+                    };
                 }
 
                 if (property.title == null) {
@@ -108,7 +124,6 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                         const recordData = record.recordContext.record;
                         Object.keys(recordData).forEach((key) => {
                             const validKey = self.sanitizeName(key);
-                            recordData[validKey] = recordData[key];
                             if (validKey !== key) {
                                 delete recordData[key];
                             }
@@ -123,13 +138,24 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                                 );
                             }
 
-                            const types = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
+                            const types = (property.type as DPMPropertyTypes[]).filter((type) => type !== "null");
                             const formats = (property.format || "").split(",").filter((type) => type !== "null");
                             const valueType = {
                                 type: types[0],
                                 format: formats[0]
                             };
-                            recordData[validKey] = convertValueByValueType(recordData[validKey], valueType);
+
+                            const convertedValue = convertValueByValueType(recordData[validKey], valueType);
+
+                            recordData[validKey] = convertedValue;
+
+                            if (valueType.type === "date-time" && isDate(convertedValue)) {
+                                recordData[validKey] = convertedValue.getTime();
+                            }
+                            if (valueType.type === "date" && isDate(convertedValue)) {
+                                recordData[validKey] = convertedValue.toISOString().split("T")[0];
+                            }
+
                             if (recordData[validKey] === null) {
                                 if (valueType.type === "string") {
                                     recordData[validKey] = "";

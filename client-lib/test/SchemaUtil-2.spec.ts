@@ -1,11 +1,7 @@
 import { expect } from "chai";
 import moment from "moment";
 import { test } from "mocha";
-import {
-    convertValueByValueType,
-    discoverValueType,
-    discoverValueTypeFromString
-} from "../src/transforms/StatsTransform";
+import { convertValueByValueType, discoverValueType, discoverValueTypeFromString } from "../src/util/SchemaUtil";
 
 describe("String value type checks", () => {
     test("string detect integer", () => {
@@ -34,13 +30,11 @@ describe("String value type checks", () => {
     test("string detect date", () => {
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DD")).type).equal("date");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DD")).format).equal("date");
-        expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ")).type).equal("date");
-        // const value = moment().format("YYYY-MM-DDThh:mmZZ");
-        // console.log(value);
+        expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ")).type).equal("date-time");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ")).format).equal("date-time");
-        expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mm:ssZZ")).type).equal("date");
+        expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mm:ssZZ")).type).equal("date-time");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mm:ssZZ")).format).equal("date-time");
-        expect(discoverValueTypeFromString(new Date().toISOString()).type).equal("date");
+        expect(discoverValueTypeFromString(new Date().toISOString()).type).equal("date-time");
         expect(discoverValueTypeFromString(new Date().toISOString()).format).equal("date-time");
     });
     test("null check", () => {

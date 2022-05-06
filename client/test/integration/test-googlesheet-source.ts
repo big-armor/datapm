@@ -161,7 +161,7 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "created_at",
-                type: ["string"],
+                type: ["date-time"],
                 format: ["date-time"]
             },
             {

@@ -13,7 +13,8 @@ import {
     ParameterAnswer,
     DPMRecordValue,
     Parameter,
-    DPMConfiguration
+    DPMConfiguration,
+    DPMPropertyTypes
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -26,7 +27,6 @@ import {
     ExtendedJSONSchema7TypeName,
     StreamSummary
 } from "../connector/Source";
-import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
 import { mergeValueFormats } from "../connector/SourceUtil";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
@@ -35,6 +35,8 @@ import { JobContext } from "../task/JobContext";
 import { JSONSchema7TypeName } from "json-schema";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
+import { createUTCDateTimeFromString, isDate, isDateTime } from "./DateUtil";
+import isNumber from "is-number";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -659,7 +661,7 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
         if (valueType.type === "binary") return typeConvertedValue ? "1.0" : "0.0";
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE) {
-        if (valueType.type === "date") return value;
+        if (valueType.type === "date-time") return value;
         if (valueType.format === "integer")
             return moment(new Date(typeConvertedValue as number))
                 .utc()
@@ -742,4 +744,119 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
 
         jobContext.print("NONE", " ");
     });
+}
+
+export function discoverValueType(value: DPMRecordValue): { type: DPMPropertyTypes; format?: string } {
+    if (value === null) return { type: "null", format: "null" };
+
+    if (typeof value === "bigint") return { type: "number", format: "integer" };
+
+    if (typeof value === "string") return discoverValueTypeFromString(value as string);
+
+    if (Array.isArray(value)) return { type: "array", format: "array" };
+
+    if (value instanceof Date) return { type: "date", format: "date-time" };
+
+    if (typeof value === "number") {
+        const strValue = value.toString();
+        if (strValue.indexOf(".") === -1) {
+            return { type: "integer", format: "integer" };
+        }
+        return { type: "number", format: "number" };
+    }
+
+    // TODO handle object and array better
+    return {
+        type: typeof value as "boolean" | "number" | "object",
+        format: typeof value as "boolean" | "number" | "object"
+    };
+}
+
+export function discoverValueTypeFromString(value: string): { type: DPMPropertyTypes; format?: string } {
+    if (value === "null") return { type: "null", format: "null" };
+
+    if (value.trim() === "") return { type: "null", format: "null" };
+
+    const booleanValues = ["true", "false", "yes", "no"];
+
+    if (booleanValues.includes(value.trim().toLowerCase())) return { type: "boolean", format: "boolean" };
+
+    if (isNumber(value.toString())) {
+        const trimmedValue = value.trim();
+
+        if (value === "0") return { type: "integer", format: "integer" };
+
+        // Find doubles with no more than one preceding zero before a period
+        if (trimmedValue.match(/^[-+]?(?:(?:[1-9][\d,]*)|0)\.\d+$/)) {
+            return { type: "number", format: "number" };
+
+            // Find integers, no leading zeros, only three numbers between commas, no other characters, allows leading +/-
+        } else if (trimmedValue.match(/^[-+]?(?![\D0])(?:\d+(?:(?<!\d{4}),(?=\d{3}(?:,|$)))?)+$|^0$/)) {
+            return { type: "integer", format: "integer" };
+        }
+    }
+
+    if (isDate(value)) {
+        return { type: "date", format: "date" };
+    } else if (isDateTime(value)) {
+        return { type: "date-time", format: "date-time" };
+    }
+
+    return { type: "string", format: "string" };
+}
+
+/** Given a value, convert it to a specific value type. Example: boolean from string */
+export function convertValueByValueType(
+    value: DPMRecordValue,
+    valueType: { type: DPMPropertyTypes; format?: string } // TODO should this be DPMRecordValue??
+): DPMRecordValue {
+    if (value == null) return null;
+
+    if (valueType.type === "null") {
+        return null;
+    } else if (valueType.type === "string") {
+        if (typeof value === "string") return value;
+        return value.toString();
+    } else if (valueType.type === "boolean" || valueType.type === "binary") {
+        if (typeof value === "boolean") return value;
+        if (typeof value === "number") return (value as number) > 0;
+        if (typeof value === "string") {
+            if (isNumber(value)) {
+                return Number.parseInt(value) > 0;
+            }
+            const stringValue = (value as string).trim().toLowerCase();
+            return stringValue === "true" || stringValue === "yes";
+        }
+    } else if (valueType.type === "number") {
+        if (typeof value === "boolean") return (value as boolean) ? 1 : 0;
+        if (typeof value === "number") return value;
+        if (typeof value === "string") return +value;
+    } else if (valueType.type === "integer") {
+        if (typeof value === "boolean") return (value as boolean) ? 1 : 0;
+        if (typeof value === "number") return Math.round(value);
+        if (typeof value === "string") return Math.round(+value);
+    } else if (valueType.type === "date") {
+        try {
+            return createUTCDateTimeFromString(value as string); // TODO - this is probably not right for all situations
+        } catch (err) {
+            return value;
+        }
+    } else if (valueType.type === "date-time") {
+        try {
+            return createUTCDateTimeFromString(value as string); // TODO - this is probably not right for all situations
+        } catch (err) {
+            return value;
+        }
+    }
+
+    // TODO recursively handle arrays and object
+    throw new Error(
+        `UNABLE_TO_CONVERT_TYPE ${typeof value} to ${valueType.type} ${
+            valueType.format ? " with format " + valueType.format : ""
+        }`
+    );
+}
+
+export function convertToJSONSchema7TypeName(type: DPMPropertyTypes): DPMPropertyTypes {
+    return type.replace("binary", "boolean") as DPMPropertyTypes;
 }
