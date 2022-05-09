@@ -30,6 +30,8 @@ describe("String value type checks", () => {
     test("string detect date", () => {
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DD")).type).equal("date");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DD")).format).equal("date");
+        console.log(moment().format("YYYY-MM-DDThh:mmZZ"));
+        console.log(JSON.stringify(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ"))));
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ")).type).equal("date-time");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mmZZ")).format).equal("date-time");
         expect(discoverValueTypeFromString(moment().format("YYYY-MM-DDThh:mm:ssZZ")).type).equal("date-time");
