@@ -121,10 +121,11 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                 objectMode: true,
                 transform(records: RecordStreamContext[], _encoding, callback) {
                     for (const record of records) {
-                        const recordData = record.recordContext.record;
+                        const recordData = { ...record.recordContext.record };
                         Object.keys(recordData).forEach((key) => {
                             const validKey = self.sanitizeName(key);
                             if (validKey !== key) {
+                                recordData[validKey] = recordData[key];
                                 delete recordData[key];
                             }
 

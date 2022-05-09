@@ -112,8 +112,7 @@ describe("AVRO Sink Test", function () {
         const cmdResult = await testCmd(
             "fetch",
             [packageCFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
-            prompts,
-            async (line) => console.log(line)
+            prompts
         );
 
         expect(cmdResult.code, "Exit code").equals(0);

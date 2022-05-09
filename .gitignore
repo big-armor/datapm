@@ -22,5 +22,6 @@ backend/tmp-registry-server-storage
 backend/tmp-registry-server-storage-*
 
 *.p12
+*.avro
 
 lib/src/DataPMVersion.ts
