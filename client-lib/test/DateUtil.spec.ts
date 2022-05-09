@@ -19,6 +19,7 @@ describe("Check package suggestion name", () => {
         expect(isDateTime("Tue Aug 30 2016 11:02:45 GMT+0800")).to.equal(true);
         expect(isDateTime("2016-08-30T03:01:19.543Z")).to.equal(true);
         expect(isDateTime("Tue Aug 30 2016")).to.equal(false);
+        expect(isDateTime("2022-05-09T01:04+0000")).to.equal(true);
         expect(isDateTime(moment().format("YYYY-MM-DDThh:mmZZ"))).to.equal(true);
         expect(isDateTime(moment().format("YYYY-MM-DDThh:mm:ssZZ"))).to.equal(true);
         expect(isDate("Tue Aug 30 2016")).to.equal(true);
