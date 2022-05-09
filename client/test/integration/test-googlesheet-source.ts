@@ -202,7 +202,7 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "Last Update",
-                type: ["string"],
+                type: ["date-time"],
                 format: ["date-time"]
             },
             {
