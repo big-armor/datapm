@@ -17,11 +17,11 @@ import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
 import { ExtendedJSONSchema7TypeName } from "../../Source";
-import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryConnectorDescription";
 import { JobContext } from "../../../task/JobContext";
+import { convertValueByValueType, discoverValueType } from "../../../util/SchemaUtil";
 
 export class BigQuerySink implements Sink {
     client: BigQuery;

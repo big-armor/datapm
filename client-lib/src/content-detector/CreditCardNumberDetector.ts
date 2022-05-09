@@ -3,8 +3,8 @@ import { RegexDetector } from "./RegexDetector";
 export const CREDIT_CARD_NUMBER = "credit_card_number";
 
 export class CreditCardNumberDetector extends RegexDetector {
-    getApplicableTypes(): ("string" | "number")[] {
-        return ["string", "number"];
+    getApplicableTypes(): ("string" | "integer")[] {
+        return ["string", "integer"];
     }
 
     getRegExp(): RegExp {

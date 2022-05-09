@@ -87,7 +87,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Credit Card Numbers", async function () {
         expect(
-            packageA.schemas[0].properties?.creditCardNumbers.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.creditCardNumbers.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === CREDIT_CARD_NUMBER
             ) != null
         ).equal(true);
@@ -175,13 +175,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Driverse license property names", async function () {
         expect(
-            packageA.schemas[0].properties?.driversLicense.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.driversLicense.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === DRIVERS_LICENSE_LABEL
             ) != null
         ).equal(true);
 
         expect(
-            packageA.schemas[0].properties?.dl.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.dl.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === DRIVERS_LICENSE_LABEL
             ) != null
         ).equal(true);
@@ -189,7 +189,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect age property names", async function () {
         expect(
-            packageA.schemas[0].properties?.age.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.age.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === AGE_LABEL
             ) != null
         ).equal(true);
@@ -239,7 +239,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect passport property names", async function () {
         expect(
-            packageA.schemas[0].properties?.Passport.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.Passport.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === PASSPORT_LABEL
             ) != null
         ).equal(true);
@@ -247,7 +247,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect NPI property names", async function () {
         expect(
-            packageA.schemas[0].properties?.NPI.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.NPI.valueTypes?.integer.contentLabels?.find(
                 (cl) => cl.label === NPI_LABEL
             ) != null
         ).equal(true);

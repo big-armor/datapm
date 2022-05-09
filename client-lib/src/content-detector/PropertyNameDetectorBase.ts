@@ -1,8 +1,8 @@
-import { ContentLabel } from "datapm-lib";
+import { ContentLabel, DPMPropertyTypes } from "datapm-lib";
 import { ContentLabelDetectorInterface } from "./ContentLabelDetector";
 
 export abstract class PropertyNameDetectorBase implements ContentLabelDetectorInterface {
-    abstract getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
+    abstract getApplicableTypes(): DPMPropertyTypes[];
     abstract getPropertyNameMatches(): RegExp[];
     abstract getLabel(): string;
 

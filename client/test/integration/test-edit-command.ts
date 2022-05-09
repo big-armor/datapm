@@ -392,7 +392,9 @@ describe("Edit Package Command Tests", async () => {
 
         const cmdResult = await testCmd("edit", [packageAFilePath, "--defaults"], [], async (line: string) => {
             if (
-                line.includes("You are not logged in to the registry. Use the `datapm login` command to authenticate.")
+                line.includes(
+                    "You are not logged in to the registry. Use the `datapm registry login` command to authenticate."
+                )
             ) {
                 results.messageFound = true;
             }

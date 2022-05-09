@@ -260,7 +260,7 @@ describe("Package Command Tests", async () => {
             [TEST_SOURCE_FILES.FILE5, "--defaults"],
             defaultPromptInputsForCSVs,
             async (line: string) => {
-                if (line.includes("senate_class") && line.includes("number(18.59%), null(81.41%)")) {
+                if (line.includes("senate_class") && line.includes("integer(18.59%), null(81.41%)")) {
                     results.senateClassStatsFound = true;
                 }
                 if (line.includes("When you are ready, you can publish with the following command")) {
@@ -285,10 +285,10 @@ describe("Package Command Tests", async () => {
         const senateClassValues = sampleRecords?.map((record) => record.senate_class);
 
         expect(valueTypes.length).equals(2);
-        expect(valueTypes).includes("number");
+        expect(valueTypes).includes("integer");
         expect(valueTypes).includes("null");
         expect(types.length).equals(2);
-        expect(types).includes("number");
+        expect(types).includes("integer");
         expect(types).includes("null");
         expect(formats.length).equals(2);
         expect(formats).includes("integer");

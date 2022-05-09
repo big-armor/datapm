@@ -452,7 +452,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
         const property = properties[key] as Schema;
         const type = property.type as JSONSchema7TypeName[];
         const types = type.filter((type) => type !== "null");
-        return types.length === 1 && types[0] === "number";
+        return types.includes("number") || types.includes("integer");
     });
 
     let promptForNumberUnits = true;

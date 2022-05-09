@@ -15,11 +15,11 @@ import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
 import { ExtendedJSONSchema7TypeName } from "../../Source";
-import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoConnectorDescription";
 import { CommitKey, Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { JobContext } from "../../../task/JobContext";
+import { convertValueByValueType, discoverValueType } from "../../../util/SchemaUtil";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;

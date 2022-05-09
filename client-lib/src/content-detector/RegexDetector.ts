@@ -1,4 +1,4 @@
-import { ContentLabel } from "datapm-lib";
+import { ContentLabel, DPMPropertyTypes } from "datapm-lib";
 import { ContentLabelDetectorInterface } from "./ContentLabelDetector";
 
 export const PHONE_NUMBER_LABEL = "phone_number";
@@ -11,7 +11,7 @@ export abstract class RegexDetector implements ContentLabelDetectorInterface {
     valueTestedCount = 0;
     ocurrenceCount = 0;
 
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+    getApplicableTypes(): DPMPropertyTypes[] {
         return ["string"];
     }
 

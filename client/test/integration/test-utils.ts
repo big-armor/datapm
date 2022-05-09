@@ -318,7 +318,6 @@ export function testCmd(
                 ) {
                     if (cmdProcess.stdin == null) throw new Error("Expected stdin, but it's null");
 
-                    // Write with a pause between each character
                     // note that this is not awaiting the delayed result
                     // so the buffer writing continues asynchronously
                     writeSlowlyToBuffer(cmdProcess.stdin, currentPrompt.input);
@@ -359,7 +358,7 @@ async function writeSlowlyToBuffer(writable: Writable, charactersRemaining: stri
     const indexOfEnter = charactersRemaining.lastIndexOf("\n");
 
     writable.write(charactersRemaining.substring(0, indexOfEnter));
-    await delay(20);
+    await delay(100);
 
     if (indexOfEnter === -1) {
         return;

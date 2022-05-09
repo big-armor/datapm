@@ -111,57 +111,57 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "tot_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "conf_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "prob_cases",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "new_case",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "pnew_case",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "tot_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "conf_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "prob_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "new_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "pnew_death",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "created_at",
-                type: ["string"],
+                type: ["date-time"],
                 format: ["date-time"]
             },
             {
@@ -202,22 +202,22 @@ describe("Googlesheet Source Test", function () {
             },
             {
                 title: "Last Update",
-                type: ["string"],
+                type: ["date-time"],
                 format: ["date-time"]
             },
             {
                 title: "Confirmed",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "Deaths",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             },
             {
                 title: "Recovered",
-                type: ["number"],
+                type: ["integer"],
                 format: ["integer"]
             }
         ];

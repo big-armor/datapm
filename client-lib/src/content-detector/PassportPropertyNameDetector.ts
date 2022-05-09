@@ -1,9 +1,10 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const PASSPORT_LABEL = "passport";
 export class PassportPropertyNameDetector extends PropertyNameDetectorBase {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
-        return ["string", "number"];
+    getApplicableTypes(): DPMPropertyTypes[] {
+        return ["string", "integer"];
     }
 
     getPropertyNameMatches(): RegExp[] {

@@ -183,7 +183,7 @@ describe("Postgres Source Test", function () {
             },
             bigint: {
                 format: ["integer"],
-                type: ["number"]
+                type: ["integer"]
             },
             real: {
                 format: ["number"],
@@ -195,11 +195,11 @@ describe("Postgres Source Test", function () {
             },
             date: {
                 format: ["date-time"],
-                type: ["string"]
+                type: ["date-time"]
             },
             "timestamp without time zone": {
                 format: ["date-time"],
-                type: ["string"]
+                type: ["date-time"]
             }
         };
         expect(newPackageFile.schemas.length).equals(1);

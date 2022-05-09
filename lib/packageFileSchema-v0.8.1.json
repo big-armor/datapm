@@ -1,5 +1,4 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://datapm.io/docs/package-file-schema-v0.8.0.json",
     "type": "object",
     "title": "DataPM Package File",
@@ -166,9 +165,6 @@
             "items": {
                 "allOf": [
                     {
-                        "$ref": "http://json-schema.org/draft-07/schema"
-                    },
-                    {
                         "type": "object",
                         "title": "Schema",
                         "description": "A schema of data available in the package. ",
@@ -179,9 +175,6 @@
                                 "patternProperties": {
                                     ".*": {
                                         "allOf": [
-                                            {
-                                                "$ref": "http://json-schema.org/draft-07/schema"
-                                            },
                                             {
                                                 "required": [
                                                     "type"

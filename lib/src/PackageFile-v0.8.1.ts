@@ -1,6 +1,7 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { UpdateMethod } from "./DataHandlingUtil";
 import { DPMConfiguration } from "./main";
+import { DPMPropertyTypes } from "./PackageUtil";
 
 export const CURRENT_PACKAGE_FILE_SCHEMA_URL = "https://datapm.io/docs/package-file-schema-v0.8.1.json";
 
@@ -121,7 +122,7 @@ export interface ContentLabel {
 }
 
 export interface ValueTypeStatistics {
-    valueType: JSONSchema7TypeName | "date";
+    valueType: DPMPropertyTypes;
 
     /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
      * then not all records were inspected, and therefore this does not represent the exact number of records
@@ -131,6 +132,16 @@ export interface ValueTypeStatistics {
     stringMinLength?: number;
     numberMaxValue?: number;
     numberMinValue?: number;
+
+    /** The maximum observed count of digits in a number (before and after the decimal) */
+    numberMaxPrecision?: number;
+
+    /** The maximum observed count of digits to the right of the decimal.  */
+    numberMaxScale?: number;
+
+    booleanTrueCount?: number;
+    booleanFalseCount?: number;
+
     dateMaxValue?: Date;
     dateMinValue?: Date;
     stringOptions?: { [key: string]: number };

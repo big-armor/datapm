@@ -260,8 +260,8 @@ describe("Package Tests", async () => {
 
         // console.log(JSON.stringify(JSON.parse(response.data.package.latestVersion?.packageFile),null,2));
 
-        expect(response.data.package.latestVersion?.identifier.versionMajor).to.equal(1);
-        expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(1);
+        expect(response.data.package.latestVersion?.identifier.versionMajor).to.equal(2);
+        expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(0);
         expect(response.data.package.latestVersion?.identifier.versionPatch).to.equal(0);
         
     })

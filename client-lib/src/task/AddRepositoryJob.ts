@@ -63,8 +63,6 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
         );
 
         if (connector.requiresCredentialsConfiguration()) {
-            this.jobContext.setCurrentStep(repositoryIdentifier + " Credentials");
-
             const credentialsResult = await obtainCredentialsConfiguration(
                 this.jobContext,
                 connector,

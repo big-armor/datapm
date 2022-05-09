@@ -1,8 +1,9 @@
+import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const SECRET_LABEL = "secret";
 export class SecretPropertyNameDetector extends PropertyNameDetectorBase {
-    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+    getApplicableTypes(): DPMPropertyTypes[] {
         return ["string"];
     }
 
