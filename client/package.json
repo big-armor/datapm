@@ -6,7 +6,7 @@
         "url": "git+https://github.com/big-armor/datapm.git",
         "directory": "client"
     },
-    "version": "0.8.135",
+    "version": "0.8.136",
     "engines": {
         "node": ">=16.14.2",
         "npm": ">=8.1.2"
