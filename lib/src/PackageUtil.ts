@@ -12,6 +12,8 @@ import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
 import { PackageFile060, Source060 } from "./PackageFile-v0.6.0";
 import { PackageFile070 } from "./PackageFile-v0.7.0";
+import { PackageFile080 } from "./PackageFile-v0.8.0";
+import { PackageFile as PackageFile081 } from "./PackageFile-v0.8.1";
 import {
     PackageFile,
     PublishMethod,
@@ -19,9 +21,9 @@ import {
     Schema,
     Source,
     StreamSet,
+    Properties,
     ValueTypeStatistics
-} from "./PackageFile-v0.8.1";
-import { PackageFile080 } from "./main";
+} from "./PackageFile-v0.9.0";
 import { DATAPM_VERSION } from "./DataPMVersion";
 
 export type DPMPropertyTypes =
@@ -33,9 +35,7 @@ export type DPMPropertyTypes =
     | "date-time"
     | "object"
     | "array"
-    | "null"
-    | "binary"; // Binary not actually used
-
+    | "null";
 export type DPMRecordValue =
     | number
     | string
@@ -88,6 +88,9 @@ export enum Compability {
     BreakingChange = 3
 }
 
+/**
+ * CHANGE_PROPERTY_FORMAT @deprecated
+ */
 export enum DifferenceType {
     REMOVE_SCHEMA = "REMOVE_SCHEMA",
     REMOVE_HIDDEN_SCHEMA = "REMOVE_HIDDEN_SCHEMA",
@@ -352,88 +355,98 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
  * compatiblility of their features.
  */
 export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = "#"): Difference[] {
-    let response: Difference[] = [];
-
     // Do not consider title comparison - assumes intent to compare
     // priorSchema.title!==newSchema.title
 
     pointer += "/" + newSchema.title;
 
-    if (priorSchema.description !== newSchema.description)
-        response.push({
-            type: DifferenceType.CHANGE_PROPERTY_DESCRIPTION,
-            pointer
-        });
+    const response = compareProperties(priorSchema.properties, newSchema.properties, pointer);
 
-    if (Array.isArray(priorSchema.type) && Array.isArray(newSchema.type)) {
-        if (!priorSchema.type.every((v) => newSchema.type?.indexOf(v) !== -1))
-            response.push({ type: DifferenceType.CHANGE_PROPERTY_TYPE, pointer });
-    } else if (!Array.isArray(priorSchema.type) && !Array.isArray(newSchema.type)) {
-        if (priorSchema.type !== newSchema.type) response.push({ type: DifferenceType.CHANGE_PROPERTY_TYPE, pointer });
-    } else {
-        response.push({ type: DifferenceType.CHANGE_PROPERTY_TYPE, pointer });
-    }
+    return response;
+}
 
-    if (priorSchema.hidden !== true && newSchema.hidden === true) {
-        response.push({ type: DifferenceType.HIDE_PROPERTY, pointer });
-    } else if (priorSchema.hidden === true && newSchema.hidden !== true) {
-        response.push({ type: DifferenceType.UNHIDE_PROPERTY, pointer });
-    }
+export function compareProperties(priorProperties: Properties, newProperties: Properties, pointer = "#"): Difference[] {
+    const response: Difference[] = [];
 
-    if (priorSchema.type === "string" && priorSchema.format !== newSchema.format)
-        response.push({ type: DifferenceType.CHANGE_PROPERTY_FORMAT, pointer });
+    // forward comparison of properties
+    for (const priorKey of Object.keys(priorProperties)) {
+        const propertyPointer = pointer + "/properties/" + priorKey;
+        const newKeys = Object.keys(newProperties);
 
-    if (priorSchema.unit !== newSchema.unit) response.push({ type: DifferenceType.CHANGE_PROPERTY_UNIT, pointer });
-
-    if (priorSchema.type === "object") {
-        if (priorSchema.properties == null)
-            throw new Error("Prior Schema property type is object, but has no properties");
-
-        if (newSchema.properties == null) throw new Error("New Schema property type is object, but has no properties");
-
-        // forward comparison of properties
-        for (const priorKey of Object.keys(priorSchema.properties)) {
-            const propertyPointer = pointer + "/properties";
-            const newKeys = Object.keys(newSchema.properties);
-
-            if (newKeys.indexOf(priorKey) === -1) {
-                if (priorSchema.properties[priorKey].hidden) {
-                    response.push({
-                        type: DifferenceType.REMOVE_HIDDEN_PROPERTY,
-                        pointer: propertyPointer + "/" + priorKey
-                    });
-                } else {
-                    response.push({
-                        type: DifferenceType.REMOVE_PROPERTY,
-                        pointer: propertyPointer + "/" + priorKey
-                    });
-                }
-                continue;
-            }
-
-            const priorProperty = priorSchema.properties[priorKey];
-
-            const newProperty = newSchema.properties[priorKey];
-
-            response = response.concat(compareSchema(priorProperty, newProperty, propertyPointer));
-        }
-
-        // Compare in reverse, as a compatible change
-        for (const newKey of Object.keys(newSchema.properties)) {
-            const priorKeys = Object.keys(priorSchema.properties);
-            const propertyPointer = pointer + "/properties/" + newKey;
-
-            if (priorKeys.indexOf(newKey) === -1) {
+        if (newKeys.indexOf(priorKey) === -1) {
+            if (priorProperties[priorKey].hidden) {
                 response.push({
-                    type: DifferenceType.ADD_PROPERTY,
+                    type: DifferenceType.REMOVE_HIDDEN_PROPERTY,
+                    pointer: propertyPointer
+                });
+            } else {
+                response.push({
+                    type: DifferenceType.REMOVE_PROPERTY,
                     pointer: propertyPointer
                 });
             }
+            continue;
+        }
+
+        const priorProperty = priorProperties[priorKey];
+
+        const newProperty = newProperties[priorKey];
+
+        if (priorProperty.description !== newProperty.description)
+            response.push({
+                type: DifferenceType.CHANGE_PROPERTY_DESCRIPTION,
+                pointer: propertyPointer
+            });
+
+        const priorSchemaValueTypes = Object.keys(priorProperty.types!);
+        const newSchemaValueTypes = Object.keys(newProperty.types ?? []);
+
+        if (
+            !priorSchemaValueTypes.every((v) => newSchemaValueTypes.indexOf(v) !== -1) ||
+            !newSchemaValueTypes.every((v) => priorSchemaValueTypes.indexOf(v) !== -1)
+        )
+            response.push({ type: DifferenceType.CHANGE_PROPERTY_TYPE, pointer: propertyPointer });
+
+        if (priorProperty.hidden !== true && newProperty.hidden === true) {
+            response.push({ type: DifferenceType.HIDE_PROPERTY, pointer: propertyPointer });
+        } else if (priorProperty.hidden === true && newProperty.hidden !== true) {
+            response.push({ type: DifferenceType.UNHIDE_PROPERTY, pointer: propertyPointer });
+        }
+
+        if (priorProperty.unit !== newProperty.unit)
+            response.push({ type: DifferenceType.CHANGE_PROPERTY_UNIT, pointer: propertyPointer });
+    }
+
+    // Compare in reverse, as a compatible change
+    for (const newKey of Object.keys(newProperties)) {
+        const propertyPointer = pointer + "/properties/" + newKey;
+
+        const priorProperty = priorProperties[newKey];
+
+        if (priorProperty == null) {
+            response.push({
+                type: DifferenceType.ADD_PROPERTY,
+                pointer: propertyPointer
+            });
+        } else if (
+            priorProperty.properties != null &&
+            priorProperty.types.object != null &&
+            newProperties[newKey].types.object != null
+        ) {
+            const changes = compareProperties(
+                priorProperty.properties,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                newProperties[newKey].properties!,
+                propertyPointer
+            );
+
+            response.push(...changes);
         }
     }
 
     return response;
 }
+
 /** returns false if they are different */
 export function sourceURIsEquivalent(urisA: string[], urisB: string[]): boolean {
     for (const a of urisA) {
@@ -816,12 +829,60 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
     }
 
     if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.8.1.json") {
-        const packageFile = (packageFileObject as unknown) as PackageFile;
+        const packageFile = (packageFileObject as unknown) as PackageFile081;
 
         for (const source of packageFile.sources) {
             if (source.configuration?.filePattern != null) {
                 source.configuration.fileRegex = source.configuration.filePattern;
                 delete source.configuration.filePattern;
+            }
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.8.1.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.9.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile081;
+
+        const newPackageFile = (oldPackageFile as unknown) as PackageFile;
+
+        for (const schema of oldPackageFile.schemas) {
+            const oldSchemaProperties = schema.properties ?? {};
+            for (const propertyKey of Object.keys(oldSchemaProperties)) {
+                const oldProperty = oldSchemaProperties[propertyKey];
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const newProperty = newPackageFile.schemas.find((s) => s.title === schema.title)!.properties[
+                    propertyKey
+                ];
+
+                newProperty.types = {};
+
+                for (const oldValueTypeName of Object.keys(oldProperty.valueTypes ?? {})) {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    const oldValueType = oldProperty.valueTypes![oldValueTypeName];
+
+                    if (oldValueTypeName === "integer") {
+                        newProperty.types.integer = oldValueType;
+                    } else if (oldValueTypeName === "number") {
+                        newProperty.types.number = oldValueType;
+                    } else if (oldValueTypeName === "string") {
+                        newProperty.types.string = oldValueType;
+                    } else if (oldValueTypeName === "boolean") {
+                        newProperty.types.boolean = oldValueType;
+                    } else if (oldValueTypeName === "date") {
+                        newProperty.types.date = oldValueType;
+                    } else if (oldValueTypeName === "date-time") {
+                        newProperty.types["date-time"] = oldValueType;
+                    } else if (oldValueTypeName === "object") {
+                        newProperty.types.object = oldValueType;
+                    } else if (oldValueTypeName === "array") {
+                        newProperty.types.array = oldValueType;
+                    } else if (oldValueTypeName === "null") {
+                        newProperty.types.null = oldValueType;
+                    }
+                }
+
+                delete oldProperty.valueTypes;
             }
         }
     }

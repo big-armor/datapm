@@ -276,10 +276,8 @@ describe("Package Command Tests", async () => {
         const schema = packageFile.schemas[0];
         const properties = schema.properties;
         // eslint-disable-next-line camelcase
-        const senateClassProperty = properties?.senate_class as Schema;
-        const valueTypes = Object.keys(senateClassProperty.valueTypes || {});
-        const types = senateClassProperty.type || [];
-        const formats = senateClassProperty.format?.split(",") || [];
+        const senateClassProperty = properties?.senate_class;
+        const valueTypes = Object.keys(senateClassProperty.types);
         const sampleRecords = schema.sampleRecords;
         // eslint-disable-next-line camelcase
         const senateClassValues = sampleRecords?.map((record) => record.senate_class);
@@ -287,12 +285,7 @@ describe("Package Command Tests", async () => {
         expect(valueTypes.length).equals(2);
         expect(valueTypes).includes("integer");
         expect(valueTypes).includes("null");
-        expect(types.length).equals(2);
-        expect(types).includes("integer");
-        expect(types).includes("null");
-        expect(formats.length).equals(2);
-        expect(formats).includes("integer");
-        expect(formats).includes("null");
+
         expect(
             senateClassValues?.every((value) => value === undefined || value === null || typeof value === "number")
         ).equals(true);

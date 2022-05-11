@@ -14,26 +14,18 @@ import {
     DPMRecordValue,
     Parameter,
     DPMConfiguration,
-    DPMPropertyTypes
+    DPMPropertyTypes,
+    ValueTypeStatistics
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
 import { PassThrough, Readable, Transform } from "stream";
 import { Maybe } from "../util/Maybe";
-import {
-    InspectionResults,
-    StreamAndTransforms,
-    StreamSetPreview,
-    ExtendedJSONSchema7TypeName,
-    StreamSummary
-} from "../connector/Source";
-import { mergeValueFormats } from "../connector/SourceUtil";
+import { InspectionResults, StreamAndTransforms, StreamSetPreview, StreamSummary } from "../connector/Source";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { JobContext } from "../task/JobContext";
-import { JSONSchema7TypeName } from "json-schema";
-import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
 import { createUTCDateTimeFromString, isDate, isDateTime } from "./DateUtil";
 import isNumber from "is-number";
@@ -43,6 +35,7 @@ export enum DeconflictOptions {
     CAST_TO_INTEGER = "CAST_TO_INTEGER",
     CAST_TO_DOUBLE = "CAST_TO_DOUBLE",
     CAST_TO_DATE = "CAST_TO_DATE",
+    CAST_TO_DATE_TIME = "CAST_TO_DATE_TIME",
     CAST_TO_STRING = "CAST_TO_STRING",
     CAST_TO_NULL = "CAST_TO_NULL",
     SKIP = "SKIP",
@@ -463,42 +456,26 @@ function createStreamAndTransformPipeLine(
     return lastTransform as Transform;
 }
 
-export async function checkSchemaDataTypeConflicts(schema: Schema): Promise<Record<string, string[]>> {
-    const propertyTypes: Record<string, string> = {};
-
-    if (schema.properties == null) throw new Error("SCHEMA_HAS_NO_PROPERTIES");
-
-    for (const property of Object.values(schema.properties)) {
-        if (property.type == null || property.title == null) continue;
-
-        const valueType: { type: ExtendedJSONSchema7TypeName; format?: string } = {
-            type: property.type as "string" | "number" | "integer" | "boolean" | "object" | "array" | "null",
-            format: property.format
-        };
-        if (valueType.format) {
-            if (!propertyTypes[property.title]) {
-                propertyTypes[property.title] = valueType.format;
-            } else if (!propertyTypes[property.title].split(",").includes(valueType.format)) {
-                propertyTypes[property.title] += `,${valueType.format}`;
-            }
-        }
-    }
-    const conflictedPropertyTypes: Record<string, string[]> = {};
-    Object.keys(propertyTypes).forEach((title) => {
-        const valueTypes = (mergeValueFormats(propertyTypes[title]) as string)
-            .replace("date-time", "date")
-            .split(",")
-            .filter((valueType) => valueType !== "null")
-            .sort();
+export async function checkSchemaDataTypeConflicts(schema: Schema): Promise<Record<string, DPMPropertyTypes[]>> {
+    const conflictedPropertyTypes: Record<string, DPMPropertyTypes[]> = {};
+    Object.keys(schema.properties).forEach((title) => {
+        const valueTypes = Object.keys(schema.properties[title].types).filter(
+            (v) => v !== "null"
+        ) as DPMPropertyTypes[];
         if (valueTypes.length > 1) {
             conflictedPropertyTypes[title] = valueTypes;
         }
     });
 
+    for (const title of Object.keys(conflictedPropertyTypes)) {
+        const valueTypes = conflictedPropertyTypes[title].sort();
+        conflictedPropertyTypes[title] = valueTypes;
+    }
+
     return conflictedPropertyTypes;
 }
 
-export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
+export function getDeconflictChoices(valueTypes: DPMPropertyTypes[]): ParameterOption[] {
     const nonStringValueType = valueTypes.filter((valueType) => valueType !== "string")[0];
     const deconflictChoices = {
         [DeconflictOptions.CAST_TO_BOOLEAN]: {
@@ -510,12 +487,16 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
             value: DeconflictOptions.CAST_TO_INTEGER
         },
         [DeconflictOptions.CAST_TO_DOUBLE]: {
-            title: "Cast all values as double",
+            title: "Cast all values as numbers",
             value: DeconflictOptions.CAST_TO_DOUBLE
         },
         [DeconflictOptions.CAST_TO_DATE]: {
-            title: "Cast all values as date",
+            title: "Cast all values as date (no time)",
             value: DeconflictOptions.CAST_TO_DATE
+        },
+        [DeconflictOptions.CAST_TO_DATE_TIME]: {
+            title: "Cast all values as date timestamps",
+            value: DeconflictOptions.CAST_TO_DATE_TIME
         },
         [DeconflictOptions.CAST_TO_STRING]: {
             title: "Cast all values as string",
@@ -549,6 +530,18 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
             DeconflictOptions.SKIP,
             DeconflictOptions.ALL
         ],
+        // Date Time
+        "date,date-time": [DeconflictOptions.CAST_TO_DATE_TIME, DeconflictOptions.CAST_TO_DATE, DeconflictOptions.ALL],
+        "date-time,integer": [
+            DeconflictOptions.CAST_TO_DATE_TIME,
+            DeconflictOptions.CAST_TO_INTEGER,
+            DeconflictOptions.ALL
+        ],
+        "date-time,number": [
+            DeconflictOptions.CAST_TO_DATE_TIME,
+            DeconflictOptions.CAST_TO_DOUBLE,
+            DeconflictOptions.ALL
+        ],
         // DATE
         "date,integer": [
             DeconflictOptions.CAST_TO_INTEGER,
@@ -578,9 +571,10 @@ export function getDeconflictChoices(valueTypes: string[]): ParameterOption[] {
     if (valueTypes.length > 2) {
         promptChoices = [DeconflictOptions.CAST_TO_STRING, DeconflictOptions.ALL];
     } else {
-        const valueTypeList = valueTypes.join(",");
+        const valueTypeList = valueTypes.sort().join(",");
         promptChoices = deconflictOptions[valueTypeList];
     }
+    if (promptChoices == null) throw new Error(`No deconflict options found for value types: ${valueTypes.join(",")}`);
     return promptChoices.map((promptChoice) => deconflictChoices[promptChoice]);
 }
 
@@ -593,7 +587,8 @@ export function updateSchemaWithDeconflictOptions(
         [DeconflictOptions.CAST_TO_BOOLEAN]: "boolean",
         [DeconflictOptions.CAST_TO_INTEGER]: "integer",
         [DeconflictOptions.CAST_TO_DOUBLE]: "number",
-        [DeconflictOptions.CAST_TO_DATE]: "date-time",
+        [DeconflictOptions.CAST_TO_DATE]: "date",
+        [DeconflictOptions.CAST_TO_DATE_TIME]: "date-time",
         [DeconflictOptions.CAST_TO_STRING]: "string"
     };
     for (const title in deconflictOptions) {
@@ -605,24 +600,16 @@ export function updateSchemaWithDeconflictOptions(
         if (deconflictOption === DeconflictOptions.ALL) {
             continue;
         }
-        let format = "";
+
         if (deconflictOption === DeconflictOptions.SKIP || deconflictOption === DeconflictOptions.CAST_TO_NULL) {
-            format = property.format?.split(",").find((format) => format !== "null" && format !== "string") as string;
+            delete properties[title];
         } else {
-            format = deconflictRules[deconflictOption];
+            const preservedValueType = Object(property.types)[deconflictOption.toString()];
+            property.types = {
+                [deconflictRules[deconflictOption]]: preservedValueType
+            };
         }
-
-        const nullIncluded = property.format && property.format?.includes("null");
-
-        property.format = nullIncluded ? `null,${format}` : format;
-
-        if (property.format === "string") {
-            property.type = ["string"];
-        }
-
-        if (nullIncluded) {
-            (property.type as JSONSchema7TypeName[]).push("null");
-        }
+        const nullIncluded = property.types.null != null;
     }
 }
 
@@ -634,38 +621,43 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
     const valueType = discoverValueType(value);
     const typeConvertedValue = convertValueByValueType(value, valueType);
     if (deconflictOption === DeconflictOptions.SKIP) {
-        if (valueType.type !== "string") return value;
+        if (valueType !== "string") return value; // Why is this here?
         return null;
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_NULL) {
-        if (valueType.type !== "string") return value;
+        if (valueType !== "string") return value;
         return "null";
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_BOOLEAN) {
-        if (valueType.type === "boolean") return typeConvertedValue;
-        if (valueType.type === "number" || valueType.type === "integer")
-            return ((typeConvertedValue as number) > 0).toString();
+        if (valueType === "boolean") return typeConvertedValue;
+        if (valueType === "number" || valueType === "integer") return ((typeConvertedValue as number) > 0).toString();
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_INTEGER) {
-        if (valueType.type === "integer") return value;
-        if (valueType.type === "number") return Math.round(typeConvertedValue as number);
-        if (valueType.type === "boolean") return typeConvertedValue ? "1" : "0";
-        if (valueType.type === "date") {
+        if (valueType === "integer") return value;
+        if (valueType === "number") return Math.round(typeConvertedValue as number);
+        if (valueType === "boolean") return typeConvertedValue ? "1" : "0";
+        if (valueType === "date") {
             return (typeConvertedValue as Date).getTime().toString();
         }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DOUBLE) {
-        if (valueType.format === "number") return value;
-        if (valueType.type === "boolean") return typeConvertedValue ? "1.0" : "0.0";
-        if (valueType.format === "integer") return `${typeConvertedValue}.0`;
-        if (valueType.type === "binary") return typeConvertedValue ? "1.0" : "0.0";
+        if (valueType === "number") return value;
+        if (valueType === "boolean") return typeConvertedValue ? "1.0" : "0.0";
+        if (valueType === "integer") return `${typeConvertedValue}.0`;
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE) {
-        if (valueType.type === "date-time") return value;
-        if (valueType.format === "integer")
+        if (valueType === "date-time" || valueType === "date") return value;
+        if (valueType === "integer")
             return moment(new Date(typeConvertedValue as number))
                 .utc()
-                .format("YYYY-MM-DD HH:mm:ss");
+                .format("YYYY-MM-DD");
+    }
+    if (deconflictOption === DeconflictOptions.CAST_TO_DATE_TIME) {
+        if (valueType === "date-time" || valueType === "date") return value;
+        if (valueType === "integer")
+            return moment(new Date(typeConvertedValue as number))
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ssZ");
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_STRING) {
         return value;
@@ -708,30 +700,29 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const schemaProperty = schema.properties![propertyTitle];
 
-        if (!schemaProperty.valueTypes) {
+        if (!schemaProperty.types) {
             throw new Error("This schema property has no value types, and therefore is not very useful");
         }
 
-        const valueTypes = Object.values(schemaProperty.valueTypes).map((valueStats) => {
+        const valueTypeSummaries = Object.keys(schemaProperty.types).map((key) => {
+            const valueStats: ValueTypeStatistics = Object(schemaProperty.types)[key];
             if (valueStats.recordCount == null || schema.recordsInspectedCount == null) {
-                return valueStats.valueType;
+                return key;
             }
             if (schema.recordCount) {
                 const percent = (valueStats.recordCount / schema.recordCount) * 100;
-                return `${valueStats.valueType}(${percent.toFixed(2)}%)`;
+                return `${key}(${percent.toFixed(2)}%)`;
             } else {
-                return `${valueStats.valueType}`;
+                return `${key}`;
             }
         });
 
         jobContext.print(
             "NONE",
-            `- ${chalk.yellow(propertyTitle)}\n    ${chalk.grey("Types: ")} ${
-                schemaProperty.type === "array" ? "Array-" : ""
-            }${valueTypes.join(", ")}`
+            `- ${chalk.yellow(propertyTitle)}\n    ${chalk.grey("Types: ")} ${valueTypeSummaries.join(", ")}`
         );
 
-        const notHiddenLabels = Object.values(schemaProperty.valueTypes)
+        const notHiddenLabels = Object.values(schemaProperty.types)
             ?.flatMap((vt) => vt.contentLabels || [])
             ?.filter((l) => l.hidden !== true);
 
@@ -746,78 +737,79 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
     });
 }
 
-export function discoverValueType(value: DPMRecordValue): { type: DPMPropertyTypes; format?: string } {
-    if (value === null) return { type: "null", format: "null" };
+export function discoverValueType(value: DPMRecordValue): DPMPropertyTypes {
+    if (value === null) return "null";
 
-    if (typeof value === "bigint") return { type: "number", format: "integer" };
+    if (typeof value === "bigint") return "integer";
 
     if (typeof value === "string") return discoverValueTypeFromString(value as string);
 
-    if (Array.isArray(value)) return { type: "array", format: "array" };
+    if (Array.isArray(value)) return "array";
 
-    if (value instanceof Date) return { type: "date", format: "date-time" };
+    if (value instanceof Date) return "date-time";
 
     if (typeof value === "number") {
         const strValue = value.toString();
         if (strValue.indexOf(".") === -1) {
-            return { type: "integer", format: "integer" };
+            return "integer";
         }
-        return { type: "number", format: "number" };
+        return "number";
     }
 
-    // TODO handle object and array better
-    return {
-        type: typeof value as "boolean" | "number" | "object",
-        format: typeof value as "boolean" | "number" | "object"
-    };
+    if (typeof value === "undefined") {
+        return "null";
+    }
+
+    if (typeof value === "object") {
+        return "object";
+    }
+
+    return typeof value as "string"; // This is just a forcing of types
 }
 
-export function discoverValueTypeFromString(value: string): { type: DPMPropertyTypes; format?: string } {
-    if (value === "null") return { type: "null", format: "null" };
+export function discoverValueTypeFromString(value: string): DPMPropertyTypes {
+    if (value === "null") return "null";
 
-    if (value.trim() === "") return { type: "null", format: "null" };
+    if (value.trim() === "") return "null";
 
     const booleanValues = ["true", "false", "yes", "no"];
 
-    if (booleanValues.includes(value.trim().toLowerCase())) return { type: "boolean", format: "boolean" };
+    if (booleanValues.includes(value.trim().toLowerCase())) return "boolean";
 
     if (isNumber(value.toString())) {
         const trimmedValue = value.trim();
 
-        if (value === "0") return { type: "integer", format: "integer" };
+        if (value === "0") return "integer";
 
         // Find doubles with no more than one preceding zero before a period
         if (trimmedValue.match(/^[-+]?(?:(?:[1-9][\d,]*)|0)\.\d+$/)) {
-            return { type: "number", format: "number" };
+            return "number";
 
             // Find integers, no leading zeros, only three numbers between commas, no other characters, allows leading +/-
         } else if (trimmedValue.match(/^[-+]?(?![\D0])(?:\d+(?:(?<!\d{4}),(?=\d{3}(?:,|$)))?)+$|^0$/)) {
-            return { type: "integer", format: "integer" };
+            return "integer";
         }
     }
 
-    if (isDate(value)) {
-        return { type: "date", format: "date" };
-    } else if (isDateTime(value)) {
-        return { type: "date-time", format: "date-time" };
+    if (isDateTime(value)) {
+        return "date-time";
+    } else if (isDate(value)) {
+        return "date";
     }
 
-    return { type: "string", format: "string" };
+    return "string";
 }
 
 /** Given a value, convert it to a specific value type. Example: boolean from string */
-export function convertValueByValueType(
-    value: DPMRecordValue,
-    valueType: { type: DPMPropertyTypes; format?: string } // TODO should this be DPMRecordValue??
-): DPMRecordValue {
+export function convertValueByValueType(value: DPMRecordValue, valueType: DPMPropertyTypes): DPMRecordValue {
     if (value == null) return null;
 
-    if (valueType.type === "null") {
+    if (valueType === "null") {
         return null;
-    } else if (valueType.type === "string") {
+    } else if (valueType === "string") {
         if (typeof value === "string") return value;
         return value.toString();
-    } else if (valueType.type === "boolean" || valueType.type === "binary") {
+    } else if (valueType === "boolean") {
         if (typeof value === "boolean") return value;
         if (typeof value === "number") return (value as number) > 0;
         if (typeof value === "string") {
@@ -827,21 +819,21 @@ export function convertValueByValueType(
             const stringValue = (value as string).trim().toLowerCase();
             return stringValue === "true" || stringValue === "yes";
         }
-    } else if (valueType.type === "number") {
+    } else if (valueType === "number") {
         if (typeof value === "boolean") return (value as boolean) ? 1 : 0;
         if (typeof value === "number") return value;
         if (typeof value === "string") return +value;
-    } else if (valueType.type === "integer") {
+    } else if (valueType === "integer") {
         if (typeof value === "boolean") return (value as boolean) ? 1 : 0;
         if (typeof value === "number") return Math.round(value);
         if (typeof value === "string") return Math.round(+value);
-    } else if (valueType.type === "date") {
+    } else if (valueType === "date") {
         try {
             return createUTCDateTimeFromString(value as string); // TODO - this is probably not right for all situations
         } catch (err) {
             return value;
         }
-    } else if (valueType.type === "date-time") {
+    } else if (valueType === "date-time") {
         try {
             return createUTCDateTimeFromString(value as string); // TODO - this is probably not right for all situations
         } catch (err) {
@@ -850,13 +842,5 @@ export function convertValueByValueType(
     }
 
     // TODO recursively handle arrays and object
-    throw new Error(
-        `UNABLE_TO_CONVERT_TYPE ${typeof value} to ${valueType.type} ${
-            valueType.format ? " with format " + valueType.format : ""
-        }`
-    );
-}
-
-export function convertToJSONSchema7TypeName(type: DPMPropertyTypes): DPMPropertyTypes {
-    return type.replace("binary", "boolean") as DPMPropertyTypes;
+    throw new Error(`UNABLE_TO_CONVERT_TYPE ${typeof value} to ${valueType}"}`);
 }

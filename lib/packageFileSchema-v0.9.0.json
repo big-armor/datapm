@@ -1,5 +1,5 @@
 {
-    "$id": "https://datapm.io/docs/package-file-schema-v0.8.1.json",
+    "$id": "https://datapm.io/docs/package-file-schema-v0.9.0.json",
     "type": "object",
     "title": "DataPM Package File",
     "description": "The datapm package file schema for validating package files.",
@@ -177,7 +177,8 @@
                                         "allOf": [
                                             {
                                                 "required": [
-                                                    "type"
+                                                    "types",
+                                                    "title"
                                                 ],
                                                 "properties": {
                                                     "description": {
@@ -190,27 +191,17 @@
                                                     "unit": {
                                                         "type": "string"
                                                     },
-                                                    "valueTypes": {
-                                                        "$id": "#/valueTypes",
+                                                    "title": {
+                                                        "type": "string",
+                                                        "description": "The name of the property used after pre-processing by dataPM"
+                                                    },
+                                                    "types": {
+                                                        "$id": "#/types",
                                                         "type": "object",
                                                         "patternProperties": {
-                                                            ".*": {
+                                                            "(string)|(number)|(integer)|(boolean)|(date)|(date-time)|(object)|(array)|(null)": {
                                                                 "type": "object",
                                                                 "properties": {
-                                                                    "valueType": {
-                                                                        "type": "string",
-                                                                        "enum": [
-                                                                            "string",
-                                                                            "number",
-                                                                            "integer",
-                                                                            "boolean",
-                                                                            "date",
-                                                                            "date-time",
-                                                                            "object",
-                                                                            "array",
-                                                                            "null"
-                                                                        ]
-                                                                    },
                                                                     "recordCount": {
                                                                         "type": "number"
                                                                     },

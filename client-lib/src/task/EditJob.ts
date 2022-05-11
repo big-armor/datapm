@@ -1,6 +1,5 @@
 import { Job, JobResult } from "./Task";
 import { JobContext } from "./JobContext";
-import { JSONSchema7TypeName } from "json-schema";
 import {
     comparePackages,
     diffCompatibility,
@@ -406,9 +405,8 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
     // Prompt Column Unit per "number" Type Column
     const properties = schema.properties as Properties;
     const keys = Object.keys(properties).filter((key) => {
-        const property = properties[key] as Schema;
-        const type = property.type as JSONSchema7TypeName[];
-        const types = type.filter((type) => type !== "null");
+        const property = properties[key];
+        const types = Object.keys(property.types).filter((t) => t != null);
         return types.includes("number") || types.includes("integer");
     });
 

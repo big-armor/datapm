@@ -62,38 +62,77 @@ describe("XLSX Source Tests", function () {
         expect(schema1.recordCount).equal(50);
         const properties1 = schema1.properties as Properties;
         // eslint-disable-next-line no-unused-expressions
-        expect(properties1.submission_date.title === "submission_date" && properties1.submission_date.format === "date")
-            .to.exist;
+        expect(
+            properties1.submission_date.title === "submission_date" &&
+                Object.keys(properties1.submission_date.types).join(",") === "date"
+        ).to.exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(properties1.state.title === "state" && properties1.state.format === "string").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.tot_cases.title === "tot_cases" && properties1.tot_cases.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.conf_cases.title === "conf_cases" && properties1.conf_cases.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.prob_cases.title === "prob_cases" && properties1.prob_cases.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.new_case.title === "new_case" && properties1.new_case.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.pnew_case.title === "pnew_case" && properties1.pnew_case.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.tot_death.title === "tot_death" && properties1.tot_death.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.conf_death.title === "conf_death" && properties1.conf_death.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.prob_death.title === "prob_death" && properties1.prob_death.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.new_death.title === "new_death" && properties1.new_death.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.pnew_death.title === "pnew_death" && properties1.pnew_death.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.created_at.title === "created_at" && properties1.created_at.format === "date-time").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties1.consent_cases.title === "consent_cases" && properties1.consent_cases.format === "string").to
+        expect(properties1.state.title === "state" && Object.keys(properties1.state.types).join(",") === "string").to
             .exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(properties1.consent_deaths.title === "consent_deaths" && properties1.consent_deaths.format === "string")
-            .to.exist;
+        expect(
+            properties1.tot_cases.title === "tot_cases" &&
+                Object.keys(properties1.tot_cases.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.conf_cases.title === "conf_cases" &&
+                Object.keys(properties1.conf_cases.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.prob_cases.title === "prob_cases" &&
+                Object.keys(properties1.prob_cases.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.new_case.title === "new_case" && Object.keys(properties1.new_case.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.pnew_case.title === "pnew_case" &&
+                Object.keys(properties1.pnew_case.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.tot_death.title === "tot_death" &&
+                Object.keys(properties1.tot_death.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.conf_death.title === "conf_death" &&
+                Object.keys(properties1.conf_death.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.prob_death.title === "prob_death" &&
+                Object.keys(properties1.prob_death.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.new_death.title === "new_death" &&
+                Object.keys(properties1.new_death.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.pnew_death.title === "pnew_death" &&
+                Object.keys(properties1.pnew_death.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.created_at.title === "created_at" &&
+                Object.keys(properties1.created_at.types).join(",") === "date-time"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.consent_cases.title === "consent_cases" &&
+                Object.keys(properties1.consent_cases.types).join(",") === "string"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties1.consent_deaths.title === "consent_deaths" &&
+                Object.keys(properties1.consent_deaths.types).join(",") === "string"
+        ).to.exist;
 
         const schema2 = packageFile.schemas[1];
         expect(schema2.title).equal("covid-02-01-2020");
@@ -102,21 +141,30 @@ describe("XLSX Source Tests", function () {
         // eslint-disable-next-line no-unused-expressions
         expect(
             properties2["Province/State"].title === "Province/State" &&
-                properties2["Province/State"].format === "string"
+                Object.keys(properties2["Province/State"].types).join(",") === "string"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
             properties2["Country/Region"].title === "Country/Region" &&
-                properties2["Country/Region"].format === "string"
+                Object.keys(properties2["Country/Region"].types).join(",") === "string"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(properties2["Last Update"].title === "Last Update" && properties2["Last Update"].format === "date-time")
+        expect(
+            properties2["Last Update"].title === "Last Update" &&
+                Object.keys(properties2["Last Update"].types).join(",") === "date-time"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            properties2.Confirmed.title === "Confirmed" &&
+                Object.keys(properties2.Confirmed.types).join(",") === "integer"
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(properties2.Deaths.title === "Deaths" && Object.keys(properties2.Deaths.types).join(",") === "integer")
             .to.exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(properties2.Confirmed.title === "Confirmed" && properties2.Confirmed.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties2.Deaths.title === "Deaths" && properties2.Deaths.format === "integer").to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(properties2.Recovered.title === "Recovered" && properties2.Recovered.format === "integer").to.exist;
+        expect(
+            properties2.Recovered.title === "Recovered" &&
+                Object.keys(properties2.Recovered.types).join(",") === "integer"
+        ).to.exist;
     });
 });

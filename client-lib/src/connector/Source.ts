@@ -1,5 +1,4 @@
 import { StreamState, DPMConfiguration, Schema, StreamStats, UpdateMethod } from "datapm-lib";
-import { JSONSchema7TypeName } from "json-schema";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
 import { JobContext } from "../task/JobContext";
@@ -9,8 +8,6 @@ export enum SourceErrors {
     CONNECTION_FAILED = "CONNECTION_FAILED",
     DATABASE_NOT_FOUND = "DATABASE_NOT_FOUND"
 }
-
-export type ExtendedJSONSchema7TypeName = JSONSchema7TypeName | "binary" | "date";
 
 /** represents a single real data stream before opening that stream. For example, an enumeration of HTTP or local files - but without doing any expensive operations to discover the meta data about those files.  */
 export interface StreamSummary {
@@ -104,13 +101,6 @@ export interface Source {
         configuration: DPMConfiguration,
         jobContext: JobContext
     ): Promise<InspectionResults>;
-}
-
-export interface Property {
-    title: string;
-    description?: string;
-    type?: ExtendedJSONSchema7TypeName;
-    format?: string;
 }
 
 export interface InspectProgress {

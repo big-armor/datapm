@@ -310,12 +310,8 @@ export class PackageJob extends Job<PackageJobResult> {
     }
 }
 
-export function filterBadSchemaProperties(schema: Schema): Properties | undefined {
-    if (schema.properties != null) {
-        return Object.fromEntries(Object.entries(schema.properties).filter(([t]) => t != null && t !== ""));
-    }
-
-    return undefined;
+export function filterBadSchemaProperties(schema: Schema): Properties {
+    return Object.fromEntries(Object.entries(schema.properties).filter(([t]) => t != null && t !== ""));
 }
 
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */

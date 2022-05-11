@@ -245,16 +245,16 @@ describe("Mongo Sink Test", function () {
         const prompts = [
             ...getMongoSinkPromptInputs(["No", "No", mongoHost, mongoPort.toString(), "", "", ""]),
             {
-                message: "Integer_Float has integer and number values.",
-                input: `${KEYS.ENTER}`
-            },
-            {
                 message: "Boolean_Integer_String has boolean and integer and string values.",
                 input: `${KEYS.ENTER}`
             },
             {
+                message: "Date_DateTime has date and date-time values",
+                input: `${KEYS.ENTER}`
+            },
+            {
                 message:
-                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and integer and number and string values.",
+                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and date-time and number and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
             }
         ];
@@ -268,6 +268,7 @@ describe("Mongo Sink Test", function () {
             [packageBFilePath, "--sink", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
+                console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -298,8 +299,14 @@ describe("Mongo Sink Test", function () {
         expect(firstRecord.Date instanceof Date).equals(true);
         expect(firstRecord.DateTime instanceof Date).equals(true);
         expect(firstRecord.Date_DateTime instanceof Date).equals(true);
+        expect(firstRecord.Date_DateTime.toISOString()).equals("2011-04-22T00:00:00.000Z");
         expect(typeof firstRecord.String).equals("string");
-        expect(typeof firstRecord["Integer_Float_Boolean_Date_DateTime_String-integer"]).equals("number");
+        expect(typeof firstRecord["Integer_Float_Boolean_Date_DateTime_String-number"]).equals("number");
+        const lastRecord = await client.connection.collection(collectionBName, {}).findOne({
+            Integer: 589
+        });
+
+        console.log(lastRecord.Date_DateTime.toISOString());
 
         await client.connection.close();
     });

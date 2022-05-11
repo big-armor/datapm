@@ -59,15 +59,13 @@ describe("Stats transform", () => {
             statsTransform.end();
         });
 
-        expect(statsTransform.schemas.test.properties?.integer.format).equal("integer");
-        expect(statsTransform.schemas.test.properties?.integer.valueTypes?.integer?.valueType).equal("integer");
-        expect(statsTransform.schemas.test.properties?.integer.valueTypes?.integer?.numberMaxPrecision).equal(16);
-        expect(statsTransform.schemas.test.properties?.integer.valueTypes?.integer?.numberMaxScale).equal(0);
+        expect(statsTransform.schemas.test.properties?.integer).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.integer.types.integer?.numberMaxPrecision).equal(16);
+        expect(statsTransform.schemas.test.properties?.integer.types.integer?.numberMaxScale).equal(0);
 
-        expect(statsTransform.schemas.test.properties?.number.format).equal("number");
-        expect(statsTransform.schemas.test.properties?.number.valueTypes?.number?.valueType).equal("number");
-        expect(statsTransform.schemas.test.properties?.number.valueTypes?.number?.numberMaxPrecision).equal(22);
-        expect(statsTransform.schemas.test.properties?.number.valueTypes?.number?.numberMaxScale).equal(21);
+        expect(statsTransform.schemas.test.properties?.number).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.number.types?.number?.numberMaxPrecision).equal(22);
+        expect(statsTransform.schemas.test.properties?.number.types?.number?.numberMaxScale).equal(21);
     });
 
     test("Test Dates", async () => {
@@ -114,12 +112,10 @@ describe("Stats transform", () => {
             statsTransform.end();
         });
 
-        expect(statsTransform.schemas.test.properties?.date.format).equal("date");
-        expect(statsTransform.schemas.test.properties?.date.valueTypes?.date?.valueType).equal("date");
+        expect(statsTransform.schemas.test.properties?.date).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.date.types.date).not.equal(undefined);
 
-        expect(statsTransform.schemas.test.properties?.dateTime.format).equal("date-time");
-        expect(statsTransform.schemas.test.properties?.dateTime.valueTypes?.["date-time"]?.valueType).equal(
-            "date-time"
-        );
+        expect(statsTransform.schemas.test.properties?.dateTime).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.dateTime.types["date-time"]).not.equal(undefined);
     });
 });

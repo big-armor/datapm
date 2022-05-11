@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { loadPackageFileFromDisk, Properties } from "datapm-lib";
-import { JSONSchema7TypeName } from "json-schema";
 import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs } from "./test-utils";
 
 describe("AVRO Source Tests", function () {
@@ -59,32 +58,28 @@ describe("AVRO Source Tests", function () {
         // eslint-disable-next-line no-unused-expressions
         expect(
             properties.Province_State.title === "Province_State" &&
-                (properties.Province_State.type as JSONSchema7TypeName[]).join(",") === "null,string"
+                Object.keys(properties.Province_State.types).join(",") === "null,string"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
             properties.Country_Region.title === "Country_Region" &&
-                (properties.Country_Region.type as JSONSchema7TypeName[]).join(",") === "string"
+                Object.keys(properties.Country_Region.types).join(",") === "string"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
             properties.Last_Update.title === "Last_Update" &&
-                (properties.Last_Update.type as JSONSchema7TypeName[]).join(",") === "string"
+                Object.keys(properties.Last_Update.types).join(",") === "string"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
-            properties.Confirmed.title === "Confirmed" &&
-                (properties.Confirmed.type as JSONSchema7TypeName[]).join(",") === "number"
+            properties.Confirmed.title === "Confirmed" && Object.keys(properties.Confirmed.types).join(",") === "number"
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(
-            properties.Deaths.title === "Deaths" &&
-                (properties.Deaths.type as JSONSchema7TypeName[]).join(",") === "number"
-        ).to.exist;
+        expect(properties.Deaths.title === "Deaths" && Object.keys(properties.Deaths.types).join(",") === "number").to
+            .exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
-            properties.Recovered.title === "Recovered" &&
-                (properties.Recovered.type as JSONSchema7TypeName[]).join(",") === "number"
+            properties.Recovered.title === "Recovered" && Object.keys(properties.Recovered.types).join(",") === "number"
         ).to.exist;
     });
 });

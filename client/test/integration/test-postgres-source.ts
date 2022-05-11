@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
@@ -205,11 +205,10 @@ describe("Postgres Source Test", function () {
         expect(newPackageFile.schemas.length).equals(1);
         columns.forEach((column) => {
             const properties = newPackageFile.schemas[0].properties as Properties;
-            const property = properties[column.column_name as string] as Schema;
+            const property = properties[column.column_name as string];
             expect(property.title).equal(column.column_name);
-            expect(property.recordCount).equal(67);
-            expect(property.format?.split(",")).include.members(typeMatch[column.data_type].format);
-            expect(property.type).include.members(typeMatch[column.data_type].type);
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(67);
+            expect(Object.keys(property.types)).include.members(typeMatch[column.data_type].type);
         });
     });
 

@@ -10,9 +10,8 @@ import {
     SchemaIdentifier,
     RecordStreamContext,
     ParameterType,
-    DPMPropertyTypes
+    ValueTypes
 } from "datapm-lib";
-import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
 import { JobContext } from "../../task/JobContext";
 import { Maybe } from "../../util/Maybe";
@@ -69,6 +68,8 @@ type ListConnectionsResponse = {
     next_page_token: string | null;
     items: DecodableConnection[];
 };
+
+const RECIEVE_TIME = "*recieve_time*";
 
 export class DecodableSink implements Sink {
     getType(): string {
@@ -133,6 +134,38 @@ export class DecodableSink implements Sink {
                         configuration,
                         message: "Connection for " + schema.title + " records?",
                         defaultValue: decodableStreamName
+                    }
+                ];
+            }
+
+            if (configuration["event-time-" + schema.title] == null) {
+                const dateTimeProperties = Object.values(schema.properties ?? {}).filter((p) => {
+                    const value = Object.keys(p.types ?? []);
+                    return value.includes("date-time") && value.length === 1;
+                });
+
+                return [
+                    {
+                        type: ParameterType.Select,
+                        name: "event-time-" + schema.title,
+                        configuration,
+                        message: "Event time for " + schema.title + " records?",
+                        options: [
+                            {
+                                title: "Do not set event time",
+                                value: null
+                            },
+                            {
+                                title: "Record time",
+                                value: RECIEVE_TIME
+                            },
+                            ...dateTimeProperties.map((p) => {
+                                return {
+                                    title: p.title as string,
+                                    value: p.title as string
+                                };
+                            })
+                        ]
                     }
                 ];
             }
@@ -523,13 +556,13 @@ export class DecodableSink implements Sink {
 
             return {
                 name: property.title,
-                type: this.getDecodableType(property.format as string, property.type as JSONSchema7TypeName[])
+                type: this.getDecodableType(property.types)
             };
         });
     }
 
-    getDecodableType(format: string, types: DPMPropertyTypes[]): string {
-        const removedNull = types.filter((t) => t !== "null");
+    getDecodableType(types: ValueTypes): string {
+        const removedNull = Object.keys(types).filter((t) => t !== "null");
 
         if (removedNull.length > 1) {
             throw new Error("Decodable Sink does not support schemas with more than one type");
@@ -545,7 +578,7 @@ export class DecodableSink implements Sink {
             case "integer":
                 return "BIGINT";
             case "number":
-                return "DECIMAL";
+                return "DECIMAL"; // Could use type.numberMaxPrecision and type.numberMaxScale to customize this
             case "boolean":
                 return "BOOLEAN";
             case "date":
@@ -553,7 +586,7 @@ export class DecodableSink implements Sink {
             case "date-time":
                 return "TIMESTAMP";
             default:
-                throw new Error("Unsupported Decodable type: " + removedNull[0]);
+                throw new Error("Unsupported Decodable Sink: " + removedNull[0]);
         }
     }
 }

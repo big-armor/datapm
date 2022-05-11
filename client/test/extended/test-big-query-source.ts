@@ -120,16 +120,13 @@ describe("Big Query Source Test", function () {
         ];
         const typeMatch: Record<string, Record<string, [string]>> = {
             number: {
-                format: ["number"],
                 type: ["number"]
             },
             string: {
-                format: ["string"],
                 type: ["string"]
             },
             date: {
-                format: ["date-time"],
-                type: ["string"]
+                type: ["date-time"]
             }
         };
         const schema = packageFile.schemas[0] as Schema;
@@ -142,11 +139,10 @@ describe("Big Query Source Test", function () {
             "SELECT date, country, confirmed_cases FROM `bigquery-public-data.covid19_italy.data_by_province` LIMIT 100"
         );
         columns.forEach((column) => {
-            const property = properties[column.columnName as string] as Schema;
+            const property = properties[column.columnName as string];
             expect(property.title).equal(column.columnName);
-            expect(property.recordCount).equal(100);
-            expect(property.format?.split(",")).include.members(typeMatch[column.dataType].format);
-            expect(property.type).include.members(typeMatch[column.dataType].type);
+            expect(Object.values(property.types).reduce((acc, cur) => acc + (cur.recordCount ?? 0), 0)).equal(100);
+            expect(Object.keys(property.types)).include.members(typeMatch[column.dataType].format);
         });
     });
 
@@ -249,11 +245,11 @@ describe("Big Query Source Test", function () {
         expect(source.configuration?.dataset).equal("local_covid_02_01_2020_v1");
         expect(source.configuration?.tableName).equal("test_table_d");
         columns.forEach((column) => {
-            const property = properties[column.columnName as string] as Schema;
+            const property = properties[column.columnName as string];
             expect(property.title).equal(column.columnName);
-            expect(property.recordCount).equal(67);
-            expect(property.format?.split(",")).include.members(typeMatch[column.dataType].format);
-            expect(property.type).include.members(typeMatch[column.dataType].type);
+
+            expect(Object.values(property.types).reduce((acc, cur) => acc + (cur.recordCount ?? 0), 0)).equal(67);
+            expect(Object.keys(property.types)).include.members(typeMatch[column.dataType].format);
         });
     });
 });

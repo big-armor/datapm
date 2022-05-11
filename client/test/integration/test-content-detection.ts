@@ -79,7 +79,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect SSN", async function () {
         expect(
-            packageA.schemas[0].properties?.ssn.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.ssn.types.string?.contentLabels?.find(
                 (cl) => cl.label === SOCIAL_SECURITY_NUMBER_LABEL
             ) != null
         ).equal(true);
@@ -87,7 +87,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Credit Card Numbers", async function () {
         expect(
-            packageA.schemas[0].properties?.creditCardNumbers.valueTypes?.integer.contentLabels?.find(
+            packageA.schemas[0].properties?.creditCardNumbers.types.integer?.contentLabels?.find(
                 (cl) => cl.label === CREDIT_CARD_NUMBER
             ) != null
         ).equal(true);
@@ -95,7 +95,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect IP V6 Addresses", async function () {
         expect(
-            packageA.schemas[0].properties?.ipV6Address.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.ipV6Address.types.string?.contentLabels?.find(
                 (cl) => cl.label === IP_V6_ADDRESS_LABEL
             ) != null
         ).equal(true);
@@ -103,12 +103,12 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect IP V4 Addresses", async function () {
         expect(
-            packageA.schemas[0].properties?.scentenceWithIPAddress.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.scentenceWithIPAddress.types.string?.contentLabels?.find(
                 (cl) => cl.label === IP_V4_ADDRESS_LABEL
             ) != null
         ).equal(true);
         expect(
-            packageA.schemas[0].properties?.ipv4Address.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.ipv4Address.types.string?.contentLabels?.find(
                 (cl) => cl.label === IP_V4_ADDRESS_LABEL
             ) != null
         ).equal(true);
@@ -116,7 +116,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Phone Numbers", async function () {
         expect(
-            packageA.schemas[0].properties?.phoneNumberStrings.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.phoneNumberStrings.types.string?.contentLabels?.find(
                 (cl) => cl.label === PHONE_NUMBER_LABEL
             ) != null
         ).equal(true);
@@ -124,13 +124,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Persons Names", async function () {
         expect(
-            packageA.schemas[0].properties?.firstName.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.firstName.types.string?.contentLabels?.find(
                 (cl) => cl.label === PEOPLE_NAMES_LABEL
             ) != null
         ).equal(true);
 
         /* expect(
-            packageA.schemas[0].properties?.lastName.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.lastName.types.string.contentLabels?.find(
                 (cl) => cl.label === PEOPLE_NAMES_LABEL
             ) != null
         ).equal(true); */
@@ -138,7 +138,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Email Addresses", async function () {
         expect(
-            packageA.schemas[0].properties?.emailAddress.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.emailAddress.types.string?.contentLabels?.find(
                 (cl) => cl.label === EMAIL_ADDRESS_LABEL
             ) != null
         ).equal(true);
@@ -146,13 +146,12 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Gender property names", async function () {
         expect(
-            packageA.schemas[0].properties?.sex.valueTypes?.string.contentLabels?.find(
-                (cl) => cl.label === GENDER_LABEL
-            ) != null
+            packageA.schemas[0].properties?.sex.types.string?.contentLabels?.find((cl) => cl.label === GENDER_LABEL) !=
+                null
         ).equal(true);
 
         expect(
-            packageA.schemas[0].properties?.gender.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.gender.types.string?.contentLabels?.find(
                 (cl) => cl.label === GENDER_LABEL
             ) != null
         ).equal(true);
@@ -160,14 +159,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect DOB property names", async function () {
         expect(
-            packageA.schemas[0].properties?.dob.valueTypes?.string.contentLabels?.find(
-                (cl) => cl.label === DOB_LABEL
-            ) != null
+            packageA.schemas[0].properties?.dob.types.string?.contentLabels?.find((cl) => cl.label === DOB_LABEL) !=
+                null
         ).equal(true);
 
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.date_Of_birth.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.date_Of_birth.types.string?.contentLabels?.find(
                 (cl) => cl.label === DOB_LABEL
             ) != null
         ).equal(true);
@@ -175,13 +173,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect Driverse license property names", async function () {
         expect(
-            packageA.schemas[0].properties?.driversLicense.valueTypes?.integer.contentLabels?.find(
+            packageA.schemas[0].properties?.driversLicense.types.integer?.contentLabels?.find(
                 (cl) => cl.label === DRIVERS_LICENSE_LABEL
             ) != null
         ).equal(true);
 
         expect(
-            packageA.schemas[0].properties?.dl.valueTypes?.integer.contentLabels?.find(
+            packageA.schemas[0].properties?.dl.types.integer?.contentLabels?.find(
                 (cl) => cl.label === DRIVERS_LICENSE_LABEL
             ) != null
         ).equal(true);
@@ -189,21 +187,20 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect age property names", async function () {
         expect(
-            packageA.schemas[0].properties?.age.valueTypes?.integer.contentLabels?.find(
-                (cl) => cl.label === AGE_LABEL
-            ) != null
+            packageA.schemas[0].properties?.age.types.integer?.contentLabels?.find((cl) => cl.label === AGE_LABEL) !=
+                null
         ).equal(true);
     });
 
     it("Should detect username property names", async function () {
         expect(
-            packageA.schemas[0].properties?.username.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.username.types.string?.contentLabels?.find(
                 (cl) => cl.label === USERNAME_LABEL
             ) != null
         ).equal(true);
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.user_name.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.user_name.types.string?.contentLabels?.find(
                 (cl) => cl.label === USERNAME_LABEL
             ) != null
         ).equal(true);
@@ -211,13 +208,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect race/ethnicity property names", async function () {
         expect(
-            packageA.schemas[0].properties?.race.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.race.types.string?.contentLabels?.find(
                 (cl) => cl.label === ETHNICITY_LABEL
             ) != null
         ).equal(true);
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.ethnicity.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.ethnicity.types.string?.contentLabels?.find(
                 (cl) => cl.label === ETHNICITY_LABEL
             ) != null
         ).equal(true);
@@ -225,13 +222,13 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect password property names", async function () {
         expect(
-            packageA.schemas[0].properties?.Password.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.Password.types.string?.contentLabels?.find(
                 (cl) => cl.label === SECRET_LABEL
             ) != null
         ).equal(true);
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.secret.valueTypes?.string.contentLabels?.find(
+            packageA.schemas[0].properties?.secret.types.string?.contentLabels?.find(
                 (cl) => cl.label === SECRET_LABEL
             ) != null
         ).equal(true);
@@ -239,7 +236,7 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect passport property names", async function () {
         expect(
-            packageA.schemas[0].properties?.Passport.valueTypes?.integer.contentLabels?.find(
+            packageA.schemas[0].properties?.Passport.types.integer?.contentLabels?.find(
                 (cl) => cl.label === PASSPORT_LABEL
             ) != null
         ).equal(true);
@@ -247,23 +244,22 @@ describe("Content Detection Tests", async function () {
 
     it("Should detect NPI property names", async function () {
         expect(
-            packageA.schemas[0].properties?.NPI.valueTypes?.integer.contentLabels?.find(
-                (cl) => cl.label === NPI_LABEL
-            ) != null
+            packageA.schemas[0].properties?.NPI.types.integer?.contentLabels?.find((cl) => cl.label === NPI_LABEL) !=
+                null
         ).equal(true);
     });
 
     it("Should detect GEO property names", async function () {
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.geo_latitude.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.geo_latitude.types.number?.contentLabels?.find(
                 (cl) => cl.label === GEO_LATITUDE_LABEL
             ) != null
         ).equal(true);
 
         expect(
             // eslint-disable-next-line camelcase
-            packageA.schemas[0].properties?.longitude.valueTypes?.number.contentLabels?.find(
+            packageA.schemas[0].properties?.longitude.types.number?.contentLabels?.find(
                 (cl) => cl.label === GEO_LONGITUDE_LABEL
             ) != null
         ).equal(true);

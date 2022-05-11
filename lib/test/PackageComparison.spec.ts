@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
     leastCompatible,
     compareSchema,
@@ -5,7 +6,8 @@ import {
     DifferenceType,
     diffCompatibility,
     nextVersion,
-    comparePackages
+    comparePackages,
+    compareProperties
 } from "../src/PackageUtil";
 import {
     Schema,
@@ -60,43 +62,68 @@ describe("Checking VersionUtil", () => {
     });
 
     it("Simple property schema comparison", () => {
-        const schemaA1: Schema = {
-            title: "SchemaA",
-            type: "string",
-            format: "date-time"
+        const propertiesA1: Properties = {
+            propertyA: {
+                title: "propertyA",
+                types: {
+                    string: {}
+                }
+            }
         };
 
-        const schemaA2: Schema = {
-            title: "SchemaA",
-            type: "string",
-            format: "date-time"
+        const propertiesA2: Properties = {
+            propertyA: {
+                title: "propertyA",
+                types: {
+                    string: {}
+                }
+            }
         };
 
-        expect(compareSchema(schemaA1, schemaA2).length).equal(0);
+        expect(compareProperties(propertiesA1, propertiesA2).length).equal(0);
 
-        schemaA2.format = "date";
+        propertiesA2.propertyA.types!.date = {};
 
-        const changeTitle = compareSchema(schemaA1, schemaA2);
+        const changeType = compareProperties(propertiesA1, propertiesA2);
 
-        expect(changeTitle[0].type).equal(DifferenceType.CHANGE_PROPERTY_FORMAT);
+        expect(changeType[0].type).equal(DifferenceType.CHANGE_PROPERTY_TYPE);
+        expect(changeType[0].pointer).equal("#/properties/propertyA");
     });
 
     it("Type arrays vs singluar values", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: {
+                    title: "string",
+                    types: {
+                        string: {}
+                    }
+                },
+                number: {
+                    title: "number",
+                    types: {
+                        number: {}
+                    }
+                }
             }
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: {
+                    title: "string",
+                    types: {
+                        string: {}
+                    }
+                },
+                number: {
+                    title: "number",
+                    types: {
+                        number: {}
+                    }
+                }
             }
         };
 
@@ -104,36 +131,34 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.length).equal(0);
 
-        (schemaA1.properties as Properties).string.type = ["string", "number"];
+        (schemaA1.properties as Properties).string.types!.number = {};
 
         const arrayVsNotDiff = compareSchema(schemaA1, schemaA2);
 
         expect(arrayVsNotDiff.length).equal(1);
         expect(arrayVsNotDiff[0].type).equal(DifferenceType.CHANGE_PROPERTY_TYPE);
 
-        (schemaA2.properties as Properties).string.type = ["string", "number"];
+        (schemaA2.properties as Properties).string.types!.number = {};
 
         const equalDiff = compareSchema(schemaA1, schemaA2);
 
         expect(equalDiff.length).equal(0);
     });
 
-    it("Object schema comparison", () => {
+    it("Schema comparison", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} } }
             }
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} } }
             }
         };
 
@@ -141,7 +166,7 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.length).equal(0);
 
-        (schemaA2.properties as Properties).boolean = { title: "boolean", type: "boolean" };
+        schemaA2.properties.boolean = { title: "boolean", types: { boolean: {} } };
 
         const compatibleChange = compareSchema(schemaA1, schemaA2);
 
@@ -149,10 +174,9 @@ describe("Checking VersionUtil", () => {
 
         expect(compatibleChange[0].type).equal(DifferenceType.ADD_PROPERTY);
 
-        (schemaA1.properties as Properties).date = {
+        schemaA1.properties.date = {
             title: "date",
-            type: "string",
-            format: "date"
+            types: { date: {} }
         };
 
         const addPropertyDiff = compareSchema(schemaA1, schemaA2);
@@ -162,11 +186,10 @@ describe("Checking VersionUtil", () => {
 
         expect(propertyRemoved != null).equal(true);
 
-        (schemaA1.properties as Properties).boolean = { title: "boolean", type: "boolean" };
-        (schemaA2.properties as Properties).date = {
+        schemaA1.properties.boolean = { title: "boolean", types: { boolean: {} } };
+        schemaA2.properties.date = {
             title: "date",
-            type: "string",
-            format: "date"
+            types: { date: {} }
         };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
@@ -186,31 +209,33 @@ describe("Checking VersionUtil", () => {
     it("Nested Objects Comparison", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
                 object: {
                     title: "object",
-                    type: "object",
+                    types: {
+                        object: {}
+                    },
                     properties: {
-                        string1: { type: "string" }
+                        string1: { title: "string1", types: { string: {} } }
                     }
                 },
-                number: { title: "number", type: "number" }
+                number: { title: "number", types: { number: {} } }
             }
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
                 object: {
                     title: "object",
-                    type: "object",
+                    types: {
+                        object: {}
+                    },
                     properties: {
-                        string1: { type: "string" }
+                        string1: { title: "string1", types: { string: {} } }
                     }
                 },
-                number: { title: "number", type: "number" }
+                number: { title: "number", types: { number: {} } }
             }
         };
 
@@ -219,7 +244,7 @@ describe("Checking VersionUtil", () => {
 
         expect(diffCompatibility(firstDiff)).equal(Compability.Identical);
 
-        ((schemaA2.properties as Properties).object.properties as Properties).string2 = { type: "string" };
+        (schemaA2.properties.object.properties as Properties).string2 = { title: "string2", types: { string: {} } };
 
         const compatibleDiff = compareSchema(schemaA1, schemaA2);
 
@@ -232,8 +257,8 @@ describe("Checking VersionUtil", () => {
 
         expect(compatibleComparison).equal(Compability.CompatibleChange);
 
-        ((schemaA1.properties as Properties).object.properties as Properties).string3 = { type: "string" };
-        ((schemaA1.properties as Properties).object.properties as Properties).string4 = { type: "string" };
+        (schemaA1.properties.object.properties as Properties).string3 = { title: "string3", types: { string: {} } };
+        (schemaA1.properties.object.properties as Properties).string4 = { title: "string4", types: { string: {} } };
 
         const breakingDiff = compareSchema(schemaA1, schemaA2);
         expect(breakingDiff).length(3);
@@ -249,9 +274,9 @@ describe("Checking VersionUtil", () => {
 
         expect(breakingChange).equal(Compability.BreakingChange);
 
-        ((schemaA1.properties as Properties).object.properties as Properties).string2 = { type: "string" };
-        ((schemaA2.properties as Properties).object.properties as Properties).string3 = { type: "string" };
-        ((schemaA2.properties as Properties).object.properties as Properties).string4 = { type: "string" };
+        (schemaA1.properties.object.properties as Properties).string2 = { title: "string2", types: { string: {} } };
+        (schemaA2.properties.object.properties as Properties).string3 = { title: "string2", types: { string: {} } };
+        (schemaA2.properties.object.properties as Properties).string4 = { title: "string3", types: { string: {} } };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
 
@@ -316,26 +341,6 @@ describe("Checking VersionUtil", () => {
         expect(collectionSlugValid("a-")).equal("COLLECTION_SLUG_INVALID");
         expect(collectionSlugValid("a_")).equal("COLLECTION_SLUG_INVALID");
         expect(collectionSlugValid("a___c")).equal("COLLECTION_SLUG_INVALID");
-    });
-
-    it("Compare identical schemas", () => {
-        const schemaA1: Schema = {
-            title: "SchemaA",
-            type: "string",
-            format: "date-time"
-        };
-
-        const schemaA2: Schema = {
-            title: "SchemaA",
-            type: "string",
-            format: "date-time"
-        };
-
-        const diffs = compareSchema(schemaA1, schemaA2);
-
-        console.log(JSON.stringify(diffs, null, 1));
-
-        expect(diffs.length).equal(0);
     });
 
     it("Compare source objects", () => {
@@ -999,19 +1004,17 @@ describe("Checking VersionUtil", () => {
     it("Compare hidden properties", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} } }
             }
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} } }
             }
         };
 
@@ -1044,19 +1047,17 @@ describe("Checking VersionUtil", () => {
     it("Compare changing property unit", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number", unit: "something" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} }, unit: "something" }
             }
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
-            type: "object",
             properties: {
-                string: { title: "string", type: "string" },
-                number: { title: "number", type: "number", unit: "something" }
+                string: { title: "string", types: { string: {} } },
+                number: { title: "number", types: { number: {} }, unit: "something" }
             }
         };
 

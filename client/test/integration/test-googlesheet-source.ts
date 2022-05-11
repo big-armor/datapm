@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import { KEYS, removePackageFiles, testCmd, TestResults, TEST_SOURCE_FILES } from "./test-utils";
 
 describe("Googlesheet Source Test", function () {
@@ -182,11 +182,12 @@ describe("Googlesheet Source Test", function () {
 
         const properties1 = schema1.properties as Properties;
         columns1.forEach((column) => {
-            const property = properties1[column.title as string] as Schema;
+            const property = properties1[column.title as string];
             expect(property.title).equal(column.title);
-            expect(property.recordCount).equal(50);
-            expect(property.format?.split(",")).include.members(column.format);
-            expect(property.type).include.members(column.type);
+
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(50);
+
+            expect(Object.keys(property.types)).include.members(column.type);
         });
 
         const columns2 = [
@@ -227,11 +228,11 @@ describe("Googlesheet Source Test", function () {
 
         const properties2 = schema2.properties as Properties;
         columns2.forEach((column) => {
-            const property = properties2[column.title as string] as Schema;
+            const property = properties2[column.title as string];
             expect(property.title).equal(column.title);
-            expect(property.recordCount).equal(67);
-            expect(property.format?.split(",")).include.members(column.format);
-            expect(property.type).include.members(column.type);
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(67);
+
+            expect(Object.keys(property.types)).include.members(column.type);
         });
     });
 });

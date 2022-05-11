@@ -10,9 +10,9 @@ import {
     SchemaIdentifier,
     RecordStreamContext,
     ParameterType,
-    DPMRecord
+    DPMRecord,
+    DPMPropertyTypes
 } from "datapm-lib";
-import { JSONSchema7TypeName } from "json-schema";
 import { Transform } from "stream";
 import { JobContext } from "../../task/JobContext";
 import { Maybe } from "../../util/Maybe";
@@ -306,19 +306,15 @@ export class TimeplusSink implements Sink {
                 throw new Error("Schema property " + propertyName + " is not found");
             }
 
-            if (property.title == null) {
-                throw new Error("Schema property " + propertyName + " must have a title");
-            }
-
             return {
                 // column definition
                 name: property.title,
-                type: this.getTimeplusType(property.type as JSONSchema7TypeName[], property.format)
+                type: this.getTimeplusType(Object.keys(property.types) as DPMPropertyTypes[])
             };
         });
     }
 
-    getTimeplusType(types: string[], format?: string): string {
+    getTimeplusType(types: DPMPropertyTypes[]): string {
         // console.log("[debug] type:" + types + " format:" + format);
         const removedNull = types.filter((t) => t !== "null");
 
@@ -336,14 +332,7 @@ export class TimeplusSink implements Sink {
             case "integer":
                 return "int";
             case "number":
-                switch (format) {
-                    case "float":
-                        return "float";
-                    case "integer":
-                        return "int";
-                    default:
-                        return "double";
-                }
+                return "double";
             case "boolean":
                 return "bool";
             default:
