@@ -17,19 +17,9 @@ In the case of conflicts between the terms of limitations and allowances below, 
 
 # Limitations
 
-You may not provide the software to third parties as a hosted or managed service, where the service generates revenue for other parties. Separate licensing must be obtained from the licensor for such services.
-
-You may not modify this software to enable additional forms of advertising to the users of the software.
-
-You may not generate revenue from the distribution of the software.
-
-You may not move, change, disable, or circumvent the license key functionality in the software, and you may not remove or obscure any functionality in the software that is protected by the license key.
+You may not use the software in situations that revenue is generated for ten or third-parties. This includes but is not limited to managed services, marketplaces, and affiliate programs.
 
 You may not alter, remove, or obscure any licensing, copyright, or other notices of the licensor in the software. Any use of the licensor’s trademarks is subject to applicable law.
-
-# Allowances
-
-You may use the software to provide a service that generates revenue only for you. That service may not generate revenue for any other party.
 
 # Patents
 
@@ -63,6 +53,10 @@ your company is any legal entity, sole proprietorship, or other kind of organiza
 
 your licenses are all the licenses granted to you for the software under these terms.
 
+third-party refers to individuals or entities who are not your employees or contractors.
+
 use means anything you do with the software requiring one of your licenses.
 
 trademark means trademarks, service marks, and similar rights.
+
+managed service means maintaining the software on behalf of a third party in exchange for a fee.
