@@ -115,7 +115,7 @@ export async function inspectSourceConnection(
         }
     }
 
-    credentialsConfiguration = await obtainCredentialsConfiguration(
+    const userCredentialsResponse = await obtainCredentialsConfiguration(
         jobContext,
         connector,
         source.connectionConfiguration,
@@ -124,6 +124,10 @@ export async function inspectSourceConnection(
         undefined,
         defaults
     );
+
+    if (userCredentialsResponse) {
+        credentialsConfiguration = userCredentialsResponse.credentialsConfiguration;
+    }
 
     const sourceDescription = await connectorDescription.getSourceDescription();
 
@@ -602,14 +606,35 @@ export function updateSchemaWithDeconflictOptions(
         }
 
         if (deconflictOption === DeconflictOptions.SKIP || deconflictOption === DeconflictOptions.CAST_TO_NULL) {
-            delete properties[title];
+            const nonStringPropertyTypes = Object.keys(property.types).filter(
+                (t) => t !== "null" && t !== "string"
+            ) as DPMPropertyTypes[];
+
+            if (nonStringPropertyTypes.length === 0) {
+                throw new Error("Could not find non-string property types for property with title: " + title);
+            }
+
+            if (nonStringPropertyTypes.length > 1) {
+                throw new Error("Found multiple non-string property types for property with title: " + title);
+            }
+
+            const nonStringPropertyType = nonStringPropertyTypes[0];
+
+            property.types = {
+                [nonStringPropertyType]: Object(property.types)[nonStringPropertyType]
+            };
         } else {
             const preservedValueType = Object(property.types)[deconflictOption.toString()];
+
+            const rule = deconflictRules[deconflictOption];
+
+            if (rule == null) {
+                throw new Error("Could not find rule for deconflict option: " + deconflictOption);
+            }
             property.types = {
-                [deconflictRules[deconflictOption]]: preservedValueType
+                [rule]: preservedValueType
             };
         }
-        const nullIncluded = property.types.null != null;
     }
 }
 
@@ -660,7 +685,14 @@ export function resolveConflict(value: DPMRecordValue, deconflictOption: Deconfl
                 .format("YYYY-MM-DD HH:mm:ssZ");
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_STRING) {
-        return value;
+        if (valueType === "null") return "null";
+        if (valueType === "boolean") return typeConvertedValue ? "true" : "false";
+        if (isDate(typeConvertedValue as string)) {
+            return (typeConvertedValue as Date).toISOString();
+        }
+        if (valueType === "object") return JSON.stringify(typeConvertedValue);
+        if (valueType === "array") return JSON.stringify(typeConvertedValue);
+        return value.toString();
     }
     return null;
 }
