@@ -237,7 +237,6 @@ export class TimeplusSink implements Sink {
         let stream: TimeplusStream | undefined;
 
         const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
-        // jobContext.print("INFO", "Sending GET to " + url);
 
         const response = await fetch(url, {
             method: "GET",
@@ -246,7 +245,6 @@ export class TimeplusSink implements Sink {
                 Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
             }
         });
-        // jobContext.print("INFO", "Got response with HTTP code " + response.status);
 
         if (response.status !== 200) {
             throw new Error(`Failed to list Timeplus streams. HTTP code: ${response.status} ${response.statusText}`);
@@ -298,27 +296,35 @@ export class TimeplusSink implements Sink {
             throw new Error("Schema must have properties");
         }
 
-        return Object.keys(schema.properties).map((propertyName) => {
+        const rv: TimeplusColumns = [];
+        for (const propertyName of Object.keys(schema.properties)) {
             const property = schema.properties?.[propertyName];
-            // console.log("[debug] propertyName:" + propertyName + " property:" + JSON.stringify(property));
 
             if (property == null) {
                 throw new Error("Schema property " + propertyName + " is not found");
             }
 
-            return {
-                // column definition
-                name: property.title,
-                type: this.getTimeplusType(Object.keys(property.types) as DPMPropertyTypes[])
-            };
-        });
+            if (property.hidden === false) {
+                // the user can exclude files
+            } else {
+                rv.push({
+                    // column definition
+                    name: property.title,
+                    type: this.getTimeplusType(Object.keys(property.types) as DPMPropertyTypes[])
+                });
+            }
+        }
+        return rv;
     }
 
     getTimeplusType(types: DPMPropertyTypes[]): string {
-        // console.log("[debug] type:" + types + " format:" + format);
         const removedNull = types.filter((t) => t !== "null");
 
         if (removedNull.length > 1) {
+            // when integer and string both possible, choose string
+            if (removedNull.includes("string")) {
+                return "string";
+            }
             throw new Error("Timeplus Sink does not support schemas with more than one type");
         }
 
@@ -335,6 +341,10 @@ export class TimeplusSink implements Sink {
                 return "double";
             case "boolean":
                 return "bool";
+            case "date-time":
+                return "string";
+            // idealy should return "datetime64";
+            // but the sample value is not accepted: Tue Jul 04 2017 17:12:00 GMT-0700 (Pacific Daylight Time)"
             default:
                 throw new Error("Unsupported Timeplus type: " + removedNull[0]);
         }
