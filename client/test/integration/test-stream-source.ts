@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk } from "datapm-lib";
 import execa from "execa";
 import { resetConfiguration } from "../../src/util/ConfigUtil";
 import { getPromptInputs, removePackageFiles, testCmd, TestResults, KEYS } from "./test-utils";
@@ -183,18 +183,16 @@ describe("Test Stream Source Test", function () {
     it("Validate the contents of the JSON file", async function () {
         const packageFile = loadPackageFileFromDisk("test.datapm.json");
         expect(packageFile.schemas.length).equals(1);
-        const properties = packageFile.schemas[0].properties as Properties;
+        const properties = packageFile.schemas[0].properties;
 
-        const companyProperty = properties.Company as Schema;
+        const companyProperty = properties.Company;
         expect(companyProperty.title).equal("Company");
-        expect(companyProperty.recordCount).equal(10);
-        expect(companyProperty.format).equal("string");
-        expect(companyProperty.type).include.members(["string"]);
+        expect(Object.values(companyProperty.types).reduce((acc, cur) => acc + (cur.recordCount ?? 0), 0)).equal(10);
+        expect(Object.keys(companyProperty.types).join(",")).equal("string");
 
-        const ibanProperty = properties.IBAN as Schema;
+        const ibanProperty = properties.IBAN;
         expect(ibanProperty.title).equal("IBAN");
-        expect(ibanProperty.recordCount).equal(10);
-        expect(ibanProperty.format).equal("string");
-        expect(ibanProperty.type).include.members(["string"]);
+        expect(Object.values(ibanProperty.types).reduce((acc, cur) => acc + (cur.recordCount ?? 0), 0)).equal(10);
+        expect(Object.keys(ibanProperty.types).join(",")).equal("string");
     });
 });

@@ -109,7 +109,6 @@ export class MySqlSink extends KnexSink implements Sink {
             throw new Error("'password' is a required configuration value for mysql");
         if (configuration.database == null) throw new Error("'database' is a required configuration value for mysql");
         if (schema.title == null) throw new Error("Schema name in configuration not definied, and are required");
-        if (schema.type !== "object") throw new Error("not a schema object!");
 
         // Open a connection to the database
         this.client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);

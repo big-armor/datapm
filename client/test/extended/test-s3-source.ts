@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import { defaultPromptInputsForCSVs, removePackageFiles, testCmd, TestResults } from "../integration/test-utils";
 
 describe("S3 Source Test", function () {
@@ -44,78 +44,63 @@ describe("S3 Source Test", function () {
         const columns = [
             {
                 title: "submission_date",
-                type: ["string"],
-                format: ["date"]
+                type: ["date"]
             },
             {
                 title: "state",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "tot_cases",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_cases",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_cases",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_case",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_case",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "tot_death",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_death",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_death",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_death",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_death",
-                type: ["number"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "created_at",
-                type: ["string"],
-                format: ["date-time"]
+                type: ["date-time"]
             },
             {
                 title: "consent_cases",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "consent_deaths",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             }
         ];
 
@@ -126,11 +111,11 @@ describe("S3 Source Test", function () {
 
         const properties = schema.properties as Properties;
         columns.forEach((column) => {
-            const property = properties[column.title as string] as Schema;
+            const property = properties[column.title as string];
             expect(property.title).equal(column.title);
-            expect(property.recordCount).equal(50);
-            expect(property.format?.split(",")).include.members(column.format);
-            expect(property.type).include.members(column.type);
+
+            expect(Object.values(property.types).reduce((acc, cur) => acc + (cur.recordCount ?? 0), 0)).equal(50);
+            expect(Object.keys(property.types)).include.members(column.type);
         });
     });
 });

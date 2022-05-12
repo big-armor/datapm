@@ -5,7 +5,6 @@ import { filterBadSchemaProperties, InspectionResults, inspectSource, inspectStr
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import * as SchemaUtil from "../util/SchemaUtil";
-import { JSONSchema7TypeName } from "json-schema";
 import { validUnit } from "./IdentifierUtil";
 
 export async function configureSource(
@@ -449,9 +448,8 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
     properties = schema.properties as Properties;
 
     const keys = Object.keys(properties).filter((key) => {
-        const property = properties[key] as Schema;
-        const type = property.type as JSONSchema7TypeName[];
-        const types = type.filter((type) => type !== "null");
+        const property = properties[key];
+        const types = Object.keys(property.types).filter((type) => type !== "null");
         return types.includes("number") || types.includes("integer");
     });
 

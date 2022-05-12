@@ -198,7 +198,7 @@ export async function fetch(
                             name: "deconflictOption",
                             message: `${title} has ${valueTypes.join(
                                 " and "
-                            )} values. How should this output be handled?`,
+                            )} values. How should this conflict be handled?`,
                             options: getDeconflictChoices(valueTypes)
                         }
                     ]);

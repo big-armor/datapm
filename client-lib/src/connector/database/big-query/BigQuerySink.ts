@@ -8,7 +8,8 @@ import {
     UpdateMethod,
     RecordStreamContext,
     Parameter,
-    ParameterType
+    ParameterType,
+    DPMPropertyTypes
 } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, TableField } from "@google-cloud/bigquery";
@@ -16,7 +17,6 @@ import moment from "moment";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName } from "../../Source";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryConnectorDescription";
@@ -244,26 +244,17 @@ export class BigQuerySink implements Sink {
 
             // TODO What to do if it's a date?
 
-            const formats = (property.format || "").split(",").filter((format) => format !== "null");
+            const types = Object.keys(property.types ?? []).filter((type) => type !== "null");
 
             let dbKey = `${this.fieldPrefix}_${this.sanitizeName(key)}`;
 
-            let valueType = discoverValueType(value);
-            if (formats.length === 1) {
-                if (valueType.type !== "null") {
-                    const type = formats[0]
-                        .replace("date-time", "date")
-                        .replace("integer", "number") as ExtendedJSONSchema7TypeName;
-                    valueType = { type, format: formats[0] };
+            const valueType = discoverValueType(value);
+            if (types.length === 1) {
+                if (valueType !== "null") {
+                    const type = types[0].replace("date-time", "date").replace("integer", "number") as DPMPropertyTypes;
                 }
-            } else if (formats.length > 1) {
-                let typeAppend = valueType.format;
-                if (typeAppend === "integer" && !formats.includes("integer")) {
-                    typeAppend = "number";
-                } else if (typeAppend === "date" && !formats.includes("date")) {
-                    typeAppend = "date-time";
-                }
-                dbKey += "-" + typeAppend;
+            } else {
+                dbKey += "-" + valueType;
             }
             insertRecord[dbKey] = convertValueByValueType(value, valueType);
         }
@@ -295,9 +286,6 @@ export class BigQuerySink implements Sink {
     }
 
     async createTableFromSchema(schema: Schema): Promise<void> {
-        if (schema.type !== "object") {
-            throw new Error("not a schema object!");
-        }
         if (schema.title == null) throw new Error("Schema title defined, and is required");
         if (schema.properties == null) throw new Error("Schema properties are required for create database model");
 
@@ -316,62 +304,53 @@ export class BigQuerySink implements Sink {
         for (const key of keys) {
             const property = schema.properties[key];
 
-            if (property.type === undefined) {
-                // Log a warning
-                continue;
-            }
+            const types = Object.keys(property.types ?? []).filter((type) => type !== "null");
 
-            if (Array.isArray(property.type)) {
-                const formats = (property.format || "").split(",").filter((type) => type !== "null");
+            for (const type of types) {
+                let typeAppend = "";
 
-                for (const format of formats) {
-                    let typeAppend = "";
-
-                    if (formats.length > 1) {
-                        typeAppend = "-" + format;
-                        // Log a warning
-                    }
-                    if (format === "null") continue;
-                    if (format === "object") {
-                        throw new Error("nesting not yet supported!");
-                    }
-                    if (format === "array") {
-                        throw new Error("relationships not yet supported!");
-                    }
-                    if (format === "boolean") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "BOOLEAN"
-                        });
-                    } else if (format === "number") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "FLOAT64"
-                        });
-                    } else if (format === "integer") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "INTEGER"
-                        });
-                    } else if (format === "date") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "DATE"
-                        });
-                    } else if (format === "date-time") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "DATETIME"
-                        });
-                    } else if (format === "string") {
-                        dbSchema.push({
-                            name: `${key}${typeAppend}`,
-                            type: "STRING"
-                        });
-                    }
+                if (type.length > 1) {
+                    typeAppend = "-" + type;
+                    // Log a warning
                 }
-            } else {
-                throw new Error("Properties with schema type single values (non-arrays) are not yet supported");
+                if (type === "null") continue;
+                if (type === "object") {
+                    throw new Error("nesting not yet supported!");
+                }
+                if (type === "array") {
+                    throw new Error("relationships not yet supported!");
+                }
+                if (type === "boolean") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "BOOLEAN"
+                    });
+                } else if (type === "number") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "FLOAT64"
+                    });
+                } else if (type === "integer") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "INTEGER"
+                    });
+                } else if (type === "date") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "DATE"
+                    });
+                } else if (type === "date-time") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "DATETIME"
+                    });
+                } else if (type === "string") {
+                    dbSchema.push({
+                        name: `${key}${typeAppend}`,
+                        type: "STRING"
+                    });
+                }
             }
         }
 

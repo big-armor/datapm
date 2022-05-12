@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import { KEYS, removePackageFiles, testCmd, TestResults, TEST_SOURCE_FILES } from "./test-utils";
 
 describe("Googlesheet Source Test", function () {
@@ -83,6 +83,7 @@ describe("Googlesheet Source Test", function () {
                 }
             ], // there are two sheets
             async (line: string) => {
+                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -101,78 +102,63 @@ describe("Googlesheet Source Test", function () {
         const columns1 = [
             {
                 title: "submission_date",
-                type: ["string"],
-                format: ["date"]
+                type: ["date"]
             },
             {
                 title: "state",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "tot_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_case",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_case",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "tot_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "created_at",
-                type: ["date-time"],
-                format: ["date-time"]
+                type: ["date-time"]
             },
             {
                 title: "consent_cases",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "consent_deaths",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             }
         ];
 
@@ -182,43 +168,38 @@ describe("Googlesheet Source Test", function () {
 
         const properties1 = schema1.properties as Properties;
         columns1.forEach((column) => {
-            const property = properties1[column.title as string] as Schema;
+            const property = properties1[column.title as string];
             expect(property.title).equal(column.title);
-            expect(property.recordCount).equal(50);
-            expect(property.format?.split(",")).include.members(column.format);
-            expect(property.type).include.members(column.type);
+
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(50);
+
+            expect(Object.keys(property.types)).include.members(column.type);
         });
 
         const columns2 = [
             {
                 title: "Province/State",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "Country/Region",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "Last Update",
-                type: ["date-time"],
-                format: ["date-time"]
+                type: ["date-time"]
             },
             {
                 title: "Confirmed",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "Deaths",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "Recovered",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             }
         ];
         const schema2 = newPackageFile.schemas[1];
@@ -227,11 +208,11 @@ describe("Googlesheet Source Test", function () {
 
         const properties2 = schema2.properties as Properties;
         columns2.forEach((column) => {
-            const property = properties2[column.title as string] as Schema;
+            const property = properties2[column.title as string];
             expect(property.title).equal(column.title);
-            expect(property.recordCount).equal(67);
-            expect(property.format?.split(",")).include.members(column.format);
-            expect(property.type).include.members(column.type);
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(67);
+
+            expect(Object.keys(property.types)).include.members(column.type);
         });
     });
 });

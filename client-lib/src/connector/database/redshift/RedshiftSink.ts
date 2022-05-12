@@ -214,7 +214,7 @@ export class RedshiftSink extends KnexSink {
                 .map((columnName) => {
                     let columnValue = "";
                     if (row[columnName] instanceof Date) {
-                        if (properties[columnName].format?.includes("date-time")) {
+                        if (Object.keys(properties[columnName].types).includes("date-time")) {
                             columnValue = moment.utc(row[columnName] as string).format("YYYY-MM-DD HH:mm:ss");
                         } else {
                             columnValue = moment.utc(row[columnName] as string).format("YYYY-MM-DD");

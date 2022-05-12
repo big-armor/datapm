@@ -301,17 +301,17 @@ describe("MySQL Sink Test", function () {
 
         const prompts = [
             ...getMySQLSinkPromptInputs(["No", "No", mysqlHost, mysqlPort.toString(), "", "", ""]),
-            {
-                message: "Integer_Float has integer and number values.",
-                input: `${KEYS.ENTER}`
-            },
+
             {
                 message: "Boolean_Integer_String has boolean and integer and string values.",
                 input: `${KEYS.ENTER}`
             },
             {
-                message:
-                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and integer and number and string values.",
+                message: "Date_DateTime has date and date-time values.",
+                input: `${KEYS.ENTER}`
+            },
+            {
+                message: "all_types has boolean and date and date-time and number and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
             }
         ];
@@ -377,46 +377,23 @@ describe("MySQL Sink Test", function () {
                 .to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(columns.find((column) => column.column_name === "String" && column.data_type === "text")).to.exist;
+
+            // eslint-disable-next-line no-unused-expressions
+            expect(columns.find((column) => column.column_name === "all_types-number" && column.data_type === "double"))
+                .to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-integer" &&
-                        column.data_type === "bigint"
-                )
+                columns.find((column) => column.column_name === "all_types-boolean" && column.data_type === "tinyint")
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(
                 columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-number" &&
-                        column.data_type === "double"
+                    (column) => column.column_name === "all_types-date-time" && column.data_type === "datetime"
                 )
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-boolean" &&
-                        column.data_type === "tinyint"
-                )
-            ).to.exist;
-            // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-date-time" &&
-                        column.data_type === "datetime"
-                )
-            ).to.exist;
-            // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-string" &&
-                        column.data_type === "text"
-                )
-            ).to.exist;
+            expect(columns.find((column) => column.column_name === "all_types-string" && column.data_type === "text"))
+                .to.exist;
         } finally {
             //
         }

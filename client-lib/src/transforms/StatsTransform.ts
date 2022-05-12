@@ -1,7 +1,15 @@
-import { RecordContext, DPMRecord, DPMRecordValue, Schema, ValueTypeStatistics, DPMPropertyTypes } from "datapm-lib";
+import {
+    RecordContext,
+    DPMRecord,
+    DPMRecordValue,
+    Schema,
+    ValueTypeStatistics,
+    DPMPropertyTypes,
+    Property
+} from "datapm-lib";
 import { Transform, TransformCallback, TransformOptions } from "stream";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
-import { convertToJSONSchema7TypeName, convertValueByValueType, discoverValueType } from "../util/SchemaUtil";
+import { convertValueByValueType, discoverValueType } from "../util/SchemaUtil";
 
 const SAMPLE_RECORD_COUNT_MAX = 100;
 
@@ -35,8 +43,6 @@ export class StatsTransform extends Transform {
         for (const recordContext of recordContexts) {
             if (!Object.keys(this.schemas).includes(recordContext.schemaSlug)) {
                 this.schemas[recordContext.schemaSlug] = {
-                    $schema: "http://json-schema.org/draft-07/schema",
-                    type: "object",
                     title: recordContext.schemaSlug,
                     properties: {},
                     recordsInspectedCount: 0,
@@ -59,10 +65,9 @@ export class StatsTransform extends Transform {
                 let property = schema.properties![title];
 
                 if (property == null) {
-                    const propertySchema: Schema = {
+                    const propertySchema: Property = {
                         title,
-                        recordCount: 0,
-                        valueTypes: {}
+                        types: {}
                     };
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     schema.properties![title] = propertySchema;
@@ -70,14 +75,8 @@ export class StatsTransform extends Transform {
                 }
 
                 const value = recordContext.record[title];
-                if (value === undefined) {
-                    property.recordsNotPresent = (property.recordsNotPresent || 0) + 1;
-                    return;
-                }
 
-                property.recordCount = (property.recordCount || 0) + 1;
-
-                const valueType = discoverValueType(value);
+                let valueType: DPMPropertyTypes = discoverValueType(value);
                 let typeConvertedValue: DPMRecordValue;
                 try {
                     typeConvertedValue = convertValueByValueType(value, valueType);
@@ -86,48 +85,35 @@ export class StatsTransform extends Transform {
                     throw error;
                 }
 
-                if (property.valueTypes == null) return;
+                if (property.types == null) return;
 
                 // If an integer is detected, and there exists
                 // already numbers. Then count this as a number (and not an integer)
-                if (valueType.type === "integer") {
-                    if (property.valueTypes.number != null) {
-                        valueType.format = "number";
-                        valueType.type = "number";
+                if (valueType === "integer") {
+                    if (property.types.number != null) {
+                        valueType = "number" as DPMPropertyTypes;
                     }
 
                     // if a number is detected, and there exists
-                    // already integers. Then convert those priort integer valueTypes
+                    // already integers. Then convert those prior integer valueTypes
                     // to number.
-                } else if (valueType.type === "number") {
-                    if (property.valueTypes.integer != null) {
-                        property.valueTypes.number = property.valueTypes.integer;
-                        delete property.valueTypes.integer;
-                        property.valueTypes.number.valueType = "number";
-                    }
-                }
-
-                // Enumerate all value type format for sinks
-                if (valueType.format) {
-                    if (!property.format) {
-                        property.format = valueType.format;
-                    } else if (!property.format.split(",").includes(valueType.format)) {
-                        property.format += `,${valueType.format}`;
+                } else if (valueType === "number") {
+                    if (property.types.integer != null) {
+                        property.types.number = property.types.integer;
+                        delete property.types.integer;
                     }
                 }
 
                 typeConvertedRecord[title] = typeConvertedValue;
 
-                let valueTypeStats = property.valueTypes[valueType.type];
+                let valueTypeStats = property.types[valueType];
                 if (!valueTypeStats) {
-                    property.valueTypes[valueType.type] = valueTypeStats = {
+                    property.types[valueType] = valueTypeStats = {
                         recordCount: 0,
-                        valueType: convertToJSONSchema7TypeName(valueType.type),
                         stringOptions: {}
                     };
                 }
-                valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
-                updateValueTypeStats(typeConvertedValue, valueTypeStats);
+                updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
 
                 this.contentLabelDetector.inspectValue(recordContext.schemaSlug, title, typeConvertedValue);
             });
@@ -148,14 +134,14 @@ export class StatsTransform extends Transform {
     }
 }
 
-function updateValueTypeStats(value: DPMRecordValue, valueTypeStats: ValueTypeStatistics) {
-    if (valueTypeStats.valueType === "null") return;
+function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes, valueTypeStats: ValueTypeStatistics) {
+    valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
 
     if (value == null) {
         return;
     }
 
-    if (valueTypeStats.valueType === "string") {
+    if (valueType === "string") {
         const stringValue = value as string;
         const valueLength = stringValue.length;
 
@@ -164,7 +150,7 @@ function updateValueTypeStats(value: DPMRecordValue, valueTypeStats: ValueTypeSt
 
         if (valueTypeStats.stringMinLength == null || valueTypeStats.stringMinLength > valueLength)
             valueTypeStats.stringMinLength = valueLength;
-    } else if (valueTypeStats.valueType === "number" || valueTypeStats.valueType === "integer") {
+    } else if (valueType === "number" || valueType === "integer") {
         let numberValue: number;
 
         if (typeof value === "number") numberValue = value as number;
@@ -195,13 +181,13 @@ function updateValueTypeStats(value: DPMRecordValue, valueTypeStats: ValueTypeSt
 
         if (valueTypeStats.numberMaxScale == null || valueTypeStats.numberMaxScale < scale)
             valueTypeStats.numberMaxScale = scale;
-    } else if (valueTypeStats.valueType === "boolean") {
+    } else if (valueType === "boolean") {
         if (valueTypeStats.booleanTrueCount == null) valueTypeStats.booleanTrueCount = 0;
         if (valueTypeStats.booleanFalseCount == null) valueTypeStats.booleanFalseCount = 0;
 
         if (value === true) valueTypeStats.booleanTrueCount++;
         else if (value === false) valueTypeStats.booleanFalseCount++;
-    } else if (valueTypeStats.valueType === "date") {
+    } else if (valueType === "date" || valueType === "date-time") {
         const dateValue = new Date(value.toString()) as Date;
 
         if (dateValue instanceof Date && isFinite(dateValue.getTime())) {

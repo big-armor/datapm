@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ContentLabel, PackageFile, Schema, ValueTypeStatistics } from "datapm-lib";
+import { ContentLabel, PackageFile, Property, Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { SnackBarService } from "src/app/services/snackBar.service";
@@ -99,8 +99,8 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
             : this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
     }
 
-    public getPropertyTypes(property: Schema): string {
-        const keys = Object.keys(property.valueTypes).sort();
+    public getPropertyTypes(property: Property): string {
+        const keys = Object.keys(property.types).sort();
         return keys.join(", ");
     }
 
@@ -158,7 +158,7 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
 
     public getAllPropertyChips(property) {
         let labels = new Set<ContentLabel>();
-        let values: any[] = Object.values(property.valueTypes);
+        let values: any[] = Object.values(property.types);
 
         values.forEach((value) => {
             if (value.contentLabels) {

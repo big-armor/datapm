@@ -1,9 +1,11 @@
 import {
     CountPrecision,
     DPMConfiguration,
+    DPMPropertyTypes,
     DPMRecord,
     DPMRecordValue,
     Properties,
+    Property,
     Schema,
     StreamStats,
     UpdateMethod,
@@ -16,7 +18,6 @@ import { InflatedByteCountTransform } from "../transforms/InflatedByteCountTrans
 import { StatsTransform } from "../transforms/StatsTransform";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
 import {
-    ExtendedJSONSchema7TypeName,
     SourceDescription,
     SourceStreamsInspectionResult,
     StreamAndTransforms,
@@ -25,7 +26,6 @@ import {
     StreamSummary
 } from "./Source";
 import { ConnectorDescription } from "./Connector";
-import { JSONSchema7TypeName } from "json-schema";
 import { EXTENDED_CONNECTORS } from "./ConnectorUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { TimeOrDeathTransform } from "../transforms/TimeOrDeathTransform";
@@ -310,25 +310,6 @@ export async function generateSchemasFromSourceStreams(
 function finalizeSchema(reachedEnd: boolean, schema: Schema): void {
     const properties = schema.properties as Properties;
 
-    Object.values(properties).forEach((property) => {
-        const types = Object.keys(property.valueTypes || {}) as ExtendedJSONSchema7TypeName[];
-        property.type = mergeValueTypes(types);
-        property.format = mergeValueFormats(property.format);
-        mergeValueTypeStats(property);
-    });
-
-    // Convert binary boolean to number if number type exists in the same column
-    if (schema.sampleRecords == null) schema.sampleRecords = [];
-    const sampleRecords = schema.sampleRecords;
-    sampleRecords.forEach((sample) => {
-        Object.keys(sample).forEach((key) => {
-            const property = properties[key];
-            if (typeof sample[key] === "boolean" && !property.type?.includes("boolean")) {
-                sample[key] = sample[key] ? 1 : 0;
-            }
-        });
-    });
-
     let recordCountPrecision = CountPrecision.EXACT;
 
     if (!reachedEnd) {
@@ -380,115 +361,4 @@ export function memorySizeOf(obj: DPMRecordValue): number {
     }
 
     return sizeOf(obj);
-}
-
-// TODO WRITE TESTS FOR THIS
-
-export function mergeValueTypes(types: ExtendedJSONSchema7TypeName[]): JSONSchema7TypeName[] {
-    let mergedTypes = [...types];
-    if (mergedTypes.includes("date")) {
-        mergedTypes = mergedTypes.join(",").replace("date", "string").split(",") as ExtendedJSONSchema7TypeName[];
-    }
-    if (mergedTypes.includes("binary")) {
-        if (mergedTypes.includes("number")) {
-            mergedTypes = mergedTypes.join(",").replace("binary", "number").split(",") as ExtendedJSONSchema7TypeName[];
-        }
-        if (mergedTypes.includes("integer")) {
-            mergedTypes = mergedTypes
-                .join(",")
-                .replace("binary", "integer")
-                .split(",") as ExtendedJSONSchema7TypeName[];
-        } else {
-            mergedTypes = mergedTypes
-                .join(",")
-                .replace("binary", "boolean")
-                .split(",") as ExtendedJSONSchema7TypeName[];
-        }
-    }
-    mergedTypes = [...new Set(mergedTypes)].sort();
-    return mergedTypes as JSONSchema7TypeName[];
-}
-
-export function mergeValueFormats(format?: string): string | undefined {
-    let formats = format?.split(",");
-    const mergeableTypes = [
-        ["date", "date-time"],
-        ["binary", "boolean"],
-        ["binary", "integer"],
-        ["binary", "number"]
-    ];
-    mergeableTypes.forEach((mergeableType) => {
-        if (formats?.includes(mergeableType[0]) && formats?.includes(mergeableType[1])) {
-            formats = formats.filter((format) => format !== mergeableType[0]);
-        }
-    });
-    formats = formats?.join(",").replace("binary", "boolean").split(",");
-    formats = [...new Set(formats)].sort();
-    return formats?.join(",");
-}
-
-export function mergeValueTypeStats(property: Schema): void {
-    const valueTypes = property.valueTypes as ValueTypes;
-    const types = Object.keys(property.valueTypes || {}) as ExtendedJSONSchema7TypeName[];
-
-    if (types.includes("binary")) {
-        const binaryCount = valueTypes.binary.recordCount || 0;
-        if (types.includes("number")) {
-            const numberCount = valueTypes.number.recordCount || 0;
-            valueTypes.number = {
-                ...valueTypes.binary,
-                ...valueTypes.number,
-                recordCount: binaryCount + numberCount,
-                stringOptions: {
-                    ...valueTypes.binary.stringOptions,
-                    ...valueTypes.number.stringOptions
-                }
-            };
-            valueTypes.number.numberMaxValue = Math.max(
-                valueTypes.number.numberMaxValue || Number.MIN_VALUE,
-                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
-            );
-            valueTypes.number.numberMinValue = Math.min(
-                valueTypes.number.numberMinValue || Number.MAX_VALUE,
-                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
-            );
-        }
-        if (types.includes("integer")) {
-            const numberCount = valueTypes.integer.recordCount || 0;
-            valueTypes.integer = {
-                ...valueTypes.binary,
-                ...valueTypes.integer,
-                recordCount: binaryCount + numberCount,
-                stringOptions: {
-                    ...valueTypes.binary.stringOptions,
-                    ...valueTypes.integer.stringOptions
-                }
-            };
-            valueTypes.integer.numberMaxValue = Math.max(
-                valueTypes.integer.numberMaxValue || Number.MIN_VALUE,
-                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
-            );
-            valueTypes.integer.numberMinValue = Math.min(
-                valueTypes.integer.numberMinValue || Number.MAX_SAFE_INTEGER,
-                ...Object.keys(valueTypes.binary.stringOptions || {}).map((value) => +value)
-            );
-        } else if (types.includes("boolean")) {
-            const booleanCount = valueTypes.boolean.recordCount || 0;
-            valueTypes.boolean = {
-                ...valueTypes.binary,
-                ...valueTypes.boolean,
-                recordCount: binaryCount + booleanCount,
-                stringOptions: {
-                    ...valueTypes.binary.stringOptions,
-                    ...valueTypes.boolean.stringOptions
-                }
-            };
-        } else {
-            valueTypes.boolean = {
-                ...valueTypes.binary
-            };
-        }
-
-        delete valueTypes.binary;
-    }
 }

@@ -364,16 +364,15 @@ describe("Postgres Sink Test", function () {
                 ""
             ]),
             {
-                message: "Integer_Float has integer and number values.",
-                input: `${KEYS.ENTER}`
-            },
-            {
                 message: "Boolean_Integer_String has boolean and integer and string values.",
                 input: `${KEYS.ENTER}`
             },
             {
-                message:
-                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and integer and number and string values.",
+                message: "Date_DateTime has date and date-time values",
+                input: `${KEYS.ENTER}`
+            },
+            {
+                message: "all_types has boolean and date and date-time and number and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
             }
         ];
@@ -450,46 +449,28 @@ describe("Postgres Sink Test", function () {
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(columns.find((column) => column.column_name === "String" && column.data_type === "text")).to.exist;
+
             // eslint-disable-next-line no-unused-expressions
             expect(
                 columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-integer" &&
-                        column.data_type === "bigint"
+                    (column) => column.column_name === "all_types-number" && column.data_type === "double precision"
                 )
+            ).to.exist;
+            // eslint-disable-next-line no-unused-expressions
+            expect(
+                columns.find((column) => column.column_name === "all_types-boolean" && column.data_type === "boolean")
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
             expect(
                 columns.find(
                     (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-number" &&
-                        column.data_type === "double precision"
-                )
-            ).to.exist;
-            // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-boolean" &&
-                        column.data_type === "boolean"
-                )
-            ).to.exist;
-            // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-date-time" &&
+                        column.column_name === "all_types-date-time" &&
                         column.data_type === "timestamp without time zone"
                 )
             ).to.exist;
             // eslint-disable-next-line no-unused-expressions
-            expect(
-                columns.find(
-                    (column) =>
-                        column.column_name === "Integer_Float_Boolean_Date_DateTime_String-string" &&
-                        column.data_type === "text"
-                )
-            ).to.exist;
+            expect(columns.find((column) => column.column_name === "all_types-string" && column.data_type === "text"))
+                .to.exist;
         } finally {
             //
         }
@@ -543,13 +524,14 @@ describe("Postgres Sink Test", function () {
                 .table("information_schema.columns")
                 .where({ table_name: tableCName })
                 .count();
-            expect(columnCount[0].count).equals("33");
 
             const columns = await knexClient
                 .table("information_schema.columns")
                 .where({ table_name: tableCName })
                 // eslint-disable-next-line camelcase
                 .select<[{ column_name: string; data_type: string }]>(["column_name", "data_type"]);
+
+            expect(columnCount[0].count).equals("33");
 
             // eslint-disable-next-line no-unused-expressions
             expect(columns.find((column) => column.column_name === "facebook" && column.data_type === "bigint")).to

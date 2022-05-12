@@ -1,4 +1,4 @@
-import { ContentLabel, DPMPropertyTypes, DPMRecordValue, Schema } from "datapm-lib";
+import { ContentLabel, DPMPropertyTypes, DPMRecordValue, Schema, ValueTypeStatistics } from "datapm-lib";
 import { EmailAddressDetector } from "./EmailContentDetector";
 import { PersonNameDetector } from "./PersonNameDetector";
 import { PhoneNumberDetector } from "./PhoneNumberDetector";
@@ -90,12 +90,10 @@ export class ContentLabelDetector {
 
         if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};
 
-        if (this.contentLabelDetectors[propertyName][valueType.type] == null)
-            this.contentLabelDetectors[propertyName][valueType.type] = getContentLabelDetectorsForValueType(
-                valueType.type
-            );
+        if (this.contentLabelDetectors[propertyName][valueType] == null)
+            this.contentLabelDetectors[propertyName][valueType] = getContentLabelDetectorsForValueType(valueType);
 
-        for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType.type]) {
+        for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType]) {
             const valueTestedCount = contentLabelDetector.getValueTestCount();
 
             let inspect = true;
@@ -119,9 +117,9 @@ export class ContentLabelDetector {
             for (const propertyName of Object.keys(schema.properties)) {
                 const property = schema.properties[propertyName];
 
-                if (property.valueTypes == null) continue;
+                if (property.types == null) continue;
 
-                for (const valueType of Object.keys(property.valueTypes || {})) {
+                for (const valueType of Object.keys(property.types || {})) {
                     const labels: ContentLabel[] = [];
 
                     const contentLabelDetectors = this.contentLabelDetectors[propertyName][valueType];
@@ -133,7 +131,7 @@ export class ContentLabelDetector {
                             continue;
                         }
 
-                        const existingLabels = property.valueTypes[valueType].contentLabels;
+                        const existingLabels = (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels;
 
                         const newLabels = contentLabelDetector.getContentLabels(propertyName, existingLabels || []);
 
@@ -156,7 +154,7 @@ export class ContentLabelDetector {
                         }
                     }
 
-                    property.valueTypes[valueType].contentLabels = labels;
+                    (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels = labels;
                 }
             }
         }

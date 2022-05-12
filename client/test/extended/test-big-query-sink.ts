@@ -258,17 +258,17 @@ describe("Big Query Sink Test", function () {
 
         const prompts = [
             ...getBigQuerySinkPromptInputs(["No", "No", "", "", tableBName, ""]),
-            {
-                message: "Integer_Float has integer and number values.",
-                input: `${KEYS.ENTER}`
-            },
+
             {
                 message: "Boolean_Integer_String has boolean and integer and string values.",
                 input: `${KEYS.ENTER}`
             },
             {
-                message:
-                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and integer and number and string values.",
+                message: "Date_DateTime has date and date-time values.",
+                input: `${KEYS.ENTER}`
+            },
+            {
+                message: "all_types has boolean and date and date-time and number and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
             }
         ];
@@ -330,42 +330,22 @@ describe("Big Query Sink Test", function () {
         expect(fields.find((field: TableField) => field.name === "field__String" && field.type === "STRING")).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
-            fields.find(
-                (field: TableField) =>
-                    field.name === "field__Integer_Float_Boolean_Date_DateTime_String_integer" &&
-                    field.type === "INTEGER"
-            )
+            fields.find((field: TableField) => field.name === "field__all_types_integer" && field.type === "INTEGER")
+        ).to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(fields.find((field: TableField) => field.name === "field__all_types_number" && field.type === "FLOAT"))
+            .to.exist;
+        // eslint-disable-next-line no-unused-expressions
+        expect(
+            fields.find((field: TableField) => field.name === "field__all_types_boolean" && field.type === "BOOLEAN")
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
         expect(
-            fields.find(
-                (field: TableField) =>
-                    field.name === "field__Integer_Float_Boolean_Date_DateTime_String_number" && field.type === "FLOAT"
-            )
+            fields.find((field: TableField) => field.name === "field__all_types_date_time" && field.type === "DATETIME")
         ).to.exist;
         // eslint-disable-next-line no-unused-expressions
-        expect(
-            fields.find(
-                (field: TableField) =>
-                    field.name === "field__Integer_Float_Boolean_Date_DateTime_String_boolean" &&
-                    field.type === "BOOLEAN"
-            )
-        ).to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(
-            fields.find(
-                (field: TableField) =>
-                    field.name === "field__Integer_Float_Boolean_Date_DateTime_String_date_time" &&
-                    field.type === "DATETIME"
-            )
-        ).to.exist;
-        // eslint-disable-next-line no-unused-expressions
-        expect(
-            fields.find(
-                (field: TableField) =>
-                    field.name === "field__Integer_Float_Boolean_Date_DateTime_String_string" && field.type === "STRING"
-            )
-        ).to.exist;
+        expect(fields.find((field: TableField) => field.name === "field__all_types_string" && field.type === "STRING"))
+            .to.exist;
     });
 
     it("Casting to null should work correctly", async function () {

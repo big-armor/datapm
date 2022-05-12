@@ -527,7 +527,7 @@ export function generateTestSourceFile(filePath: string): void {
         "DateTime",
         "Date_DateTime",
         "String",
-        "Integer_Float_Boolean_Date_DateTime_String"
+        "all_types"
     ];
     const records: string[][] = [];
 

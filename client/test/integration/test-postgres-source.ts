@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
@@ -15,6 +15,7 @@ import {
     TestResults,
     TEST_SOURCE_FILES
 } from "./test-utils";
+import fs from "fs";
 
 const postgresSinkPromptInputs = [
     "Exclude any attributes from",
@@ -95,6 +96,7 @@ describe("Postgres Source Test", function () {
     after(async function () {
         removePackageFiles(["covid-02-01-2020"]);
         removePackageFiles(["postgres"]);
+        if (fs.existsSync("covid-02-01-2020.json")) fs.rmSync("covid-02-01-2020.json");
         knexClient.destroy();
         await postgresContainer.stop();
     });
@@ -178,38 +180,31 @@ describe("Postgres Source Test", function () {
         const columns = await knexClient("information_schema.columns").where({ table_name: "covid-02-01-2020" });
         const typeMatch: Record<string, Record<string, [string]>> = {
             boolean: {
-                format: ["boolean"],
                 type: ["boolean"]
             },
             bigint: {
-                format: ["integer"],
                 type: ["integer"]
             },
             real: {
-                format: ["number"],
                 type: ["number"]
             },
             text: {
-                format: ["string"],
                 type: ["string"]
             },
             date: {
-                format: ["date-time"],
                 type: ["date-time"]
             },
             "timestamp without time zone": {
-                format: ["date-time"],
                 type: ["date-time"]
             }
         };
         expect(newPackageFile.schemas.length).equals(1);
         columns.forEach((column) => {
             const properties = newPackageFile.schemas[0].properties as Properties;
-            const property = properties[column.column_name as string] as Schema;
+            const property = properties[column.column_name as string];
             expect(property.title).equal(column.column_name);
-            expect(property.recordCount).equal(67);
-            expect(property.format?.split(",")).include.members(typeMatch[column.data_type].format);
-            expect(property.type).include.members(typeMatch[column.data_type].type);
+            expect(Object.values(property.types).reduce((acc, curr) => acc + (curr.recordCount ?? 0), 0)).equal(67);
+            expect(Object.keys(property.types)).include.members(typeMatch[column.data_type].type);
         });
     });
 
@@ -243,4 +238,52 @@ describe("Postgres Source Test", function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
     });
+
+    it("should allow fetch of data", async function () {
+        const prompts: PromptInput[] = [
+            { message: "Exclude any attributes from covid-02-01-2020?", input: "No" + KEYS.ENTER },
+            { message: "Rename attributes from covid-02-01-2020?", input: "No" + KEYS.ENTER },
+
+            {
+                message: "Credentials?",
+                input: "postgres" + KEYS.ENTER
+            },
+            {
+                message: "Sink Connector?",
+                input: "Local" + KEYS.ENTER
+            },
+            {
+                message: "File format?",
+                input: "JSON" + KEYS.ENTER
+            },
+            {
+                message: "File Location?",
+                input: "./" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd("fetch", ["postgres.datapm.json"], prompts, async (line: string) => {
+            if (line.includes("datapm fetch ")) {
+                results.messageFound = true;
+            }
+        });
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const file = fs.readFileSync("./covid-02-01-2020.json", "utf8");
+
+        const lines = file.split("\n");
+
+        const firstLine = JSON.parse(lines[0]);
+
+        expect(lines.length).equal(68);
+        expect(firstLine["Last Update"]).equal("2020-02-01T11:53:00.000Z");
+    });
+
+    // TODO Test that you can use the package
 });

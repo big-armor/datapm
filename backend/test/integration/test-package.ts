@@ -708,16 +708,13 @@ describe("Package Tests", async () => {
         packageFileContents.version = "1.0.2";
         packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
-            recordCount: 1234,
-            valueTypes: {
+            types: {
                 string: {
                     recordCount: 3238,
-                    valueType: "string",
                     stringMaxLength: 17,
                     stringMinLength: 3
                 }
-            },
-            type: ["string"]
+            }
         };
         let packageFileString = JSON.stringify(packageFileContents);
 
@@ -746,16 +743,13 @@ describe("Package Tests", async () => {
         packageFileContents.version = "1.2.0";
         packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
-            recordCount: 1234,
-            valueTypes: {
+            types: {
                 string: {
                     recordCount: 3238,
-                    valueType: "string",
                     stringMaxLength: 17,
                     stringMinLength: 3
                 }
-            },
-            type: ["string"]
+            }
         };
         let packageFileString = JSON.stringify(packageFileContents);
 

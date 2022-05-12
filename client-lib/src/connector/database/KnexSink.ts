@@ -12,7 +12,6 @@ import {
 import Knex, { CreateTableBuilder, Ref, Transaction } from "knex";
 import { Transform } from "stream";
 import { Maybe } from "../../util/Maybe";
-import { ExtendedJSONSchema7TypeName } from "../Source";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 import { JobContext } from "../../task/JobContext";
@@ -163,24 +162,22 @@ export abstract class KnexSink implements Sink {
                     continue;
                 }
 
-                const formats = (property.format || "").split(",").filter((type) => type !== "null");
+                const types = Object.keys(property.types).filter((type) => type !== "null");
 
                 let valueType = discoverValueType(value);
-                if (formats.length === 1) {
-                    if (valueType.type !== "null") {
-                        const type = formats[0]
-                            .replace("date-time", "date")
-                            .replace("integer", "number") as ExtendedJSONSchema7TypeName;
-                        valueType = { type, format: formats[0] };
+
+                if (valueType === "null") {
+                    continue;
+                }
+
+                if (types.length === 1) {
+                    // nothing to do?
+                } else if (types.length > 1) {
+                    if (valueType === "integer" && types.includes("number")) {
+                        valueType = "number";
                     }
-                } else if (formats.length > 1) {
-                    let typeAppend = valueType.format;
-                    if (typeAppend === "integer" && !formats.includes("integer")) {
-                        typeAppend = "number";
-                    } else if (typeAppend === "date" && !formats.includes("date")) {
-                        typeAppend = "date-time";
-                    }
-                    propertyTtile += "-" + typeAppend;
+
+                    propertyTtile += "-" + valueType;
                 }
                 insertRecord[propertyTtile] = convertValueByValueType(value, valueType);
             }
@@ -221,45 +218,35 @@ export abstract class KnexSink implements Sink {
 
             const title = this.getSafeTableName(property.title);
 
-            if (property.type === undefined) {
-                // Log a warning
-                continue;
-            }
+            const types = Object.keys(property.types).filter((type) => type !== "null");
 
-            if (Array.isArray(property.type)) {
-                const formats = (property.format || "").split(",").filter((type) => type !== "null");
+            for (const type of types) {
+                let typeAppend = "";
 
-                for (const format of formats) {
-                    let typeAppend = "";
-
-                    if (formats.length > 1) {
-                        typeAppend = "-" + format;
-                        // Log a warning
-                    }
-                    if (format === "null") continue;
-                    if (format === "object") {
-                        throw new Error("nesting not yet supported!");
-                    }
-                    if (format === "array") {
-                        throw new Error("relationships not yet supported!");
-                    }
-                    if (format === "boolean") {
-                        tableBuilder.boolean(title + typeAppend);
-                    } else if (format === "number") {
-                        tableBuilder.double(title + typeAppend);
-                    } else if (format === "integer") {
-                        tableBuilder.bigInteger(title + typeAppend);
-                    } else if (format === "date") {
-                        tableBuilder.date(title + typeAppend);
-                    } else if (format === "date-time") {
-                        tableBuilder.dateTime(title + typeAppend, { useTz: false });
-                    } else if (format === "string") {
-                        tableBuilder.text(title + typeAppend);
-                        // TODO use string length determine if it should be an indexable varchar
-                    }
+                if (types.length > 1) {
+                    typeAppend = "-" + type;
                 }
-            } else {
-                throw new Error("Properties with schema type single values (non-arrays) are not yet supported");
+                if (type === "null") continue;
+                if (type === "object") {
+                    throw new Error("nesting not yet supported!");
+                }
+                if (type === "array") {
+                    throw new Error("relationships not yet supported!");
+                }
+                if (type === "boolean") {
+                    tableBuilder.boolean(title + typeAppend);
+                } else if (type === "number") {
+                    tableBuilder.double(title + typeAppend);
+                } else if (type === "integer") {
+                    tableBuilder.bigInteger(title + typeAppend);
+                } else if (type === "date") {
+                    tableBuilder.date(title + typeAppend);
+                } else if (type === "date-time") {
+                    tableBuilder.dateTime(title + typeAppend, { useTz: false });
+                } else if (type === "string") {
+                    tableBuilder.text(title + typeAppend);
+                    // TODO use string length determine if it should be an indexable varchar
+                }
             }
         }
     }

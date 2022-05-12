@@ -71,11 +71,11 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
             name: this.sanitizeName(schema.title as string),
             type: "record",
             fields: Object.values(schema.properties as Properties).map((property) => {
-                if (property.valueTypes == null) {
+                if (property.types == null) {
                     throw new Error("Property " + property.title + " does not have valueTypes defined");
                 }
 
-                const propertyTypes = Object.keys(property.valueTypes).filter((type) => type !== "null");
+                const propertyTypes = Object.keys(property.types).filter((type) => type !== "null");
                 let propertyType = propertyTypes[0] as string;
                 if (propertyTypes.includes("number")) {
                     propertyType = "double";
@@ -139,28 +139,27 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                                 );
                             }
 
-                            const types = (property.type as DPMPropertyTypes[]).filter((type) => type !== "null");
-                            const formats = (property.format || "").split(",").filter((type) => type !== "null");
-                            const valueType = {
-                                type: types[0],
-                                format: formats[0]
-                            };
+                            const types = Object.keys(property.types).filter((type) => type !== "null");
+
+                            const valueType = types[0] as DPMPropertyTypes;
 
                             const convertedValue = convertValueByValueType(recordData[validKey], valueType);
 
                             recordData[validKey] = convertedValue;
 
-                            if (valueType.type === "date-time" && isDate(convertedValue)) {
+                            if (valueType === "date-time" && isDate(convertedValue)) {
                                 recordData[validKey] = convertedValue.getTime();
                             }
-                            if (valueType.type === "date" && isDate(convertedValue)) {
+                            if (valueType === "date" && isDate(convertedValue)) {
+                                // TODO This does not appear to handle date-line crossovers
+                                // so the date might float by a day back or forward
                                 recordData[validKey] = convertedValue.toISOString().split("T")[0];
                             }
 
                             if (recordData[validKey] === null) {
-                                if (valueType.type === "string") {
+                                if (valueType === "string") {
                                     recordData[validKey] = "";
-                                } else if (valueType.type === "number" || valueType.type === "integer") {
+                                } else if (valueType === "number" || valueType === "integer") {
                                     recordData[validKey] = 0;
                                 }
                             }

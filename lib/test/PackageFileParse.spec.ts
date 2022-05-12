@@ -5,7 +5,7 @@ import fs from "fs";
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
         const test = new PackageFile();
-        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.8.1.json");
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.9.0.json");
     });
 
     it("Should parse dates", async function () {
@@ -39,23 +39,23 @@ describe("PackageFile checks", () => {
         expect(packageFile.schemas.length).equal(1);
         expect(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            Object.values(packageFile.schemas[0].properties!.district.valueTypes!).find(
+            Object.values(packageFile.schemas[0].properties!.district.types!).find(
                 (a) => typeof a.numberMaxValue === "string"
             )
         ).equal(undefined);
 
         expect(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            Object.values(packageFile.schemas[0].properties!.district.valueTypes!).find(
+            Object.values(packageFile.schemas[0].properties!.district.types!).find(
                 (a) => typeof a.numberMinValue === "string"
             )
         ).equal(undefined);
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(packageFile.schemas[0].properties!.district.valueTypes!.number.numberMaxValue === 9);
+        expect(packageFile.schemas[0].properties!.district.types!.number?.numberMaxValue === 9);
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(packageFile.schemas[0].properties!.district.valueTypes!.number.numberMaxValue === 0);
+        expect(packageFile.schemas[0].properties!.district.types!.number?.numberMaxValue === 0);
     });
 
     it("Should throw invalid package file error", async function () {
