@@ -113,7 +113,6 @@ export class StatsTransform extends Transform {
                         stringOptions: {}
                     };
                 }
-                valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
                 updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
 
                 this.contentLabelDetector.inspectValue(recordContext.schemaSlug, title, typeConvertedValue);
@@ -136,9 +135,7 @@ export class StatsTransform extends Transform {
 }
 
 function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes, valueTypeStats: ValueTypeStatistics) {
-    if (valueType === "null") {
-        valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
-    }
+    valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
 
     if (value == null) {
         return;

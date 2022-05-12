@@ -158,6 +158,7 @@ describe("Mongo Sink Test", function () {
         const firstRecord = await client.connection.collection(collectionAName, {}).findOne({});
 
         expect(typeof firstRecord["Province/State"]).equals("string");
+        expect(firstRecord["Province/State"]).equals("Hubei");
         expect(typeof firstRecord["Country/Region"]).equals("string");
         expect(typeof firstRecord.Confirmed).equals("number");
         expect(typeof firstRecord.Deaths).equals("number");
@@ -253,8 +254,7 @@ describe("Mongo Sink Test", function () {
                 input: `${KEYS.ENTER}`
             },
             {
-                message:
-                    "Integer_Float_Boolean_Date_DateTime_String has boolean and date and date-time and number and string values.",
+                message: "all_types has boolean and date and date-time and number and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
             }
         ];
@@ -268,7 +268,6 @@ describe("Mongo Sink Test", function () {
             [packageBFilePath, "--sink", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
-                console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -301,12 +300,12 @@ describe("Mongo Sink Test", function () {
         expect(firstRecord.Date_DateTime instanceof Date).equals(true);
         expect(firstRecord.Date_DateTime.toISOString()).equals("2011-04-22T00:00:00.000Z");
         expect(typeof firstRecord.String).equals("string");
-        expect(typeof firstRecord["Integer_Float_Boolean_Date_DateTime_String-number"]).equals("number");
+        expect(typeof firstRecord.all_types_number).equals("number");
         const lastRecord = await client.connection.collection(collectionBName, {}).findOne({
             Integer: 589
         });
 
-        console.log(lastRecord.Date_DateTime.toISOString());
+        expect(lastRecord.Date_DateTime.toISOString()).equals("2013-10-19T06:58:43.000Z");
 
         await client.connection.close();
     });

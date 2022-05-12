@@ -83,6 +83,7 @@ describe("Googlesheet Source Test", function () {
                 }
             ], // there are two sheets
             async (line: string) => {
+                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -101,78 +102,63 @@ describe("Googlesheet Source Test", function () {
         const columns1 = [
             {
                 title: "submission_date",
-                type: ["string"],
-                format: ["date"]
+                type: ["date"]
             },
             {
                 title: "state",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "tot_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_cases",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_case",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_case",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "tot_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "conf_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "prob_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "new_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "pnew_death",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "created_at",
-                type: ["date-time"],
-                format: ["date-time"]
+                type: ["date-time"]
             },
             {
                 title: "consent_cases",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "consent_deaths",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             }
         ];
 
@@ -193,33 +179,27 @@ describe("Googlesheet Source Test", function () {
         const columns2 = [
             {
                 title: "Province/State",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "Country/Region",
-                type: ["string"],
-                format: ["string"]
+                type: ["string"]
             },
             {
                 title: "Last Update",
-                type: ["date-time"],
-                format: ["date-time"]
+                type: ["date-time"]
             },
             {
                 title: "Confirmed",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "Deaths",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             },
             {
                 title: "Recovered",
-                type: ["integer"],
-                format: ["integer"]
+                type: ["integer"]
             }
         ];
         const schema2 = newPackageFile.schemas[1];

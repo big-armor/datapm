@@ -164,10 +164,19 @@ export abstract class KnexSink implements Sink {
 
                 const types = Object.keys(property.types).filter((type) => type !== "null");
 
-                const valueType = discoverValueType(value);
+                let valueType = discoverValueType(value);
+
+                if (valueType === "null") {
+                    continue;
+                }
+
                 if (types.length === 1) {
                     // nothing to do?
                 } else if (types.length > 1) {
+                    if (valueType === "integer" && types.includes("number")) {
+                        valueType = "number";
+                    }
+
                     propertyTtile += "-" + valueType;
                 }
                 insertRecord[propertyTtile] = convertValueByValueType(value, valueType);

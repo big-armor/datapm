@@ -15,6 +15,7 @@ import {
     TestResults,
     TEST_SOURCE_FILES
 } from "./test-utils";
+import fs from "fs";
 
 const postgresSinkPromptInputs = [
     "Exclude any attributes from",
@@ -95,6 +96,7 @@ describe("Postgres Source Test", function () {
     after(async function () {
         removePackageFiles(["covid-02-01-2020"]);
         removePackageFiles(["postgres"]);
+        if (fs.existsSync("covid-02-01-2020.json")) fs.rmSync("covid-02-01-2020.json");
         knexClient.destroy();
         await postgresContainer.stop();
     });
@@ -178,27 +180,21 @@ describe("Postgres Source Test", function () {
         const columns = await knexClient("information_schema.columns").where({ table_name: "covid-02-01-2020" });
         const typeMatch: Record<string, Record<string, [string]>> = {
             boolean: {
-                format: ["boolean"],
                 type: ["boolean"]
             },
             bigint: {
-                format: ["integer"],
                 type: ["integer"]
             },
             real: {
-                format: ["number"],
                 type: ["number"]
             },
             text: {
-                format: ["string"],
                 type: ["string"]
             },
             date: {
-                format: ["date-time"],
                 type: ["date-time"]
             },
             "timestamp without time zone": {
-                format: ["date-time"],
                 type: ["date-time"]
             }
         };
@@ -242,4 +238,52 @@ describe("Postgres Source Test", function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
     });
+
+    it("should allow fetch of data", async function () {
+        const prompts: PromptInput[] = [
+            { message: "Exclude any attributes from covid-02-01-2020?", input: "No" + KEYS.ENTER },
+            { message: "Rename attributes from covid-02-01-2020?", input: "No" + KEYS.ENTER },
+
+            {
+                message: "Credentials?",
+                input: "postgres" + KEYS.ENTER
+            },
+            {
+                message: "Sink Connector?",
+                input: "Local" + KEYS.ENTER
+            },
+            {
+                message: "File format?",
+                input: "JSON" + KEYS.ENTER
+            },
+            {
+                message: "File Location?",
+                input: "./" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd("fetch", ["postgres.datapm.json"], prompts, async (line: string) => {
+            if (line.includes("datapm fetch ")) {
+                results.messageFound = true;
+            }
+        });
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const file = fs.readFileSync("./covid-02-01-2020.json", "utf8");
+
+        const lines = file.split("\n");
+
+        const firstLine = JSON.parse(lines[0]);
+
+        expect(lines.length).equal(68);
+        expect(firstLine["Last Update"]).equal("2020-02-01T11:53:00.000Z");
+    });
+
+    // TODO Test that you can use the package
 });

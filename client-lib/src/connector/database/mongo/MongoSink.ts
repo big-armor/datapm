@@ -75,7 +75,7 @@ export class MongoSinkModule implements Sink {
     }
 
     getSafeTableName(name: string): string {
-        return name.replace(/\./g, "-");
+        return name.replace(/\.-/g, "_");
     }
 
     filterDefaultConfigValues(
@@ -188,7 +188,6 @@ export class MongoSinkModule implements Sink {
                     callback();
                 },
                 final: async function (callback) {
-                    console.log("Final called");
                     await self.complete(this);
                     callback();
                 }
@@ -225,10 +224,20 @@ export class MongoSinkModule implements Sink {
 
             let dbKey = key;
 
-            const valueType = discoverValueType(value);
+            let valueType = discoverValueType(value);
+
+            if (valueType === "integer" && types.includes("number")) {
+                valueType = "number";
+            }
+
+            if (types.length > 1 && !types.includes(valueType)) {
+                throw new Error("Value type " + valueType + " was not enumerated for property " + key);
+                // TODO: automatically update the mongo schema to include the new type?
+            }
+
             if (types.length > 1) {
                 const typeAppend = valueType;
-                dbKey += "-" + typeAppend;
+                dbKey += "_" + typeAppend;
             }
             insertRecord[dbKey] = convertValueByValueType(value, valueType);
         }
@@ -276,7 +285,7 @@ export class MongoSinkModule implements Sink {
                 let typeAppend = "";
 
                 if (types.length > 1) {
-                    typeAppend = "-" + type;
+                    typeAppend = "_" + type;
                     // Log a warning
                 }
                 if (type === "null") continue;
@@ -308,15 +317,18 @@ export class MongoSinkModule implements Sink {
     }
 
     async flushPendingInserts(transform: Transform): Promise<void> {
-        console.log("Flushing pending inserts: " + this.pendingInserts.length);
-        await this.model.insertMany(this.pendingInserts.map((i) => i.insert));
+        const inserts = this.pendingInserts.map((i) => i.insert);
+        // eslint-disable-next-line no-useless-catch
+        try {
+            await this.model.insertMany(inserts);
+        } catch (error) {
+            throw error;
+        }
 
         if (this.pendingInserts.length > 0)
             transform.push(this.pendingInserts[this.pendingInserts.length - 1].originalRecord);
 
         this.pendingInserts = [];
-
-        console.log("Finished pending inserts: " + this.pendingInserts.length);
     }
 
     async commitAfterWrites(
