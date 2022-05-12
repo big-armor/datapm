@@ -1,3 +1,9 @@
+#### 0.8.135 (2022-05-09)
+
+##### Bug Fixes
+
+*  number, integer, date, and date-time value type handling ([#477](https://github.com/big-armor/datapm/pull/477)) ([b2261edf](https://github.com/big-armor/datapm/commit/b2261edfc907a3252ea0ba011bfa9445ee2d4c7d))
+
 #### 0.8.134 (2022-05-04)
 
 #### 0.8.133 (2022-05-03)
