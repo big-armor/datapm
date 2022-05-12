@@ -17,13 +17,13 @@ In the case of conflicts between the terms of limitations and allowances below, 
 
 # Limitations
 
-You may not use the software in situations that revenue is generated for ten or third-parties. This includes but is not limited to managed services, marketplaces, and affiliate programs.
+You may not use the software in situations that revenue is generated for ten or more third-parties. This includes but is not limited to managed services, marketplaces, and affiliate programs.
 
 You may not alter, remove, or obscure any licensing, copyright, or other notices of the licensor in the software. Any use of the licensor’s trademarks is subject to applicable law.
 
 # Patents
 
-The licensor grants you a license, under any patent claims the licensor can license, or becomes able to license, to make, have made, use, import and have imported the software, in each case subject to the limitations and conditions in this license. This license does not cover any patent claims that you cause to be infringed by modifications or additions to the software. If you or your company make any written claim that the software infringes or contributes to infringement of any patent, your patent license for the software granted under these terms ends immediately. If your company makes such a claim, your patent license ends immediately for work on behalf of your company.
+The licensor grants you a license, under any patents the licensor holds, to make, have made, use, import and have imported the software, in each case subject to the limitations and conditions in this license. This license does not cover any patent claims that you cause to be infringed by modifications or additions to the software. If you or your company make any written claim that the software infringes or contributes to infringement of any patent, your patent license for the software granted under these terms ends immediately. If your company makes such a claim, your patent license ends immediately for work on behalf of your company.
 
 # Notices
 

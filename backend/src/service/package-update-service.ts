@@ -27,7 +27,6 @@ async function packageUpdateSchedulingCronHandler() {
 
 export async function packageUpdateScheduling(connection: Connection) {
     
-
     const beforeDate = new Date(new Date().getTime() - (1000 * 60 * 60 * 24));
 
     // Find the package that was updated the longest in the past

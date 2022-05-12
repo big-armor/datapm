@@ -546,6 +546,9 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
 }
 
 
+/* 
+FIXME Disabled because it's causing segfaults
+
 resource "google_cloud_scheduler_job" "package_updates" {
   depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-pacakge-updates"
@@ -568,5 +571,5 @@ resource "google_cloud_scheduler_job" "package_updates" {
     }
     body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"PACKAGE_UPDATE\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) { runJob(key: $key, job: $job)}\"}")
   }
-}
+} */
 
