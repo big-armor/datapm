@@ -51,7 +51,7 @@
                         </div>
                         <div
                             class="d-flex align-items-center justify-content-between"
-                            *ngFor="let type of property.valueTypes | values"
+                            *ngFor="let type of property.types | values"
                             [ngSwitch]="type.valueType"
                         >
                             <div *ngSwitchCase="'number'">
