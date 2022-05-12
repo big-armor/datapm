@@ -11,8 +11,10 @@ import {
     diffCompatibility,
     nextVersion,
     PackageFile,
+    Property,
     Schema,
-    ValueTypes
+    ValueTypes,
+    ValueTypeStatistics
 } from "datapm-lib";
 import { SemVer } from "semver/classes";
 import { PackageService } from "src/app/package/services/package.service";
@@ -33,16 +35,16 @@ export interface PropertyDialogData {
 export class EditPropertyDialogComponent {
     public readonly CHIP_SEPARATOR_KEY_CODES: number[] = [ENTER, COMMA];
 
-    public selectedProperty: Schema;
+    public selectedProperty: Property;
     public selectedPropertyTitle: string;
-    public properties: Schema[] = [];
+    public properties: Property[] = [];
     public package: Package;
     public packageFile: PackageFile;
     public schema: Schema;
 
     public valueTypesObject: ValueTypes;
     public valueTypes = [];
-    public valueTypeValues = [];
+    public valueTypeValues:ValueTypeStatistics[] = [];
     public valueTypesForType: { [key: string]: ContentLabel[] } = {};
 
     public contentLabels: ContentLabel[] = [];
@@ -100,7 +102,7 @@ export class EditPropertyDialogComponent {
         this.selectedProperty.unit = this.unitControl.value;
         this.selectedProperty.description = this.description;
         const updatedPackageFile = cloneDeep(this.packageFile);
-        const schemaToChange = updatedPackageFile.schemas.find((s) => s.$id === this.schema.$id);
+        const schemaToChange = updatedPackageFile.schemas.find((s) => s.title === this.schema.title);
         const propertyToUpdateIndx = Object.values(schemaToChange.properties).findIndex(
             (p) => p.title === this.selectedPropertyTitle
         );
@@ -136,7 +138,7 @@ export class EditPropertyDialogComponent {
     }
 
     public addLabelsChips() {
-        this.valueTypeValues = Object.values(this.selectedProperty.valueTypes);
+        this.valueTypeValues = Object.values(this.selectedProperty.types);
         this.valueTypeValues.forEach((v) => {
             if (!v.contentLabels) {
                 v.contentLabels = [];

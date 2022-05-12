@@ -1,11 +1,11 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Schema } from "datapm-lib";
+import { Property, Schema } from "datapm-lib";
 
 @Pipe({
     name: "schemaProperties"
 })
 export class SchemaPropertiesPipe implements PipeTransform {
-    transform(value: Schema): Schema[] {
+    transform(value: Schema): Property[] {
         return Object.values(value?.properties);
     }
 }
