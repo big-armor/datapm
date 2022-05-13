@@ -85,7 +85,7 @@ export class ContentLabelDetector {
         this.contentLabelDetectors = {};
     }
 
-    inspectValue(_schemaSlug: string, propertyName: string, value: DPMRecordValue): void {
+    inspectValue(propertyName: string, value: DPMRecordValue): void {
         const valueType = discoverValueType(value);
 
         if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};

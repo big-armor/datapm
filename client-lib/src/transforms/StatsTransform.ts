@@ -9,6 +9,7 @@ import {
 } from "datapm-lib";
 import { Transform, TransformCallback, TransformOptions } from "stream";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
+import { JobContext } from "../main";
 import { convertValueByValueType, discoverValueType } from "../util/SchemaUtil";
 
 const SAMPLE_RECORD_COUNT_MAX = 100;
@@ -58,65 +59,11 @@ export class StatsTransform extends Transform {
 
             this.progressCallBack(this.recordCount, this.recordsInspected);
 
-            const typeConvertedRecord: DPMRecord = {};
+            const properties = schema.properties;
 
-            Array.from(Object.keys(recordContext.record)).forEach((title: string) => {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                let property = schema.properties![title];
+            const record = recordContext.record;
 
-                if (property == null) {
-                    const propertySchema: Property = {
-                        title,
-                        types: {}
-                    };
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    schema.properties![title] = propertySchema;
-                    property = propertySchema;
-                }
-
-                const value = recordContext.record[title];
-
-                let valueType: DPMPropertyTypes = discoverValueType(value);
-                let typeConvertedValue: DPMRecordValue;
-                try {
-                    typeConvertedValue = convertValueByValueType(value, valueType);
-                } catch (error) {
-                    console.log(JSON.stringify(recordContext, null, 2));
-                    throw error;
-                }
-
-                if (property.types == null) return;
-
-                // If an integer is detected, and there exists
-                // already numbers. Then count this as a number (and not an integer)
-                if (valueType === "integer") {
-                    if (property.types.number != null) {
-                        valueType = "number" as DPMPropertyTypes;
-                    }
-
-                    // if a number is detected, and there exists
-                    // already integers. Then convert those prior integer valueTypes
-                    // to number.
-                } else if (valueType === "number") {
-                    if (property.types.integer != null) {
-                        property.types.number = property.types.integer;
-                        delete property.types.integer;
-                    }
-                }
-
-                typeConvertedRecord[title] = typeConvertedValue;
-
-                let valueTypeStats = property.types[valueType];
-                if (!valueTypeStats) {
-                    property.types[valueType] = valueTypeStats = {
-                        recordCount: 0,
-                        stringOptions: {}
-                    };
-                }
-                updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
-
-                this.contentLabelDetector.inspectValue(recordContext.schemaSlug, title, typeConvertedValue);
-            });
+            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record);
 
             if (schema.sampleRecords == null) schema.sampleRecords = [];
 
@@ -221,6 +168,8 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
                 millsecondsPrecision
             );
         }
+    } else if (valueType === "object") {
+        // Nothing to do
     }
 
     if (valueTypeStats.stringOptions != null) {
@@ -238,4 +187,73 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
             if (Object.keys(valueTypeStats.stringOptions).length > 50) delete valueTypeStats.stringOptions; // delete if there are too many options
         }
     }
+}
+
+function inspectRecord(
+    jobContext: JobContext,
+    properties: Record<string, Property>,
+    record: DPMRecord,
+    contentLabelDetector: ContentLabelDetector
+): DPMRecord {
+    const typeConvertedRecord: DPMRecord = {};
+
+    Array.from(Object.keys(record)).forEach((title: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let property = properties![title];
+
+        if (property == null) {
+            const propertySchema: Property = {
+                title,
+                types: {}
+            };
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            properties![title] = propertySchema;
+            property = propertySchema;
+        }
+
+        const value = record[title];
+
+        let valueType: DPMPropertyTypes = discoverValueType(value);
+        let typeConvertedValue: DPMRecordValue;
+        try {
+            typeConvertedValue = convertValueByValueType(value, valueType);
+        } catch (error) {
+            const message = `Failed to convert value ${value} to type ${valueType}`;
+            throw new Error(message);
+        }
+
+        if (property.types == null) return;
+
+        // If an integer is detected, and there exists
+        // already numbers. Then count this as a number (and not an integer)
+        if (valueType === "integer") {
+            if (property.types.number != null) {
+                valueType = "number" as DPMPropertyTypes;
+            }
+
+            // if a number is detected, and there exists
+            // already integers. Then convert those prior integer valueTypes
+            // to number.
+        } else if (valueType === "number") {
+            if (property.types.integer != null) {
+                property.types.number = property.types.integer;
+                delete property.types.integer;
+            }
+        }
+
+        typeConvertedRecord[title] = typeConvertedValue;
+
+        let valueTypeStats = property.types[valueType];
+        if (!valueTypeStats) {
+            property.types[valueType] = valueTypeStats = {
+                recordCount: 0,
+                stringOptions: {}
+            };
+        }
+        updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
+
+        contentLabelDetector.inspectValue(title, typeConvertedValue);
+    });
+
+    return typeConvertedRecord;
 }
