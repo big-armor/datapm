@@ -31,14 +31,16 @@ describe("Stats transform", () => {
                 record: {
                     integer: "101",
                     number: "101.2"
-                }
+                },
+                receivedDate: new Date()
             },
             {
                 schemaSlug: "test",
                 record: {
                     integer: Number.MAX_SAFE_INTEGER,
                     number: Number.MAX_VALUE
-                }
+                },
+                receivedDate: new Date()
             }
         ];
 
@@ -91,7 +93,8 @@ describe("Stats transform", () => {
                 record: {
                     date: moment().format("YYYY-MM-DD"),
                     dateTime: moment().toISOString()
-                }
+                },
+                receivedDate: new Date()
             }
         ];
 
