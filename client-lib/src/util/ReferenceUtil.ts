@@ -16,7 +16,7 @@ export async function obtainReference(
             value: c.getType()
         };
     });
-    const initialOptions: ParameterOption[] = includeConnectors ? sourceConnectorOptions : [];
+    const initialOptions: ParameterOption[] = [];
 
     if (includeConnectors) {
         initialOptions.push(...sourceConnectorOptions);
