@@ -5,7 +5,7 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 
 const LIMIT = 50000;
-const DATE_FORMAT = "YYYY-MM-DDThh:mm:ssTZ";
+const DATE_FORMAT = "YYYY-MM-DDThh:mm:ssZ";
 
 export async function generateSiteMapIndex(context:HTTPContext):Promise<string> {
 
@@ -77,7 +77,7 @@ export async function generatePackageSiteMap(siteMapNumber: number, context: HTT
 
         for (const packageEntity of publicPackages) {
 
-            const date = moment().format(DATE_FORMAT);
+            const date = moment(packageEntity.updatedAt).format(DATE_FORMAT);
 
             responseXml += `
     <url>
@@ -112,7 +112,7 @@ export async function generateCatalogSiteMap(siteMapNumber: number, context: HTT
 
         for (const catalogEntity of publicCatalogs) {
 
-            const date = moment().format(DATE_FORMAT);
+            const date = moment(catalogEntity.updatedAt).format(DATE_FORMAT);
 
             responseXml += `
     <url>
@@ -146,7 +146,7 @@ export async function generateCollectionsSiteMap(siteMapNumber: number, context:
 
         for (const collectionEntity of publicCollections) {
 
-            const date = moment().format(DATE_FORMAT);
+            const date = moment(collectionEntity.updatedAt).format(DATE_FORMAT);
 
             responseXml += `
     <url>
