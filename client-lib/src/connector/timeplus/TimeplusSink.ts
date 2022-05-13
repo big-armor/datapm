@@ -11,7 +11,8 @@ import {
     RecordStreamContext,
     ParameterType,
     DPMRecord,
-    DPMPropertyTypes
+    DPMPropertyTypes,
+    DPMRecordValue
 } from "datapm-lib";
 import { Transform } from "stream";
 import { JobContext } from "../../task/JobContext";
@@ -39,7 +40,8 @@ type TimeplusStream = {
 type ListStreamsResponse = Array<TimeplusStream>;
 
 export class TimeplusSink implements Sink {
-    activeStream: string;
+    columnTypeCache: Map<string, string>;
+    hiddenColumns: Array<string>;
 
     getType(): string {
         return TYPE;
@@ -151,17 +153,19 @@ export class TimeplusSink implements Sink {
                     const events = records.map((r) => r.recordContext.record);
 
                     const columns: string[] = [];
-                    const rows: (string | undefined)[][] = [];
+                    const rows: DPMRecordValue[][] = [];
                     for (let i = 0; i < events.length; i++) {
                         const event: DPMRecord = events[i];
                         const row = [];
                         for (const key of keys) {
                             const columnName = key;
+                            if (this.hiddenColumns.includes(columnName)) continue;
                             const columnValue = event[key];
                             if (i === 0) {
                                 columns.push(columnName);
                             }
-                            row.push(columnValue?.toString());
+                            // if (this.columnTypeCache.get(columnName) === "datetime64")
+                            row.push(columnValue);
                         }
                         rows.push(row);
                     }
@@ -172,7 +176,6 @@ export class TimeplusSink implements Sink {
                     const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/streams/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
-                    // jobContext.print("INFO", `ingestURL: ${ingestURL}`);
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
@@ -297,6 +300,8 @@ export class TimeplusSink implements Sink {
         }
 
         const rv: TimeplusColumns = [];
+        this.columnTypeCache = new Map<string, string>();
+        this.hiddenColumns = new Array<string>();
         for (const propertyName of Object.keys(schema.properties)) {
             const property = schema.properties?.[propertyName];
 
@@ -304,13 +309,15 @@ export class TimeplusSink implements Sink {
                 throw new Error("Schema property " + propertyName + " is not found");
             }
 
-            if (property.hidden === false) {
+            if (property.hidden === true) {
                 // the user can exclude files
+                this.hiddenColumns.push(property.title);
             } else {
+                const type = this.getTimeplusType(Object.keys(property.types) as DPMPropertyTypes[]);
+                this.columnTypeCache.set(property.title, type);
                 rv.push({
-                    // column definition
                     name: property.title,
-                    type: this.getTimeplusType(Object.keys(property.types) as DPMPropertyTypes[])
+                    type: type
                 });
             }
         }
@@ -342,9 +349,7 @@ export class TimeplusSink implements Sink {
             case "boolean":
                 return "bool";
             case "date-time":
-                return "string";
-            // idealy should return "datetime64";
-            // but the sample value is not accepted: Tue Jul 04 2017 17:12:00 GMT-0700 (Pacific Daylight Time)"
+                return "datetime64";
             default:
                 throw new Error("Unsupported Timeplus type: " + removedNull[0]);
         }
