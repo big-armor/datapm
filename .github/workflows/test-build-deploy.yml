@@ -260,6 +260,10 @@ jobs:
 
     build-client-windows-intel64:
         runs-on: windows-latest
+        # TODO Would be best if this runs on all pull requests, except forks
+        # but there is apparently no way to identify that a pull request is from
+        # a fork (or wasn't obvious)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         timeout-minutes: 15
         needs:
             - testLib
@@ -318,6 +322,8 @@ jobs:
 
     build-client-macos-intel64:
         runs-on: macos-latest
+        # TODO same as windows build above
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         timeout-minutes: 25
         needs:
             - testLib
@@ -387,7 +393,7 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-windows-intel64
             - build-client-macos-intel64
@@ -527,7 +533,7 @@ jobs:
         name: "Update Test Environment"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - buildAndDeploy
         steps:
@@ -580,7 +586,7 @@ jobs:
     github-release-clients:
         runs-on: ubuntu-latest
         name: "Client Releases on GitHub"
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-macos-intel64
             - build-client-windows-intel64
@@ -641,7 +647,7 @@ jobs:
         needs:
             - buildAndDeploy
             - github-release-clients
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         steps:
             - name: Checkout
               uses: actions/checkout@v2
