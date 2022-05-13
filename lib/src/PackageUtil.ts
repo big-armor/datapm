@@ -61,6 +61,9 @@ export interface RecordContext {
 
     /** The offset used to resume at this point */
     offset?: number;
+
+    /** The timestamp of receiving the record in datapm */
+    receivedDate: Date;
 }
 
 /** Created by the internal system to identify a record received from a source, and tag it with additional properties */

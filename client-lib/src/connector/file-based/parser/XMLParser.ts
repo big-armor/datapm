@@ -66,7 +66,8 @@ export class XMLParser implements Parser {
                     const recordContext: RecordContext = {
                         record,
                         schemaSlug: schemaPrefix,
-                        offset: recordIndex++
+                        offset: recordIndex++,
+                        receivedDate: new Date()
                     };
 
                     callback(null, recordContext);

@@ -205,7 +205,8 @@ export class KrakenSource implements Source {
                                                 open_price: tickerData.o[0],
                                                 open_last_24_hours: tickerData.o[1]
                                             },
-                                            schemaSlug: "ticker"
+                                            schemaSlug: "ticker",
+                                            receivedDate: new Date()
                                         };
                                         stream.push(recordContext);
                                     } else if (messageObject[2] === "trade") {
@@ -222,7 +223,8 @@ export class KrakenSource implements Source {
                                                     side: t[3],
                                                     orderType: t[4],
                                                     misc: t[5]
-                                                }
+                                                },
+                                                receivedDate: new Date()
                                             };
                                         });
 
@@ -237,7 +239,8 @@ export class KrakenSource implements Source {
                                                 timestamp: spreadData[2],
                                                 bidVolume: spreadData[3],
                                                 askVolume: spreadData[4]
-                                            }
+                                            },
+                                            receivedDate: new Date()
                                         };
 
                                         stream.push(recordContext);

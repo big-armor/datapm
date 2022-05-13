@@ -152,7 +152,8 @@ export class DataPMSource implements Source {
                                                         const recordContext: RecordContext = {
                                                             record: record.record,
                                                             schemaSlug: batch.batchIdentifier.schemaTitle,
-                                                            offset: record.offset
+                                                            offset: record.offset,
+                                                            receivedDate: new Date()
                                                         };
                                                         const okToContinue = duplex.push(recordContext);
 

@@ -52,7 +52,8 @@ export class AVROParser implements Parser {
                 transform: (chunk: DPMRecord, encoding, callback) => {
                     const returnValue: RecordContext = {
                         record: chunk,
-                        schemaSlug: schemaPrefix
+                        schemaSlug: schemaPrefix,
+                        receivedDate: new Date()
                     };
                     callback(null, returnValue);
                 }

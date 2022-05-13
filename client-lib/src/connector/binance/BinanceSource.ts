@@ -232,7 +232,8 @@ export class BinanceSource implements Source {
 
                                         const recordContext: RecordContext = {
                                             record: data,
-                                            schemaSlug: event.e
+                                            schemaSlug: event.e,
+                                            receivedDate: new Date()
                                         };
 
                                         stream.write(recordContext);
@@ -253,7 +254,8 @@ export class BinanceSource implements Source {
 
                                         const recordContext: RecordContext = {
                                             record: data,
-                                            schemaSlug: event.e
+                                            schemaSlug: event.e,
+                                            receivedDate: new Date()
                                         };
 
                                         stream.write(recordContext);
@@ -271,7 +273,8 @@ export class BinanceSource implements Source {
 
                                         const recordContext: RecordContext = {
                                             record: data,
-                                            schemaSlug: "bookTicker"
+                                            schemaSlug: "bookTicker",
+                                            receivedDate: new Date()
                                         };
 
                                         stream.write(recordContext);

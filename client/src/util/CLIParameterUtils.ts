@@ -40,10 +40,8 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 ParameterType.MultiSelect
             ].includes(promptParameter.type)
         ) {
-            if (!promptParameter.options || promptParameter.options.length === 0) {
-                throw new Error(
-                    `Prompt ${promptParameter.name} is a ${promptParameter.type}, but no options were provided`
-                );
+            if (!promptParameter.options) {
+                promptParameter.options = [];
             }
 
             if (promptParameter.type === ParameterType.Select) promptParameter.type = ParameterType.AutoComplete;

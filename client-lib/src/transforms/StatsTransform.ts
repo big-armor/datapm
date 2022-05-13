@@ -188,7 +188,12 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
         if (value === true) valueTypeStats.booleanTrueCount++;
         else if (value === false) valueTypeStats.booleanFalseCount++;
     } else if (valueType === "date" || valueType === "date-time") {
-        const dateValue = new Date(value.toString()) as Date;
+        // TODO something upstream of this is converting date string values with longer
+        // than three milliseconds to Date() objects - which do not support more than 3 milliseconds
+        // precision. So this will never detect precision more than 3
+        // Workaround seems to pass through both the raw value and the converted value?
+        // but that could get complex quickly.
+        const dateValue = value instanceof Date ? value : new Date(value.toString());
 
         if (dateValue instanceof Date && isFinite(dateValue.getTime())) {
             if (valueTypeStats.dateMaxValue == null || valueTypeStats.dateMaxValue?.getTime() < dateValue.getTime())
@@ -196,6 +201,25 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
 
             if (valueTypeStats.dateMinValue == null || valueTypeStats.dateMinValue.getTime() < dateValue.getTime())
                 valueTypeStats.dateMinValue = dateValue;
+
+            let millsecondsString = dateValue.getMilliseconds().toString();
+
+            if (typeof value === "string") {
+                const regex = /\d{2}:\d{2}:\d{2}\.(\d+)/g;
+                const matches = regex.exec(value);
+                if (matches != null && matches.length === 2) {
+                    millsecondsString = matches[1];
+                }
+            }
+
+            millsecondsString = millsecondsString.replace(/0+$/, "");
+            const millseconds = Number.parseInt(millsecondsString);
+            const millsecondsPrecision = millseconds > 0 ? millseconds.toString().length : 0;
+
+            valueTypeStats.dateMaxMillsecondsPrecision = Math.max(
+                valueTypeStats.dateMaxMillsecondsPrecision || 0,
+                millsecondsPrecision
+            );
         }
     }
 
