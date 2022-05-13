@@ -1,3 +1,9 @@
+#### 0.31.1 (2022-05-13)
+
+##### Bug Fixes
+
+*  improve date types in Timeplus sink ([#479](https://github.com/big-armor/datapm/pull/479)) ([50fdca9b](https://github.com/big-armor/datapm/commit/50fdca9b70c36abb5992ed1963b5057ceb36e7c4))
+
 #### 0.31.0 (2022-05-12)
 
 #### 0.8.135 (2022-05-09)
