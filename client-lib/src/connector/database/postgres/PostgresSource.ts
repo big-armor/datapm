@@ -167,7 +167,8 @@ export class PostgresSource implements Source {
                                     transform: function (record, encoding, callback) {
                                         const recordContext: RecordContext = {
                                             record,
-                                            schemaSlug: tableName as string
+                                            schemaSlug: tableName as string,
+                                            receivedDate: new Date()
                                         };
 
                                         callback(null, recordContext);

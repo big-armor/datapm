@@ -77,7 +77,8 @@ export class XLSXParser implements Parser {
                             });
                             const returnValue: RecordContext = {
                                 record: sanitizedRow,
-                                schemaSlug: sheetName
+                                schemaSlug: sheetName,
+                                receivedDate: new Date()
                             };
                             this.push(returnValue);
                         });

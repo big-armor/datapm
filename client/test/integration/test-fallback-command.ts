@@ -34,6 +34,18 @@ describe("Fallback command", async function () {
         expect(lineFound).equal(true);
     });
 
+    it("Should fallback for info command", async () => {
+        let lineFound = false;
+        await testCmd("info", [], [], async (line: string, index, process) => {
+            if (line.includes("Package identifier, url, or file?")) {
+                lineFound = true;
+                process.kill(9);
+            }
+        });
+
+        expect(lineFound).equal(true);
+    });
+
     it("Should fallback for package command", async () => {
         let lineFound = false;
         await testCmd("package", [], [], async (line: string, index, process) => {

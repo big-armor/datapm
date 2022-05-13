@@ -241,7 +241,8 @@ export class CSVParser implements Parser {
                         recordsWithContext.push({
                             record: recordObject,
                             schemaSlug: schemaPrefix,
-                            offset: recordCount++
+                            offset: recordCount++,
+                            receivedDate: new Date()
                         });
                     }
 

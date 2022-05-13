@@ -219,6 +219,7 @@ export async function generateSchemasFromSourceStreams(
 
         lastTransform = lastTransform.pipe(
             new TimeOrDeathTransform(timeoutMs, () => {
+                sourceStreamContext.stream.destroy();
                 finalize(false);
             })
         );

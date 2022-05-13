@@ -3,8 +3,9 @@ import { Schema } from "datapm-lib";
 import { Job, JobResult } from "../task/Task";
 import { JobContext } from "../task/JobContext";
 import { printSchema } from "../util/SchemaUtil";
+import { obtainReference } from "../util/ReferenceUtil";
 export class InfoJobArguments {
-    reference: string;
+    reference?: string;
 }
 export class InfoJobResult {}
 export class InfoJob extends Job<InfoJobResult> {
@@ -14,6 +15,10 @@ export class InfoJob extends Job<InfoJobResult> {
 
     async _execute(): Promise<JobResult<InfoJobResult>> {
         let packageFileWithContext;
+
+        if (this.args.reference == null) {
+            this.args.reference = await obtainReference(this.jobContext, "Package identifier, url, or file?", false);
+        }
 
         try {
             packageFileWithContext = await this.jobContext.getPackageFile(this.args.reference.toString(), "modified");

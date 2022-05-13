@@ -141,6 +141,8 @@ export interface ValueTypeStatistics {
 
     dateMaxValue?: Date;
     dateMinValue?: Date;
+    dateMaxMillsecondsPrecision?: number;
+
     stringOptions?: { [key: string]: number };
 
     /** A dictionary of content labels referencing a boolean value as to whether they should be displayed. This

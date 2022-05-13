@@ -190,7 +190,8 @@ export class FTXSource implements Source {
                                                         ...item,
                                                         market: data.market
                                                     },
-                                                    schemaSlug: data.channel
+                                                    schemaSlug: data.channel,
+                                                    receivedDate: new Date()
                                                 };
 
                                                 stream.push(recordContext);
@@ -201,7 +202,8 @@ export class FTXSource implements Source {
                                                     ...data.data,
                                                     market: data.market
                                                 },
-                                                schemaSlug: data.channel
+                                                schemaSlug: data.channel,
+                                                receivedDate: new Date()
                                             };
 
                                             stream.push(recordContext);

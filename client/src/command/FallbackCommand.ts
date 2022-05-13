@@ -4,6 +4,7 @@ import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { Command } from "./Command";
 import { editPackage } from "./EditCommandModule";
 import { fetchPackage } from "./FetchCommand";
+import { handleInfo } from "./InfoCommand";
 import { packageCommand } from "./PackageCommand";
 import { publishPackage } from "./PublishPackageCommand";
 import { authenticateToRegistry, defaultRegistryCommand, logoutFromRegistry } from "./RegistryCommand";
@@ -40,6 +41,11 @@ export class FallbackCommand implements Command {
                         command: "search",
                         describe: "Search for data",
                         handler: handleSearch
+                    })
+                    .command({
+                        command: "info",
+                        describe: "Get package info",
+                        handler: handleInfo
                     })
                     .command({
                         command: "package",

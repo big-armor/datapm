@@ -59,6 +59,13 @@ type DecodableStream = {
     schema: DecodableSchema;
 };
 
+type DecodableCreateStreamRequest = {
+    name: string;
+    description: string;
+    watermark?: string;
+    schema: DecodableSchema;
+};
+
 type ListStreamsResponse = {
     next_page_token: string | null;
     items: DecodableStream[];
@@ -69,7 +76,7 @@ type ListConnectionsResponse = {
     items: DecodableConnection[];
 };
 
-const RECIEVE_TIME = "*recieve_time*";
+const RECIEVE_TIME = "datapm_receive_time";
 
 export class DecodableSink implements Sink {
     getType(): string {
@@ -149,15 +156,12 @@ export class DecodableSink implements Sink {
                         type: ParameterType.Select,
                         name: "event-time-" + schema.title,
                         configuration,
-                        message: "Event time for " + schema.title + " records?",
+                        message: "Event time for " + schema.title + "?",
                         options: [
                             {
-                                title: "Do not set event time",
-                                value: null
-                            },
-                            {
-                                title: "Record time",
-                                value: RECIEVE_TIME
+                                title: "DataPM recieve time",
+                                value: RECIEVE_TIME,
+                                selected: true
                             },
                             ...dateTimeProperties.map((p) => {
                                 return {
@@ -241,7 +245,14 @@ export class DecodableSink implements Sink {
                     _encoding: string,
                     callback: (error?: Error | null, data?: RecordStreamContext) => void
                 ) => {
-                    const events = records.map((r) => r.recordContext.record);
+                    const events = records.map((r) => {
+                        const record = r.recordContext.record;
+                        if (configuration["event-time-" + schema.title] === RECIEVE_TIME) {
+                            record[RECIEVE_TIME] = r.recordContext.receivedDate;
+                        }
+
+                        return record;
+                    });
                     const response = await fetch(
                         `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/connections/${connectionId}/events`,
                         {
@@ -260,7 +271,7 @@ export class DecodableSink implements Sink {
                     if (response.status !== 202) {
                         callback(
                             new Error(
-                                `Unexpected response status ${response.status} body ${JSON.stringify(response.json())}`
+                                `Unexpected response status ${response.status} body ${JSON.stringify(response.text())}`
                             )
                         );
                         return;
@@ -353,13 +364,20 @@ export class DecodableSink implements Sink {
         if (!stream) {
             task.setMessage("Decodable Stream " + decodableStreamName + " does not exist, creating");
 
-            const decodableSchema = this.getDecodableSchema(schema);
+            const decodableSchema = this.getDecodableSchema(schema, configuration);
 
-            const requestBody = JSON.stringify({
+            const createStream: DecodableCreateStreamRequest = {
                 name: decodableStreamName,
                 description: "Created by DataPM",
                 schema: decodableSchema
-            });
+            };
+
+            if (configuration["event-time-" + schema.title] != null) {
+                const waterMarkField = configuration["event-time-" + schema.title] as string;
+                createStream.watermark = "`" + waterMarkField + "` AS `" + waterMarkField + "`";
+            }
+
+            const requestBody = JSON.stringify(createStream);
 
             const response = await fetch(
                 `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/streams`,
@@ -381,7 +399,7 @@ export class DecodableSink implements Sink {
                     "Unable to create decodable stream. Response code: " +
                         response.status +
                         " body: " +
-                        JSON.stringify(response.json())
+                        JSON.stringify(response.text())
                 );
             }
 
@@ -450,7 +468,7 @@ export class DecodableSink implements Sink {
         if (!connection) {
             task.setMessage("Decodable Connection " + decodableConnectionName + " does not exist, creating");
 
-            const decodableSchema = this.getDecodableSchema(schema);
+            const decodableSchema = this.getDecodableSchema(schema, configuration);
 
             const response = await fetch(
                 `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/connections`,
@@ -538,12 +556,12 @@ export class DecodableSink implements Sink {
         return connection.id;
     }
 
-    getDecodableSchema(schema: Schema): DecodableSchema {
+    getDecodableSchema(schema: Schema, configuration: DPMConfiguration): DecodableSchema {
         if (schema.properties == null) {
             throw new Error("Schema must have properties");
         }
 
-        return Object.keys(schema.properties).map((propertyName) => {
+        const decodableSchema = Object.keys(schema.properties).map((propertyName) => {
             const property = schema.properties?.[propertyName];
 
             if (property == null) {
@@ -559,6 +577,15 @@ export class DecodableSink implements Sink {
                 type: this.getDecodableType(property.types)
             };
         });
+
+        if (configuration["event-time-" + schema.title] === RECIEVE_TIME) {
+            decodableSchema.push({
+                name: RECIEVE_TIME,
+                type: "TIMESTAMP(3)"
+            });
+        }
+
+        return decodableSchema;
     }
 
     getDecodableType(types: ValueTypes): string {
@@ -572,21 +599,41 @@ export class DecodableSink implements Sink {
             throw new Error("column has no value types");
         }
 
-        switch (removedNull[0]) {
-            case "string":
-                return "STRING";
-            case "integer":
-                return "BIGINT";
-            case "number":
-                return "DECIMAL"; // Could use type.numberMaxPrecision and type.numberMaxScale to customize this
-            case "boolean":
-                return "BOOLEAN";
-            case "date":
-                return "DATE";
-            case "date-time":
-                return "TIMESTAMP";
-            default:
-                throw new Error("Unsupported Decodable Sink: " + removedNull[0]);
+        const type = removedNull[0];
+
+        if (type === "string") {
+            return "STRING";
         }
+
+        if (type === "number") {
+            // TODO support Double vs. Decimal decision
+            // by comparing max and min value range vs
+            // scale of the number to determine if they would
+            // be outside the range of Decimal (exact). Could
+            // then use double (approximate)
+            const scale = types[type]?.numberMaxScale ?? 0;
+            const precision = 31;
+            return `DECIMAL(${precision},${scale})`;
+        }
+
+        if (type === "integer") {
+            return "BIGINT";
+        }
+
+        if (type === "boolean") {
+            return "BOOLEAN";
+        }
+
+        if (type === "date") {
+            return "DATE";
+        }
+
+        if (type === "date-time") {
+            // Currently sets to TIMESTAMP(3) because
+            // upstream processing converts to javascript Date
+            // object, which automatically truncates to 3 digits
+            return "TIMESTAMP(3)";
+        }
+        throw new Error("Unsupported Decodable Sink: " + removedNull[0]);
     }
 }

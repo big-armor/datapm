@@ -8,13 +8,10 @@ import {
     SinkStateKey,
     Source,
     ParameterType,
-    ParameterOption,
     CATALOG_SLUG_REGEX,
     PACKAGE_SLUG_REGEX,
-    CURRENT_PACKAGE_FILE_SCHEMA_URL,
-    ParameterAnswer
+    CURRENT_PACKAGE_FILE_SCHEMA_URL
 } from "datapm-lib";
-import { Package, SearchPackagesResult, PackageIdentifier } from "../generated/graphql";
 import ON_DEATH from "death";
 import { SemVer } from "semver";
 import { getConnectorDescriptionByType, CONNECTORS } from "../connector/ConnectorUtil";
@@ -28,7 +25,7 @@ import { PackageFileWithContext, RegistryPackageFileContext } from "../util/Pack
 import { repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
 import { fetch, FetchOutcome, FetchResult, FetchStatus, newRecordsAvailable } from "../util/StreamToSinkUtil";
-import { Job, JobResult, MessageType, Task } from "./Task";
+import { Job, JobResult } from "./Task";
 import { JobContext } from "./JobContext";
 import numeral from "numeral";
 import {
@@ -36,8 +33,7 @@ import {
     excludeSchemaPropertyQuestions,
     renameSchemaPropertyQuestions
 } from "../util/SourceInspectionUtil";
-import { getRegistryClientWithConfig } from "../util/RegistryClient";
-import { ApolloQueryResult } from "@apollo/client";
+import { obtainReference } from "../util/ReferenceUtil";
 
 export interface FetchPackageJobResult {
     parameterCount: number;
@@ -116,104 +112,13 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         this.jobContext.setCurrentStep("Source Selection");
 
         if (this.args.reference == null) {
-            const sourceConnectors = CONNECTORS.filter((c) => c.hasSource());
+            const referencePromptResult = await obtainReference(
+                this.jobContext,
+                "Source package or connector name?",
+                true
+            );
 
-            const referencePromptResult = await this.jobContext.parameterPrompt([
-                {
-                    type: ParameterType.AutoComplete,
-                    configuration: {},
-                    name: "reference",
-                    allowFreeFormInput: true,
-                    message: "Source package or connector name?",
-                    // TODO - callback for autocomplete so that we can search for packages by reference
-                    options: sourceConnectors
-                        .map<ParameterOption>((c) => {
-                            return {
-                                title: c.getDisplayName(),
-                                value: c.getType()
-                            };
-                        })
-                        .sort((a, b) => a.title.localeCompare(b.title)),
-                    validate: (value) => {
-                        if (!value) return "Required";
-                        return true;
-                    },
-                    onChange: async (input: string, currentChoices: ParameterOption[]): Promise<ParameterOption[]> => {
-                        if (input == null || input.trim().length === 0) {
-                            return currentChoices;
-                        }
-
-                        const returnValue: ParameterOption[] = sourceConnectors
-                            .filter((c) => c.getDisplayName().toLowerCase().startsWith(input.toLowerCase()))
-                            .map((c) => {
-                                return {
-                                    title: c.getDisplayName(),
-                                    value: c.getType()
-                                };
-                            });
-
-                        if (returnValue.length > 9) {
-                            return returnValue;
-                        }
-
-                        const registries = this.jobContext.getRegistryConfigs();
-
-                        if (registries.find((r) => r.url === "https://datapm.io") == null) {
-                            registries.push({
-                                url: "https://datapm.io"
-                            });
-                        }
-
-                        const searchPromises: Promise<
-                            ApolloQueryResult<{ searchPackages: SearchPackagesResult }>
-                        >[] = [];
-                        for (const registry of registries) {
-                            const client = getRegistryClientWithConfig(this.jobContext, registry);
-                            const searchPromise = client.searchPackages(input, 10, 0);
-                            searchPromises.push(searchPromise);
-                        }
-
-                        const results = await Promise.allSettled(searchPromises);
-
-                        const packages: Package[] = [];
-                        for (const result of results) {
-                            if (result.status === "rejected") continue;
-
-                            if (result.value.data.searchPackages.packages)
-                                packages.push(...result.value.data.searchPackages.packages);
-                        }
-
-                        const packageIdentifiers: PackageIdentifier[] = packages.map((p) => p.identifier);
-
-                        const sortedPackageIdentifiers = packageIdentifiers.sort((a, b) => {
-                            const aI = a.catalogSlug + "/" + b.packageSlug;
-                            const bI = b.catalogSlug + "/" + b.packageSlug;
-
-                            return aI.localeCompare(bI);
-                        });
-
-                        returnValue.push(
-                            ...sortedPackageIdentifiers.map<ParameterOption>((p) => {
-                                const title =
-                                    p.catalogSlug +
-                                    "/" +
-                                    p.packageSlug +
-                                    " " +
-                                    chalk.gray(p.registryURL.replace(/^https?:\/\//, ""));
-
-                                return {
-                                    title,
-                                    value: p.registryURL + "/" + p.catalogSlug + "/" + p.packageSlug
-                                };
-                            })
-                        );
-
-                        return returnValue;
-                    }
-                }
-            ]);
-
-            this.args.reference = referencePromptResult.reference;
+            this.args.reference = referencePromptResult;
         }
 
         if (this.args.reference == null) throw new Error("The 'reference' value is required");

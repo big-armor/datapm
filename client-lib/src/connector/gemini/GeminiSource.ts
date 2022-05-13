@@ -205,7 +205,8 @@ export class GeminiSource implements Source {
 
                                             const recordContext: RecordContext = {
                                                 record: eventData,
-                                                schemaSlug: eventData.type
+                                                schemaSlug: eventData.type,
+                                                receivedDate: new Date()
                                             };
 
                                             delete eventData.type;

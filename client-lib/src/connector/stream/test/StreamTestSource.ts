@@ -143,7 +143,8 @@ export class StreamTestSource implements Source {
 
                         const recordContext: RecordContext = {
                             schemaSlug: "random",
-                            record
+                            record,
+                            receivedDate: new Date()
                         };
 
                         stream.push(recordContext);

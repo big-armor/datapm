@@ -218,7 +218,8 @@ export class GoogleSheetSource implements Source {
                         recordsWithContext.push({
                             record: recordObject,
                             schemaSlug: schemaPrefix,
-                            offset: recordCount++
+                            offset: recordCount++,
+                            receivedDate: new Date()
                         });
                     }
 

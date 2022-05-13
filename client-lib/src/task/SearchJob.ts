@@ -117,7 +117,6 @@ export class SearchJob extends Job<SearchJobResult> {
 
             console.log("");
             for (const packageRef of result.data?.searchPackages?.packages || []) {
-                this.jobContext.print("NONE", chalk.yellow(packageRef.displayName));
                 this.jobContext.print("NONE", chalk.green(packageString(packageRef.identifier)));
                 this.jobContext.print("NONE", packageRef.description?.trim() || "");
                 this.jobContext.print("NONE", "");
@@ -125,6 +124,10 @@ export class SearchJob extends Job<SearchJobResult> {
 
             this.jobContext.print("NONE", "");
         }
+
+        this.jobContext.print("INFO", "Use the following commands to see more info or fetch one of the packages above");
+        this.jobContext.print("NONE", chalk.green("datapm info <referenceFromAbove>"));
+        this.jobContext.print("NONE", chalk.green("datapm fetch <referenceFromAbove>"));
 
         return {
             exitCode: 0

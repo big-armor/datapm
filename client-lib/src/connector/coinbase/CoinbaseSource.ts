@@ -181,7 +181,8 @@ export class CoinbaseSource implements Source {
                                     if (data.type === "ticker") {
                                         const recordContext: RecordContext = {
                                             record: data,
-                                            schemaSlug: "ticker"
+                                            schemaSlug: "ticker",
+                                            receivedDate: new Date()
                                         };
                                         stream.push(recordContext);
                                     }
@@ -189,7 +190,8 @@ export class CoinbaseSource implements Source {
                                     if (data.type === "last_match" || data.type === "match") {
                                         const recordContext: RecordContext = {
                                             record: data,
-                                            schemaSlug: "match"
+                                            schemaSlug: "match",
+                                            receivedDate: new Date()
                                         };
                                         stream.push(recordContext);
                                     }
