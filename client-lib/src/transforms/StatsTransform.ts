@@ -63,7 +63,7 @@ export class StatsTransform extends Transform {
 
             const record = recordContext.record;
 
-            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record);
+            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record, this.contentLabelDetector);
 
             if (schema.sampleRecords == null) schema.sampleRecords = [];
 
@@ -81,6 +81,7 @@ export class StatsTransform extends Transform {
     }
 }
 
+/** Updates the valueType object provided with the attributes of the value provided */
 function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes, valueTypeStats: ValueTypeStatistics) {
     valueTypeStats.recordCount = (valueTypeStats.recordCount || 0) + 1;
 
@@ -189,11 +190,12 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
     }
 }
 
+/** Recursively inspects the contents of objects and arrays. */
 function inspectRecord(
-    jobContext: JobContext,
     properties: Record<string, Property>,
     record: DPMRecord,
-    contentLabelDetector: ContentLabelDetector
+    contentLabelDetector: ContentLabelDetector,
+    interationDepth = 0
 ): DPMRecord {
     const typeConvertedRecord: DPMRecord = {};
 
@@ -239,6 +241,8 @@ function inspectRecord(
                 property.types.number = property.types.integer;
                 delete property.types.integer;
             }
+        } else if (valueType === "object") {
+            inspectRecord();
         }
 
         typeConvertedRecord[title] = typeConvertedValue;
@@ -252,7 +256,8 @@ function inspectRecord(
         }
         updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
 
-        contentLabelDetector.inspectValue(title, typeConvertedValue);
+        TODO Make contentLabelDetector inspection support heirarchies
+        if (interationDepth === 0) contentLabelDetector.inspectValue(title, typeConvertedValue);
     });
 
     return typeConvertedRecord;

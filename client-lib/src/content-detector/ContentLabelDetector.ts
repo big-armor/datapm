@@ -98,6 +98,7 @@ export class ContentLabelDetector {
 
             let inspect = true;
 
+            // Inspect first 100 and then randomly inspect the rest
             if (valueTestedCount > 100) inspect = Math.random() < 1 / valueTestedCount;
 
             try {
