@@ -14,6 +14,12 @@ export async function generateSiteMapIndex(context:HTTPContext):Promise<string> 
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 `;
 
+    responseXml += `
+        <sitemap>
+            <loc>${process.env["REGISTRY_URL"]}/sitemap_static.xml</loc>
+        </sitemap>
+    `
+
     const publicPackagesCount = await context.connection
         .getCustomRepository(PackageRepository).countPublicPackages();
 
@@ -62,6 +68,46 @@ export async function generateSiteMapIndex(context:HTTPContext):Promise<string> 
     return responseXml;
 }
 
+export async function generateStaticSiteMap() {
+            // XML header
+    let responseXml = `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">        
+    `;
+
+    responseXml += `
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}/docs</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}/privacy</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}/terms</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}/contact</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+    <url>
+        <loc>${process.env["REGISTRY_URL"]}/downloads</loc>
+        <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
+    </url>
+`
+
+    responseXml += `
+    </urlset>
+    `;
+
+    return responseXml;
+
+}
 export async function generatePackageSiteMap(siteMapNumber: number, context: HTTPContext):Promise<string> {
         const offset = siteMapNumber * LIMIT;
 
