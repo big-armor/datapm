@@ -25,14 +25,14 @@ describe("Check email formats", () => {
         emailContentDetector.inspectValue("not an email");
         expect(emailContentDetector.getValueTestCount()).equal(5);
 
-        let labels = emailContentDetector.getContentLabels("test", []);
+        let labels = emailContentDetector.getContentLabels("test");
 
         expect(labels.length).equal(1);
 
         emailContentDetector.inspectValue("There is an email burried test@test.com deep in this value.");
         expect(emailContentDetector.getValueTestCount()).equal(6);
 
-        labels = emailContentDetector.getContentLabels("test", []);
+        labels = emailContentDetector.getContentLabels("test");
         expect(labels.length).equal(1);
         expect(labels[0].label).equal(EMAIL_ADDRESS_LABEL);
         expect(labels[0].appliedByContentDetector).equal(EmailAddressDetector.name);

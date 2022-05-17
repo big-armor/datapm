@@ -1,0 +1,71 @@
+{
+    "$schema": "packageFileSchema-v0.9.0.json",
+    "canonical": true,
+    "generatedBy": "manually",
+    "updatedDate": "2021-10-01T13:54:29.442Z",
+    "displayName": "Object test",
+    "packageSlug": "object-test",
+    "version": "1.0.0",
+    "description": "test for heirarchical object data",
+    "sources": [],
+    "schemas": [
+        {
+            "$id": "test",
+            "unit": "object",
+            "properties": {
+                "testObject": {
+                    "title": "testObject",
+                    "types": {
+                        "object": {
+                            "recordCount": 1
+                        }
+                    },
+                    "properties": {
+                        "subObject": {
+                            "title": "subObject",
+                            "types": {
+                                "object": {
+                                    "recordCount": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "testArrayObjects": {
+                    "title": "testArrayObjects",
+                    "types": {
+                        "array": {
+                            "recordCount": 2,
+                            "minArrayLength": 1,
+                            "maxArrayLength": 10,
+                            "arrayTypes": {
+                                "object": {
+                                    "recordCount": 10
+                                },
+                                "string": {
+                                    "recordCount": 1
+                                }
+                            }
+                        }
+                    },
+                    "properties": {
+                        "aNumber": {
+                            "title": "aNumber",
+                            "types": {
+                                "number": {
+                                    "recordCount": 10
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "recordCount": 1,
+            "title": "test",
+            "source": {
+                "type": "manually-made",
+                "configuration": {}
+            }
+        }
+    ]
+}

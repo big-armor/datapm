@@ -149,6 +149,11 @@ export interface ValueTypeStatistics {
      * allows content labels to be "hidden" by a package editor - and to keep that fact for future iterations.
      */
     contentLabels?: ContentLabel[];
+
+    /** Types of properties found in an array. If arrays contain arrays, the key will be array, and that object will have arrayTypes as well.
+     * If the array contains objects, the key will be object, and that object will have objectProperties as well.
+     */
+    arrayTypes?: { [key in DPMPropertyTypes]: ValueTypeStatistics };
 }
 
 // eslint-disable-next-line no-use-before-define

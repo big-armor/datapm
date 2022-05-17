@@ -938,7 +938,7 @@ export function getSchemaVersionFromPackageFile(packageFileObject: any): SemVer 
     if (packageFileSchemaUrl == null)
         packageFileSchemaUrl = "https://datapm.io/docs/datapm-package-file-schema-v0.1.0.json";
 
-    const schemaVersion = packageFileSchemaUrl.match(/package-file-schema-v(.*)\.json/i);
+    const schemaVersion = packageFileSchemaUrl.match(/v(.*)\.json/i);
 
     if (schemaVersion == null) throw new Error("ERROR_SCHEMA_VERSION_NOT_RECOGNIZED - " + packageFileSchemaUrl);
 

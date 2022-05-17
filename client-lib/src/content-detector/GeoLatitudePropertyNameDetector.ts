@@ -9,7 +9,7 @@ export class GeoLatitudePropertyNameDetector extends PropertyNameDetectorBase {
     }
 
     getPropertyNameMatches(): RegExp[] {
-        return [/^long$|longitude/i];
+        return [/^lat$|latitude/i];
     }
 
     getLabel(): string {

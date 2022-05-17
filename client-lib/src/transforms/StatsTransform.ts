@@ -18,20 +18,19 @@ export class StatsTransform extends Transform {
     recordCount = 0;
     recordsInspected = 0;
     schemas: Record<string, Schema>;
-    contentLabelDetector: ContentLabelDetector;
+    contentLabelDetectorsBySchema: Record<string, ContentLabelDetector>;
 
     progressCallBack: (recordCount: number, recordsInspectedCount: number) => void;
 
     constructor(
         progressCallback: (recordCount: number, recordsInspectedCount: number) => void,
         schemas: Record<string, Schema>,
-        contentLabelDetector: ContentLabelDetector,
         opts?: TransformOptions
     ) {
         super(opts);
         this.schemas = schemas;
         this.progressCallBack = progressCallback;
-        this.contentLabelDetector = contentLabelDetector;
+        this.contentLabelDetectorsBySchema = {};
     }
 
     async _transform(
@@ -63,7 +62,13 @@ export class StatsTransform extends Transform {
 
             const record = recordContext.record;
 
-            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record, this.contentLabelDetector);
+            if (this.contentLabelDetectorsBySchema[recordContext.schemaSlug] === undefined) {
+                this.contentLabelDetectorsBySchema[recordContext.schemaSlug] = new ContentLabelDetector();
+            }
+
+            const contentLabelDetector = this.contentLabelDetectorsBySchema[recordContext.schemaSlug];
+
+            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record, contentLabelDetector);
 
             if (schema.sampleRecords == null) schema.sampleRecords = [];
 
@@ -76,7 +81,11 @@ export class StatsTransform extends Transform {
     }
 
     _final(callback: (error?: Error | null) => void): void {
-        this.contentLabelDetector.applyLabelsToSchemas(Object.values(this.schemas));
+        for (const schema of Object.values(this.schemas)) {
+            const contentLabelDetector = this.contentLabelDetectorsBySchema[schema.title];
+            contentLabelDetector.applyLabelsToProperties(schema.properties);
+        }
+
         callback(null);
     }
 }
@@ -176,7 +185,9 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
     if (valueTypeStats.stringOptions != null) {
         const valueString = value.toString() as string;
 
-        if (valueString.length > 50) {
+        if (valueType === "object") {
+            delete valueTypeStats.stringOptions;
+        } else if (valueString.length > 50) {
             valueTypeStats.stringOptions = undefined;
         } else {
             if (valueTypeStats.stringOptions[valueString] == null) {
@@ -191,12 +202,16 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
 }
 
 /** Recursively inspects the contents of objects and arrays. */
-function inspectRecord(
+export function inspectRecord(
     properties: Record<string, Property>,
     record: DPMRecord,
     contentLabelDetector: ContentLabelDetector,
-    interationDepth = 0
+    interationDepth = 10 // TODO configurable?
 ): DPMRecord {
+    if (interationDepth === 0) {
+        return record;
+    }
+
     const typeConvertedRecord: DPMRecord = {};
 
     Array.from(Object.keys(record)).forEach((title: string) => {
@@ -224,6 +239,16 @@ function inspectRecord(
             throw new Error(message);
         }
 
+        typeConvertedRecord[title] = typeConvertedValue;
+
+        let valueTypeStats = property.types[valueType];
+        if (!valueTypeStats) {
+            property.types[valueType] = valueTypeStats = {
+                recordCount: 0,
+                stringOptions: {}
+            };
+        }
+
         if (property.types == null) return;
 
         // If an integer is detected, and there exists
@@ -242,22 +267,19 @@ function inspectRecord(
                 delete property.types.integer;
             }
         } else if (valueType === "object") {
-            inspectRecord();
+            if (property.properties == null) property.properties = {};
+            const objectLabelDetector = contentLabelDetector.getObjectLabelDetector(title);
+            typeConvertedRecord[title] = inspectRecord(
+                property.properties,
+                typeConvertedValue as DPMRecord,
+                objectLabelDetector,
+                interationDepth - 1
+            );
         }
 
-        typeConvertedRecord[title] = typeConvertedValue;
-
-        let valueTypeStats = property.types[valueType];
-        if (!valueTypeStats) {
-            property.types[valueType] = valueTypeStats = {
-                recordCount: 0,
-                stringOptions: {}
-            };
-        }
         updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
 
-        TODO Make contentLabelDetector inspection support heirarchies
-        if (interationDepth === 0) contentLabelDetector.inspectValue(title, typeConvertedValue);
+        contentLabelDetector.inspectValue(title, typeConvertedValue, valueType);
     });
 
     return typeConvertedRecord;

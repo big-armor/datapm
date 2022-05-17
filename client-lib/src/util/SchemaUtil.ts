@@ -871,6 +871,8 @@ export function convertValueByValueType(value: DPMRecordValue, valueType: DPMPro
         } catch (err) {
             return value;
         }
+    } else if (valueType === "object") {
+        return value;
     }
 
     // TODO recursively handle arrays and object

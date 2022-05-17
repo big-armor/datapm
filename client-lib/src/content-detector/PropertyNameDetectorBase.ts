@@ -26,7 +26,7 @@ export abstract class PropertyNameDetectorBase implements ContentLabelDetectorIn
         return true;
     }
 
-    getContentLabels(propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
+    getContentLabels(propertyName: string): ContentLabel[] {
         const propertyNameMatches = this.getPropertyNameMatches();
 
         let found = false;

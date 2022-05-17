@@ -171,110 +171,7 @@
                         "additionalItems": true,
                         "properties": {
                             "properties": {
-                                "type": "object",
-                                "patternProperties": {
-                                    ".*": {
-                                        "allOf": [
-                                            {
-                                                "required": [
-                                                    "types",
-                                                    "title"
-                                                ],
-                                                "properties": {
-                                                    "description": {
-                                                        "type": "string",
-                                                        "maxLength": 4096
-                                                    },
-                                                    "hidden": {
-                                                        "type": "boolean"
-                                                    },
-                                                    "unit": {
-                                                        "type": "string"
-                                                    },
-                                                    "title": {
-                                                        "type": "string",
-                                                        "description": "The name of the property used after pre-processing by dataPM"
-                                                    },
-                                                    "types": {
-                                                        "$id": "#/types",
-                                                        "type": "object",
-                                                        "patternProperties": {
-                                                            "(string)|(number)|(integer)|(boolean)|(date)|(date-time)|(object)|(array)|(null)": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                    "recordCount": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "stringMaxLength": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "stringMinLength": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "numberMaxValue": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "numberMinValue": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "numberMaxPrecision": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "numberMaxScale": {
-                                                                        "type": "number"
-                                                                    },
-                                                                    "dateMaxValue": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "dateMinValue": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "stringOptions": {
-                                                                        "type": "object",
-                                                                        "patternProperties": {
-                                                                            ".*": {
-                                                                                "type": "number"
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "contentLabels": {
-                                                                        "type": "array",
-                                                                        "items": {
-                                                                            "required": [
-                                                                                "label"
-                                                                            ],
-                                                                            "properties": {
-                                                                                "label": {
-                                                                                    "type": "string",
-                                                                                    "maxLength": 75
-                                                                                },
-                                                                                "hidden": {
-                                                                                    "type": "boolean"
-                                                                                },
-                                                                                "appliedByContentDetector": {
-                                                                                    "type": "string",
-                                                                                    "description": "The name of the content detector that applied the label"
-                                                                                },
-                                                                                "confidence": {
-                                                                                    "type": "number",
-                                                                                    "description": "A number zero to one that describes the confidence of the label"
-                                                                                },
-                                                                                "occurrence": {
-                                                                                    "type": "number",
-                                                                                    "description": "The number of times the content was detected"
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                }
+                                "$ref": "#/definitions/properties"
                             },
                             "description": {
                                 "type": "string",
@@ -574,6 +471,126 @@
                     }
                 },
                 "additionalProperties": true
+            }
+        },
+        "properties": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "allOf": [
+                        {
+                            "required": [
+                                "types",
+                                "title"
+                            ],
+                            "properties": {
+                                "properties": {
+                                    "$ref": "#/definitions/properties"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "maxLength": 4096
+                                },
+                                "hidden": {
+                                    "type": "boolean"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "description": "The name of the property used after pre-processing by dataPM"
+                                },
+                                "types": {
+                                    "$ref": "#/definitions/types"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "types": {
+            "type": "object",
+            "patternProperties": {
+                "(string)|(number)|(integer)|(boolean)|(date)|(date-time)|(object)|(array)|(null)": {
+                    "$ref": "#/definitions/typeValue"
+                }
+            }
+        },
+        "typeValue": {
+            "type": "object",
+            "required": [
+                "recordCount"
+            ],
+            "properties": {
+                "recordCount": {
+                    "type": "number"
+                },
+                "stringMaxLength": {
+                    "type": "number"
+                },
+                "stringMinLength": {
+                    "type": "number"
+                },
+                "numberMaxValue": {
+                    "type": "number"
+                },
+                "numberMinValue": {
+                    "type": "number"
+                },
+                "numberMaxPrecision": {
+                    "type": "number"
+                },
+                "numberMaxScale": {
+                    "type": "number"
+                },
+                "dateMaxValue": {
+                    "type": "string"
+                },
+                "dateMinValue": {
+                    "type": "string"
+                },
+                "stringOptions": {
+                    "type": "object",
+                    "patternProperties": {
+                        ".*": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "arrayTypes": {
+                    "$ref": "#/definitions/types"
+                },
+                "contentLabels": {
+                    "type": "array",
+                    "items": {
+                        "required": [
+                            "label"
+                        ],
+                        "properties": {
+                            "label": {
+                                "type": "string",
+                                "maxLength": 75
+                            },
+                            "hidden": {
+                                "type": "boolean"
+                            },
+                            "appliedByContentDetector": {
+                                "type": "string",
+                                "description": "The name of the content detector that applied the label"
+                            },
+                            "confidence": {
+                                "type": "number",
+                                "description": "A number zero to one that describes the confidence of the label"
+                            },
+                            "occurrence": {
+                                "type": "number",
+                                "description": "The number of times the content was detected"
+                            }
+                        }
+                    }
+                }
             }
         }
     },
