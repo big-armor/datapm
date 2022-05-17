@@ -38,7 +38,7 @@ async function _checkDataPMVersion(oraRef: Ora): Promise<boolean> {
                 `There is a new version (${status.version}) of DataPM available. You are using ${localSemVer.format()}.`
             )
         );
-        console.log(chalk.green("http://datapm.io/downloads"));
+        console.log(chalk.green("https://datapm.io/downloads"));
         console.log(" ");
 
         return true;

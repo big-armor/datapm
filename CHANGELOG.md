@@ -1,3 +1,11 @@
+#### 0.31.4 (2022-05-14)
+
+##### Bug Fixes
+
+*  sitemap lastmod date format ([6250cc06](https://github.com/big-armor/datapm/commit/6250cc06075fc6ab1530f44214d16be3e160b773))
+
+#### 0.31.3 (2022-05-13)
+
 #### 0.31.1 (2022-05-13)
 
 ##### Bug Fixes

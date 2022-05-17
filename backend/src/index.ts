@@ -29,7 +29,7 @@ import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
 import { parse } from "url";
 import { libPackageVersion } from "datapm-lib";
-import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex } from "./util/SiteMapUtil";
+import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex, generateStaticSiteMap } from "./util/SiteMapUtil";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -499,6 +499,16 @@ async function main() {
         const contextObject = await context({ req });
 
         const siteMapContents = await generateSiteMapIndex(contextObject);
+        res.setHeader('Content-Type', 'application/xml');
+        res.setHeader('Content-Length', siteMapContents.length);
+
+        res.send(siteMapContents);
+
+    });
+
+    app.use("/sitemap_static.xml", async (req, res, next) => {
+
+        const siteMapContents = await generateStaticSiteMap();
         res.setHeader('Content-Type', 'application/xml');
         res.setHeader('Content-Length', siteMapContents.length);
 
