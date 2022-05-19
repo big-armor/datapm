@@ -481,7 +481,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
 
     if (promptForNumberUnits) {
         for (const key of keys) {
-            const property = properties[key] as Schema;
+            const property = properties[key];
             const columnUnitResponse = await jobContext.parameterPrompt([
                 {
                     type: ParameterType.Text,

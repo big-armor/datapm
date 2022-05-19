@@ -153,10 +153,13 @@ export interface ValueTypeStatistics {
     /** Types of properties found in an array. If arrays contain arrays, the key will be array, and that object will have arrayTypes as well.
      * If the array contains objects, the key will be object, and that object will have objectProperties as well.
      */
-    arrayTypes?: { [key in DPMPropertyTypes]: ValueTypeStatistics };
+    arrayTypes?: ValueTypes;
 
     arrayMinLength?: number;
     arrayMaxLength?: number;
+
+    /** The properties of this, if this is an object property */
+    objectProperties?: Properties;
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -239,13 +242,10 @@ export interface Property {
     /** A description about the schema or property. This is flat text and should be kept to a few scentences.  */
     description?: string;
 
-    /** The properties of this, if this is an object property */
-    properties?: Properties;
-
     /** Whether the consumer should by default include this schema/property in the regular output */
     hidden?: boolean;
 
-    /** What the schema or a property in the data represents. Example for objects: Person, Date and Location, Point In Time. Examples for values: Meters, Degrees Celsius */
+    /** What the property in the data represents. Example for objects: Person, Date and Location, Point In Time. Examples for values: Meters, Degrees Celsius */
     unit?: string;
 
     /** An object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the values of the property. */

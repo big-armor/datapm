@@ -172,7 +172,9 @@ export class ContentLabelDetector {
                 (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels = labels;
 
                 if (valueType === "object") {
-                    this.getObjectLabelDetector(propertyName).applyLabelsToProperties(property.properties || {});
+                    this.getObjectLabelDetector(propertyName).applyLabelsToProperties(
+                        property.types.object?.objectProperties || {}
+                    );
                 }
             }
         }

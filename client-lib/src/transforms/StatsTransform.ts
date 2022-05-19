@@ -5,11 +5,11 @@ import {
     Schema,
     ValueTypeStatistics,
     DPMPropertyTypes,
-    Property
+    Property,
+    ValueTypes
 } from "datapm-lib";
 import { Transform, TransformCallback, TransformOptions } from "stream";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
-import { JobContext } from "../main";
 import { convertValueByValueType, discoverValueType } from "../util/SchemaUtil";
 
 const SAMPLE_RECORD_COUNT_MAX = 100;
@@ -68,7 +68,7 @@ export class StatsTransform extends Transform {
 
             const contentLabelDetector = this.contentLabelDetectorsBySchema[recordContext.schemaSlug];
 
-            const typeConvertedRecord: DPMRecord = inspectRecord(properties, record, contentLabelDetector);
+            const typeConvertedRecord: DPMRecord = inspectObject(properties, record, contentLabelDetector);
 
             if (schema.sampleRecords == null) schema.sampleRecords = [];
 
@@ -180,14 +180,20 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
         }
     } else if (valueType === "object") {
         // Nothing to do
+    } else if (valueType === "array") {
+        const arrayValue = value as [];
+        valueTypeStats.arrayMaxLength = Math.max(valueTypeStats.arrayMaxLength || 0, arrayValue.length);
+        valueTypeStats.arrayMinLength = Math.min(valueTypeStats.arrayMaxLength || 0, arrayValue.length);
     }
 
     if (valueTypeStats.stringOptions != null) {
-        const valueString = value.toString() as string;
-
-        if (valueType === "object") {
+        if (valueType === "object" || valueType === "array") {
             delete valueTypeStats.stringOptions;
-        } else if (valueString.length > 50) {
+            return;
+        }
+
+        const valueString = value.toString() as string;
+        if (valueString.length > 50) {
             valueTypeStats.stringOptions = undefined;
         } else {
             if (valueTypeStats.stringOptions[valueString] == null) {
@@ -201,8 +207,27 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
     }
 }
 
-/** Recursively inspects the contents of objects and arrays. */
-export function inspectRecord(
+/** Recursively inspects the contents of arrays */
+export function inspectArray(
+    title: string,
+    array: DPMRecord[],
+    types: ValueTypes,
+    labelDetector: ContentLabelDetector,
+    interationDepth: number
+): (DPMRecordValue | DPMRecordValue[])[] {
+    if (interationDepth > 10) return array;
+
+    const typeConvertedArray: (DPMRecordValue | DPMRecordValue[])[] = [];
+
+    for (const record of array) {
+        const typeConvertedValue = inspectValue(title, record, types, labelDetector, interationDepth + 1);
+        typeConvertedArray.push(typeConvertedValue);
+    }
+
+    return typeConvertedArray;
+}
+/** Recursively inspects the contents of objects */
+export function inspectObject(
     properties: Record<string, Property>,
     record: DPMRecord,
     contentLabelDetector: ContentLabelDetector,
@@ -212,7 +237,7 @@ export function inspectRecord(
         return record;
     }
 
-    const typeConvertedRecord: DPMRecord = {};
+    const typeConvertedRecord: DPMRecord | DPMRecord[] = {};
 
     Array.from(Object.keys(record)).forEach((title: string) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -230,57 +255,81 @@ export function inspectRecord(
 
         const value = record[title];
 
-        let valueType: DPMPropertyTypes = discoverValueType(value);
-        let typeConvertedValue: DPMRecordValue;
-        try {
-            typeConvertedValue = convertValueByValueType(value, valueType);
-        } catch (error) {
-            const message = `Failed to convert value ${value} to type ${valueType}`;
-            throw new Error(message);
-        }
-
-        typeConvertedRecord[title] = typeConvertedValue;
-
-        let valueTypeStats = property.types[valueType];
-        if (!valueTypeStats) {
-            property.types[valueType] = valueTypeStats = {
-                recordCount: 0,
-                stringOptions: {}
-            };
-        }
-
         if (property.types == null) return;
 
-        // If an integer is detected, and there exists
-        // already numbers. Then count this as a number (and not an integer)
-        if (valueType === "integer") {
-            if (property.types.number != null) {
-                valueType = "number" as DPMPropertyTypes;
-            }
+        const typeConvertedValue = inspectValue(title, value, property.types, contentLabelDetector, interationDepth);
 
-            // if a number is detected, and there exists
-            // already integers. Then convert those prior integer valueTypes
-            // to number.
-        } else if (valueType === "number") {
-            if (property.types.integer != null) {
-                property.types.number = property.types.integer;
-                delete property.types.integer;
-            }
-        } else if (valueType === "object") {
-            if (property.properties == null) property.properties = {};
-            const objectLabelDetector = contentLabelDetector.getObjectLabelDetector(title);
-            typeConvertedRecord[title] = inspectRecord(
-                property.properties,
-                typeConvertedValue as DPMRecord,
-                objectLabelDetector,
-                interationDepth - 1
-            );
-        }
-
-        updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
-
-        contentLabelDetector.inspectValue(title, typeConvertedValue, valueType);
+        typeConvertedRecord[title] = typeConvertedValue;
     });
 
     return typeConvertedRecord;
+}
+
+function inspectValue(
+    title: string,
+    value: any,
+    types: ValueTypes,
+    labelDetector: ContentLabelDetector,
+    iterationDepth: number
+): DPMRecordValue | (DPMRecordValue | DPMRecordValue[])[] {
+    let valueType: DPMPropertyTypes = discoverValueType(value);
+    let typeConvertedValue: DPMRecordValue | (DPMRecordValue | DPMRecordValue[])[];
+    try {
+        typeConvertedValue = convertValueByValueType(value, valueType);
+    } catch (error) {
+        const message = `Failed to convert value ${value} to type ${valueType}`;
+        throw new Error(message);
+    }
+
+    if (!types[valueType]) {
+        types[valueType] = {
+            recordCount: 0,
+            stringOptions: {}
+        };
+    }
+
+    const valueTypeStats = types[valueType] as ValueTypeStatistics;
+
+    // If an integer is detected, and there exists
+    // already numbers. Then count this as a number (and not an integer)
+    if (valueType === "integer") {
+        if (types.number != null) {
+            valueType = "number" as DPMPropertyTypes;
+        }
+
+        // if a number is detected, and there exists
+        // already integers. Then convert those prior integer valueTypes
+        // to number.
+    } else if (valueType === "number") {
+        if (types.integer != null) {
+            types.number = types.integer;
+            delete types.integer;
+        }
+    } else if (valueType === "object") {
+        if (valueTypeStats.objectProperties == null) valueTypeStats.objectProperties = {};
+        const objectLabelDetector = labelDetector.getObjectLabelDetector(title);
+        typeConvertedValue = inspectObject(
+            valueTypeStats.objectProperties,
+            typeConvertedValue as DPMRecord,
+            objectLabelDetector,
+            iterationDepth - 1
+        );
+    } else if (valueType === "array") {
+        if (valueTypeStats.arrayTypes == null) valueTypeStats.arrayTypes = {};
+
+        const arrayLabelDetector = labelDetector.getObjectLabelDetector(title);
+        typeConvertedValue = inspectArray(
+            title,
+            typeConvertedValue as DPMRecord[],
+            valueTypeStats.arrayTypes,
+            arrayLabelDetector,
+            iterationDepth - 1
+        );
+    }
+
+    updateValueTypeStats(typeConvertedValue, valueType as DPMPropertyTypes, valueTypeStats);
+
+    labelDetector.inspectValue(title, typeConvertedValue, valueType);
+
+    return typeConvertedValue;
 }

@@ -772,15 +772,17 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
 export function discoverValueType(value: DPMRecordValue): DPMPropertyTypes {
     if (value === null) return "null";
 
-    if (typeof value === "bigint") return "integer";
+    const valueTypeOf = typeof value;
 
-    if (typeof value === "string") return discoverValueTypeFromString(value as string);
+    if (valueTypeOf === "bigint") return "integer";
+
+    if (valueTypeOf === "string") return discoverValueTypeFromString(value as string);
 
     if (Array.isArray(value)) return "array";
 
     if (value instanceof Date) return "date-time";
 
-    if (typeof value === "number") {
+    if (valueTypeOf === "number") {
         const strValue = value.toString();
         if (strValue.indexOf(".") === -1) {
             return "integer";
@@ -788,15 +790,19 @@ export function discoverValueType(value: DPMRecordValue): DPMPropertyTypes {
         return "number";
     }
 
-    if (typeof value === "undefined") {
+    if (valueTypeOf === "undefined") {
         return "null";
     }
 
-    if (typeof value === "object") {
+    if (valueTypeOf === "object") {
         return "object";
     }
 
-    return typeof value as "string"; // This is just a forcing of types
+    if (valueTypeOf === "boolean") {
+        return "boolean";
+    }
+
+    throw new Error("Unable to detect type for value typof " + valueTypeOf);
 }
 
 export function discoverValueTypeFromString(value: string): DPMPropertyTypes {
@@ -833,7 +839,10 @@ export function discoverValueTypeFromString(value: string): DPMPropertyTypes {
 }
 
 /** Given a value, convert it to a specific value type. Example: boolean from string */
-export function convertValueByValueType(value: DPMRecordValue, valueType: DPMPropertyTypes): DPMRecordValue {
+export function convertValueByValueType(
+    value: DPMRecordValue,
+    valueType: DPMPropertyTypes
+): DPMRecordValue | DPMRecordValue[] {
     if (value == null) return null;
 
     if (valueType === "null") {
@@ -872,6 +881,8 @@ export function convertValueByValueType(value: DPMRecordValue, valueType: DPMPro
             return value;
         }
     } else if (valueType === "object") {
+        return value;
+    } else if (valueType === "array") {
         return value;
     }
 

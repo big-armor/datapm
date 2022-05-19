@@ -213,10 +213,11 @@ describe("Checking VersionUtil", () => {
                 object: {
                     title: "object",
                     types: {
-                        object: {}
-                    },
-                    properties: {
-                        string1: { title: "string1", types: { string: {} } }
+                        object: {
+                            objectProperties: {
+                                string1: { title: "string1", types: { string: {} } }
+                            }
+                        }
                     }
                 },
                 number: { title: "number", types: { number: {} } }
@@ -229,10 +230,11 @@ describe("Checking VersionUtil", () => {
                 object: {
                     title: "object",
                     types: {
-                        object: {}
-                    },
-                    properties: {
-                        string1: { title: "string1", types: { string: {} } }
+                        object: {
+                            objectProperties: {
+                                string1: { title: "string1", types: { string: {} } }
+                            }
+                        }
                     }
                 },
                 number: { title: "number", types: { number: {} } }
@@ -244,7 +246,10 @@ describe("Checking VersionUtil", () => {
 
         expect(diffCompatibility(firstDiff)).equal(Compability.Identical);
 
-        (schemaA2.properties.object.properties as Properties).string2 = { title: "string2", types: { string: {} } };
+        (schemaA2.properties.object.types.object?.objectProperties as Properties).string2 = {
+            title: "string2",
+            types: { string: {} }
+        };
 
         const compatibleDiff = compareSchema(schemaA1, schemaA2);
 
@@ -257,8 +262,14 @@ describe("Checking VersionUtil", () => {
 
         expect(compatibleComparison).equal(Compability.CompatibleChange);
 
-        (schemaA1.properties.object.properties as Properties).string3 = { title: "string3", types: { string: {} } };
-        (schemaA1.properties.object.properties as Properties).string4 = { title: "string4", types: { string: {} } };
+        (schemaA1.properties.object.types.object?.objectProperties as Properties).string3 = {
+            title: "string3",
+            types: { string: {} }
+        };
+        (schemaA1.properties.object.types.object?.objectProperties as Properties).string4 = {
+            title: "string4",
+            types: { string: {} }
+        };
 
         const breakingDiff = compareSchema(schemaA1, schemaA2);
         expect(breakingDiff).length(3);
@@ -274,9 +285,18 @@ describe("Checking VersionUtil", () => {
 
         expect(breakingChange).equal(Compability.BreakingChange);
 
-        (schemaA1.properties.object.properties as Properties).string2 = { title: "string2", types: { string: {} } };
-        (schemaA2.properties.object.properties as Properties).string3 = { title: "string2", types: { string: {} } };
-        (schemaA2.properties.object.properties as Properties).string4 = { title: "string3", types: { string: {} } };
+        (schemaA1.properties.object.types.object?.objectProperties as Properties).string2 = {
+            title: "string2",
+            types: { string: {} }
+        };
+        (schemaA2.properties.object.types.object?.objectProperties as Properties).string3 = {
+            title: "string2",
+            types: { string: {} }
+        };
+        (schemaA2.properties.object.types.object?.objectProperties as Properties).string4 = {
+            title: "string3",
+            types: { string: {} }
+        };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
 

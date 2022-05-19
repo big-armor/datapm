@@ -76,8 +76,11 @@ describe("PackageFile checks", () => {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.canonical).equal(true);
     });
-    it("Should parse 0.9.0 heirarchical object schema", async function () {
+    it("Should parse heirarchical object schema", async function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/object-test.datapm.json");
-        expect(packageFile.schemas[0].properties?.testObject.properties?.subObject.types.object?.recordCount).equal(1);
+        expect(
+            packageFile.schemas[0].properties?.testObject.types?.object?.objectProperties?.subObject.types.object
+                ?.recordCount
+        ).equal(1);
     });
 });
