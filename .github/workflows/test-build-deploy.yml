@@ -12,14 +12,12 @@ env:
 
 jobs:
     lint:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
+        container: node:16.14.2
         timeout-minutes: 3
         name: Lint Source Code
         steps:
             - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -44,13 +42,10 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
+        container: node:16.14.2
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -88,13 +83,10 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
+        container: node:16.14.2
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -140,13 +132,10 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
+        container: node:16.14.2
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -183,15 +172,13 @@ jobs:
 
     build-client-linux-intel64:
         runs-on: ubuntu-latest
+        container: node:16.14.2
         timeout-minutes: 25
         needs:
             - lint
         name: Build Linux Intel 64-bit Client
         steps:
             - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: "16.14.2"
 
               # This debootstrap package is related to installing debian, and the correct version is missing as of 4/29/2022
               # This command instructs apt-get to not install the package as a depedency in the build tools below
@@ -393,6 +380,7 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        container: node:16.14.2
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-windows-intel64
@@ -402,10 +390,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -533,6 +517,7 @@ jobs:
         name: "Update Test Environment"
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        container: node:16.14.2
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - buildAndDeploy
@@ -643,7 +628,8 @@ jobs:
     bumpVersion:
         name: "Bump Package Versions"
         timeout-minutes: 5
-        runs-on: "ubuntu-latest"
+        runs-on: ubuntu-latest
+        container: node:16.14.2
         needs:
             - buildAndDeploy
             - github-release-clients
@@ -651,10 +637,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - uses: actions/setup-node@v2-beta
-              with:
-                  node-version: "16.14.2"
 
             - name: Install Dependencies
               run: npm ci
