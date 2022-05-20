@@ -464,6 +464,7 @@ export async function createTestPackage(
         ]);
         prompts.splice(6, 0, ...unitPrompts);
         await testCmd("package", options, prompts, async (line: string) => {
+            console.log(line);
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("No matches");
