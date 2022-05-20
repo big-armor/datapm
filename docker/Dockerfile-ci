@@ -1,27 +1,39 @@
 # This docker file builds the datapm/ci image, which is
 # used by the GitHub action runners for the container image.
 
+# Use the following commands to build the image and push it to docker hub
+# docker buildx build --platform linux/amd64 -f Dockerfile-ci . -t datapm/ci:latest
+# docker push datapm/ci:latest
 FROM ubuntu:20.04
-SHELL ["/bin/bash", "-c"] 
+SHELL ["/bin/bash", "-c"]
 
 # Get the latest package updates
+
 RUN apt-get update
 
 # Install build tools
-ENV DEBIAN_FRONTEND=noninteractive 
-RUN apt-get install -y g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint curl
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get install --no-install-recommends --yes g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint curl docker-compose
 
 RUN mkdir -p /usr/local/nvm
+
 # Install NVM and then correct version of node
+
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 16.14.2
-
-# Install nvm with node and npm
-RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | sh \
     && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
     && nvm use default
+ENV NODE_PATH $NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH      $NVM_DIR/v$NODE_VERSION/bin:$PATH
+# Install Chromium for headless browser tests
+# https://geekflare.com/install-chromium-ubuntu-centos/
+RUN apt-get install --no-install-recommends --yes libappindicator1 fonts-liberation libasound2 libatk-bridge2.0-0 libatspi2.0-0 libdrm2 libgbm1 libgtk-3-0 libxkbcommon0 xdg-utils
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome*.deb
+
+CMD ["sh"]
