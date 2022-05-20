@@ -1,0 +1,27 @@
+# This docker file builds the datapm/ci image, which is
+# used by the GitHub action runners for the container image.
+
+FROM ubuntu:20.04
+SHELL ["/bin/bash", "-c"] 
+
+# Get the latest package updates
+RUN apt-get update
+
+# Install build tools
+ENV DEBIAN_FRONTEND=noninteractive 
+RUN apt-get install -y g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint curl
+
+RUN mkdir -p /usr/local/nvm
+# Install NVM and then correct version of node
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 16.14.2
+
+# Install nvm with node and npm
+RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH      $NVM_DIR/v$NODE_VERSION/bin:$PATH
