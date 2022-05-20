@@ -12,7 +12,7 @@ env:
 
 jobs:
     lint:
-        runs-on: ubuntu-latest
+        container: node:16.14.2
         timeout-minutes: 3
         name: Lint Source Code
         steps:
