@@ -13,11 +13,15 @@ env:
 jobs:
     lint:
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         timeout-minutes: 3
         name: Lint Source Code
         steps:
             - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -42,10 +46,14 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -83,10 +91,14 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -132,10 +144,14 @@ jobs:
         needs: lint
         timeout-minutes: 10
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -172,7 +188,7 @@ jobs:
 
     build-client-linux-intel64:
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         timeout-minutes: 25
         needs:
             - lint
@@ -180,10 +196,14 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
+
               # This debootstrap package is related to installing debian, and the correct version is missing as of 4/29/2022
               # This command instructs apt-get to not install the package as a depedency in the build tools below
-            - name: Do not allow debootstrap to be installed
-              run: sudo apt-mark hold debootstrap
+              # - name: Do not allow debootstrap to be installed
+              # run: apt-mark hold debootstrap
 
             - name: Install Build Tools
               run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint
@@ -380,7 +400,7 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-windows-intel64
@@ -390,6 +410,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Print npm verion
               run: npm --version
@@ -517,7 +541,7 @@ jobs:
         name: "Update Test Environment"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - buildAndDeploy
@@ -629,7 +653,7 @@ jobs:
         name: "Bump Package Versions"
         timeout-minutes: 5
         runs-on: ubuntu-latest
-        container: node:16.14.2
+        container: ubuntu:20.04
         needs:
             - buildAndDeploy
             - github-release-clients
@@ -637,6 +661,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.14.2"
 
             - name: Install Dependencies
               run: npm ci
