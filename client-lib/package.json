@@ -134,6 +134,7 @@
     "socket.io-msgpack-parser": "^3.0.1",
     "stream-mmmagic": "2.2.0",
     "tar-stream": "^2.2.0",
+    "twitter-api-sdk": "^1.0.7",
     "unbzip2-stream": "^1.4.3",
     "unzipper": "^0.10.11",
     "uuid": "^8.3.2",
