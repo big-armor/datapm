@@ -36,4 +36,18 @@ RUN apt-get install --no-install-recommends --yes wget libappindicator1 fonts-li
 RUN curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb
 RUN dpkg -i google-chrome.deb
 
+# Install gcloud
+# https://cloud.google.com/sdk/docs/install#deb
+RUN apt-get install --no-install-recommends --yes apt-transport-https ca-certificates gnupg
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+RUN apt-get update && apt-get install --no-install-recommends --yes google-cloud-cli
+
+# Install Terraform
+# https://learn.hashicorp.com/tutorials/terraform/install-cli
+RUN apt-get install --no-install-recommends --yes gnupg software-properties-common curl
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+RUN apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+RUN apt-get update && apt-get install --no-install-recommends --yes  terraform
+
 CMD ["sh"]
