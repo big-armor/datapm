@@ -5,10 +5,10 @@
     "typings": "dist/index.d.ts",
     "module": "dist/index.js",
     "scripts": {
-        "clean": "gulp clean",
+        "clean": "npx gulp clean",
         "prebuild": "cd ../client-lib && npm run build && cd ../backend && npm run clean && npm run codegen",
         "build": "tsc",
-        "postbuild": "gulp",
+        "postbuild": "npx gulp",
         "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
         "start": "TYPEORM_IS_DIST=false TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --watch '../client-lib/src' --watch '../lib/src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "prestart-nowatch": "npm run prestart",
@@ -20,7 +20,7 @@
         "test": "TYPEORM_IS_DIST=false mocha --max-old-space-size=8192 -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
         "test:debug": "TYPEORM_IS_DIST=false npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "precodegen": "cd ../client-lib && npm run codegen && cd ../backend",
-        "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
+        "codegen": "npx @graphql-codegen/cli --config codegen.yml && npx @graphql-codegen/cli --config codegen-test.yml"
     },
     "repository": {
         "type": "git",

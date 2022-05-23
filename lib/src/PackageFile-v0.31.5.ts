@@ -2,7 +2,7 @@ import { UpdateMethod } from "./DataHandlingUtil";
 import { DPMConfiguration } from "./main";
 import { DPMPropertyTypes } from "./PackageUtil";
 
-export const CURRENT_PACKAGE_FILE_SCHEMA_URL = "https://datapm.io/docs/package-file-schema-v0.9.0.json";
+export const CURRENT_PACKAGE_FILE_SCHEMA_URL = "https://datapm.io/docs/package-file-schema-v0.31.5.json";
 
 export enum CountPrecision {
     EXACT = "EXACT",
