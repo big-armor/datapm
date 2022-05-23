@@ -14,7 +14,7 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         container: datapm/ci:latest
-        timeout-minutes: 3
+        timeout-minutes: 4
         name: Lint Source Code
         steps:
             - uses: actions/checkout@v2

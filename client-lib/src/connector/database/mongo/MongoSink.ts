@@ -290,10 +290,10 @@ export class MongoSinkModule implements Sink {
                 }
                 if (type === "null") continue;
                 if (type === "object") {
-                    throw new Error("nesting not yet supported!");
+                    throw new Error("object type properties not yet supported for mongo sink");
                 }
                 if (type === "array") {
-                    throw new Error("relationships not yet supported!");
+                    throw new Error("arrays not yet supported for mongo sink!");
                 }
                 if (type === "boolean") {
                     dbSchema[key + typeAppend] = { type: Boolean };
