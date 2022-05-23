@@ -142,7 +142,7 @@ export class DecodableSink implements Sink {
                         name: "connection-name-" + schema.title,
                         configuration,
                         message: "Connection for " + schema.title + " records?",
-                        defaultValue: decodableStreamName
+                        defaultValue: configuration["stream-name-" + schema.title] as string
                     }
                 ];
             }
@@ -650,7 +650,7 @@ export function getDecodableType(types: ValueTypes): string {
     if (type === "object") {
         if (valueStats.objectProperties == null) throw new Error("object type has no defined properties");
 
-        let propertiesString = "Row(";
+        let propertiesString = "ROW(";
 
         const keys = Object.keys(valueStats.objectProperties);
 
