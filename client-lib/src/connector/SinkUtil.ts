@@ -4,7 +4,10 @@ import { SinkDescription } from "./Sink";
 import { asyncMap } from "../util/AsyncUtils";
 
 export async function getSinkDescriptions(): Promise<SinkDescription[]> {
-    const values = await asyncMap(getConnectorDescriptions(), (r) => r.getSinkDescription());
+    const values = await asyncMap(
+        getConnectorDescriptions().filter((r) => r.hasSink()),
+        (r) => r.getSinkDescription()
+    );
 
     return values.filter((f) => f != null) as SinkDescription[];
 }
