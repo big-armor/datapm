@@ -13,13 +13,13 @@
     "npm": ">=8.1.2"
   },
   "scripts": {
-    "prebuild": "cd ../lib && npm run build && cd ../client-lib && gulp prebuild && npm run codegen",
+    "prebuild": "cd ../lib && npm run build && cd ../client-lib && npx gulp prebuild && npm run codegen",
     "build": "tsc",
-    "clean": "gulp clean",
-    "postbuild": "gulp postbuild",
+    "clean": "npx gulp clean",
+    "postbuild": "npx gulp postbuild",
     "pretest": "npm run codegen",
     "precodegen": "cd ../lib && npm run codegen",
-    "codegen": "graphql-codegen --config codegen.yml",
+    "codegen": "npx @graphql-codegen/cli --config codegen.yml",
     "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts src/**./*.spec.ts",
     "test:unit": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register src/**/*.spec.ts",
     "lint": "npm run eslint",
