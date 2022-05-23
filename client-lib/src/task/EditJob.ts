@@ -432,7 +432,7 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
         ]);
         if (confirmContinueResponse.confirm === true) {
             for (const key of keys) {
-                const property = properties[key] as Schema;
+                const property = properties[key];
                 const columnUnitResponse = await jobContext.parameterPrompt([
                     {
                         type: ParameterType.Text,

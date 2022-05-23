@@ -212,7 +212,7 @@ describe("Postgres Source Test", function () {
         const prompts: PromptInput[] = [
             {
                 message: "Repository?",
-                input: "localhost" + KEYS.ENTER
+                input: postgresHost + KEYS.ENTER
             },
             {
                 message: "Credentials?",

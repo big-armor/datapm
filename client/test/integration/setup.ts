@@ -30,7 +30,7 @@ export let databaseIpAddress: string;
 export let databasePortNumber: number;
 export let mailDevWebPortNumber: number;
 let mailDevSMTPPortNumber: number;
-let mailDevIpAddress: string;
+export let mailDevIpAddress: string;
 export const registryServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
@@ -159,9 +159,10 @@ before(async function () {
             {
                 REGISTRY_URL: "http://localhost:" + registryServerPort,
                 PORT: registryServerPort.toString(),
+                TYPEORM_HOST: databaseIpAddress,
                 TYPEORM_PORT: databasePortNumber.toString(),
                 SMTP_PORT: mailDevSMTPPortNumber.toString(),
-                SMTP_SERVER: "localhost",
+                SMTP_SERVER: mailDevIpAddress,
                 SMTP_USER: "",
                 SMTP_PASSWORD: "",
                 SMTP_SECURE: "false",

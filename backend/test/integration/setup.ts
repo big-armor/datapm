@@ -81,6 +81,7 @@ before(async function () {
         .start();
 
     const postgresPortNumber = container.getMappedPort(5432);
+    const postgresIpAddress = container.getContainerIpAddress();
 
     console.log("Postgres started");
 
@@ -105,6 +106,7 @@ before(async function () {
 
     serverProcess = execa("npm", ["run", "start-nowatch"], {
         env: {
+            TYPEORM_HOST: postgresIpAddress,
             TYPEORM_PORT: postgresPortNumber.toString(),
             SMTP_PORT: "1026",
             SMTP_SERVER: "localhost",

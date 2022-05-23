@@ -228,10 +228,10 @@ export abstract class KnexSink implements Sink {
                 }
                 if (type === "null") continue;
                 if (type === "object") {
-                    throw new Error("nesting not yet supported!");
+                    tableBuilder.jsonb(title + typeAppend);
                 }
                 if (type === "array") {
-                    throw new Error("relationships not yet supported!");
+                    tableBuilder.jsonb(title + typeAppend);
                 }
                 if (type === "boolean") {
                     tableBuilder.boolean(title + typeAppend);

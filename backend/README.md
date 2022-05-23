@@ -8,9 +8,9 @@ See the [Private Registry](https://datapm.io/docs/registry) docs on how to run y
 
 You can offer pull requests for this project. Instructions to build and run the project are below.
 
-## Developer Prerequisites:
+## Developer Environment Prerequisites:
 
-1. node 14 or newer
+1. NodeJS 16 or newer
 1. Docker with docker-compose
 
 # Prepare the project
@@ -18,10 +18,11 @@ You can offer pull requests for this project. Instructions to build and run the 
 The following should be done before you start coding and testing.
 
 ```
+# From the root of the project directory
 npm run prepare-dev-environment
 ```
 
-That script builds the lib folder, then links the lib/dist folder to all other sub-projects and builds them. This is required so that the correct copy of the lib is linked to your project. (We're looking for better ways to do this, submit an issue if you have ideas.)
+That script builds the lib folder, then links the lib/dist folder to all other sub-projects and builds them. This is required so that the correct copy of the lib is linked to your project. (We're looking for better ways to do this, submit a PR if you have ideas.)
 
 ## Start Postgres and SMTP Server
 
@@ -57,7 +58,7 @@ The GraphQL playground is available at [http://localhost:4200/graphql]
 
 ## Database Migrations
 
-If you change any of the backend/src/entity files, you will need to create a database migration. These migrations automatically update the postgresql database schemas. To create a migration, use the following command:
+If you change any of the backend/src/entity files, you will need to create a database migration. These migrations automatically update the postgresql database schemas on datapm server start. To create a migration, use the following command:
 
 ```
 npx typeorm migration:create -n CamelCaseMigrationName

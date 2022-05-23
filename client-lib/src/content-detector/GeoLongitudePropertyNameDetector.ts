@@ -1,7 +1,7 @@
 import { DPMPropertyTypes } from "datapm-lib";
 import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
-export const GEO_LONGITUDE_LABEL = "geo_latitude";
+export const GEO_LONGITUDE_LABEL = "geo_longitude";
 
 export class GeoLongitudePropertyNameDetector extends PropertyNameDetectorBase {
     getApplicableTypes(): DPMPropertyTypes[] {
@@ -9,7 +9,7 @@ export class GeoLongitudePropertyNameDetector extends PropertyNameDetectorBase {
     }
 
     getPropertyNameMatches(): RegExp[] {
-        return [/^lat$|latitude/i];
+        return [/^long$|longitude/i];
     }
 
     getLabel(): string {

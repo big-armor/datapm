@@ -1,4 +1,12 @@
-import { ContentLabel, DPMPropertyTypes, DPMRecordValue, Schema, ValueTypeStatistics } from "datapm-lib";
+import {
+    ContentLabel,
+    DPMPropertyTypes,
+    DPMRecordValue,
+    Properties,
+    Property,
+    Schema,
+    ValueTypeStatistics
+} from "datapm-lib";
 import { EmailAddressDetector } from "./EmailContentDetector";
 import { PersonNameDetector } from "./PersonNameDetector";
 import { PhoneNumberDetector } from "./PhoneNumberDetector";
@@ -50,7 +58,7 @@ export const ContentLabelDetectors: Class<ContentLabelDetectorInterface>[] = [
 export interface ContentLabelDetectorInterface {
     getApplicableTypes(): DPMPropertyTypes[];
 
-    /** Given a value, return a list of the labels present
+    /** Inspect the given value, and store any results locally for later use in getContentLabels()
      */
     inspectValue(value: string | number): void;
 
@@ -62,7 +70,7 @@ export interface ContentLabelDetectorInterface {
     isThresholdMet(): boolean;
 
     /** Based on the observed state, and the existing labels applied by the same implementation, return a complete set of content labels that should be applied  */
-    getContentLabels(propertyName: string, existingLabels: ContentLabel[]): ContentLabel[];
+    getContentLabels(propertyName: string): ContentLabel[];
 }
 
 export function getContentLabelDetectorsForValueType(valueType: DPMPropertyTypes): ContentLabelDetectorInterface[] {
@@ -81,13 +89,22 @@ export class ContentLabelDetector {
     /** First level is the property name, second is the value type  */
     contentLabelDetectors: Record<string, Record<string, ContentLabelDetectorInterface[]>>;
 
+    objectLabelDetectors: Record<string, ContentLabelDetector> = {};
+
+    /** returns a content label detector for a given property (which is assumed to have an object valueType) */
+    getObjectLabelDetector(propertyKey: string): ContentLabelDetector {
+        if (this.objectLabelDetectors[propertyKey] == null) {
+            this.objectLabelDetectors[propertyKey] = new ContentLabelDetector();
+        }
+
+        return this.objectLabelDetectors[propertyKey];
+    }
+
     constructor() {
         this.contentLabelDetectors = {};
     }
 
-    inspectValue(_schemaSlug: string, propertyName: string, value: DPMRecordValue): void {
-        const valueType = discoverValueType(value);
-
+    inspectValue(propertyName: string, value: DPMRecordValue, valueType: DPMPropertyTypes): void {
         if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};
 
         if (this.contentLabelDetectors[propertyName][valueType] == null)
@@ -98,7 +115,8 @@ export class ContentLabelDetector {
 
             let inspect = true;
 
-            if (valueTestedCount > 100) inspect = Math.random() < 1 / valueTestedCount;
+            // Inspect first 100 and then randomly inspect the rest, while backing off for performance
+            if (valueTestedCount > 100) inspect = Math.random() < 1 / (valueTestedCount - 99);
 
             try {
                 if (inspect) contentLabelDetector.inspectValue(value as string | number);
@@ -109,52 +127,54 @@ export class ContentLabelDetector {
         }
     }
 
-    /** Applies the detected labels to the schema, while preserving prior labels and their hidden attribute */
-    applyLabelsToSchemas(schemas: Schema[]): void {
-        for (const schema of schemas) {
-            if (schema.properties == null) continue;
+    /** Applies the detected labels to the given properties, while preserving prior labels and their hidden attribute.
+     * Also recurses object properties
+     */
+    applyLabelsToProperties(properties: Properties): void {
+        for (const propertyName of Object.keys(properties)) {
+            const property = properties[propertyName];
 
-            for (const propertyName of Object.keys(schema.properties)) {
-                const property = schema.properties[propertyName];
+            for (const valueType of Object.keys(property.types || {})) {
+                const labels: ContentLabel[] = [];
 
-                if (property.types == null) continue;
+                const contentLabelDetectors = this.contentLabelDetectors[propertyName][valueType];
 
-                for (const valueType of Object.keys(property.types || {})) {
-                    const labels: ContentLabel[] = [];
+                if (contentLabelDetectors == null) continue;
 
-                    const contentLabelDetectors = this.contentLabelDetectors[propertyName][valueType];
-
-                    if (contentLabelDetectors == null) continue;
-
-                    for (const contentLabelDetector of contentLabelDetectors) {
-                        if (!contentLabelDetector.isThresholdMet()) {
-                            continue;
-                        }
-
-                        const existingLabels = (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels;
-
-                        const newLabels = contentLabelDetector.getContentLabels(propertyName, existingLabels || []);
-
-                        for (const newLabel of newLabels) {
-                            if (newLabel.ocurrenceCount === 0) continue;
-
-                            const oldLabel = existingLabels?.find((l) => l.label === newLabel.label);
-
-                            if (oldLabel != null) {
-                                newLabel.hidden = oldLabel.hidden === true ? true : newLabel.hidden;
-                            }
-
-                            labels.push(newLabel);
-                        }
-
-                        for (const oldLabel of existingLabels || []) {
-                            const newLabel = labels.find((l) => l.label === oldLabel.label);
-                            if (newLabel != null) continue;
-                            labels.push(oldLabel);
-                        }
+                for (const contentLabelDetector of contentLabelDetectors) {
+                    if (!contentLabelDetector.isThresholdMet()) {
+                        continue;
                     }
 
-                    (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels = labels;
+                    const existingLabels = (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels;
+
+                    const newLabels = contentLabelDetector.getContentLabels(propertyName);
+
+                    for (const newLabel of newLabels) {
+                        if (newLabel.ocurrenceCount === 0) continue;
+
+                        const oldLabel = existingLabels?.find((l) => l.label === newLabel.label);
+
+                        if (oldLabel != null) {
+                            newLabel.hidden = oldLabel.hidden === true ? true : newLabel.hidden;
+                        }
+
+                        labels.push(newLabel);
+                    }
+
+                    for (const oldLabel of existingLabels || []) {
+                        const newLabel = labels.find((l) => l.label === oldLabel.label);
+                        if (newLabel != null) continue;
+                        labels.push(oldLabel);
+                    }
+                }
+
+                (Object(property.types)[valueType] as ValueTypeStatistics).contentLabels = labels;
+
+                if (valueType === "object") {
+                    this.getObjectLabelDetector(propertyName).applyLabelsToProperties(
+                        property.types.object?.objectProperties || {}
+                    );
                 }
             }
         }

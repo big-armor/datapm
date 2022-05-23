@@ -10,7 +10,9 @@ import {
     SchemaIdentifier,
     RecordStreamContext,
     ParameterType,
-    ValueTypes
+    ValueTypes,
+    ValueTypeStatistics,
+    DPMPropertyTypes
 } from "datapm-lib";
 import { Transform } from "stream";
 import { JobContext } from "../../task/JobContext";
@@ -574,7 +576,7 @@ export class DecodableSink implements Sink {
 
             return {
                 name: property.title,
-                type: this.getDecodableType(property.types)
+                type: getDecodableType(property.types)
             };
         });
 
@@ -587,53 +589,87 @@ export class DecodableSink implements Sink {
 
         return decodableSchema;
     }
+}
 
-    getDecodableType(types: ValueTypes): string {
-        const removedNull = Object.keys(types).filter((t) => t !== "null");
+export function getDecodableType(types: ValueTypes): string {
+    const removedNull = Object.keys(types).filter((t) => t !== "null");
 
-        if (removedNull.length > 1) {
-            throw new Error("Decodable Sink does not support schemas with more than one type");
-        }
-
-        if (removedNull.length === 0) {
-            throw new Error("column has no value types");
-        }
-
-        const type = removedNull[0];
-
-        if (type === "string") {
-            return "STRING";
-        }
-
-        if (type === "number") {
-            // TODO support Double vs. Decimal decision
-            // by comparing max and min value range vs
-            // scale of the number to determine if they would
-            // be outside the range of Decimal (exact). Could
-            // then use double (approximate)
-            const scale = types[type]?.numberMaxScale ?? 0;
-            const precision = 31;
-            return `DECIMAL(${precision},${scale})`;
-        }
-
-        if (type === "integer") {
-            return "BIGINT";
-        }
-
-        if (type === "boolean") {
-            return "BOOLEAN";
-        }
-
-        if (type === "date") {
-            return "DATE";
-        }
-
-        if (type === "date-time") {
-            // Currently sets to TIMESTAMP(3) because
-            // upstream processing converts to javascript Date
-            // object, which automatically truncates to 3 digits
-            return "TIMESTAMP(3)";
-        }
-        throw new Error("Unsupported Decodable Sink: " + removedNull[0]);
+    if (removedNull.length > 1) {
+        throw new Error("Decodable Sink does not support schemas with more than one type");
     }
+
+    if (removedNull.length === 0) {
+        throw new Error("column has no value types");
+    }
+
+    const type = removedNull[0];
+    const valueStats = types[type as DPMPropertyTypes] as ValueTypeStatistics;
+
+    if (valueStats == null) throw new Error("type " + type + " has no statistics");
+
+    if (type === "string") {
+        return "STRING";
+    }
+
+    if (type === "number") {
+        // TODO support Double vs. Decimal decision
+        // by comparing max and min value range vs
+        // scale of the number to determine if they would
+        // be outside the range of Decimal (exact). Could
+        // then use double (approximate)
+        const scale = types[type]?.numberMaxScale ?? 0;
+        const precision = 31;
+        return `DECIMAL(${precision},${scale})`;
+    }
+
+    if (type === "integer") {
+        return "BIGINT";
+    }
+
+    if (type === "boolean") {
+        return "BOOLEAN";
+    }
+
+    if (type === "date") {
+        return "DATE";
+    }
+
+    if (type === "date-time") {
+        // Currently sets to TIMESTAMP(3) because
+        // upstream processing converts to javascript Date
+        // object, which automatically truncates to 3 digits
+        return "TIMESTAMP(3)";
+    }
+
+    if (type === "array") {
+        if (valueStats.arrayTypes == null) throw new Error("array type has no defined array types");
+
+        return "ARRAY<" + getDecodableType(valueStats.arrayTypes) + ">";
+    }
+
+    if (type === "object") {
+        if (valueStats.objectProperties == null) throw new Error("object type has no defined properties");
+
+        let propertiesString = "Row(";
+
+        const keys = Object.keys(valueStats.objectProperties);
+
+        for (let i = 0; i < keys.length; i++) {
+            const propertyKey = keys[i];
+            const property = valueStats.objectProperties[propertyKey];
+            const typeString = getDecodableType(property.types);
+
+            propertiesString += `${propertyKey} ${typeString}`;
+
+            if (property.description != null) propertiesString += `'${property.description}'`;
+
+            if (i < keys.length - 1) propertiesString += ", ";
+        }
+
+        propertiesString += ")";
+
+        return propertiesString;
+    }
+
+    throw new Error("Unsupported type for Decodable Sink: " + removedNull[0]);
 }

@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import { loadPackageFileFromDisk, Properties } from "datapm-lib";
 import execa, { ExecaChildProcess } from "execa";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -452,7 +452,7 @@ describe("Package Command Tests", async () => {
     it("Should honor the excluded and renamed attributes", async function () {
         const packageFile = loadPackageFileFromDisk("package-b.datapm.json");
         const properties = packageFile.schemas[0].properties as Properties;
-        const property = properties["State Name"] as Schema;
+        const property = properties["State Name"];
 
         expect(properties["State Code"].hidden).equal(true);
         expect(properties["State Name"].title).equals("New State Name");

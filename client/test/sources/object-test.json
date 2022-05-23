@@ -1,0 +1,32 @@
+[
+    {
+        "string": "test1",
+        "object": {
+            "subString": "test1",
+            "subInteger": 1,
+            "subObject": {
+                "subSubString": "test1",
+                "subSubDateTime": "2020-01-01T00:00:00Z",
+                "subSubObject": {
+                    "subSubSubString": "test1",
+                    "subSubSubBoolean": true
+                }
+            }
+        }
+    },
+    {
+        "string": "test2",
+        "object": {
+            "subString": "test2",
+            "subInteger": 2,
+            "subObject": {
+                "subSubString": "test2",
+                "subSubDateTime": "2020-01-01T00:00:00Z",
+                "subSubObject": {
+                    "subSubSubString": "test2",
+                    "subSubSubBoolean": true
+                }
+            }
+        }
+    }
+]

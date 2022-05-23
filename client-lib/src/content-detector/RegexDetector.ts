@@ -41,7 +41,7 @@ export abstract class RegexDetector implements ContentLabelDetectorInterface {
         this.valueTestedCount++;
     }
 
-    getContentLabels(_propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
+    getContentLabels(_propertyName: string): ContentLabel[] {
         return [
             {
                 ocurrenceCount: this.ocurrenceCount,

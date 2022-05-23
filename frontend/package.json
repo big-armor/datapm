@@ -18,7 +18,7 @@
         "build": "NODE_OPTIONS=--max-old-space-size=4096 npx ng build --prod",
         "pretest": "npm run codegen",
         "test": "ng test",
-        "test:ci": "npm run codegen && ng test --watch false  --browsers=ChromeHeadless",
+        "test:ci": "npm run codegen && ng test --watch false  --browsers=ChromeHeadlessNoSandbox",
         "lint": "ng lint",
         "e2e": "ng e2e",
         "codegen": "graphql-codegen --config codegen.yml"

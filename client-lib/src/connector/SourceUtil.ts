@@ -132,8 +132,6 @@ export async function generateSchemasFromSourceStreams(
     let nextStreamIndex = 0;
     let currentStreamSummary: StreamSummary | null = null;
 
-    const contentLabelDetector = new ContentLabelDetector();
-
     const moveToNextStream = async function () {
         completedStreamsRecordCount += currentStreamRecordCount;
         completedStreamsInspectedRecordCount += currentStreamInspectedCount;
@@ -182,7 +180,6 @@ export async function generateSchemasFromSourceStreams(
                 return "INSPECT";
             },
             schemas,
-            contentLabelDetector,
             {
                 objectMode: true
             }

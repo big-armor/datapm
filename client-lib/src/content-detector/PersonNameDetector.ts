@@ -36,7 +36,7 @@ export class PersonNameDetector implements ContentLabelDetectorInterface {
         this.valueTestedCount++;
     }
 
-    getContentLabels(_propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
+    getContentLabels(_propertyName: string): ContentLabel[] {
         if (this.foundCount === 0) return [];
 
         return [

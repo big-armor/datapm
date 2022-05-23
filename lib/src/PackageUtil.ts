@@ -14,6 +14,7 @@ import { PackageFile060, Source060 } from "./PackageFile-v0.6.0";
 import { PackageFile070 } from "./PackageFile-v0.7.0";
 import { PackageFile080 } from "./PackageFile-v0.8.0";
 import { PackageFile as PackageFile081 } from "./PackageFile-v0.8.1";
+import { PackageFile as PackageFile090, Properties as Properties090 } from "./PackageFile-v0.9.0";
 import {
     PackageFile,
     PublishMethod,
@@ -22,8 +23,9 @@ import {
     Source,
     StreamSet,
     Properties,
-    ValueTypeStatistics
-} from "./PackageFile-v0.9.0";
+    ValueTypeStatistics,
+    Property
+} from "./PackageFile-v0.31.5";
 import { DATAPM_VERSION } from "./DataPMVersion";
 
 export type DPMPropertyTypes =
@@ -401,6 +403,7 @@ export function compareProperties(priorProperties: Properties, newProperties: Pr
                 pointer: propertyPointer
             });
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const priorSchemaValueTypes = Object.keys(priorProperty.types!);
         const newSchemaValueTypes = Object.keys(newProperty.types ?? []);
 
@@ -431,15 +434,11 @@ export function compareProperties(priorProperties: Properties, newProperties: Pr
                 type: DifferenceType.ADD_PROPERTY,
                 pointer: propertyPointer
             });
-        } else if (
-            priorProperty.properties != null &&
-            priorProperty.types.object != null &&
-            newProperties[newKey].types.object != null
-        ) {
+        } else if (priorProperty.types.object?.objectProperties != null && newProperties[newKey].types.object != null) {
             const changes = compareProperties(
-                priorProperty.properties,
+                priorProperty.types.object.objectProperties,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                newProperties[newKey].properties!,
+                newProperties[newKey].types.object!.objectProperties!,
                 propertyPointer
             );
 
@@ -890,6 +889,32 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         }
     }
 
+    if ((packageFileObject.$schema as string).endsWith("v0.9.0.json")) {
+        packageFileObject.$schema = (packageFileObject.$schema as string).replace("0.9.0", "0.31.5");
+
+        const oldPackageFile = packageFileObject as PackageFile090;
+
+        const recurseProperties = (properties: Properties090): void => {
+            for (const propertyKey of Object.keys(properties)) {
+                const oldProperty = properties[propertyKey];
+                const newProperty = properties[propertyKey] as Property;
+                if (oldProperty.properties != null && oldProperty.types.object != null) {
+                    newProperty.types.object = {
+                        ...oldProperty.types.object,
+                        objectProperties: oldProperty.properties
+                    };
+
+                    recurseProperties(oldProperty.properties);
+                    delete oldProperty.properties;
+                }
+            }
+        };
+
+        for (const schema of oldPackageFile.schemas) {
+            recurseProperties(schema.properties);
+        }
+    }
+
     return packageFileObject as PackageFile;
 }
 
@@ -938,7 +963,7 @@ export function getSchemaVersionFromPackageFile(packageFileObject: any): SemVer 
     if (packageFileSchemaUrl == null)
         packageFileSchemaUrl = "https://datapm.io/docs/datapm-package-file-schema-v0.1.0.json";
 
-    const schemaVersion = packageFileSchemaUrl.match(/package-file-schema-v(.*)\.json/i);
+    const schemaVersion = packageFileSchemaUrl.match(/v(.*)\.json/i);
 
     if (schemaVersion == null) throw new Error("ERROR_SCHEMA_VERSION_NOT_RECOGNIZED - " + packageFileSchemaUrl);
 
