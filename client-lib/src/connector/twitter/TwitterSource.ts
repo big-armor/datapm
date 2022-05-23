@@ -95,6 +95,11 @@ export class TwitterSource implements Source {
                                             break;
                                         }
 
+                                        const geoObject = tweet.data.geo;
+                                        if (geoObject && Object.keys(geoObject).length === 0) {
+                                            delete tweet.data.geo;
+                                        }
+
                                         const recordContext: RecordContext = {
                                             record: tweet.data,
                                             schemaSlug: "tweets",
