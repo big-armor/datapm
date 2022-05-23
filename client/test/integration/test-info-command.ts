@@ -1,11 +1,30 @@
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { resetConfiguration } from "../../src/util/ConfigUtil";
-import { createTestPackage, removePackageFiles, testCmd, TestResults, KEYS, TEST_SOURCE_FILES } from "./test-utils";
+import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
+import { registryServerPort } from "./setup";
+import {
+    createApiKey,
+    createTestPackage,
+    createTestUser,
+    removePackageFiles,
+    testCmd,
+    TestResults,
+    KEYS,
+    TEST_SOURCE_FILES
+} from "./test-utils";
 
 describe("Info Command Tests", async function () {
+    let apiKey = "";
     let packageAFilePath = "";
 
     before(async () => {
+        const userAClient: ApolloClient<NormalizedCacheObject> = await createTestUser();
+        apiKey = await createApiKey(userAClient);
+        addRegistry({
+            url: `http://localhost:${registryServerPort}`,
+            apiKey
+        });
+
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.HTTP1, false, "package-a", "Package A", "", [
             {
                 message: "What does each state-codes record represent?",
@@ -38,6 +57,11 @@ describe("Info Command Tests", async function () {
     });
 
     it("Fetch package info", async function () {
+        addRegistry({
+            url: `http://localhost:${registryServerPort}`,
+            apiKey
+        });
+
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
