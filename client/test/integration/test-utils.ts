@@ -14,7 +14,7 @@ import {
     Scope,
     VerifyEmailAddressDocument
 } from "datapm-client-lib";
-import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
+import { dataServerPort, mailDevIpAddress, mailDevWebPortNumber, registryServerPort } from "./setup";
 import { createAPIKeyFromParts } from "datapm-lib";
 import fetch from "cross-fetch";
 
@@ -171,7 +171,7 @@ export async function createUser(
                 const emailValidationToken = matches[1];
 
                 // Delete the email
-                request.delete(`http://localhost:${mailDevWebPortNumber}/email/${email.id}`);
+                request.delete(`http://${mailDevIpAddress}:${mailDevWebPortNumber}/email/${email.id}`);
 
                 await client.mutate({
                     mutation: VerifyEmailAddressDocument,
@@ -205,7 +205,7 @@ async function getEmail(subject: string, to: string): Promise<Email> {
 
     const startDate = new Date();
     while (emailFound === false) {
-        const response = await request.get("http://localhost:" + mailDevWebPortNumber + "/email");
+        const response = await request.get("http://" + mailDevIpAddress + ":" + mailDevWebPortNumber + "/email");
         const emails = JSON.parse(response.text) as [Email];
 
         for (const email of emails) {
@@ -464,7 +464,7 @@ export async function createTestPackage(
         ]);
         prompts.splice(6, 0, ...unitPrompts);
         await testCmd("package", options, prompts, async (line: string) => {
-            console.log(line);
+            // console.log(line);
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("No matches");
