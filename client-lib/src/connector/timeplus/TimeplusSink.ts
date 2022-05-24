@@ -136,6 +136,9 @@ export class TimeplusSink implements Sink {
 
         const authToken = getAuthToken(credentialsConfiguration);
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this;
+
         return {
             getCommitKeys: () => {
                 return [] as CommitKey[];
@@ -159,12 +162,12 @@ export class TimeplusSink implements Sink {
                         const row = [];
                         for (const key of keys) {
                             const columnName = key;
-                            if (this.hiddenColumns.includes(columnName)) continue;
+                            if (that.hiddenColumns.includes(columnName)) continue;
                             const columnValue = event[key];
                             if (i === 0) {
                                 columns.push(columnName);
                             }
-                            // if (this.columnTypeCache.get(columnName) === "datetime64")
+                            // if (that.columnTypeCache.get(columnName) === "json")
                             row.push(columnValue);
                         }
                         rows.push(row);
@@ -173,6 +176,7 @@ export class TimeplusSink implements Sink {
                         columns: columns,
                         data: rows
                     };
+                    const bodyStr = JSON.stringify(data);
                     const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/streams/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
@@ -183,7 +187,7 @@ export class TimeplusSink implements Sink {
                             "Content-Type": "application/json",
                             Accept: "application/json"
                         },
-                        body: JSON.stringify(data)
+                        body: bodyStr
                     });
 
                     // shall we use 202?
@@ -257,10 +261,10 @@ export class TimeplusSink implements Sink {
 
         stream = listStreamsResponse.find((s) => s.name === timeplusStreamName);
 
+        const timeplusColumns = this.getTimeplusColumns(schema);
+
         if (!stream) {
             task.setMessage("Timeplus Stream " + timeplusStreamName + " does not exist, creating");
-
-            const timeplusColumns = this.getTimeplusColumns(schema);
 
             const requestBody = JSON.stringify({
                 name: timeplusStreamName,
@@ -350,6 +354,8 @@ export class TimeplusSink implements Sink {
                 return "bool";
             case "date-time":
                 return "datetime64";
+            case "object":
+                return "json"; // this is index-time json extraction. For flexible schema, use 'string'
             default:
                 throw new Error("Unsupported Timeplus type: " + removedNull[0]);
         }
