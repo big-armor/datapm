@@ -626,7 +626,8 @@ jobs:
         name: "Bump Package Versions"
         timeout-minutes: 5
         runs-on: ubuntu-latest
-        container: datapm/ci:latest
+        # TODO See note in buildAndDeploy step above
+        # container: datapm/ci:latest
         needs:
             - buildAndDeploy
             - github-release-clients
