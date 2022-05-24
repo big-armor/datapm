@@ -373,7 +373,9 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        container: datapm/ci:latest
+        # TODO would be better if this ran on datapm/ci:latest image
+        # but there's a file system access denied error during the build registry docker container step
+        # container: datapm/ci:latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-windows-intel64
