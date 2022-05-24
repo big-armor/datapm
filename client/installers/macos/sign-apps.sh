@@ -81,10 +81,16 @@ cd installers/macos/macOS-x64
 ./build-macos-x64.sh DataPM $DATAPM_VERSION $BUILD_NUMBER
 cd ../../../
 
+# Import the apple connect api key
+echo ""
+echo "###   Importing apple connect api key"
+echo $MACOS_APPLE_CONNECT_API_KEY | base64 -D > apple-connect-api-key.p8
+xcrun notarytool store-credentials Notarize --key apple-connect-api-key.p8 --key-id $MACOS_APPLE_CONNECT_KEY_ID --issuer $MACOS_APPLE_CONNECT_ISSUER
+
 # Submit the installer for notarization by Apple
 echo ""
 echo "###   Submitting installer for notarization"
-xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id $APPLE_TEAM_ID --wait
+xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --team-id $APPLE_TEAM_ID --progress --wait --keychain-profile "Notarize"
 
 echo ""
 echo "###   Attaching notarization ticket"
