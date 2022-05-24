@@ -467,7 +467,7 @@ jobs:
                   path: dist/client-installers
 
             - name: Build Registry Docker Container
-              run: gulp buildRegistryDockerImage
+              run: npm run build:registryDockerImage
 
             - name: Smoke Test Registry Docker Image
               run: npm run test
