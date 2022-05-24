@@ -376,6 +376,7 @@ jobs:
         # TODO would be better if this ran on datapm/ci:latest image
         # but there's a file system access denied error during the build registry docker container step
         # container: datapm/ci:latest
+        # same for update test environment below
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - build-client-windows-intel64
@@ -512,7 +513,8 @@ jobs:
         name: "Update Test Environment"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        container: datapm/ci:latest
+        # TODO See note in buildAndDeploy step above
+        # container: datapm/ci:latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
             - buildAndDeploy
