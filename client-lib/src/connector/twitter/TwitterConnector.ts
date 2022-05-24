@@ -1,8 +1,8 @@
 import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
-import Client from "twitter-api-sdk";
 import { JobContext } from "../../task/JobContext";
 import { Connector } from "../Connector";
 import { TYPE } from "./TwitterConnectorDescription";
+import { TwitterApi, ETwitterStreamEvent } from "twitter-api-v2";
 
 export class TwitterConnector implements Connector {
     getType(): string {
@@ -68,11 +68,9 @@ export class TwitterConnector implements Connector {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
-        const client = new Client(credentialsConfiguration.bearerToken as string);
+        const client = new TwitterApi(credentialsConfiguration.bearerToken as string);
 
-        const user = await client.tweets.tweetsRecentSearch({
-            query: "datapm"
-        });
+        const user = await client.v2.userByUsername("jack");
 
         if (user.errors) {
             return user.errors.join("\n");

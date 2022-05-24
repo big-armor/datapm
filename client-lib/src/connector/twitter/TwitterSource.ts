@@ -1,10 +1,9 @@
-import { DPMConfiguration, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
-import { PassThrough, Readable } from "stream";
-import Client from "twitter-api-sdk";
+import { DPMConfiguration, DPMRecord, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
+import { PassThrough } from "stream";
 import { JobContext } from "../../task/JobContext";
 import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./TwitterConnectorDescription";
-
+import { TwitterApi, ETwitterStreamEvent } from "twitter-api-v2";
 export class TwitterSource implements Source {
     sourceType(): string {
         return TYPE;
@@ -42,9 +41,33 @@ export class TwitterSource implements Source {
                             name: "tweetStream",
                             updateMethod: UpdateMethod.CONTINUOUS,
                             openStream: async () => {
-                                const client = new Client(credentialsConfiguration.bearerToken as string);
+                                const client = new TwitterApi(credentialsConfiguration.bearerToken as string);
 
-                                const stream = client.tweets.searchStream({
+                                const rules = await client.v2.streamRules();
+
+                                if (rules.data != null) {
+                                    await client.v2.updateStreamRules({
+                                        delete: {
+                                            ids: rules.data?.map((rule) => rule.id as string)
+                                        }
+                                    });
+                                }
+
+                                await client.v2.updateStreamRules({
+                                    add: [
+                                        {
+                                            value: configuration.search as string
+                                        }
+                                    ]
+                                });
+
+                                const returnWritable = new PassThrough({
+                                    objectMode: true
+                                });
+
+                                let stop = false;
+
+                                const stream = await client.v2.searchStream({
                                     "tweet.fields": [
                                         "id",
                                         "created_at",
@@ -61,56 +84,33 @@ export class TwitterSource implements Source {
                                     expansions: ["author_id"]
                                 });
 
-                                const rules = await client.tweets.getRules();
-
-                                if (rules.data != null) {
-                                    await client.tweets.addOrDeleteRules({
-                                        delete: {
-                                            ids: rules.data?.map((rule) => rule.id as string)
-                                        }
-                                    });
-                                }
-
-                                await client.tweets.addOrDeleteRules({
-                                    add: [
-                                        {
-                                            value: configuration.search as string
-                                        }
-                                    ]
-                                });
-
-                                const returnWritable = new PassThrough({
-                                    objectMode: true
-                                });
-
-                                let stop = false;
-
                                 returnWritable.on("close", () => {
                                     stop = true;
+                                    stream.close();
                                 });
 
-                                setTimeout(async () => {
-                                    for await (const tweet of stream) {
-                                        if (stop) {
-                                            break;
-                                        }
-
-                                        const geoObject = tweet.data.geo;
-                                        if (geoObject && Object.keys(geoObject).length === 0) {
-                                            delete tweet.data.geo;
-                                        }
-
-                                        const recordContext: RecordContext = {
-                                            record: tweet.data,
-                                            schemaSlug: "tweets",
-                                            receivedDate: new Date()
-                                        };
-
-                                        if (tweet != null) {
-                                            returnWritable.push(recordContext);
-                                        }
+                                stream.on(ETwitterStreamEvent.Data, (event) => {
+                                    const geoObject = event.data.geo;
+                                    if (geoObject && Object.keys(geoObject).length === 0) {
+                                        delete event.data.geo;
                                     }
-                                }, 1);
+
+                                    const recordContext: RecordContext = {
+                                        record: (event.data as unknown) as DPMRecord,
+                                        schemaSlug: "tweets",
+                                        receivedDate: new Date()
+                                    };
+
+                                    if (event != null) {
+                                        returnWritable.push(recordContext);
+                                    }
+                                });
+
+                                stream.on(ETwitterStreamEvent.ConnectionClosed, () => {
+                                    returnWritable.end();
+                                });
+
+                                stream.autoReconnect = true;
 
                                 return {
                                     stream: returnWritable
