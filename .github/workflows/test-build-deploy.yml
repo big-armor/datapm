@@ -355,8 +355,9 @@ jobs:
                   MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
                   APPLE_DEVELOPER_CERTIFICATE_ID: ${{secrets.APPLE_DEVELOPER_CERTIFICATE_ID}}
                   DATAPM_VERSION: ${{ steps.package-version.outputs.DATAPM_VERSION}}
-                  APPLE_ID: ${{ secrets.APPLE_ID }}
-                  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+                  MACOS_APPLE_CONNECT_KEY_ID: ${{ secrets.MACOS_APPLE_CONNECT_KEY_ID }}
+                  MACOS_APPLE_CONNECT_ISSUER: ${{ secrets.MACOS_APPLE_CONNECT_ISSUER }}
+                  MACOS_APPLE_CONNECT_API_KEY: ${{ secrets.MACOS_APPLE_CONNECT_API_KEY }}
                   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
               run: ./installers/macos/sign-apps.sh
               working-directory: client
