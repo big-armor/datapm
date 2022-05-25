@@ -1,15 +1,9 @@
 import { DPMConfiguration, DPMRecord, ParameterType, RecordContext, UpdateMethod } from "datapm-lib";
-import { EventEmitter, PassThrough, Stream } from "stream";
+import { PassThrough } from "stream";
 import { JobContext } from "../../task/JobContext";
 import { InspectionResults, Source } from "../Source";
 import { TYPE } from "./TwitterConnectorDescription";
-import {
-    TwitterApi,
-    ETwitterStreamEvent,
-    Tweetv2FieldsParams,
-    TweetV2SingleStreamResult,
-    TweetStream
-} from "twitter-api-v2";
+import { TwitterApi, ETwitterStreamEvent, Tweetv2FieldsParams, TweetStream } from "twitter-api-v2";
 
 const streamOptions: Partial<Tweetv2FieldsParams> = {
     "tweet.fields": [
