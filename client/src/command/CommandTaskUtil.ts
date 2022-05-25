@@ -27,7 +27,7 @@ import { getPackage } from "../util/GetPackageUtil";
 export class CLIJobContext extends JobContext {
     currentOraSpinner: ora.Ora | undefined;
 
-    currentTask: Task | undefined;
+    currentTasks: Task[] = [];
 
     parameterCount = 0;
 
@@ -95,10 +95,6 @@ export class CLIJobContext extends JobContext {
     }
 
     async startTask(taskTitle: string): Promise<Task> {
-        if (this.currentTask?.getStatus() === "RUNNING") {
-            this.currentTask.end("SUCCESS");
-        }
-
         let taskStatus: TaskStatus = "RUNNING";
 
         if (this.argv.quiet) {
@@ -110,49 +106,74 @@ export class CLIJobContext extends JobContext {
                 },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setMessage: () => {},
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                clear: () => {}
+                getLastMessage: () => undefined
             };
         }
 
-        // Disable becuase we need to allow for multiple fetches at once, but
-        // dont' currently have a reliable way to do that
-        // So we just show the last one for now
-        // if (this.currentOraSpinner) throw new Error("Trying to start a new task when the old task has not yet ended");
+        if (this.currentTasks.length === 0) {
+            this.currentOraSpinner = this.oraRef.start(taskTitle);
+        }
 
         this.currentOraSpinner = this.oraRef.start(taskTitle);
 
-        this.currentTask = {
+        let currentMessage: string | undefined = taskTitle;
+
+        const currentTask: Task = {
             getStatus: () => taskStatus,
             end: async (status, message) => {
-                if (!this.currentOraSpinner) return;
-
                 taskStatus = status;
 
-                this.currentOraSpinner.text = message || this.currentOraSpinner.text;
-                if (status === "SUCCESS") {
-                    this.currentOraSpinner.succeed();
-                } else {
-                    this.currentOraSpinner.fail();
+                currentMessage = message;
+
+                if (message) {
+                    this.currentOraSpinner?.stop();
+
+                    if (status === "SUCCESS") {
+                        this.oraRef.succeed(message);
+                    } else {
+                        this.oraRef.fail(message);
+                    }
                 }
 
-                this.currentOraSpinner = undefined;
+                this.currentTasks = this.currentTasks.filter((t) => t !== currentTask);
+
+                if (this.currentTasks.length === 0) {
+                    this.currentOraSpinner?.stop();
+                    this.currentOraSpinner = undefined;
+                } else {
+                    this.currentOraSpinner?.start();
+                    this.updateOraRefMessage();
+                }
             },
             setMessage: (message) => {
-                if (!this.currentOraSpinner) return;
+                currentMessage = message || "";
 
-                this.currentOraSpinner.text = message || this.currentOraSpinner.text;
+                this.updateOraRefMessage();
             },
-            clear: () => {
-                this.currentOraSpinner?.clear();
+            getLastMessage(): string | undefined {
+                return currentMessage;
             }
         };
 
-        return this.currentTask;
+        this.currentTasks.push(currentTask);
+
+        return currentTask;
+    }
+
+    updateOraRefMessage(): void {
+        let messageString = "";
+
+        for (const task of this.currentTasks) {
+            messageString += task.getLastMessage() + "\n";
+        }
+
+        if (this.currentOraSpinner) this.currentOraSpinner.text = messageString;
     }
 
     print(type: string, message: string): void {
         if (this.argv.quiet) return;
+
+        if (this.currentOraSpinner) this.currentOraSpinner.stop();
 
         switch (type) {
             case "ERROR":
@@ -179,6 +200,8 @@ export class CLIJobContext extends JobContext {
             case "NONE":
                 console.log(message);
         }
+
+        if (this.currentOraSpinner) this.currentOraSpinner.start();
     }
 
     log(_message: string): void {

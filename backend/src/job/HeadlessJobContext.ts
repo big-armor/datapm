@@ -51,8 +51,8 @@ export class HeadlessJobContext extends BackendJobContextBase{
         let taskStatus:TaskStatus = "RUNNING";
         this.log("INFO", "task started: " + message);
         return {
-            clear: () => {
-                // Nothing to do
+            getLastMessage: () => {
+                return undefined
             },
             end: async (taskStatus: TaskStatus, message:string, error: Error) => {
                 this.log("INFO","task ended: " + message);

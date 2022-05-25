@@ -29,6 +29,8 @@ import { UsernamePipe } from "./pipes/username.pipe";
 import { CoverComponent } from "./cover/cover.component";
 import { PercentPipe } from "./pipes/percent.pipe";
 import { ValuesPipe } from "./pipes/values.pipe";
+import { KeysPipe } from "./pipes/keys.pipe";
+import { EntriesPipe } from "./pipes/entries.pipe";
 import { SortByPipe } from "./pipes/sort.pipe";
 import { InputComponent } from "./input/input.component";
 import { InputErrorPipe } from "./pipes/input-error.pipe";
@@ -92,6 +94,8 @@ import { UpdateMethodPipe } from "../package/pipes/update-method.pipe";
         CoverComponent,
         PercentPipe,
         ValuesPipe,
+        KeysPipe,
+        EntriesPipe,
         SortByPipe,
         InputComponent,
         InputErrorPipe,
@@ -170,6 +174,8 @@ import { UpdateMethodPipe } from "../package/pipes/update-method.pipe";
         CoverComponent,
         PercentPipe,
         ValuesPipe,
+        KeysPipe,
+        EntriesPipe,
         SortByPipe,
         TruncatePipe,
         InputComponent,

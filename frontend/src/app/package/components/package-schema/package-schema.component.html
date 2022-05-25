@@ -51,68 +51,68 @@
                         </div>
                         <div
                             class="d-flex align-items-center justify-content-between"
-                            *ngFor="let type of property.types | values"
-                            [ngSwitch]="type.valueType"
+                            *ngFor="let entry of property.types | entries"
+                            [ngSwitch]="entry.key"
                         >
                             <div *ngSwitchCase="'number'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                                      
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} ({{
-                                                type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                                entry.value.recordCount / schema.recordCount | percent
                                             }}) {{ schema.unit }} records
                                         </li>
                                         <li *ngIf="property.unit">unit: {{ property.unit }}</li>
-                                        <li>max value: {{ type.numberMaxValue | number }}</li>
-                                        <li>min value: {{ type.numberMinValue | number }}</li>
+                                        <li>max value: {{ entry.value.numberMaxValue | number }}</li>
+                                        <li>min value: {{ entry.value.numberMinValue | number }}</li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div *ngSwitchCase="'integer'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                             
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} ({{
-                                            type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                            entry.value.recordCount / schema.recordCount | percent
                                             }}) {{ schema.unit }} records
                                         </li>
                                         <li *ngIf="property.unit">unit: {{ property.unit }}</li>
-                                        <li>max value: {{ type.numberMaxValue | number }}</li>
-                                        <li>min value: {{ type.numberMinValue | number }}</li>
+                                        <li>max value: {{ entry.value.numberMaxValue | number }}</li>
+                                        <li>min value: {{ entry.value.numberMinValue | number }}</li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div *ngSwitchCase="'boolean'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} ({{
-                                                type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                                entry.value.recordCount / schema.recordCount | percent
                                             }}) records
                                         </li>
                                     </ul>
@@ -121,17 +121,17 @@
 
                             <div *ngSwitchCase="'null'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} ({{
-                                                type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                                entry.value.recordCount / schema.recordCount | percent
                                             }}) records
                                         </li>
                                     </ul>
@@ -140,26 +140,26 @@
 
                             <div *ngSwitchCase="'string'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} records ({{
-                                                type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} records ({{
+                                                entry.value.recordCount / schema.recordCount | percent
                                             }}
                                             of total)
                                         </li>
-                                        <li>max length: {{ type.stringMaxLength | number }} characters</li>
-                                        <li>min length: {{ type.stringMinLength | number }} characters</li>
-                                        <li *ngIf="type.stringOptions">
+                                        <li>max length: {{ entry.valuestringMaxLength | number }} characters</li>
+                                        <li>min length: {{ entry.valuestringMinLength | number }} characters</li>
+                                        <li *ngIf="entry.valuestringOptions">
                                             enumerated values:
                                             <ul>
-                                                <li *ngFor="let value of stringOptions(type.stringOptions)">
+                                                <li *ngFor="let value of stringOptions(entry.valuestringOptions)">
                                                     {{ value.name }}: {{ value.value | number }} record<span
                                                         *ngIf="value.value > 1"
                                                         >s</span
@@ -173,21 +173,42 @@
 
                             <div *ngSwitchCase="'date'">
                                 <div class="text-dark-gray">
-                                    <div class="weight-500">{{ type.valueType }}</div>
+                                    <div class="weight-500">{{ entry.key }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(type).length">
+                                        <li *ngIf="getPropertyChips(entry.value).length">
                                             content labels:
-                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
                                                 cl.label
                                                 }}</mat-chip>
                                         </li>
                                         <li>
-                                            present in {{ type.recordCount | number }} ({{
-                                                type.recordCount / schema.recordCount | percent
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                                entry.value.recordCount / schema.recordCount | percent
                                             }}) records
                                         </li>
-                                        <li>max date: {{ type.dateMaxValue | date }}</li>
-                                        <li>min date: {{ type.dateMinValue | date }}</li>
+                                        <li>max date: {{ entry.value.dateMaxValue | date }}</li>
+                                        <li>min date: {{ entry.value.dateMinValue | date }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'date-time'">
+                                <div class="text-dark-gray">
+                                    <div class="weight-500">{{ entry.key }}</div>
+                                    <ul>
+                                        <li *ngIf="getPropertyChips(entry.value).length">
+                                            content labels:
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
+                                                cl.label
+                                                }}</mat-chip>
+                                        </li>
+                                        <li>
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                            entry.value.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                        <li>max date: {{ entry.value.dateMaxValue | date:'long' }}</li>
+                                        <li>min date: {{ entry.value.dateMinValue | date:'long' }}</li>
                                     </ul>
                                 </div>
                             </div>
