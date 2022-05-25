@@ -1,3 +1,9 @@
+#### 0.31.11 (2022-05-25)
+
+##### Bug Fixes
+
+*  Fixed task messages being hidden ([#486](https://github.com/big-armor/datapm/pull/486)) ([60e74682](https://github.com/big-armor/datapm/commit/60e74682bc6ff9a1ee6dc3192a255e56710a20ef))
+
 #### 0.31.10 (2022-05-24)
 
 #### 0.31.9 (2022-05-24)
