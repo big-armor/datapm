@@ -53,6 +53,7 @@ export interface FetchPackageJobResult {
     // For fetching from a package that requires additional
     // source configuration
     packageSourceConnectionConfiguration: { [sourceSlug: string]: DPMConfiguration };
+    packageSourceCredentialsConfiguration: { [sourceSlug: string]: string };
     packageSourceConfiguration: { [sourceSlug: string]: DPMConfiguration };
 
     excludedSchemaProperties: { [key: string]: string[] };
@@ -72,6 +73,7 @@ export class FetchArguments {
     forceUpdate?: boolean;
 
     packageSourceConnectionConfig?: string;
+    packageSourceCredentialsConfig?: string;
     packageSourceConfig?: string;
 
     sourceConnectionConfig?: string;
@@ -408,6 +410,10 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.args.packageSourceConnectionConfig ?? "{}"
         );
 
+        const packageSourceCredentialConfig: { [sourceSlug: string]: string } = JSON.parse(
+            this.args.packageSourceCredentialsConfig ?? "{}"
+        );
+
         for (const source of packageFile.sources) {
             this.jobContext.setCurrentStep("Inspecting " + source.slug);
 
@@ -419,10 +425,18 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 };
             }
 
+            if (packageSourceCredentialConfig[source.slug] != null) {
+                source.credentialsIdentifier = packageSourceCredentialConfig[source.slug];
+            }
+
             const inspectionResult = await inspectSourceConnection(this.jobContext, source, this.args.defaults);
 
             if (Object.keys(inspectionResult.additionalConnectionConfiguration).length > 0) {
                 packageSourceConnectionConfig[source.slug] = inspectionResult.additionalConnectionConfiguration;
+            }
+
+            if (inspectionResult.credentialsIdentifier) {
+                packageSourceCredentialConfig[source.slug] = inspectionResult.credentialsIdentifier;
             }
 
             if (Object.keys(inspectionResult.additionalConfiguration).length > 0) {
@@ -468,6 +482,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         if (sinkType == null) {
             throw new Error("Sink type is required");
         }
+
+        if (sinkType === "stdout") this.args.quiet = true;
 
         // Prompt parameters
         let sinkConnectionConfiguration: DPMConfiguration = {};
@@ -630,6 +646,20 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.jobContext.print("ERROR", `Recieved ${interupted}, stopping early.`);
         }
 
+        const sinkCredentialsIdentifier = sinkConnector.requiresCredentialsConfiguration()
+            ? await sinkConnector.getCredentialsIdentifierFromConfiguration(
+                  sinkConnectionConfiguration,
+                  sinkCredentialsConfiguration
+              )
+            : undefined;
+
+        /*         const sourceCredentialsIdentifier = sourceConnec.requiresCredentialsConfiguration()
+            ? await sinkConnector.getCredentialsIdentifierFromConfiguration(
+                  sinkConnectionConfiguration,
+                  sinkCredentialsConfiguration
+              )
+            : undefined; */
+
         return {
             exitCode: 0,
             result: {
@@ -641,7 +671,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 sinkRepositoryIdentifier: sinkConnector.userSelectableConnectionHistory()
                     ? obtainSinkConfigurationResult.repositoryIdentifier
                     : undefined,
-                sinkCredentialsIdentifier: obtainCredentialsConfigurationResult.credentialsIdentifier,
+                sinkCredentialsIdentifier,
                 sourceConnectionConfiguration: this.args.sourceConnectionConfig
                     ? JSON.parse(this.args.sourceConnectionConfig)
                     : undefined,
@@ -651,8 +681,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 excludedSchemaProperties,
                 renamedSchemaProperties,
 
-                packageSourceConfiguration: packageSourceConfig,
-                packageSourceConnectionConfiguration: packageSourceConnectionConfig
+                packageSourceConnectionConfiguration: packageSourceConnectionConfig,
+                packageSourceCredentialsConfiguration: packageSourceCredentialConfig,
+                packageSourceConfiguration: packageSourceConfig
             }
         };
     }

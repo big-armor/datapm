@@ -76,6 +76,12 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             )}' `;
         }
 
+        if (Object.values(jobResult.result.packageSourceCredentialsConfiguration).length > 0) {
+            command += `--packageSourceCredentialsConfig '${JSON.stringify(
+                jobResult.result.packageSourceCredentialsConfiguration
+            )}' `;
+        }
+
         if (Object.values(jobResult.result.packageSourceConfiguration).find((v) => Object.keys(v).length > 0) != null) {
             command += `--packageSourceConfig '${JSON.stringify(jobResult.result.packageSourceConfiguration)}' `;
         }

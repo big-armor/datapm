@@ -59,6 +59,7 @@ export interface RecordStreamEventContext {
 
 type InternalSourceInspectionResults = InspectionResults & {
     additionalConnectionConfiguration: DPMConfiguration;
+    credentialsIdentifier: string | undefined;
     additionalConfiguration: DPMConfiguration;
 };
 
@@ -160,6 +161,8 @@ export async function inspectSourceConnection(
     return {
         ...inspectionResults,
         additionalConnectionConfiguration,
+        credentialsIdentifier:
+            userCredentialsResponse !== false ? userCredentialsResponse.credentialsIdentifier : undefined,
         additionalConfiguration
     };
 }

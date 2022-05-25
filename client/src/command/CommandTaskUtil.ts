@@ -95,6 +95,8 @@ export class CLIJobContext extends JobContext {
     }
 
     async startTask(taskTitle: string): Promise<Task> {
+        let taskStatus: TaskStatus = "RUNNING";
+
         if (this.argv.quiet) {
             return {
                 getStatus: () => taskStatus,
@@ -111,13 +113,6 @@ export class CLIJobContext extends JobContext {
         if (this.currentTasks.length === 0) {
             this.currentOraSpinner = this.oraRef.start(taskTitle);
         }
-
-        let taskStatus: TaskStatus = "RUNNING";
-
-        // Disable becuase we need to allow for multiple fetches at once, but
-        // dont' currently have a reliable way to do that
-        // So we just show the last one for now
-        // if (this.currentOraSpinner) throw new Error("Trying to start a new task when the old task has not yet ended");
 
         this.currentOraSpinner = this.oraRef.start(taskTitle);
 

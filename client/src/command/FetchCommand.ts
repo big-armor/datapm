@@ -48,6 +48,9 @@ export class FetchCommand implements Command {
                     .option("packageSourceConnectionConfig", {
                         type: "string"
                     })
+                    .option("packageSourceCredentialsConfig", {
+                        type: "string"
+                    })
                     .option("packageSourceConfig", {
                         type: "string"
                     })
