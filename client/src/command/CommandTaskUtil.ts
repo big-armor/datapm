@@ -104,7 +104,7 @@ export class CLIJobContext extends JobContext {
                 },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setMessage: () => {},
-                getMessage: () => undefined
+                getLastMessage: () => undefined
             };
         }
 
@@ -155,7 +155,7 @@ export class CLIJobContext extends JobContext {
 
                 this.updateOraRefMessage();
             },
-            getMessage(): string | undefined {
+            getLastMessage(): string | undefined {
                 return currentMessage;
             }
         };
@@ -169,7 +169,7 @@ export class CLIJobContext extends JobContext {
         let messageString = "";
 
         for (const task of this.currentTasks) {
-            messageString += task.getMessage() + "\n";
+            messageString += task.getLastMessage() + "\n";
         }
 
         if (this.currentOraSpinner) this.currentOraSpinner.text = messageString;

@@ -64,6 +64,7 @@ export class WebsocketJobContext extends BackendJobContextBase {
         request.message = message;
 
         let taskStatus:TaskStatus = "RUNNING";
+        let lastMessage: string | undefined;
 
         const task: Task = {
             getStatus: () => {
@@ -90,12 +91,12 @@ export class WebsocketJobContext extends BackendJobContextBase {
 
                 const request = new JobMessageRequest(JobRequestType.TASK_UPDATE);
                 request.message = message;
+                lastMessage = message;
 
                 this.socket.emit(this.channelName, request);
             },
-            clear: (): void =>  {
-                const request = new JobMessageRequest(JobRequestType.CLEAR_TASK);
-                this.socket.emit(this.channelName, request);
+            getLastMessage: () =>  {
+                return lastMessage
             }
         }
 

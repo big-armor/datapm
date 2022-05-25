@@ -9,7 +9,7 @@ export interface Task {
 
     setMessage(message?: string): void;
 
-    getMessage(): string | undefined;
+    getLastMessage(): string | undefined;
 
     /** After calling end, setStatus should never be called. */
     end(status: TaskStatus, message?: string, error?: Error): Promise<void>;
