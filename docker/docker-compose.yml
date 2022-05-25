@@ -37,5 +37,7 @@ services:
             - POSTGRES_PASSWORD=postgres
     smtp:
         image: namshi/smtp:latest
-        ports:
-            - "1025:25"
+        environment:
+            # This is ok, because the SMTP server is not exposed outside the docker network
+            # 0.0.0.0/0 is used because the docker engine can assign any network
+            - RELAY_NETWORKS=:0.0.0.0/0 
