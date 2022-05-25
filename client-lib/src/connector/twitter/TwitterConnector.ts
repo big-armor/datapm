@@ -31,6 +31,8 @@ export class TwitterConnector implements Connector {
     ): Promise<string | undefined> {
         const bearerToken = credentialsConfiguration.bearerToken as string;
 
+        if (bearerToken == null) return undefined;
+
         return bearerToken.substring(0, 5) + "..." + bearerToken.substring(bearerToken.length - 5);
     }
 
