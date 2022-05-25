@@ -483,8 +483,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             throw new Error("Sink type is required");
         }
 
-        if (sinkType === "stdout") this.args.quiet = true;
-
         // Prompt parameters
         let sinkConnectionConfiguration: DPMConfiguration = {};
         let sinkCredentialsConfiguration: DPMConfiguration = {};
