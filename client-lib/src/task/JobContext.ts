@@ -192,6 +192,9 @@ export class SilentJobContext extends JobContext {
             },
             setMessage: () => {
                 // do nothing
+            },
+            getMessage: () => {
+                return undefined;
             }
         });
     }

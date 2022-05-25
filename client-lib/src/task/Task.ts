@@ -9,11 +9,10 @@ export interface Task {
 
     setMessage(message?: string): void;
 
+    getMessage(): string | undefined;
+
     /** After calling end, setStatus should never be called. */
     end(status: TaskStatus, message?: string, error?: Error): Promise<void>;
-
-    /** Removes the spinner */
-    clear(): void;
 
     // addSubTask(message: string): Task;
 }
