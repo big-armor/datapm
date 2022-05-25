@@ -43,7 +43,7 @@ services:
       - TYPEORM_SCHEMA=public
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
-      - SMTP_SERVER=localhost
+      - SMTP_SERVER=smtp
       - SMTP_PORT=25
       - SMTP_USER=
       - SMTP_PASSWORD=
@@ -68,8 +68,9 @@ services:
       - POSTGRES_PASSWORD=postgres
   smtp:
     image: namshi/smtp:latest
-    ports:
-        - "25:25"
+    environment:
+        - RELAY_NETWORKS=:0.0.0.0/0
+
 
 ```
 
