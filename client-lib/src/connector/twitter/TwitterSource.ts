@@ -111,7 +111,7 @@ export class TwitterSource implements Source {
 
                                     stream = await client.v2.searchStream(streamOptions);
                                 } else if (configuration.streamType === "sample") {
-                                    stream = await client.v2.sampleStream();
+                                    stream = await client.v2.sampleStream(streamOptions);
                                 } else {
                                     throw new Error("Unknown stream type " + configuration.streamType);
                                 }
