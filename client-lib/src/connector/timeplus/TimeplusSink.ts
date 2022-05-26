@@ -168,7 +168,11 @@ export class TimeplusSink implements Sink {
                                 columns.push(columnName);
                             }
                             // if (that.columnTypeCache.get(columnName) === "json")
-                            row.push(columnValue);
+                            if (columnValue == null) {
+                                row.push(""); // set an empty string
+                            } else {
+                                row.push(columnValue);
+                            }
                         }
                         rows.push(row);
                     }
@@ -192,9 +196,9 @@ export class TimeplusSink implements Sink {
 
                     // shall we use 202?
                     if (response.status !== 200) {
-                        callback(
-                            new Error(`Unexpected response status ${response.status} body ${await response.text()}`)
-                        );
+                        const msg = `Unexpected response status ${response.status} body ${await response.text()}`;
+                        // console.log(bodyStr);
+                        callback(new Error(msg));
                         return;
                     }
 
@@ -347,15 +351,17 @@ export class TimeplusSink implements Sink {
             case "string":
                 return "string";
             case "integer":
-                return "int";
+                return "string"; // int
             case "number":
                 return "double";
             case "boolean":
                 return "bool";
             case "date-time":
-                return "datetime64";
+                return "string"; // datetime64
             case "object":
-                return "json"; // this is index-time json extraction. For flexible schema, use 'string'
+                return "string"; // use 'string' for more flexible schemas. 'json' type for index-time json extraction (fixed schema, cannot be null)
+            case "array":
+                return "string"; // need further test
             default:
                 throw new Error("Unsupported Timeplus type: " + removedNull[0]);
         }
