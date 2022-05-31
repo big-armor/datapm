@@ -167,9 +167,11 @@ export class TimeplusSink implements Sink {
                             if (i === 0) {
                                 columns.push(columnName);
                             }
-                            // if (that.columnTypeCache.get(columnName) === "json")
-                            if (columnValue == null) {
-                                row.push(""); // set an empty string
+                            if (columnValue == null || Object.keys(columnValue).length === 0) {
+                                row.push(" "); // set an empty string if the value is null or an empty json object
+                            } else if (typeof columnValue === "object") {
+                                // if (that.columnTypeCache.get(columnName) === "json")
+                                row.push(JSON.stringify(columnValue));
                             } else {
                                 row.push(columnValue);
                             }
@@ -197,11 +199,11 @@ export class TimeplusSink implements Sink {
                     // shall we use 202?
                     if (response.status !== 200) {
                         const msg = `Unexpected response status ${response.status} body ${await response.text()}`;
+                        jobContext.print("WARN", `Fail to ingest data in batch, with error message: ${msg}`);
                         // console.log(bodyStr);
-                        callback(new Error(msg));
-                        return;
+                        // callback(new Error(msg));
+                        // return;
                     }
-
                     callback(null, records[records.length - 1]);
                 }
             })
