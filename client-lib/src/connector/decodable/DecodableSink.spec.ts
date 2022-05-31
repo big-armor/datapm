@@ -33,7 +33,7 @@ describe("Decodable Sink Unit Tests", () => {
         };
 
         const decodableType = getDecodableType(properties.topObject.types);
-        expect(decodableType).equal("Row(subObject Row(intValue BIGINT))");
+        expect(decodableType).equal("ROW(subObject ROW(intValue BIGINT))");
     });
 
     it("can create array schemas", () => {
@@ -101,6 +101,6 @@ describe("Decodable Sink Unit Tests", () => {
         };
 
         const decodableType = getDecodableType(properties.topObject.types);
-        expect(decodableType).equal("Row(arrayOfObjects ARRAY<Row(intValue BIGINT)>)");
+        expect(decodableType).equal("ROW(arrayOfObjects ARRAY<ROW(intValue BIGINT)>)");
     });
 });
