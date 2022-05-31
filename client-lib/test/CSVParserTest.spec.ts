@@ -55,22 +55,24 @@ describe("Checking transforms", () => {
 
         expect(chunks[0][0].record).to.include({
             String: "string1",
-            Boolean: "true",
-            BigInt: "1000000000",
-            Integer: "100000",
-            Float: "1000.00",
-            Date: "2020/11/11",
-            DateTime: "2020-11-11 11:11"
+            Boolean: true,
+            BigInt: 1000000000,
+            Integer: 100000,
+            Float: 1000.0
         });
+
+        expect((chunks[0][0].record.Date as Date).toISOString()).equal("2020-11-11T00:00:00.000Z");
+        expect((chunks[0][0].record.DateTime as Date).toISOString()).equal("2020-11-11T11:11:00.000Z");
 
         expect(chunks[0][1].record).to.include({
             String: "string2",
-            Boolean: "false",
-            BigInt: "1000000001",
-            Integer: "100001",
-            Float: "1000.01",
-            Date: "2020/11/12",
-            DateTime: "2020-11-11 11:12"
+            Boolean: false,
+            BigInt: 1000000001,
+            Integer: 100001,
+            Float: 1000.01
         });
+
+        expect((chunks[0][1].record.Date as Date).toISOString()).equal("2020-11-12T00:00:00.000Z");
+        expect((chunks[0][1].record.DateTime as Date).toISOString()).equal("2020-11-11T11:12:00.000Z");
     });
 });

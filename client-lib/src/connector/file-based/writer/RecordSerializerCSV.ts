@@ -78,6 +78,11 @@ export class RecordSerializerCSV implements DPMRecordSerializer {
         const options = {
             delimiter: configuration.delimeter?.toString() || ",",
             quoted: configuration.quotes as boolean,
+            cast: {
+                date: (value: Date) => {
+                    return value.toISOString();
+                }
+            },
             header: (configuration.headers as boolean) === true && updateMethod === UpdateMethod.BATCH_FULL_SET
         };
 

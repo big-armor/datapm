@@ -440,11 +440,11 @@ function createStreamAndTransformPipeLine(
                             chunk.recordContext.record[title] as string,
                             deconflictOption
                         );
-                        if (deconflictedValue === null) {
+                        if (deconflictedValue.skipRecord === true) {
                             shouldSkip = true;
                             break;
                         } else {
-                            chunk.recordContext.record[title] = deconflictedValue;
+                            chunk.recordContext.record[title] = deconflictedValue.value;
                         }
                     }
                     if (!shouldSkip) {
@@ -549,6 +549,12 @@ export function getDeconflictChoices(valueTypes: DPMPropertyTypes[]): ParameterO
             DeconflictOptions.CAST_TO_DOUBLE,
             DeconflictOptions.ALL
         ],
+
+        "date-time,string": [
+            DeconflictOptions.CAST_TO_DATE_TIME,
+            DeconflictOptions.CAST_TO_STRING,
+            DeconflictOptions.ALL
+        ],
         // DATE
         "date,integer": [
             DeconflictOptions.CAST_TO_INTEGER,
@@ -627,13 +633,18 @@ export function updateSchemaWithDeconflictOptions(
                 [nonStringPropertyType]: Object(property.types)[nonStringPropertyType]
             };
         } else {
-            const preservedValueType = Object(property.types)[deconflictOption.toString()];
-
             const rule = deconflictRules[deconflictOption];
 
             if (rule == null) {
                 throw new Error("Could not find rule for deconflict option: " + deconflictOption);
             }
+
+            const preservedValueType = Object(property.types)[rule];
+
+            if (preservedValueType == null) {
+                throw new Error(`Could not find preserved value type for property with title: ${title}`);
+            }
+
             property.types = {
                 [rule]: preservedValueType
             };
@@ -641,63 +652,111 @@ export function updateSchemaWithDeconflictOptions(
     }
 }
 
-export function resolveConflict(value: DPMRecordValue, deconflictOption: DeconflictOptions): DPMRecordValue {
-    if (value === "null") return value;
-    if (value == null) return value;
+/** return false if the entire record should be skipped */
+export function resolveConflict(
+    value: DPMRecordValue,
+    deconflictOption: DeconflictOptions
+): { skipRecord: boolean; value: DPMRecordValue } {
+    if (value === "null") return { skipRecord: false, value: null };
+    if (value == null) return { skipRecord: false, value: null };
 
-    if (deconflictOption === DeconflictOptions.ALL) return value;
+    if (deconflictOption === DeconflictOptions.ALL) return { skipRecord: false, value };
     const valueType = discoverValueType(value);
     const typeConvertedValue = convertValueByValueType(value, valueType);
     if (deconflictOption === DeconflictOptions.SKIP) {
-        if (valueType !== "string") return value; // Why is this here?
-        return null;
+        if (valueType !== "string") return { skipRecord: false, value };
+        return { skipRecord: true, value };
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_NULL) {
-        if (valueType !== "string") return value;
-        return "null";
+        if (valueType !== "string") return { skipRecord: false, value };
+        return { skipRecord: false, value: null };
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_BOOLEAN) {
-        if (valueType === "boolean") return typeConvertedValue;
-        if (valueType === "number" || valueType === "integer") return ((typeConvertedValue as number) > 0).toString();
+        if (valueType === "boolean") return { skipRecord: false, value: typeConvertedValue };
+        if (valueType === "number" || valueType === "integer")
+            return { skipRecord: false, value: ((typeConvertedValue as number) > 0).toString() };
+        if (valueType === "string") {
+            const convertedValue = convertValueByValueType(value, "boolean");
+            return { skipRecord: false, value: convertedValue };
+        }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_INTEGER) {
-        if (valueType === "integer") return value;
-        if (valueType === "number") return Math.round(typeConvertedValue as number);
-        if (valueType === "boolean") return typeConvertedValue ? "1" : "0";
+        if (valueType === "integer") return { skipRecord: false, value: typeConvertedValue };
+        if (valueType === "number") return { skipRecord: false, value: Math.round(typeConvertedValue as number) };
+        if (valueType === "boolean") return { skipRecord: false, value: typeConvertedValue ? "1" : "0" };
         if (valueType === "date") {
-            return (typeConvertedValue as Date).getTime().toString();
+            return { skipRecord: false, value: (typeConvertedValue as Date).getTime().toString() };
+        }
+        if (valueType === "string") {
+            const convertedValue = convertValueByValueType(value, "integer");
+            return { skipRecord: false, value: convertedValue };
         }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DOUBLE) {
-        if (valueType === "number") return value;
-        if (valueType === "boolean") return typeConvertedValue ? "1.0" : "0.0";
-        if (valueType === "integer") return `${typeConvertedValue}.0`;
+        if (valueType === "number") return { skipRecord: false, value };
+        if (valueType === "boolean") return { skipRecord: false, value: typeConvertedValue ? "1.0" : "0.0" };
+        if (valueType === "integer") return { skipRecord: false, value: `${typeConvertedValue}.0` };
+        if (valueType === "string") {
+            const convertedValue = convertValueByValueType(value, "number");
+            return { skipRecord: false, value: convertedValue };
+        }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE) {
-        if (valueType === "date-time" || valueType === "date") return value;
+        if (valueType === "date-time" || valueType === "date") return { skipRecord: false, value: typeConvertedValue };
         if (valueType === "integer")
-            return moment(new Date(typeConvertedValue as number))
-                .utc()
-                .format("YYYY-MM-DD");
+            return {
+                skipRecord: false,
+                value: moment(new Date(typeConvertedValue as number))
+                    .utc()
+                    .toDate()
+            };
+
+        if (valueType === "string") {
+            const stringTypeConveredValue: Date | null = convertValueByValueType(value, "date") as Date | null;
+
+            if (stringTypeConveredValue == null) return { skipRecord: false, value: null };
+
+            const momentValue = moment(stringTypeConveredValue as Date);
+
+            if (!momentValue.isValid()) return { skipRecord: false, value: null };
+
+            return { skipRecord: false, value: momentValue.utc().toDate() };
+        }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_DATE_TIME) {
-        if (valueType === "date-time" || valueType === "date") return value;
+        if (valueType === "date-time" || valueType === "date") return { skipRecord: false, value: typeConvertedValue };
         if (valueType === "integer")
-            return moment(new Date(typeConvertedValue as number))
-                .utc()
-                .format("YYYY-MM-DD HH:mm:ssZ");
+            return {
+                skipRecord: false,
+                value: moment(new Date(typeConvertedValue as number))
+                    .utc()
+                    .toDate()
+            };
+
+        if (valueType === "string") {
+            const stringTypeConveredValue: Date | null = convertValueByValueType(value, "date") as Date | null;
+
+            if (stringTypeConveredValue == null) return { skipRecord: false, value: null };
+
+            const momentValue = moment(stringTypeConveredValue as Date);
+
+            if (!momentValue.isValid()) return { skipRecord: false, value: null };
+
+            return { skipRecord: false, value: momentValue.utc().toDate() };
+        }
     }
     if (deconflictOption === DeconflictOptions.CAST_TO_STRING) {
-        if (valueType === "null") return "null";
-        if (valueType === "boolean") return typeConvertedValue ? "true" : "false";
+        if (valueType === "string") return { skipRecord: false, value };
+        if (valueType === "null") return { skipRecord: false, value: null };
+        if (valueType === "boolean") return { skipRecord: false, value: typeConvertedValue ? "true" : "false" };
         if (isDate(typeConvertedValue as string)) {
-            return (typeConvertedValue as Date).toISOString();
+            return { skipRecord: false, value: (typeConvertedValue as Date).toISOString() };
         }
-        if (valueType === "object") return JSON.stringify(typeConvertedValue);
-        if (valueType === "array") return JSON.stringify(typeConvertedValue);
-        return value.toString();
+        if (valueType === "object") return { skipRecord: false, value: JSON.stringify(typeConvertedValue) };
+        if (valueType === "array") return { skipRecord: false, value: JSON.stringify(typeConvertedValue) };
+        return { skipRecord: false, value: value.toString() };
     }
-    return null;
+    return { skipRecord: false, value: null };
 }
 
 /** Prints only the record count and property info for the schema.
@@ -779,11 +838,22 @@ export function discoverValueType(value: DPMRecordValue): DPMPropertyTypes {
 
     if (valueTypeOf === "bigint") return "integer";
 
-    if (valueTypeOf === "string") return discoverValueTypeFromString(value as string);
+    if (valueTypeOf === "string") return "string";
 
     if (Array.isArray(value)) return "array";
 
-    if (value instanceof Date) return "date-time";
+    if (value instanceof Date) {
+        if (
+            value.getUTCHours() === 0 &&
+            value.getUTCMinutes() === 0 &&
+            value.getUTCSeconds() === 0 &&
+            value.getUTCMilliseconds() === 0
+        ) {
+            return "date";
+        }
+
+        return "date-time";
+    }
 
     if (valueTypeOf === "number") {
         const strValue = value.toString();
@@ -847,6 +917,7 @@ export function convertValueByValueType(
     valueType: DPMPropertyTypes
 ): DPMRecordValue | DPMRecordValue[] {
     if (value == null) return null;
+    if (value === "null") return null;
 
     if (valueType === "null") {
         return null;
@@ -872,6 +943,7 @@ export function convertValueByValueType(
         if (typeof value === "number") return Math.round(value);
         if (typeof value === "string") return Math.round(+value);
     } else if (valueType === "date") {
+        if (value instanceof Date) return value;
         try {
             return createUTCDateTimeFromString(value as string); // TODO - this is probably not right for all situations
         } catch (err) {

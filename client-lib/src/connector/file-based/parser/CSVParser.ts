@@ -11,6 +11,7 @@ import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffse
 import { Maybe } from "../../../util/Maybe";
 import { DISPLAY_NAME, MIME_TYPE } from "./CSVParserDescription";
 import { JobContext } from "../../../task/JobContext";
+import { convertValueByValueType, discoverValueTypeFromString } from "../../../util/SchemaUtil";
 
 export class CSVParser implements Parser {
     getFileExtensions(): string[] {
@@ -201,6 +202,8 @@ export class CSVParser implements Parser {
                         records = csvParser(chunk, {
                             columns: columns,
                             relax: true,
+                            autoParse: false,
+                            autoParseDate: false,
                             skipEmptyLines: true,
                             quote: (configuration?.quote as string) || '"',
                             delimiter: (configuration?.delimiter as string) || ",",
@@ -236,6 +239,15 @@ export class CSVParser implements Parser {
                             }
                         } else {
                             recordObject = recordArray;
+                        }
+
+                        for (const key of Object.keys(recordObject)) {
+                            const value = recordObject[key];
+                            if (typeof value === "string") {
+                                const valueType = discoverValueTypeFromString(recordObject[key] as string);
+                                const value = convertValueByValueType(recordObject[key], valueType);
+                                recordObject[key] = value;
+                            }
                         }
 
                         recordsWithContext.push({

@@ -16,7 +16,6 @@ import { clearInterval } from "timers";
 import { Maybe } from "../util/Maybe";
 import { InflatedByteCountTransform } from "../transforms/InflatedByteCountTransform";
 import { StatsTransform } from "../transforms/StatsTransform";
-import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
 import {
     SourceDescription,
     SourceStreamsInspectionResult,

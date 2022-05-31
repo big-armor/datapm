@@ -36,7 +36,7 @@ describe("JSON Sink", function () {
 
         const fileLines = jsonFileContents.toString().split("\n");
         expect(fileLines[1]).include(
-            '{"Province/State":"Zhejiang","Country/Region":"Mainland China","Last Update":"2/1/2020 10:53","Confirmed":"599","Deaths":"0","Recovered":"21"}'
+            '{"Province/State":"Zhejiang","Country/Region":"Mainland China","Last Update":"2020-02-01T10:53:00.000Z","Confirmed":599,"Deaths":0,"Recovered":21}'
         );
         expect(fileLines.length).equal(68);
     });
