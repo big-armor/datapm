@@ -114,10 +114,12 @@ describe("Stats transform", () => {
         });
 
         expect(statsTransform.schemas.test.properties?.date).not.equal(undefined);
-        expect(statsTransform.schemas.test.properties?.date.types.date).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.date.types.date).equal(undefined);
+        expect(statsTransform.schemas.test.properties?.date.types.string).not.equal(undefined);
 
         expect(statsTransform.schemas.test.properties?.dateTime).not.equal(undefined);
-        expect(statsTransform.schemas.test.properties?.dateTime.types["date-time"]).not.equal(undefined);
+        expect(statsTransform.schemas.test.properties?.dateTime.types["date-time"]).equal(undefined);
+        expect(statsTransform.schemas.test.properties?.dateTime.types.string).not.equal(undefined);
     });
 
     test("Test objects", async () => {
@@ -142,15 +144,15 @@ describe("Stats transform", () => {
                 record: {
                     testObject: {
                         string: "test",
-                        integer: "-1434",
-                        number: "1.2",
+                        integer: -1434,
+                        number: 1.2,
                         testSubObject: {
                             string: "subObject",
-                            integer: "10",
-                            number: "24310.2"
+                            integer: 10,
+                            number: 24310.2
                         }
                     },
-                    number: "101.2"
+                    number: 101.2
                 },
                 receivedDate: new Date()
             },

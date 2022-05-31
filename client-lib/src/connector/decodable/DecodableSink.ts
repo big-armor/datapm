@@ -650,7 +650,7 @@ export function getDecodableType(types: ValueTypes): string {
     if (type === "object") {
         if (valueStats.objectProperties == null) throw new Error("object type has no defined properties");
 
-        let propertiesString = "ROWM";
+        let propertiesString = "ROW(";
 
         const keys = Object.keys(valueStats.objectProperties);
 
@@ -659,7 +659,7 @@ export function getDecodableType(types: ValueTypes): string {
             const property = valueStats.objectProperties[propertyKey];
             const typeString = getDecodableType(property.types);
 
-            propertiesString += `\`${propertyKey}\` ${typeString}`;
+            propertiesString += `${propertyKey} ${typeString}`;
 
             // if (property.description != null) propertiesString += `'${property.description}'`;
 

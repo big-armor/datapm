@@ -5,6 +5,7 @@ import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import XmlParser from "xml-streamer";
 import { DISPLAY_NAME, MIME_TYPE } from "./XMLParserDescription";
 import { JobContext } from "../../../task/JobContext";
+import { convertValueByValueType, discoverValueTypeFromString } from "../../../util/SchemaUtil";
 
 export class XMLParser implements Parser {
     getFileExtensions(): string[] {
@@ -87,12 +88,24 @@ function flattenXMLNodes(prefix: string, object: { [key: string]: any }, xmlNode
         if (topKey === "$") {
             flattenXMLNodes("", object, xmlNodes.$ as { [key: string]: unknown });
         } else if (topKey === "_") {
-            object[prefix] = xmlNodes._ as string;
+            const value = xmlNodes._ as string;
+
+            const type = discoverValueTypeFromString(value);
+
+            const convertedValue = convertValueByValueType(value, type);
+
+            object[prefix] = convertedValue;
         } else if (typeof xmlNodes[topKey] === "object") {
             // TODO handle arrays?
             flattenXMLNodes(keyWithPrefix, object, xmlNodes[topKey] as { [key: string]: unknown });
         } else {
-            object[keyWithPrefix] = xmlNodes[topKey];
+            const value = xmlNodes[topKey];
+
+            const type = discoverValueTypeFromString(value);
+
+            const convertedValue = convertValueByValueType(value, type);
+
+            object[keyWithPrefix] = convertedValue;
         }
     }
 

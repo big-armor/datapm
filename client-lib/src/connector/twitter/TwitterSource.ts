@@ -16,6 +16,7 @@ const streamOptions: Partial<Tweetv2FieldsParams> = {
         "in_reply_to_user_id",
         "organic_metrics",
         "conversation_id",
+        "source",
         "geo",
         "entities"
     ],

@@ -68,14 +68,13 @@ describe("detect type check", function () {
         expect(discoverValueType([1, 2, 3])).equal("array");
     });
     test("number", () => {
-        expect(discoverValueType("1.2")).equal("number");
-        expect(discoverValueType("1.2")).equal("number");
+        expect(discoverValueType("1.2")).equal("string");
 
-        expect(discoverValueType("1.0")).equal("number");
-        expect(discoverValueType("1.0")).equal("number");
+        expect(discoverValueType("1.0")).equal("string");
 
         expect(discoverValueType(1.0)).equal("integer");
-        expect(discoverValueType(1.0)).equal("integer");
+
+        expect(discoverValueType(1.2)).equal("number");
     });
 });
 

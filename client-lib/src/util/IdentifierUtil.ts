@@ -75,12 +75,22 @@ export function isCatalogIdentifier(
 }
 
 export function identifierToString(identifier: PackageIdentifier | VersionIdentifier | CatalogIdentifier): string {
+    let registryUrl = identifier.registryURL;
+
+    if (registryUrl) {
+        if (identifier.registryURL?.match(/^https?:\/\/(www\.)?datapm.io/) != null) {
+            registryUrl = "";
+        } else if (!registryUrl.endsWith("/")) {
+            registryUrl = `${registryUrl}/`;
+        }
+    }
+
     if (isCatalogIdentifier(identifier)) {
-        return `${identifier.registryURL}/${identifier.catalogSlug}`;
+        return `${registryUrl}${identifier.catalogSlug}`;
     } else if (isPackageIdentifier(identifier)) {
-        return `${identifier.registryURL}/${identifier.catalogSlug}/${identifier.packageSlug}`;
+        return `${registryUrl}${identifier.catalogSlug}/${identifier.packageSlug}`;
     } else if (isVersionIdentifier(identifier)) {
-        return `${identifier.registryURL}/${identifier.catalogSlug}/${identifier.packageSlug}/${identifier.versionMajor}.${identifier.versionMinor}.${identifier.versionPatch}`;
+        return `${registryUrl}${identifier.catalogSlug}/${identifier.packageSlug}/${identifier.versionMajor}.${identifier.versionMinor}.${identifier.versionPatch}`;
     }
 
     throw new Error("Unknown identifier type");

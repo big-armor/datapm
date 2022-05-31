@@ -14,6 +14,7 @@ import { ColumnOption } from "csv-parse";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 import { TYPE } from "./GoogleSheetConnectorDescription";
 import { JobContext } from "../../../task/JobContext";
+import { convertValueByValueType, discoverValueTypeFromString } from "../../../util/SchemaUtil";
 
 export class GoogleSheetSource implements Source {
     sourceType(): string {
@@ -213,6 +214,13 @@ export class GoogleSheetSource implements Source {
                             }
                         } else {
                             recordObject = recordArray;
+                        }
+
+                        for (const key of Object.keys(recordObject)) {
+                            const value = recordObject[key] as string;
+                            const type = discoverValueTypeFromString(value);
+                            const convertedValue = convertValueByValueType(value, type);
+                            recordObject[key] = convertedValue;
                         }
 
                         recordsWithContext.push({

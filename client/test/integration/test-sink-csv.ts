@@ -44,7 +44,7 @@ describe("CSV Sink", function () {
 
         const fileLines = csvFileContents.toString().split("\n");
         expect(fileLines[0]).equal('"Province/State","Country/Region","Last Update","Confirmed","Deaths","Recovered"');
-        expect(fileLines[1]).equal('"Hubei","Mainland China","2/1/2020 11:53","7153","249","168"');
+        expect(fileLines[1]).equal('"Hubei","Mainland China","2020-02-01T11:53:00.000Z","7153","249","168"');
         expect(fileLines.length).equal(69);
     });
 
@@ -62,7 +62,7 @@ describe("CSV Sink", function () {
         const csvFileContents = fs.readFileSync(("./covid-02-01-2020.csv" as unknown) as string);
 
         const fileLines = csvFileContents.toString().split("\n");
-        expect(fileLines[0]).equal("Hubei,Mainland China,2/1/2020 11:53,7153,249,168");
+        expect(fileLines[0]).equal("Hubei,Mainland China,2020-02-01T11:53:00.000Z,7153,249,168");
         expect(fileLines.length).equal(68);
     });
 });
