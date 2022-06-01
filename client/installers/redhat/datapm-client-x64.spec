@@ -25,12 +25,14 @@ echo "Install"
 echo "Clean"
 
 %post
-ln -s %{base_install_dir}/datapm /usr/bin/datapm
+ln -s /usr/lib/datapm/datapm /usr/bin/datapm
 
 %postun
 rm -f /usr/bin/datapm
 
 %files
+/* 
+
 %defattr(-,root,root,-)
 /usr/lib/datapm
 
