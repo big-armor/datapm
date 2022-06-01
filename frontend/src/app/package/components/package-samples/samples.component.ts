@@ -76,6 +76,11 @@ export class SamplesComponent implements OnChanges {
                     continue;
                 }
 
+                if (typeof value === "object") {
+                    returnValue[propertyTitle] = JSON.stringify(value).substring(0,100);
+                    continue;
+                }
+
                 returnValue[propertyTitle] = value.toString !== undefined ? value.toString() : "";
             }
 
