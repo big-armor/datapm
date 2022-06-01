@@ -138,6 +138,8 @@ export class TwitterSource implements Source {
                                         delete event.data.geo;
                                     }
 
+                                    event.data.created_at = new Date(event.data.created_at);
+
                                     const recordContext: RecordContext = {
                                         record: (event.data as unknown) as DPMRecord,
                                         schemaSlug: "tweets",

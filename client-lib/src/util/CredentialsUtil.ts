@@ -72,16 +72,21 @@ export async function obtainCredentialsConfiguration(
     let parameterCount = 0;
 
     if (credentialsIdentifier != null) {
-        const savedCredentials = await jobContext.getRepositoryCredential(
-            connector.getType(),
-            repositoryIdentifier,
-            credentialsIdentifier
-        );
+        try {
+            const savedCredentials = await jobContext.getRepositoryCredential(
+                connector.getType(),
+                repositoryIdentifier,
+                credentialsIdentifier
+            );
 
-        // purposefully prioritized the credentialsConfiguration over the savedCredentials
-        credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration };
+            // purposefully prioritized the credentialsConfiguration over the savedCredentials
+            credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration };
 
-        jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
+            jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
+        } catch (error) {
+            jobContext.print("WARN", "There was a problem reading the saved credentials for " + credentialsIdentifier);
+            jobContext.print("WARN", error.message);
+        }
     }
 
     const pendingParameters = await connector.getCredentialsParameters(
