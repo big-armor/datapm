@@ -1,3 +1,15 @@
+#### 0.31.16 (2022-06-01)
+
+#### 0.31.15 (2022-05-31)
+
+#### 0.31.14 (2022-05-27)
+
+##### New Features
+
+*  For TimePlus Sink, use string type for int/json/array, use empty string for null ([#489](https://github.com/big-armor/datapm/pull/489)) ([fec24cda](https://github.com/big-armor/datapm/commit/fec24cdacf969835a27684f13b38b5bb6050f049))
+
+#### 0.31.13 (2022-05-26)
+
 #### 0.31.12 (2022-05-25)
 
 #### 0.31.11 (2022-05-25)

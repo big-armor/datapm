@@ -167,8 +167,14 @@ export class TimeplusSink implements Sink {
                             if (i === 0) {
                                 columns.push(columnName);
                             }
-                            // if (that.columnTypeCache.get(columnName) === "json")
-                            row.push(columnValue);
+                            if (columnValue == null || Object.keys(columnValue).length === 0) {
+                                row.push(" "); // set an empty string if the value is null or an empty json object
+                            } else if (typeof columnValue === "object") {
+                                // if (that.columnTypeCache.get(columnName) === "json")
+                                row.push(JSON.stringify(columnValue));
+                            } else {
+                                row.push(columnValue);
+                            }
                         }
                         rows.push(row);
                     }
@@ -192,12 +198,12 @@ export class TimeplusSink implements Sink {
 
                     // shall we use 202?
                     if (response.status !== 200) {
-                        callback(
-                            new Error(`Unexpected response status ${response.status} body ${await response.text()}`)
-                        );
-                        return;
+                        const msg = `Unexpected response status ${response.status} body ${await response.text()}`;
+                        jobContext.print("WARN", `Fail to ingest data in batch, with error message: ${msg}`);
+                        // console.log(bodyStr);
+                        // callback(new Error(msg));
+                        // return;
                     }
-
                     callback(null, records[records.length - 1]);
                 }
             })
@@ -347,15 +353,17 @@ export class TimeplusSink implements Sink {
             case "string":
                 return "string";
             case "integer":
-                return "int";
+                return "string"; // int
             case "number":
                 return "double";
             case "boolean":
                 return "bool";
             case "date-time":
-                return "datetime64";
+                return "string"; // datetime64
             case "object":
-                return "json"; // this is index-time json extraction. For flexible schema, use 'string'
+                return "string"; // use 'string' for more flexible schemas. 'json' type for index-time json extraction (fixed schema, cannot be null)
+            case "array":
+                return "string"; // need further test
             default:
                 throw new Error("Unsupported Timeplus type: " + removedNull[0]);
         }
