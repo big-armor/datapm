@@ -138,6 +138,25 @@
                                 </div>
                             </div>
 
+                            <div *ngSwitchCase="'object'">
+                                <div class="text-dark-gray">
+                                    <div class="weight-500">{{ entry.key }}</div>
+                                    <ul>
+                                        <li *ngIf="getPropertyChips(entry.value).length">
+                                            content labels:
+                                            <mat-chip *ngFor="let cl of getPropertyChips(entry.value); last as isLast" [hidden]="cl.hidden">{{
+                                                cl.label
+                                                }}</mat-chip>
+                                        </li>
+                                        <li>
+                                            present in {{ entry.value.recordCount | number }} ({{
+                                            entry.value.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
                             <div *ngSwitchCase="'string'">
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ entry.key }}</div>
@@ -154,16 +173,16 @@
                                             }}
                                             of total)
                                         </li>
-                                        <li>max length: {{ entry.valuestringMaxLength | number }} characters</li>
-                                        <li>min length: {{ entry.valuestringMinLength | number }} characters</li>
-                                        <li *ngIf="entry.valuestringOptions">
+                                        <li>max length: {{ entry.value.stringMaxLength | number }} characters</li>
+                                        <li>min length: {{ entry.value.stringMinLength | number }} characters</li>
+                                        <li *ngIf="entry.value.stringOptions">
                                             enumerated values:
                                             <ul>
-                                                <li *ngFor="let value of stringOptions(entry.valuestringOptions)">
+                                                <li *ngFor="let value of stringOptions(entry.value.stringOptions)">
                                                     {{ value.name }}: {{ value.value | number }} record<span
                                                         *ngIf="value.value > 1"
                                                         >s</span
-                                                    >
+                                                    > ({{ value.value / entry.value.recordCount | percent }})
                                                 </li>
                                             </ul>
                                         </li>
