@@ -7,7 +7,7 @@ URL:            https://datapm.io
 License:        https://datapm.io/docs/license
 Source0:        %{name}-%{version}-source.tar.gz
 
-Requires:       bash libsecret
+Requires:       libsecret
 AutoReqProv:    no
 
 %description
@@ -15,8 +15,8 @@ DataPM is a package manager for data. See more at https://datapm.io
 
 %prep
 rm -rf $RPM_BUILD_ROOT
-mkdir -p ${RPM_BUILD_ROOT}/usr/lib/datapm
-cp -R ../../../../pkg-linux-intel64/* ${RPM_BUILD_ROOT}/usr/lib/datapm
+mkdir -p ${RPM_BUILD_ROOT}/opt/datapm
+cp -R ../../../../pkg-linux-intel64/* ${RPM_BUILD_ROOT}/opt/datapm
 
 %install
 echo "Install"
@@ -25,7 +25,7 @@ echo "Install"
 echo "Clean"
 
 %post
-ln -s /usr/lib/datapm/datapm /usr/bin/datapm
+ln -s /opt/datapm/datapm /usr/bin/datapm
 
 %postun
 rm -f /usr/bin/datapm
@@ -34,7 +34,7 @@ rm -f /usr/bin/datapm
 /* 
 
 %defattr(-,root,root,-)
-/usr/lib/datapm
+/opt/datapm
 
 %changelog
 * Mon Feb 07 2021 Travis Collins <hello@datapm.io> - 0.0.1
