@@ -1,7 +1,7 @@
 Name:           datapm-client
 Version:        x.x.x
 Release:        BUILD_NUMBER%{?dist}
-Summary:        A simple hello world script
+Summary:        A package manager for data
 BuildArch:      x86_64
 URL:            https://datapm.io
 License:        https://datapm.io/docs/license
