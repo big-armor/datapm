@@ -156,7 +156,7 @@ function updateValueTypeStats(value: DPMRecordValue, valueType: DPMPropertyTypes
             if (valueTypeStats.dateMaxValue == null || valueTypeStats.dateMaxValue?.getTime() < dateValue.getTime())
                 valueTypeStats.dateMaxValue = dateValue;
 
-            if (valueTypeStats.dateMinValue == null || valueTypeStats.dateMinValue.getTime() < dateValue.getTime())
+            if (valueTypeStats.dateMinValue == null || valueTypeStats.dateMinValue.getTime() > dateValue.getTime())
                 valueTypeStats.dateMinValue = dateValue;
 
             let millsecondsString = dateValue.getMilliseconds().toString();
