@@ -167,11 +167,16 @@ export class TimeplusSink implements Sink {
                             if (i === 0) {
                                 columns.push(columnName);
                             }
-                            if (columnValue == null || Object.keys(columnValue).length === 0) {
-                                row.push(" "); // set an empty string if the value is null or an empty json object
-                            } else if (typeof columnValue === "object") {
+                            if (columnValue == null) {
+                                row.push(" "); // set an empty string if the value is null
+                            } else if (typeof columnValue === "object" && !(columnValue instanceof Date)) {
+                                const str = JSON.stringify(columnValue);
+                                if (str === "{}") {
+                                    row.push(" "); // set an empty string if the value is an empty json object
+                                } else {
+                                    row.push(str);
+                                }
                                 // if (that.columnTypeCache.get(columnName) === "json")
-                                row.push(JSON.stringify(columnValue));
                             } else {
                                 row.push(columnValue);
                             }
@@ -353,13 +358,13 @@ export class TimeplusSink implements Sink {
             case "string":
                 return "string";
             case "integer":
-                return "string"; // int
+                return "int";
             case "number":
                 return "double";
             case "boolean":
                 return "bool";
             case "date-time":
-                return "string"; // datetime64
+                return "datetime64";
             case "object":
                 return "string"; // use 'string' for more flexible schemas. 'json' type for index-time json extraction (fixed schema, cannot be null)
             case "array":
