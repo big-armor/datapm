@@ -140,6 +140,10 @@ export class TwitterSource implements Source {
 
                                     event.data.created_at = new Date(event.data.created_at);
 
+                                    event.data.author = (event.includes.users as { id: string }[]).find(
+                                        (user) => user.id === event.data.author_id
+                                    );
+
                                     const recordContext: RecordContext = {
                                         record: (event.data as unknown) as DPMRecord,
                                         schemaSlug: "tweets",
