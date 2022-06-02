@@ -1,3 +1,9 @@
+#### 0.31.21 (2022-06-02)
+
+##### Bug Fixes
+
+*  remove keytar loading a startup. Make missing directory if not present ([46e3df50](https://github.com/big-armor/datapm/commit/46e3df50af6172c691f9e785223993c3ebfe09cd))
+
 #### 0.31.20 (2022-06-02)
 
 #### 0.31.19 (2022-06-01)
