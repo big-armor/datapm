@@ -71,7 +71,7 @@
         "reflect-metadata": "^0.1.13",
         "sanitize-filename": "^1.6.3",
         "semver": "^7.3.2",
-        "sharp": "^v0.28.0",
+        "sharp": "^v0.30.5",
         "socket.io": "^4.2.0",
         "socket.io-client": "^4.4.0",
         "socket.io-msgpack-parser": "^3.0.1",
