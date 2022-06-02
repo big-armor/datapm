@@ -1,3 +1,11 @@
+#### 0.31.19 (2022-06-01)
+
+##### Bug Fixes
+
+*  RPM installer now working for more types of linux ([abf35515](https://github.com/big-armor/datapm/commit/abf35515253ea987e236fb9da230df619a5d3276))
+
+#### 0.31.18 (2022-06-01)
+
 #### 0.31.17 (2022-06-01)
 
 #### 0.31.16 (2022-06-01)
