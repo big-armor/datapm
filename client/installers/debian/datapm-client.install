@@ -1,1 +1,1 @@
-./debian/source/* ./usr/lib/datapm-client
+./debian/source/* ./opt/datapm
