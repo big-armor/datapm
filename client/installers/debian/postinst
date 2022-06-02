@@ -7,6 +7,6 @@ if [ -f $DATAPM_LINK_LOCATION ]; then
      rm -f $DATAPM_LINK_LOCATION
 fi
 
-ln -s /usr/lib/datapm/datapm $DATAPM_LINK_LOCATION
+ln -s /opt/datapm/datapm $DATAPM_LINK_LOCATION
 
 exit 0

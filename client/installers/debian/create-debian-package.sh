@@ -17,8 +17,8 @@ cp changelog control datapm-client.links datapm-client.install postinst prerm bu
 
 # Move build files into place
 echo "Copy source..."
-mkdir -p build/usr/lib/datapm
-cp -R ../../pkg-linux-intel64/* build/usr/lib/datapm
+mkdir -p build/opt/datapm
+cp -R ../../pkg-linux-intel64/* build/opt/datapm
 
 # Extract version number from package.json
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`

@@ -2,7 +2,7 @@
 
 set -e
 
-DATAPM_LINK_LOCATION="/usr/bin/datapm"
+DATAPM_LINK_LOCATION="/opt/datapm"
 if [ -f $DATAPM_LINK_LOCATION ]; then
      rm -f $DATAPM_LINK_LOCATION
 fi
