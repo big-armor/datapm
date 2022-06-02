@@ -1,6 +1,5 @@
 import Conf from "conf";
 import { DPMConfiguration } from "datapm-lib";
-import { getPassword, setPassword } from "keytar";
 import * as crypto from "crypto";
 import { v4 as uuid } from "uuid";
 import { RegistryConfig, RepositoryConfig, RepositoryType } from "datapm-client-lib";
@@ -237,14 +236,22 @@ async function getCredentialSecretKey(): Promise<string | null> {
 
     // Use node-keytar on macOS and windows. Keytar uses libsecret -> gnome-keyring -> X11 on linux (sad face)
     if (operatingSystem === "win32" || operatingSystem === "darwin") {
-        secret = await getPassword("datapm", "default");
+        const keytar = await import("keytar");
+
+        secret = await keytar.getPassword("datapm", "default");
 
         if (secret === null) {
             secret = uuid() as string;
-            await setPassword("datapm", "default", secret);
+            await keytar.setPassword("datapm", "default", secret);
         }
     } else {
-        const credentialsFilePath = path.join(os.homedir(), "datapm", "credentials.secret");
+        const rootDirectory = path.join(os.homedir(), "datapm");
+
+        if (!fs.existsSync(rootDirectory)) {
+            fs.mkdirSync(rootDirectory, { recursive: true });
+        }
+
+        const credentialsFilePath = path.join("credentials.secret");
         const secretFile = credentialsFilePath;
 
         if (!fs.existsSync(secretFile)) {
