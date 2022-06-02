@@ -11,7 +11,7 @@ URL:            https://datapm.io
 License:        https://datapm.io/docs/license
 Source0:        %{name}-%{version}-source.tar.gz
 
-Requires:       libsecret
+# Requires:       nothing-required
 
 # Don't automatically include dependencies by scanning
 # files. This was including libc, and making it incompatible

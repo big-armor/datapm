@@ -4,6 +4,9 @@ import { getPassword, setPassword } from "keytar";
 import * as crypto from "crypto";
 import { v4 as uuid } from "uuid";
 import { RegistryConfig, RepositoryConfig, RepositoryType } from "datapm-client-lib";
+import os from "os";
+import fs from "fs";
+import path from "path";
 
 const configSchema = {
     registries: {
@@ -229,11 +232,38 @@ async function getCredentialSecretKey(): Promise<string | null> {
         return process.env.CREDENTIALS_SECRET_KEY;
     }
 
-    let secret = await getPassword("datapm", "default");
+    const operatingSystem = os.platform();
+    let secret: string | null;
 
-    if (secret === null) {
-        secret = uuid() as string;
-        await setPassword("datapm", "default", secret);
+    // Use node-keytar on macOS and windows. Keytar uses libsecret -> gnome-keyring -> X11 on linux (sad face)
+    if (operatingSystem === "win32" || operatingSystem === "darwin") {
+        secret = await getPassword("datapm", "default");
+
+        if (secret === null) {
+            secret = uuid() as string;
+            await setPassword("datapm", "default", secret);
+        }
+    } else {
+        const credentialsFilePath = path.join(os.homedir(), "datapm", "credentials.secret");
+        const secretFile = credentialsFilePath;
+
+        if (!fs.existsSync(secretFile)) {
+            secret = uuid() as string;
+            fs.writeFileSync(secretFile, secret);
+            fs.chmodSync(secretFile, 0o400);
+        } else {
+            const fileStat = fs.statSync(secretFile);
+            const unixFilePermissions = "0" + (fileStat.mode & parseInt("777", 8)).toString(8);
+
+            if (unixFilePermissions !== "0400") {
+                console.log("The datapm credentials file should be readable only by the owner");
+                console.log("Use the following command to fix this serious issue: ");
+                console.log("chmod 400 " + secretFile);
+                process.exit(1);
+            }
+
+            secret = fs.readFileSync(secretFile).toString();
+        }
     }
     return secret;
 }

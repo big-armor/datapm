@@ -139,6 +139,8 @@ export async function obtainCredentialsConfiguration(
                         credentialsPromptResult.credentialsIdentifier
                     )) ?? {};
             } catch (error) {
+                if (error.message.includes("permissions are not 0400")) throw error;
+
                 jobContext.print(
                     "WARN",
                     `There was an error reading the credentials. It is likely the credentials were encrypted with a key other than the one found on the keychain. This means you will need to re-enter the credentials. Choose 'Add or Update Credentials' and re-enter them.`
