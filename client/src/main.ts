@@ -49,4 +49,10 @@ yargs
     })
     .recommendCommands()
     .strict()
+    .version(false)
+    .option("version", {
+        alias: "v",
+        describe: "Show the version of DataPM",
+        type: "string"
+    })
     .help().argv;

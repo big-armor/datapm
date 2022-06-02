@@ -1,3 +1,23 @@
+#### 0.31.21 (2022-06-02)
+
+##### Bug Fixes
+
+*  remove keytar loading a startup. Make missing directory if not present ([46e3df50](https://github.com/big-armor/datapm/commit/46e3df50af6172c691f9e785223993c3ebfe09cd))
+
+#### 0.31.20 (2022-06-02)
+
+#### 0.31.19 (2022-06-01)
+
+##### Bug Fixes
+
+*  RPM installer now working for more types of linux ([abf35515](https://github.com/big-armor/datapm/commit/abf35515253ea987e236fb9da230df619a5d3276))
+
+#### 0.31.18 (2022-06-01)
+
+#### 0.31.17 (2022-06-01)
+
+#### 0.31.16 (2022-06-01)
+
 #### 0.31.15 (2022-05-31)
 
 #### 0.31.14 (2022-05-27)

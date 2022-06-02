@@ -1,6 +1,8 @@
+import ora from "ora";
 import prompts from "prompts";
 import { Argv } from "yargs";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
+import { checkDataPMVersion } from "../util/VersionCheckUtil";
 import { Command } from "./Command";
 import { editPackage } from "./EditCommandModule";
 import { fetchPackage } from "./FetchCommand";
@@ -25,8 +27,13 @@ const enum Commands {
     EDIT = "Edit"
 }
 
+export class Arguments {
+    defaults?: boolean;
+    quiet?: boolean;
+}
+
 export class FallbackCommand implements Command {
-    prepareCommand(argv: Argv): Argv {
+    prepareCommand(argv: Argv<Arguments>): Argv {
         return argv.command({
             command: "*",
             describe: "DataPM Actions",
@@ -68,8 +75,20 @@ export class FallbackCommand implements Command {
                         handler: defaultRegistryCommand
                     });
             },
-            handler: async () => {
+            handler: async (innerArgv) => {
                 printDataPMVersion(argv);
+
+                if (innerArgv.version != null) {
+                    if (!argv.argv.quiet) {
+                        const oraRef: ora.Ora = ora({
+                            color: "yellow",
+                            spinner: "dots"
+                        });
+                        await checkDataPMVersion(oraRef);
+                    }
+
+                    process.exit(0);
+                }
 
                 const commandPromptResult = await prompts({
                     type: "autocomplete",

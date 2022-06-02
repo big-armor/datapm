@@ -252,7 +252,7 @@ async function main() {
     });
 
 
-    /** Client Installer Downloads */
+    /** Terraform script Downloads */
     app.use("/static/terraform-scripts/:type", async (req, res, next) => {
 
         const terraFormScriptsDirectory = path.join(__dirname, "static","terraform-scripts");

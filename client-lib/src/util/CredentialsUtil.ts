@@ -72,16 +72,21 @@ export async function obtainCredentialsConfiguration(
     let parameterCount = 0;
 
     if (credentialsIdentifier != null) {
-        const savedCredentials = await jobContext.getRepositoryCredential(
-            connector.getType(),
-            repositoryIdentifier,
-            credentialsIdentifier
-        );
+        try {
+            const savedCredentials = await jobContext.getRepositoryCredential(
+                connector.getType(),
+                repositoryIdentifier,
+                credentialsIdentifier
+            );
 
-        // purposefully prioritized the credentialsConfiguration over the savedCredentials
-        credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration };
+            // purposefully prioritized the credentialsConfiguration over the savedCredentials
+            credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration };
 
-        jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
+            jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
+        } catch (error) {
+            jobContext.print("WARN", "There was a problem reading the saved credentials for " + credentialsIdentifier);
+            jobContext.print("WARN", error.message);
+        }
     }
 
     const pendingParameters = await connector.getCredentialsParameters(
@@ -134,6 +139,8 @@ export async function obtainCredentialsConfiguration(
                         credentialsPromptResult.credentialsIdentifier
                     )) ?? {};
             } catch (error) {
+                if (error.message.includes("permissions are not 0400")) throw error;
+
                 jobContext.print(
                     "WARN",
                     `There was an error reading the credentials. It is likely the credentials were encrypted with a key other than the one found on the keychain. This means you will need to re-enter the credentials. Choose 'Add or Update Credentials' and re-enter them.`

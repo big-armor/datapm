@@ -11,4 +11,6 @@ import { DownloadsRoutingModule } from "./downloads-routing.module"
     DownloadsRoutingModule
   ]
 })
-export class DownloadsModule { }
+export class DownloadsModule { 
+
+}
