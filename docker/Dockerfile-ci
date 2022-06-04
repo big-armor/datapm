@@ -14,7 +14,7 @@ RUN apt-get update
 # Install build tools
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get install --no-install-recommends --yes unzip g++ gcc make jq git-buildpackage libsecret-1-0 rpm rpmlint curl docker-compose
+RUN apt-get install --no-install-recommends --yes unzip g++ gcc make jq git-buildpackage rpm rpmlint curl docker-compose
 
 RUN mkdir -p /usr/local/nvm
 
@@ -49,5 +49,9 @@ RUN apt-get install --no-install-recommends --yes gnupg software-properties-comm
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 RUN apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 RUN apt-get update && apt-get install --no-install-recommends --yes  terraform
+
+# Install Python3
+# Required for modules using node-gyp
+RUN apt install --no-install-recommends --yes python3.9
 
 CMD ["sh"]

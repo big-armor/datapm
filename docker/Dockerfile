@@ -11,6 +11,10 @@ RUN ls /usr/src/app/util/*
 
 COPY backend/package.json backend/package-lock.json backend/gulpfile.js /build/backend/
 
+# Install python3
+# required for node-gyp in segfault-handler
+RUN apk --update add python3
+
 RUN cd /build/backend/ \
     && npm ci \
     && npx copy-node-modules ./ dist/ \
