@@ -570,8 +570,7 @@ jobs:
         name: "Client Releases on GitHub"
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
-            - build-client-macos-intel64
-            - build-client-windows-intel64
+            - updateTestEnvironment
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -629,7 +628,6 @@ jobs:
         # TODO See note in buildAndDeploy step above
         # container: datapm/ci:latest
         needs:
-            - buildAndDeploy
             - github-release-clients
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         steps:
