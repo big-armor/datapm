@@ -11,8 +11,12 @@ RUN ls /usr/src/app/util/*
 
 COPY backend/package.json backend/package-lock.json backend/gulpfile.js /build/backend/
 
+
+
 # Install python3
 # required for node-gyp in segfault-handler
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get install --no-install-recommends --yes unzip g++ gcc make
 RUN apk --update add python3
 
 RUN cd /build/backend/ \
