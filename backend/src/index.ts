@@ -30,7 +30,7 @@ import { SocketConnectionHandler } from "./socket/SocketHandler";
 import { parse } from "url";
 import { libPackageVersion } from "datapm-lib";
 import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex, generateStaticSiteMap } from "./util/SiteMapUtil";
-import * as SegfaultHandler from "segfault-handler";
+import * as SegfaultHandler from "segfault-raub";
 
 
 console.log("DataPM Registry Server Starting...");
@@ -45,8 +45,6 @@ const app = express();
 async function main() {
 
     process.title = "DataPM Registry Server";
-
-    SegfaultHandler.registerHandler('crash.log');
 
     // get secrets from environment variable or from secret manager
     // NOTE: getSecretVariable does not throw/fail. If the secret is unable
