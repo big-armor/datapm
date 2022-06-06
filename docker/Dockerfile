@@ -2,7 +2,7 @@ FROM node:16.14.2-alpine3.15
 
 # Install python3
 # required for node-gyp in segfault-handler
-RUN apk --update add python3 gcc make
+RUN apk --update add python3 gcc make g++
 
 COPY lib/dist /build/lib/dist
 COPY client-lib/dist /build/client-lib/dist
