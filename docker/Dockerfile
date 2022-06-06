@@ -1,5 +1,9 @@
 FROM node:16.14.2-alpine3.15
 
+# Install python3
+# required for node-gyp in segfault-handler
+RUN apk --update add python3 gcc make
+
 COPY lib/dist /build/lib/dist
 COPY client-lib/dist /build/client-lib/dist
 COPY docs/ /usr/src/static/docs/
@@ -10,14 +14,6 @@ COPY client-installers /usr/src/app/client-installers/
 RUN ls /usr/src/app/util/*
 
 COPY backend/package.json backend/package-lock.json backend/gulpfile.js /build/backend/
-
-
-
-# Install python3
-# required for node-gyp in segfault-handler
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get install --no-install-recommends --yes unzip g++ gcc make
-RUN apk --update add python3
 
 RUN cd /build/backend/ \
     && npm ci \
