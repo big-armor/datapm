@@ -1,4 +1,4 @@
-FROM node:16.14.2-alpine3.15
+FROM node:16.14.2-bullseye-slim
 
 COPY lib/dist /build/lib/dist
 COPY client-lib/dist /build/client-lib/dist
