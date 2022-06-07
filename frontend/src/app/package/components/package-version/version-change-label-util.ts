@@ -98,6 +98,8 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
             changeLabel = "Changed property units";
         case PackageDifferenceType.CHANGE_SOURCE_CREDENTIALS:
             changeLabel = "Changed source credentials";
+        case PackageDifferenceType.CHANGE_STREAM_UPDATE_METHOD:
+            changeLabel = "Changed update method";
     }
 
     let changeFieldName = difference.pointer === "#" ? "" : difference.pointer;

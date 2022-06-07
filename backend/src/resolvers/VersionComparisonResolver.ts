@@ -7,7 +7,6 @@ import { VersionEntity } from "../entity/VersionEntity";
 import { PackageDifferenceType, PackageIdentifierInput, VersionIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionComparisonRepository, saveVersionComparison } from "../repository/VersionComparisonRepository";
-import { VersionDifferenceRepository } from "../repository/VersionDifferenceRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
