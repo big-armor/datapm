@@ -48,8 +48,6 @@ export async function packageUpdateScheduling(connection: Connection) {
 
         const jobContext = new HeadlessJobContext(jobId, userContext );
 
-
-
         const packageUpdateJob = new UpdatePackageJob(jobContext, {
             defaults: true,
             inspectionSeconds: 30,

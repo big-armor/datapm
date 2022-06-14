@@ -15,6 +15,7 @@ import { PackageFile070 } from "./PackageFile-v0.7.0";
 import { PackageFile080 } from "./PackageFile-v0.8.0";
 import { PackageFile as PackageFile081 } from "./PackageFile-v0.8.1";
 import { PackageFile as PackageFile090, Properties as Properties090 } from "./PackageFile-v0.9.0";
+import { PackageFile as PackageFile0315 } from "./PackageFile-v0.31.5";
 import {
     PackageFile,
     PublishMethod,
@@ -25,7 +26,7 @@ import {
     Properties,
     ValueTypeStatistics,
     Property
-} from "./PackageFile-v0.31.5";
+} from "./PackageFile-v0.32.1";
 import { DATAPM_VERSION } from "./DataPMVersion";
 
 export type DPMPropertyTypes =
@@ -913,6 +914,12 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         for (const schema of oldPackageFile.schemas) {
             recurseProperties(schema.properties);
         }
+    }
+
+    if ((packageFileObject.$schema as string).endsWith("v0.31.5.json")) {
+        packageFileObject.$schema = (packageFileObject.$schema as string).replace("0.31.5", "0.32.1");
+
+        const oldPackageFile = packageFileObject as PackageFile0315;
     }
 
     return packageFileObject as PackageFile;
