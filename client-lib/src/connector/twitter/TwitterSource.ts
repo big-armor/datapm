@@ -20,7 +20,8 @@ const streamOptions: Partial<Tweetv2FieldsParams> = {
         "geo",
         "entities"
     ],
-    expansions: ["author_id"]
+    "place.fields": ["country_code", "name", "country", "place_type"],
+    expansions: ["author_id", "geo.place_id"]
 };
 export class TwitterSource implements Source {
     sourceType(): string {
@@ -143,6 +144,12 @@ export class TwitterSource implements Source {
                                     event.data.author = (event.includes.users as { id: string }[]).find(
                                         (user) => user.id === event.data.author_id
                                     );
+
+                                    if (event.data.geo?.place_id != null) {
+                                        event.data.place = (event.includes.places as { id: string }[]).find(
+                                            (place) => place.id === event.data.geo.place_id
+                                        );
+                                    }
 
                                     const recordContext: RecordContext = {
                                         record: (event.data as unknown) as DPMRecord,
