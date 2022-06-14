@@ -173,7 +173,7 @@ jobs:
     build-client-linux-intel64:
         runs-on: ubuntu-latest
         container: datapm/ci:latest
-        timeout-minutes: 25
+        timeout-minutes: 30
         needs:
             - lint
         name: Build Linux Intel 64-bit Client
