@@ -1,3 +1,9 @@
+#### 0.31.36 (2022-06-16)
+
+##### New Features
+
+*  Added EventSource Source ([#508](https://github.com/big-armor/datapm/pull/508)) ([e43693d0](https://github.com/big-armor/datapm/commit/e43693d04b566ab86e82a5127176f21c45ea5f50))
+
 #### 0.31.35 (2022-06-14)
 
 ##### Other Changes
