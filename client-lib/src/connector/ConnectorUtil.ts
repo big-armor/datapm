@@ -19,6 +19,7 @@ import { KafkaConnectorDescription } from "./stream/kafka/KafkaConnectorDescript
 import { GeminiConnectorDescription } from "./gemini/GeminiConnectorDescription";
 import { TimeplusConnectorDescription } from "./timeplus/TimeplusConnectorDescription";
 import { TwitterConnectorDescription } from "./twitter/TwitterConnectorDescription";
+import { EventSourceConnectorDescription } from "./event-source/EventSourceConnectorDescription";
 
 export const CONNECTORS: ConnectorDescription[] = [
     new BigQueryConnectorDescription(),
@@ -31,6 +32,7 @@ export const CONNECTORS: ConnectorDescription[] = [
     new DecodableConnectorDescription(),
     new CoinbaseConnectorDescription(),
     new TwitterConnectorDescription(),
+    new EventSourceConnectorDescription(),
     new KrakenConnectorDescription(),
     new FTXConnectorDescription(),
     new BinanceConnectorDescription(),
