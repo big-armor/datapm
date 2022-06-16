@@ -578,7 +578,8 @@ export function getDeconflictChoices(valueTypes: DPMPropertyTypes[]): ParameterO
             DeconflictOptions.CAST_TO_NULL,
             DeconflictOptions.SKIP,
             DeconflictOptions.ALL
-        ]
+        ],
+        "array,object": [DeconflictOptions.CAST_TO_STRING]
     };
     let promptChoices = [];
     if (valueTypes.length > 2) {
@@ -639,10 +640,10 @@ export function updateSchemaWithDeconflictOptions(
                 throw new Error("Could not find rule for deconflict option: " + deconflictOption);
             }
 
-            const preservedValueType = Object(property.types)[rule];
+            let preservedValueType: ValueTypeStatistics = Object(property.types)[rule];
 
             if (preservedValueType == null) {
-                throw new Error(`Could not find preserved value type for property with title: ${title}`);
+                preservedValueType = {};
             }
 
             property.types = {
