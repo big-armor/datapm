@@ -1,12 +1,12 @@
 {
     "name": "datapm-client",
-    "version": "0.31.33",
+    "version": "0.31.37",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "datapm-client",
-            "version": "0.31.33",
+            "version": "0.31.37",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@apollo/client": "^3.3.21",
@@ -34,7 +34,6 @@
                 "@types/knex": "^0.16.1",
                 "@types/mocha": "^8.2.0",
                 "@types/node": "^16.11.22",
-                "@types/node-fetch": "^2.6.1",
                 "@types/prompts": "^2.0.8",
                 "@types/react": "^16.9.43",
                 "@types/semver": "^7.3.3",
@@ -81,7 +80,7 @@
         },
         "../client-lib": {
             "name": "datapm-client-lib",
-            "version": "0.31.5",
+            "version": "0.31.35",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@apollo/client": "^3.3.21",
@@ -133,7 +132,7 @@
                 "socket.io-msgpack-parser": "^3.0.1",
                 "stream-mmmagic": "2.2.0",
                 "tar-stream": "^2.2.0",
-                "twitter-api-sdk": "^1.0.7",
+                "twitter-api-v2": "^1.12.2",
                 "unbzip2-stream": "^1.4.3",
                 "unzipper": "^0.10.11",
                 "uuid": "^8.3.2",
@@ -167,6 +166,7 @@
                 "@types/mocha": "^8.0.3",
                 "@types/mysql": "^2.15.15",
                 "@types/node": "^16.11.22",
+                "@types/node-fetch": "^2.6.1",
                 "@types/numeral": "0.0.28",
                 "@types/pg": "^7.14.4",
                 "@types/react": "^16.9.43",
@@ -202,7 +202,7 @@
         },
         "../lib": {
             "name": "datapm-lib",
-            "version": "0.31.5",
+            "version": "0.31.35",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "ajv": "^6.12.6",
@@ -954,16 +954,6 @@
             "resolved": "https://registry.npmjs.org/@types/node/-/node-16.11.22.tgz",
             "integrity": "sha512-DYNtJWauMQ9RNpesl4aVothr97/tIJM8HbyOXJ0AYT1Z2bEjLHyfjOBPAQQVMLf8h3kSShYfNk8Wnto8B2zHUA==",
             "dev": true
-        },
-        "node_modules/@types/node-fetch": {
-            "version": "2.6.1",
-            "resolved": "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.6.1.tgz",
-            "integrity": "sha512-oMqjURCaxoSIsHSr1E47QHzbmzNR5rK8McHuNb11BOM9cHcIK3Avy0s/b2JlXHoQGTYS3NsvWzV1M0iK7l0wbA==",
-            "dev": true,
-            "dependencies": {
-                "@types/node": "*",
-                "form-data": "^3.0.0"
-            }
         },
         "node_modules/@types/parse-json": {
             "version": "4.0.0",
@@ -12802,16 +12792,6 @@
             "integrity": "sha512-DYNtJWauMQ9RNpesl4aVothr97/tIJM8HbyOXJ0AYT1Z2bEjLHyfjOBPAQQVMLf8h3kSShYfNk8Wnto8B2zHUA==",
             "dev": true
         },
-        "@types/node-fetch": {
-            "version": "2.6.1",
-            "resolved": "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.6.1.tgz",
-            "integrity": "sha512-oMqjURCaxoSIsHSr1E47QHzbmzNR5rK8McHuNb11BOM9cHcIK3Avy0s/b2JlXHoQGTYS3NsvWzV1M0iK7l0wbA==",
-            "dev": true,
-            "requires": {
-                "@types/node": "*",
-                "form-data": "^3.0.0"
-            }
-        },
         "@types/parse-json": {
             "version": "4.0.0",
             "resolved": "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz",
@@ -14429,6 +14409,7 @@
                 "@types/mocha": "^8.0.3",
                 "@types/mysql": "^2.15.15",
                 "@types/node": "^16.11.22",
+                "@types/node-fetch": "^2.6.1",
                 "@types/numeral": "0.0.28",
                 "@types/pg": "^7.14.4",
                 "@types/react": "^16.9.43",
@@ -14501,7 +14482,7 @@
                 "superagent": "^6.1.0",
                 "tar-stream": "^2.2.0",
                 "ts-node": "^8.10.2",
-                "twitter-api-sdk": "^1.0.7",
+                "twitter-api-v2": "^1.12.2",
                 "typescript": "^4.5.5",
                 "unbzip2-stream": "^1.4.3",
                 "unzipper": "^0.10.11",
