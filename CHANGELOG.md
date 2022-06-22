@@ -1,3 +1,9 @@
+#### 0.31.37 (2022-06-22)
+
+##### Build System / Dependencies
+
+* **deps:**  bump semver-regex from 3.1.3 to 3.1.4 in /client-lib ([#506](https://github.com/big-armor/datapm/pull/506)) ([4e051c07](https://github.com/big-armor/datapm/commit/4e051c07d13b4800edafce041f0d2221b3b86288))
+
 #### 0.31.36 (2022-06-16)
 
 ##### New Features
