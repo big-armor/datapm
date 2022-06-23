@@ -1,3 +1,9 @@
+#### 0.31.38 (2022-06-23)
+
+##### Bug Fixes
+
+*  Decodable timestamp and missing properties ([480f0319](https://github.com/big-armor/datapm/commit/480f0319d0383f1fe89a8ea7817730178007397b))
+
 #### 0.31.37 (2022-06-22)
 
 ##### Build System / Dependencies
