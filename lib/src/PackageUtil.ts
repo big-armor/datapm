@@ -920,6 +920,19 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         packageFileObject.$schema = (packageFileObject.$schema as string).replace("0.31.5", "0.32.1");
 
         const oldPackageFile = packageFileObject as PackageFile0315;
+
+        if (oldPackageFile.readmeFile != null && oldPackageFile.readmeMarkdown != null)
+            delete oldPackageFile.readmeFile;
+
+        if (oldPackageFile.licenseFile != null && oldPackageFile.licenseMarkdown != null)
+            delete oldPackageFile.licenseFile;
+
+        if (oldPackageFile.readmeFile == null && oldPackageFile.readmeMarkdown == null)
+            oldPackageFile.readmeMarkdown =
+                "# " + oldPackageFile.displayName ?? oldPackageFile.packageSlug + "\n\n No readme defined";
+
+        if (oldPackageFile.licenseFile == null && oldPackageFile.licenseMarkdown == null)
+            oldPackageFile.licenseMarkdown = "No license defined";
     }
 
     return packageFileObject as PackageFile;

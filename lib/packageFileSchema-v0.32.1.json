@@ -321,6 +321,38 @@
             "$ref": "#/definitions/source"
         }
     },
+    "allOf": [
+        {
+            "description": "Require readmeMarkdown or file",
+            "oneOf": [
+                {
+                    "required": [
+                        "readmeMarkdown"
+                    ]
+                },
+                {
+                    "required": [
+                        "readmeFile"
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Allow either licenseFile, licenseMarkdown, or neither - but not both",
+            "oneOf": [
+                {
+                    "required": [
+                        "licenseMarkdown"
+                    ]
+                },
+                {
+                    "required": [
+                        "licenseFile"
+                    ]
+                }
+            ]
+        }
+    ],
     "definitions": {
         "source": {
             "type": "array",
