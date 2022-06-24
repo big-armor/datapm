@@ -19,7 +19,7 @@ import { JobContext } from "../../task/JobContext";
 import { Maybe } from "../../util/Maybe";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
-import { getAuthToken } from "./TimeplusConnector";
+import { getApiKey } from "./TimeplusConnector";
 import { DISPLAY_NAME, TYPE } from "./TimeplusConnectorDescription";
 import { fetch } from "cross-fetch";
 import { SemVer } from "semver";
@@ -134,7 +134,7 @@ export class TimeplusSink implements Sink {
         if (schema.properties == null) throw new Error("Schema properties not definied, and are required");
         const keys = Object.keys(schema.properties);
 
-        const authToken = getAuthToken(credentialsConfiguration);
+        const apiKey = getApiKey(credentialsConfiguration);
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
@@ -194,7 +194,7 @@ export class TimeplusSink implements Sink {
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
-                            Authorization: `Bearer ${authToken}`,
+                            "X-Api-Key": apiKey,
                             "Content-Type": "application/json",
                             Accept: "application/json"
                         },
@@ -256,11 +256,13 @@ export class TimeplusSink implements Sink {
 
         const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
 
+        const apiKey = getApiKey(credentialsConfiguration);
+
         const response = await fetch(url, {
             method: "GET",
             headers: {
                 Accept: "application/json",
-                Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
+                "X-Api-Key": apiKey
             }
         });
 
@@ -288,7 +290,7 @@ export class TimeplusSink implements Sink {
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${getAuthToken(credentialsConfiguration)}`
+                    "X-Api-Key": apiKey
                 },
                 body: requestBody
             });
