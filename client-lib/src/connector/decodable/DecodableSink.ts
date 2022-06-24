@@ -12,7 +12,10 @@ import {
     ParameterType,
     ValueTypes,
     ValueTypeStatistics,
-    DPMPropertyTypes
+    DPMPropertyTypes,
+    DPMRecord,
+    Properties,
+    DPMRecordValue
 } from "datapm-lib";
 import { Transform } from "stream";
 import { JobContext } from "../../task/JobContext";
@@ -24,6 +27,8 @@ import { DISPLAY_NAME, TYPE } from "./DecodableConnectorDescription";
 import { fetch } from "cross-fetch";
 import { SemVer } from "semver";
 import { BatchingTransform } from "../../transforms/BatchingTransform";
+import moment, { MomentInput } from "moment";
+import { iam_v1 } from "googleapis";
 
 type DecodableConnection = {
     id: string;
@@ -239,7 +244,7 @@ export class DecodableSink implements Sink {
             },
             outputLocation: `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/streams`,
             lastOffset: undefined,
-            transforms: [new BatchingTransform(100, 100)],
+            transforms: [new BatchingTransform(1, 100)],
             writable: new Transform({
                 objectMode: true,
                 transform: async (
@@ -250,11 +255,23 @@ export class DecodableSink implements Sink {
                     const events = records.map((r) => {
                         const record = r.recordContext.record;
                         if (configuration["event-time-" + schema.title] === RECIEVE_TIME) {
-                            record[RECIEVE_TIME] = r.recordContext.receivedDate;
+                            record[RECIEVE_TIME] = r.recordContext.receivedDate
+                                .toISOString()
+                                .replace(/[T]/g, " ")
+                                .replace("Z", "");
                         }
 
                         return record;
                     });
+
+                    for (const event of events) {
+                        makeDecodableSafeObjects(schema.properties, event);
+                    }
+
+                    const body = JSON.stringify({
+                        events
+                    });
+
                     const response = await fetch(
                         `https://${connectionConfiguration.account}.api.decodable.co/v1alpha2/connections/${connectionId}/events`,
                         {
@@ -264,16 +281,14 @@ export class DecodableSink implements Sink {
                                 "Content-Type": "application/json",
                                 Accept: "application/json"
                             },
-                            body: JSON.stringify({
-                                events
-                            })
+                            body
                         }
                     );
 
                     if (response.status !== 202) {
                         callback(
                             new Error(
-                                `Unexpected response status ${response.status} body ${JSON.stringify(response.text())}`
+                                `Unexpected response status ${response.status} body ${JSON.stringify(response.json())}`
                             )
                         );
                         return;
@@ -588,6 +603,60 @@ export class DecodableSink implements Sink {
         }
 
         return decodableSchema;
+    }
+}
+
+function makeDecodableSafeObjects(properties: Properties, object: DPMRecord): void {
+    for (const key of Object.keys(properties)) {
+        const property = properties[key];
+
+        if (property == null) {
+            throw new Error("Schema property " + key + " is not found");
+        }
+
+        if (property.title == null) {
+            throw new Error("Schema property " + key + " must have a title");
+        }
+
+        if (object[property.title] === undefined) {
+            object[property.title] = null;
+            continue;
+        }
+
+        const removedNull = Object.keys(property.types).filter((t) => t !== "null");
+
+        if (removedNull.length > 1) {
+            throw new Error("Decodable Sink does not support schemas with more than one type");
+        }
+
+        if (removedNull.length === 0) {
+            throw new Error("column has no value types");
+        }
+
+        const type = removedNull[0];
+
+        if (type === "object") {
+            const valueType = property.types.object;
+
+            makeDecodableSafeObjects(valueType?.objectProperties as Properties, object[property.title] as DPMRecord);
+        }
+
+        if (type === "array") {
+            const valueType = property.types.array;
+
+            if (valueType?.arrayTypes?.object != null) {
+                for (const arrayValue of object[property.title] as Array<DPMRecord>) {
+                    makeDecodableSafeObjects(valueType?.arrayTypes?.object.objectProperties as Properties, arrayValue);
+                }
+            }
+        }
+
+        if (type === "date-time") {
+            const value = object[property.title];
+            const momentValue = moment(value as MomentInput);
+
+            object[property.title] = momentValue.toISOString().replace(/[T]/g, " ").replace("Z", "");
+        }
     }
 }
 

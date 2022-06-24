@@ -1,3 +1,15 @@
+#### 0.31.38 (2022-06-23)
+
+##### Bug Fixes
+
+*  Decodable timestamp and missing properties ([480f0319](https://github.com/big-armor/datapm/commit/480f0319d0383f1fe89a8ea7817730178007397b))
+
+#### 0.31.37 (2022-06-22)
+
+##### Build System / Dependencies
+
+* **deps:**  bump semver-regex from 3.1.3 to 3.1.4 in /client-lib ([#506](https://github.com/big-armor/datapm/pull/506)) ([4e051c07](https://github.com/big-armor/datapm/commit/4e051c07d13b4800edafce041f0d2221b3b86288))
+
 #### 0.31.36 (2022-06-16)
 
 ##### New Features
