@@ -67,7 +67,7 @@ export class CopyPackageCommandModule {
 
         await task.end(
             "SUCCESS",
-            `Found target package file: ${packageFileWithContext.packageFileUrl.replace("file://", "")}`
+            `Found target package file: ${packageFileWithContext.packageReference.replace("file://", "")}`
         );
 
         const defaultSaveLocation = path.join(

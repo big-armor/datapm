@@ -5,9 +5,9 @@ import {
     removePackageFiles,
     TEST_SOURCE_FILES,
     testCmd,
-    getPromptInputs
+    getPromptInputs,
+    loadTestPackageFile
 } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -84,7 +84,7 @@ describe("XML Tests", function () {
         const exitCode = await testCmd("package", [TEST_SOURCE_FILES.FILE12], prompts);
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("country-currencies.datapm.json");
+        const packageFile = loadTestPackageFile("country-currencies");
 
         expect(packageFile.displayName).equal("country-currencies");
         expect(packageFile.schemas[0].recordCount).equal(279);

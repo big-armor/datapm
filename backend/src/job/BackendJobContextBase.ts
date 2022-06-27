@@ -115,7 +115,7 @@ export abstract class BackendJobContextBase extends JobContext {
         return {
             contextType: "registry",
             hasPermissionToSave: editPermission,
-            packageFileUrl: process.env["REGISTRY_URL"] + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
+            packageReference: process.env["REGISTRY_URL"] + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
             packageFile: latestPackageFile,
             permitsSaving: true,
             save: async (packageFile: PackageFile): Promise<void> => {

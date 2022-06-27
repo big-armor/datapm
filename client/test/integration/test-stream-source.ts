@@ -1,8 +1,7 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import execa from "execa";
 import { resetConfiguration } from "../../src/util/ConfigUtil";
-import { getPromptInputs, removePackageFiles, testCmd, TestResults, KEYS } from "./test-utils";
+import { getPromptInputs, removePackageFiles, testCmd, TestResults, KEYS, loadTestPackageFile } from "./test-utils";
 
 const generateCommandPrompts = [
     "Exclude any attributes",
@@ -181,7 +180,7 @@ describe("Test Stream Source Test", function () {
     });
 
     it("Validate the contents of the JSON file", async function () {
-        const packageFile = loadPackageFileFromDisk("test.datapm.json");
+        const packageFile = loadTestPackageFile("test");
         expect(packageFile.schemas.length).equals(1);
         const properties = packageFile.schemas[0].properties;
 

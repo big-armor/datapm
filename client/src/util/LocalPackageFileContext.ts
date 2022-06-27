@@ -9,7 +9,12 @@ import { SemVer } from "semver";
 
 export class LocalPackageFileContext implements PackageFileWithContext {
     // eslint-disable-next-line no-useless-constructor
-    constructor(public jobContext: JobContext, public packageFile: PackageFile, public catalog: string) {}
+    constructor(
+        public jobContext: JobContext,
+        public packageFile: PackageFile,
+        public filePath: string | undefined,
+        public catalogSlug: string
+    ) {}
 
     get contextType(): "localFile" {
         return "localFile";
@@ -20,9 +25,18 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 
     get hasPermissionToSave(): boolean {
-        const fileStats = fs.statSync(this.packageFileUrl);
+        const fileLocation = generatePackageFileLocation(this.basePath(), this.packageFile);
 
-        return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
+        if (fs.existsSync(fileLocation)) {
+            const fileStats = fs.statSync(fileLocation);
+
+            return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
+        } else {
+            const dirName = path.dirname(fileLocation);
+
+            if (!fs.existsSync(dirName)) fs.mkdirSync(dirName, { recursive: true });
+            return true;
+        }
     }
 
     get cantSaveReason(): CantSaveReasons | false {
@@ -33,8 +47,12 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         return false;
     }
 
-    get packageFileUrl(): string {
-        return this.basePath();
+    get packageReference(): string {
+        if (this.catalogSlug === "local") return "local/" + this.packageFile.packageSlug;
+
+        if (this.filePath == null) throw new Error("filePath not defined, and catalog is not local");
+
+        return this.filePath;
     }
 
     get readmeFileUrl(): string | undefined {
@@ -77,8 +95,19 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 
     basePath(): string {
+        if (this.filePath) {
+            return path.dirname(this.filePath);
+        }
+
         const majorVersion = new SemVer(this.packageFile.version).major.toString();
-        return path.join(os.homedir(), "datapm", "data", this.catalog, this.packageFile.packageSlug, majorVersion);
+        return path.join(
+            os.homedir(),
+            "datapm",
+            "data",
+            this.catalogSlug ?? "local",
+            this.packageFile.packageSlug,
+            majorVersion
+        );
     }
 }
 
@@ -87,10 +116,7 @@ async function writePackageFile(basePath: string, packageFile: PackageFile): Pro
 
     if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
 
-    const packageFileLocation = path.join(
-        basePath,
-        packageFile.packageSlug + "-" + packageFile.version + ".datapm.json"
-    );
+    const packageFileLocation = generatePackageFileLocation(basePath, packageFile);
 
     const writeStream = fs.createWriteStream(packageFileLocation);
 
@@ -99,22 +125,27 @@ async function writePackageFile(basePath: string, packageFile: PackageFile): Pro
     return packageFileLocation;
 }
 
+function generatePackageFileLocation(basePath: string, packageFile: PackageFile): string {
+    return path.join(basePath, packageFile.packageSlug + "-" + packageFile.version + ".datapm.json");
+}
+
 async function writeReadmeFile(basePath: string, packageFile: PackageFile): Promise<string> {
     const contents =
         packageFile.readmeMarkdown != null
             ? packageFile.readmeMarkdown
             : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
 
-    const readmeFileLocation =
-        packageFile.readmeFile != null
-            ? packageFile.readmeFile
-            : path.join(basePath, packageFile.packageSlug + ".README.md");
+    if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
+
+    const readmeFileName = packageFile.packageSlug + ".README.md";
+    const readmeFileLocation = path.join(basePath, readmeFileName);
 
     const writable = fs.createWriteStream(readmeFileLocation);
 
     await writeFile(writable, contents);
 
     delete packageFile.readmeMarkdown;
+    packageFile.readmeFile = readmeFileName;
 
     return readmeFileLocation;
 }
@@ -125,16 +156,17 @@ async function writeLicenseFile(basePath: string, packageFile: PackageFile): Pro
             ? (packageFile.licenseMarkdown as string)
             : "# License\n\nLicense not defined. Contact author.";
 
-    const licenseFileLocation =
-        packageFile.licenseFile != null
-            ? packageFile.licenseFile
-            : path.join(basePath, packageFile.packageSlug + ".LICENSE.md");
+    if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
+
+    const licenseFile = packageFile.packageSlug + ".LICENSE.md";
+    const licenseFileLocation = path.join(basePath, licenseFile);
 
     const writable = fs.createWriteStream(licenseFileLocation);
 
     await writeFile(writable, contents);
 
     delete packageFile.licenseMarkdown;
+    packageFile.licenseFile = licenseFile;
 
     return licenseFileLocation;
 }

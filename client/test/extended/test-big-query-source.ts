@@ -1,7 +1,14 @@
 import { expect } from "chai";
 import execa from "execa";
-import { getPromptInputs, removePackageFiles, testCmd, TestResults, KEYS } from "../integration/test-utils";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import {
+    getPromptInputs,
+    removePackageFiles,
+    testCmd,
+    TestResults,
+    KEYS,
+    loadTestPackageFile
+} from "../integration/test-utils";
+import { Properties, Schema } from "datapm-lib";
 
 /** This test requires two environment variables to run
  *
@@ -102,7 +109,7 @@ describe("Big Query Source Test", function () {
     });
 
     it("Validate the contents of the package file test1", async function () {
-        const packageFile = loadPackageFileFromDisk("test1.datapm.json");
+        const packageFile = loadTestPackageFile("test1");
         expect(packageFile.schemas.length).equals(1);
         const columns = [
             {
@@ -205,7 +212,7 @@ describe("Big Query Source Test", function () {
     });
 
     it("Validate the contents of the package file test2", async function () {
-        const packageFile = loadPackageFileFromDisk("test2.datapm.json");
+        const packageFile = loadTestPackageFile("test2");
         expect(packageFile.schemas.length).equals(1);
         const columns = [
             {

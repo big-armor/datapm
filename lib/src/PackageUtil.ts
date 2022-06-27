@@ -605,6 +605,7 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
         }
 
         packageFile.readmeMarkdown = fs.readFileSync(readmeFileAbsolutePath).toString();
+        delete packageFile.readmeFile;
     }
 
     if (packageFile.licenseFile != null) {
@@ -615,6 +616,7 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
         }
 
         packageFile.licenseMarkdown = fs.readFileSync(licenseFileAbsolutePath).toString();
+        delete packageFile.licenseFile;
     }
 
     return packageFile;

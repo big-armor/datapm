@@ -1,18 +1,14 @@
 /**
  * Not enough ticker changes all the time to test this.
  * import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("FTX Source", () => {
     after(() => {
-        if (fs.existsSync("ftx-btc-usd-ticker.datapm.json")) {
-            fs.unlinkSync("ftx-btc-usd-ticker.datapm.json");
-            fs.unlinkSync("ftx-btc-usd-ticker.README.md");
-            fs.unlinkSync("ftx-btc-usd-ticker.LICENSE.md");
-        }
+        removePackageFiles(["ftx-btc-usd-ticker"]);
+a
         if (fs.existsSync("ticker.csv")) {
             fs.unlinkSync("ticker.csv");
         }
@@ -99,7 +95,7 @@ describe("FTX Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("ftx-btc-usd-ticker.datapm.json");
+        const packageFile = loadTestPackageFile("ftx-btc-usd-ticker");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -110,7 +106,7 @@ describe("FTX Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["ftx-btc-usd-ticker.datapm.json"],
+            ["local/ftx-btc-usd-ticker"],
             [
                 {
                     message: "Exclude any attributes from",
@@ -174,7 +170,7 @@ describe("FTX Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["ftx-btc-usd-ticker.datapm.json"],
+            ["local/ftx-btc-usd-ticker"],
             [
                 {
                     message: "Exclude any attributes from",

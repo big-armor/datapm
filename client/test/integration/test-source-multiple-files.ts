@@ -5,7 +5,8 @@ import {
     removePackageFiles,
     KEYS,
     getPromptInputs,
-    testCmd
+    testCmd,
+    loadTestPackageFile
 } from "./test-utils";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -46,9 +47,8 @@ describe("Multiple CSV Tests", function () {
             ]
         );
 
-        const packageFile = loadPackageFileFromDisk(packageFilePath);
+        const packageFile = loadTestPackageFile(packageFilePath);
 
-        expect(packageFilePath.endsWith("non-profits.datapm.json")).eq(true);
         expect(packageFile.displayName).equal("non-profits");
         expect(packageFile.schemas[0].recordCount).equal(396);
     });
@@ -67,7 +67,7 @@ describe("Multiple CSV Tests", function () {
         );
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("non-profits.datapm.json");
+        const packageFile = loadTestPackageFile("non-profits");
 
         expect(packageFile.displayName).equal("non-profits");
         expect(packageFile.schemas[0].recordCount).equal(396);

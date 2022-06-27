@@ -281,7 +281,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     hasPermissionToSave: false,
                     licenseFileUrl: "",
                     readmeFileUrl: "",
-                    packageFileUrl: "",
+                    packageReference: "",
                     permitsSaving: false,
                     save: () => {
                         throw new Error("Save not available");

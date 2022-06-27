@@ -2,18 +2,15 @@
  * Not enough matches all the time to test this.
  * 
  * import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
+import { loadTestPackageFile } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Coinbase Matches Source", () => {
     after(() => {
-        if (fs.existsSync("coinbase-btc-usd-match.datapm.json")) {
-            fs.unlinkSync("coinbase-btc-usd-match.datapm.json");
-            fs.unlinkSync("coinbase-btc-usd-match.README.md");
-            fs.unlinkSync("coinbase-btc-usd-match.LICENSE.md");
-        }
+        removePackageFiles(["coinbase-btc-usd-match"]);
+
         if (fs.existsSync("match.csv")) {
             fs.unlinkSync("match.csv");
         }
@@ -97,7 +94,7 @@ describe("Coinbase Matches Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("coinbase-btc-usd-matches.datapm.json");
+        const packageFile = loadTestPackageFile("coinbase-btc-usd-matches");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -108,7 +105,7 @@ describe("Coinbase Matches Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["coinbase-btc-usd-matches.datapm.json"],
+            ["local/coinbase-btc-usd-matches"],
             [
                 {
                     message: "Exclude any attributes from",
@@ -172,7 +169,7 @@ describe("Coinbase Matches Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["coinbase-btc-usd-matches.datapm.json"],
+            ["local/coinbase-btc-usd-matches"],
             [
                 {
                     message: "Exclude any attributes from",

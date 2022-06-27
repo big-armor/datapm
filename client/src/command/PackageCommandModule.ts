@@ -68,6 +68,8 @@ export async function generatePackage(args: PackageCommandArguments): Promise<vo
     try {
         await publishCommand.handleCommand({ reference: jobResult.result?.packageFileLocation });
     } catch (error) {
+        jobContext.print("ERROR", error.message);
+
         jobContext.print("NONE", "");
         jobContext.print("NONE", chalk.grey("You can publish the package file with the following command later"));
         jobContext.print("NONE", chalk.green(`datapm publish ${jobResult.result?.packageFileLocation}`));

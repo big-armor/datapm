@@ -2,18 +2,13 @@
  * 
  * 
  * import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Kraken Ticker Source", () => {
     after(() => {
-        if (fs.existsSync("kraken-eth-usd-ticker.datapm.json")) {
-            fs.unlinkSync("kraken-eth-usd-ticker.datapm.json");
-            fs.unlinkSync("kraken-eth-usd-ticker.README.md");
-            fs.unlinkSync("kraken-eth-usd-ticker.LICENSE.md");
-        }
+        removePackageFile(["kraken-eth-usd-ticker"]);
         if (fs.existsSync("ticker.csv")) {
             fs.unlinkSync("ticker.csv");
         }
@@ -96,7 +91,7 @@ describe("Kraken Ticker Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("kraken-eth-usd-ticker.datapm.json");
+        const packageFile = loadTestPackageFile("kraken-eth-usd-ticker");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -108,7 +103,7 @@ describe("Kraken Ticker Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["kraken-eth-usd-ticker.datapm.json"],
+            ["local/kraken-eth-usd-ticker"],
             [
                 {
                     message: "Exclude any attributes from",

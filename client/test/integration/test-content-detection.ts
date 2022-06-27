@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, PackageFile } from "datapm-lib";
+import { PackageFile } from "datapm-lib";
 import {
     AGE_LABEL,
     CREDIT_CARD_NUMBER,
@@ -28,6 +28,7 @@ import {
     createTestPackage,
     createTestUser,
     KEYS,
+    loadTestPackageFile,
     removePackageFiles,
     TEST_SOURCE_FILES
 } from "./test-utils";
@@ -64,7 +65,7 @@ describe("Content Detection Tests", async function () {
                 ]
             );
 
-            packageA = loadPackageFileFromDisk("package-a.datapm.json");
+            packageA = loadTestPackageFile("package-a");
         } catch (error) {
             console.log(JSON.stringify(error));
             throw error;

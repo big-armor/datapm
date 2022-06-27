@@ -3,18 +3,15 @@
  * Not always enough data to test
  * 
  * import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
+import { loadTestPackageFile } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Coinbase Ticker Source", () => {
     after(() => {
-        if (fs.existsSync("coinbase-btc-usd-ticker.datapm.json")) {
-            fs.unlinkSync("coinbase-btc-usd-ticker.datapm.json");
-            fs.unlinkSync("coinbase-btc-usd-ticker.README.md");
-            fs.unlinkSync("coinbase-btc-usd-ticker.LICENSE.md");
-        }
+        removePackageFiles(["coinbase-btc-usd-ticker"]);
+
         if (fs.existsSync("ticker.csv")) {
             fs.unlinkSync("ticker.csv");
         }
@@ -97,7 +94,7 @@ describe("Coinbase Ticker Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("coinbase-btc-usd-ticker.datapm.json");
+        const packageFile = loadTestPackageFile("coinbase-btc-usd-ticker");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -108,7 +105,7 @@ describe("Coinbase Ticker Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["coinbase-btc-usd-ticker.datapm.json"],
+            ["local/coinbase-btc-usd-ticker"],
             [
                 {
                     message: "Exclude any attributes from",
@@ -172,7 +169,7 @@ describe("Coinbase Ticker Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["coinbase-btc-usd-ticker.datapm.json"],
+            ["local/coinbase-btc-usd-ticker"],
             [
                 {
                     message: "Exclude any attributes from",

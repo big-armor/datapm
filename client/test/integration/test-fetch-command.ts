@@ -278,7 +278,7 @@ describe("Fetch Command Tests", async function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["package-b.datapm.json", "--forceUpdate"],
+            ["local/package-b", "--forceUpdate"],
             prompts,
             async (line: string) => {
                 if (line.includes("Finished writing 51 records")) {

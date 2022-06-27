@@ -1,5 +1,13 @@
-import { createApiKey, createTestUser, KEYS, testCmd, removePackageFiles, TEST_SOURCE_FILES } from "./test-utils";
-import { SinkState, loadPackageFileFromDisk } from "datapm-lib";
+import {
+    createApiKey,
+    createTestUser,
+    KEYS,
+    testCmd,
+    removePackageFiles,
+    TEST_SOURCE_FILES,
+    loadTestPackageFile
+} from "./test-utils";
+import { SinkState } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -116,7 +124,7 @@ describe("CSV Offset Tests", function () {
 
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("countries.datapm.json");
+        const packageFile = loadTestPackageFile("countries");
 
         expect(packageFile.displayName).equal("countries");
         expect(packageFile.schemas[0].recordCount).equal(5);
@@ -125,7 +133,7 @@ describe("CSV Offset Tests", function () {
     it("Should fetch data first time", async () => {
         const exitCode = await testCmd(
             "fetch",
-            ["countries.datapm.json"],
+            ["local/countries"],
             [
                 {
                     message: "Exclude any attributes from",
@@ -176,7 +184,7 @@ describe("CSV Offset Tests", function () {
 
         const exitCode = await testCmd(
             "fetch",
-            ["countries.datapm.json"],
+            ["local/countries"],
             [
                 {
                     message: "Exclude any attributes from",

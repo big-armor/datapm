@@ -55,11 +55,16 @@ export class CLIJobContext extends JobContext {
                 reference.packageSlug;
         }
 
-        return getPackage(this, reference, modifiedOrCanonical);
+        return getPackage(this, reference as string, modifiedOrCanonical);
     }
 
     async saveNewPackageFile(catalog: string, packageFile: PackageFile): Promise<PackageFileWithContext> {
-        const packageFileWithContext = new LocalPackageFileContext(this, packageFile, catalog);
+        if (catalog == null) catalog = "local";
+
+        if (catalog !== "local")
+            throw new Error("Can only save new package files to the 'local' catalog in a local context");
+
+        const packageFileWithContext = new LocalPackageFileContext(this, packageFile, undefined, catalog);
 
         await packageFileWithContext.save(packageFile);
 

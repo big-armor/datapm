@@ -190,7 +190,7 @@ describe("Compare Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("compare", [packageAFilePath, packageBFilePath], [], async (line: string) => {
-            if (line.includes("Found 9 differences")) {
+            if (line.includes("Found 7 differences")) {
                 results.messageFound = true;
             }
         });

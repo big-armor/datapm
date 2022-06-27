@@ -7,13 +7,12 @@ import {
     createTestUser,
     getPromptInputs,
     KEYS,
+    loadTestPackageFile,
     removePackageFiles,
     testCmd,
     TestResults,
     TEST_SOURCE_FILES
 } from "./test-utils";
-
-import { loadPackageFileFromDisk } from "datapm-lib";
 
 const generateCommandPromptsWithDerivedFrom = [
     "Is there a header line above?",
@@ -98,7 +97,7 @@ describe("Package - Derived From", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const packageFileObject = loadPackageFileFromDisk("package-a.datapm.json");
+        const packageFileObject = loadTestPackageFile("package-a");
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(packageFileObject.schemas[0].derivedFrom![0].url).equal("https://test.datapm-not-a-site.io");
