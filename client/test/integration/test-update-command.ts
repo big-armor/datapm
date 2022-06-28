@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { PackageFile, Properties } from "datapm-lib";
+import { loadPackageFileFromDisk, PackageFile, Properties } from "datapm-lib";
 import faker from "faker";
 import fs from "fs";
 import moment from "moment";
@@ -263,18 +263,13 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd(
-            "update",
-            [packageAReference, "--forceUpdate"],
-            prompts,
-            async (line: string) => {
-                if (line.includes("When you are ready, you can publish with the following command")) {
-                    results.messageFound = true;
-                }
+        const cmdResult = await testCmd("update", [packageAPath2, "--forceUpdate"], prompts, async (line: string) => {
+            if (line.includes("When you are ready, you can publish with the following command")) {
+                results.messageFound = true;
             }
-        );
+        });
 
-        const newPackageFile: PackageFile = loadTestPackageFile(packageAReference);
+        const newPackageFile: PackageFile = loadPackageFileFromDisk(packageAPath2);
 
         expect(cmdResult.code, "Exit code").equals(0);
 
@@ -282,12 +277,12 @@ describe("Update Package Command Tests", async () => {
     });
 
     it("Should preserve README and LICENSE files", async () => {
-        const packageFile: PackageFile = loadTestPackageFile(packageAReference);
+        const packageJSON = JSON.parse(fs.readFileSync(packageAPath2, "utf8"));
 
         const packageDirectory = path.dirname(packageAPath2);
 
-        fs.writeFileSync(path.join(packageDirectory, packageFile.readmeFile as string), "README SAVED");
-        fs.writeFileSync(path.join(packageDirectory, packageFile.licenseFile as string), "LICENSE SAVED");
+        fs.writeFileSync(path.join(packageDirectory, packageJSON.readmeFile as string), "README SAVED");
+        fs.writeFileSync(path.join(packageDirectory, packageJSON.licenseFile as string), "LICENSE SAVED");
 
         const prompts: PromptInput[] = [
             {
@@ -318,16 +313,14 @@ describe("Update Package Command Tests", async () => {
         expect(rawPackageFile.readmeMarkdown).to.equal(undefined);
         expect(rawPackageFile.licenseMarkdown).to.equal(undefined);
 
-        const newPackageFile: PackageFile = loadTestPackageFile(packageAPath2);
-
         const readmeContents = fs.readFileSync(
-            path.join(packageDirectory, newPackageFile.readmeFile as string),
+            path.join(packageDirectory, rawPackageFile.readmeFile as string),
             "utf-8"
         );
         expect(readmeContents).equals("README SAVED");
 
         const licenseContents = fs.readFileSync(
-            path.join(packageDirectory, newPackageFile.licenseFile as string),
+            path.join(packageDirectory, rawPackageFile.licenseFile as string),
             "utf-8"
         );
         expect(licenseContents).equals("LICENSE SAVED");

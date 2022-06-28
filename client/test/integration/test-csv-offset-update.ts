@@ -13,9 +13,19 @@ import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import fs from "fs";
 
+function cleanUp() {
+    removePackageFiles(["countries"]);
+    if (fs.existsSync("countries-v1.json")) fs.unlinkSync("countries-v1.json");
+    if (fs.existsSync("countries.csv")) fs.unlinkSync("countries.csv");
+    if (fs.existsSync("countries.json")) fs.unlinkSync("countries.json");
+    if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
+    if (fs.existsSync("local-countries-1-state.json")) fs.unlinkSync("local-countries-1-state.json");
+}
+
 describe("CSV Offset Tests", function () {
     before(async () => {
         resetConfiguration();
+        cleanUp();
         const userAClient = await createTestUser();
         const apiKey = await createApiKey(userAClient);
         addRegistry({
@@ -25,12 +35,7 @@ describe("CSV Offset Tests", function () {
     });
 
     after(() => {
-        removePackageFiles(["countries"]);
-        if (fs.existsSync("countries-v1.json")) fs.unlinkSync("countries-v1.json");
-        if (fs.existsSync("countries.csv")) fs.unlinkSync("countries.csv");
-        if (fs.existsSync("countries.json")) fs.unlinkSync("countries.json");
-        if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
-        if (fs.existsSync("local-countries-1-state.json")) fs.unlinkSync("local-countries-1-state.json");
+        cleanUp();
     });
 
     it("Should create a test package", async () => {

@@ -66,7 +66,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     async save(packageFile: PackageFile): Promise<void> {
         let task = await this.jobContext.startTask("Writing README file...");
         try {
-            const readmeFileLocation = await writeReadmeFile(this.basePath(), packageFile);
+            const readmeFileLocation = await this.writeReadmeFile(packageFile);
             await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
         } catch (error) {
             await task.end("ERROR", `Unable to write the README file: ${error.message}`);
@@ -75,7 +75,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
 
         task = await this.jobContext.startTask("Writing LICENSE file...");
         try {
-            const licenseFileLocation = await writeLicenseFile(this.basePath(), packageFile);
+            const licenseFileLocation = await this.writeLicenseFile(packageFile);
             await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
         } catch (error) {
             await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
@@ -85,7 +85,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         task = await this.jobContext.startTask("Writing package file...");
 
         try {
-            const packageFileLocation = await writePackageFile(this.basePath(), packageFile);
+            const packageFileLocation = await this.writePackageFile(packageFile);
 
             await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
         } catch (error) {
@@ -109,66 +109,74 @@ export class LocalPackageFileContext implements PackageFileWithContext {
             majorVersion
         );
     }
-}
 
-async function writePackageFile(basePath: string, packageFile: PackageFile): Promise<string> {
-    const json = JSON.stringify(packageFile, null, " ");
+    async writePackageFile(packageFile: PackageFile): Promise<string> {
+        const json = JSON.stringify(packageFile, null, " ");
 
-    if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
+        let packageFileLocation = this.filePath;
 
-    const packageFileLocation = generatePackageFileLocation(basePath, packageFile);
+        if (packageFileLocation == null) {
+            if (!fs.existsSync(this.basePath())) fs.mkdirSync(this.basePath(), { recursive: true });
 
-    const writeStream = fs.createWriteStream(packageFileLocation);
+            packageFileLocation = generatePackageFileLocation(this.basePath(), packageFile);
+        }
 
-    await writeFile(writeStream, json);
+        const writeStream = fs.createWriteStream(packageFileLocation);
 
-    return packageFileLocation;
+        await writeFile(writeStream, json);
+
+        return packageFileLocation;
+    }
+
+    async writeReadmeFile(packageFile: PackageFile): Promise<string> {
+        const contents =
+            packageFile.readmeMarkdown != null
+                ? packageFile.readmeMarkdown
+                : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
+
+        const basePath = this.filePath ? path.dirname(this.filePath) : this.basePath();
+
+        if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
+
+        const readmeFileName = packageFile.readmeFile ? packageFile.readmeFile : packageFile.packageSlug + ".README.md";
+        const readmeFileLocation = path.join(basePath, readmeFileName);
+
+        const writable = fs.createWriteStream(readmeFileLocation);
+
+        await writeFile(writable, contents);
+
+        delete packageFile.readmeMarkdown;
+        packageFile.readmeFile = readmeFileName;
+
+        return readmeFileLocation;
+    }
+
+    async writeLicenseFile(packageFile: PackageFile): Promise<string> {
+        const contents =
+            typeof packageFile.licenseMarkdown === "string"
+                ? (packageFile.licenseMarkdown as string)
+                : "# License\n\nLicense not defined. Contact author.";
+
+        const basePath = this.filePath ? path.dirname(this.filePath) : this.basePath();
+
+        if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
+
+        const licenseFile = packageFile.licenseFile ? packageFile.licenseFile : packageFile.packageSlug + ".LICENSE.md";
+        const licenseFileLocation = path.join(basePath, licenseFile);
+
+        const writable = fs.createWriteStream(licenseFileLocation);
+
+        await writeFile(writable, contents);
+
+        delete packageFile.licenseMarkdown;
+        packageFile.licenseFile = licenseFile;
+
+        return licenseFileLocation;
+    }
 }
 
 function generatePackageFileLocation(basePath: string, packageFile: PackageFile): string {
     return path.join(basePath, packageFile.packageSlug + "-" + packageFile.version + ".datapm.json");
-}
-
-async function writeReadmeFile(basePath: string, packageFile: PackageFile): Promise<string> {
-    const contents =
-        packageFile.readmeMarkdown != null
-            ? packageFile.readmeMarkdown
-            : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
-
-    if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
-
-    const readmeFileName = packageFile.packageSlug + ".README.md";
-    const readmeFileLocation = path.join(basePath, readmeFileName);
-
-    const writable = fs.createWriteStream(readmeFileLocation);
-
-    await writeFile(writable, contents);
-
-    delete packageFile.readmeMarkdown;
-    packageFile.readmeFile = readmeFileName;
-
-    return readmeFileLocation;
-}
-
-async function writeLicenseFile(basePath: string, packageFile: PackageFile): Promise<string> {
-    const contents =
-        typeof packageFile.licenseMarkdown === "string"
-            ? (packageFile.licenseMarkdown as string)
-            : "# License\n\nLicense not defined. Contact author.";
-
-    if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
-
-    const licenseFile = packageFile.packageSlug + ".LICENSE.md";
-    const licenseFileLocation = path.join(basePath, licenseFile);
-
-    const writable = fs.createWriteStream(licenseFileLocation);
-
-    await writeFile(writable, contents);
-
-    delete packageFile.licenseMarkdown;
-    packageFile.licenseFile = licenseFile;
-
-    return licenseFileLocation;
 }
 
 async function writeFile(writable: Writable, contents: string) {

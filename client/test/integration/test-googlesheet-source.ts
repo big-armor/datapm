@@ -46,7 +46,7 @@ describe("Googlesheet Source Test", function () {
                 }
             ],
             async (line: string) => {
-                console.log(line);
+                // console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

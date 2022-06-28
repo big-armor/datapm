@@ -74,7 +74,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             };
         }
 
-        await task.end("SUCCESS", "Found package file");
+        await task.end("SUCCESS", "Found package file: " + packageFileWithContext.packageReference);
 
         task = await this.jobContext.startTask("Checking edit permissions...");
 
@@ -227,6 +227,13 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 credentialsConfiguration,
                 sourceConfiguration
             );
+
+            // remove the updateConfiguration related keys, and save the remaining to the source
+            for (const updateOnlyKey of Object.keys(sourceObject.updateConfiguration || {})) {
+                delete sourceConfiguration[updateOnlyKey];
+            }
+
+            sourceObject.configuration = sourceConfiguration;
 
             const streamSets: StreamSet[] = [];
             for (const streamSet of uriInspectionResults.streamSetPreviews) {
