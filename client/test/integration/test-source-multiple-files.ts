@@ -10,7 +10,6 @@ import {
 } from "./test-utils";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 
 describe("Multiple CSV Tests", function () {

@@ -9,7 +9,6 @@ import {
     getPromptInputs,
     loadTestPackageFile
 } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
