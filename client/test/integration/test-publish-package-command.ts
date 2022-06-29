@@ -23,11 +23,17 @@ const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);
 
+function cleanUp() {
+    removePackageFiles(["state-codes"]);
+    if (fs.existsSync("package-a-updated.datapm.json")) fs.unlinkSync("package-a-updated.datapm.json");
+}
+
 describe("Publish Package Command Tests", async function () {
     let apiKey = "";
     let packageAFilePath = "";
 
     before(async () => {
+        cleanUp();
         resetConfiguration();
         const userAClient: ApolloClient<NormalizedCacheObject> = await createTestUser();
         apiKey = await createApiKey(userAClient);
@@ -39,7 +45,7 @@ describe("Publish Package Command Tests", async function () {
     });
 
     after(() => {
-        removePackageFiles(["state-codes"]);
+        cleanUp();
         resetConfiguration();
     });
 
@@ -294,7 +300,7 @@ describe("Publish Package Command Tests", async function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const packageFileAfterPublish: PackageFile = loadPackageFileFromDisk("state-codes-3.0.0.datapm.json");
+        const packageFileAfterPublish: PackageFile = loadPackageFileFromDisk(newPackageFileLocation);
 
         expect(packageFileAfterPublish.version).equals("3.0.0");
 
