@@ -302,7 +302,7 @@ describe("Publish Package Command Tests", async function () {
 
         const packageFileAfterPublish: PackageFile = loadPackageFileFromDisk(newPackageFileLocation);
 
-        expect(packageFileAfterPublish.version).equals("3.0.0");
+        expect(packageFileAfterPublish.version).equals("2.0.0");
 
         fs.unlinkSync(newPackageFileLocation);
     });
