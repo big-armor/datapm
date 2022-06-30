@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import ora from "ora";
-import path from "path";
 import {
     Task,
     RepositoryConfig,
@@ -56,20 +55,18 @@ export class CLIJobContext extends JobContext {
                 reference.packageSlug;
         }
 
-        return getPackage(this, reference, modifiedOrCanonical);
+        return getPackage(this, reference as string, modifiedOrCanonical);
     }
 
-    async saveNewPackageFile(
-        catalogSlug: string | undefined,
-        packagefile: PackageFile
-    ): Promise<PackageFileWithContext> {
-        const packageFileWithContext = new LocalPackageFileContext(
-            this,
-            packagefile,
-            path.join(process.cwd(), packagefile.packageSlug + ".datapm.json")
-        );
+    async saveNewPackageFile(catalog: string, packageFile: PackageFile): Promise<PackageFileWithContext> {
+        if (catalog == null) catalog = "local";
 
-        await packageFileWithContext.save(packagefile);
+        if (catalog !== "local")
+            throw new Error("Can only save new package files to the 'local' catalog in a local context");
+
+        const packageFileWithContext = new LocalPackageFileContext(this, packageFile, undefined, catalog);
+
+        await packageFileWithContext.save(packageFile);
 
         return packageFileWithContext;
     }

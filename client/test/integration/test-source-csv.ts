@@ -6,9 +6,9 @@ import {
     removePackageFiles,
     TEST_SOURCE_FILES,
     testCmd,
-    getPromptInputs
+    getPromptInputs,
+    loadTestPackageFile
 } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -59,9 +59,8 @@ describe("CSV Source Tests", function () {
             ]
         );
 
-        const packageFile = loadPackageFileFromDisk(packageFilePath);
+        const packageFile = loadTestPackageFile(packageFilePath);
 
-        expect(packageFilePath.endsWith("airports-small.datapm.json")).eq(true);
         expect(packageFile.displayName).equal("airports-small");
         expect(packageFile.schemas[0].recordCount).equal(99);
     });
@@ -120,7 +119,7 @@ describe("CSV Source Tests", function () {
 
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("sea-levels.datapm.json");
+        const packageFile = loadTestPackageFile("sea-levels");
 
         expect(packageFile.displayName).equal("sea-levels");
         expect(packageFile.schemas[0].recordCount).equal(135);
@@ -174,7 +173,7 @@ describe("CSV Source Tests", function () {
 
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("coinbaseusd-small.datapm.json");
+        const packageFile = loadTestPackageFile("coinbaseusd-small");
 
         expect(packageFile.displayName).equal("coinbaseUSD-small");
         expect(packageFile.schemas[0].recordCount).equal(100);
@@ -183,9 +182,8 @@ describe("CSV Source Tests", function () {
     it("Should read UTF-8 encoded CVS with BOM headers", async () => {
         const packageFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE14, true, "business-confidence-index");
 
-        const packageFile = loadPackageFileFromDisk(packageFilePath);
+        const packageFile = loadTestPackageFile(packageFilePath);
 
-        expect(packageFilePath.endsWith("business-confidence-index.datapm.json")).eq(true);
         expect(packageFile.displayName).equal("business-confidence-index");
         expect(packageFile.schemas[0].recordCount).equal(99);
     });

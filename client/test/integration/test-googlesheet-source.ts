@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties } from "datapm-lib";
-import { KEYS, removePackageFiles, testCmd, TestResults, TEST_SOURCE_FILES } from "./test-utils";
+import { Properties } from "datapm-lib";
+import { KEYS, loadTestPackageFile, removePackageFiles, testCmd, TestResults, TEST_SOURCE_FILES } from "./test-utils";
 
 describe("Googlesheet Source Test", function () {
     before(async function () {
@@ -46,6 +46,7 @@ describe("Googlesheet Source Test", function () {
                 }
             ],
             async (line: string) => {
+                // console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -95,7 +96,7 @@ describe("Googlesheet Source Test", function () {
     });
 
     it("Validate the contents of the JSON file", async function () {
-        const newPackageFile = loadPackageFileFromDisk("test-sheet.datapm.json");
+        const newPackageFile = loadTestPackageFile("test-sheet");
 
         expect(newPackageFile.schemas.length).equals(2);
 

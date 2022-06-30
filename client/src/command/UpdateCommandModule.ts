@@ -29,7 +29,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
         if (taskResult.result.contextType === "localFile") {
             console.log("");
             console.log(chalk.grey("When you are ready, you can publish with the following command"));
-            console.log(chalk.green(`datapm publish ${taskResult.result.packageFileUrl.replace("file://", "")}`));
+            console.log(chalk.green(`datapm publish ${taskResult.result.packageReference.replace("file://", "")}`));
             process.exit(0);
         }
 

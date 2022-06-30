@@ -1,6 +1,5 @@
-import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs } from "./test-utils";
+import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs, loadTestPackageFile } from "./test-utils";
 import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("TAR File Tests", function () {
     after(() => {
@@ -19,7 +18,7 @@ describe("TAR File Tests", function () {
         const exitCode = await testCmd("package", ["--defaults", TEST_SOURCE_FILES.FILE25], prompts);
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("source.datapm.json");
+        const packageFile = loadTestPackageFile("source");
 
         expect(packageFile.displayName).equal("source");
         expect(packageFile.schemas[0].recordCount).equal(399);
@@ -33,7 +32,7 @@ describe("TAR File Tests", function () {
         const exitCode = await testCmd("package", ["--defaults", TEST_SOURCE_FILES.FILE25], prompts);
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("source.datapm.json");
+        const packageFile = loadTestPackageFile("source");
 
         expect(packageFile.displayName).equal("source");
         expect(packageFile.schemas[0].recordCount).equal(5953);

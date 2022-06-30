@@ -15,8 +15,10 @@ import {
     VerifyEmailAddressDocument
 } from "datapm-client-lib";
 import { dataServerPort, mailDevIpAddress, mailDevWebPortNumber, registryServerPort } from "./setup";
-import { createAPIKeyFromParts } from "datapm-lib";
+import { createAPIKeyFromParts, loadPackageFileFromDisk, PackageFile } from "datapm-lib";
 import fetch from "cross-fetch";
+import { getDataPMHomePath, getLocalPackageLatestVersionPath } from "../../src/util/GetPackageUtil";
+import path from "path";
 
 export const KEYS = {
     ENTER: "\n",
@@ -472,9 +474,10 @@ export async function createTestPackage(
             }
 
             if (line.includes("datapm publish ")) {
-                const matches = line.match(/datapm\spublish\s(.*)/);
+                const matches = line.match(/datapm\spublish\slocal\/(.*)/);
                 if (matches == null) throw new Error("No matches");
-                packageFilePath = matches[1];
+                const packageSlug = matches[1];
+                packageFilePath = getLocalPackageLatestVersionPath(packageSlug);
             }
         });
         if (packageFilePath === "") {
@@ -509,11 +512,17 @@ export function writeCSVFile(fileName: string, headers: string[], records: strin
     fs.writeFileSync(fileName, content);
 }
 
+export function loadTestPackageFile(packageName: string): PackageFile {
+    if (packageName.startsWith("local/")) packageName = packageName.replace("local/", "");
+    const packagePath = getLocalPackageLatestVersionPath(packageName);
+    return loadPackageFileFromDisk(packagePath);
+}
+
 export function removePackageFiles(packageNames: string[]): void {
     packageNames.forEach((packageName) => {
-        if (fs.existsSync(`${packageName}.datapm.json`)) fs.unlinkSync(`${packageName}.datapm.json`);
-        if (fs.existsSync(`${packageName}.README.md`)) fs.unlinkSync(`${packageName}.README.md`);
-        if (fs.existsSync(`${packageName}.LICENSE.md`)) fs.unlinkSync(`${packageName}.LICENSE.md`);
+        const packagePath = path.join(getDataPMHomePath(), "local", packageName);
+
+        if (fs.existsSync(packagePath)) fs.rmSync(packagePath, { recursive: true });
     });
 }
 

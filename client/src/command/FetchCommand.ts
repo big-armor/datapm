@@ -8,6 +8,7 @@ export class FetchArguments {
     sinkConfig?: string;
     sinkConnectionConfig?: string;
     sinkCredentialsConfig?: string;
+    sourceCredentialsIdentifier?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
     sinkRepository?: string;
@@ -40,6 +41,9 @@ export class FetchCommand implements Command {
                         type: "string"
                     })
                     .option("sourceCredentialsConfig", {
+                        type: "string"
+                    })
+                    .option("sourceCredentialsIdentifier", {
                         type: "string"
                     })
                     .option("sourceConfig", {

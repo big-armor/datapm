@@ -1,7 +1,10 @@
 import { Parameter, ParameterAnswer, DPMConfiguration, PackageFile, TaskStatus } from "datapm-lib";
+import path from "path";
 import { RepositoryConfig, RegistryConfig } from "../config/Config";
 import { PackageFileWithContext, PackageIdentifier } from "../main";
 import { MessageType, Task } from "./Task";
+import os from "os";
+import { SemVer } from "semver";
 
 /** A JobContext is given to a Job. The context is an implementation specific to
  * where the task is executing (server, command line client, etc). The context implementation
@@ -204,7 +207,20 @@ export class SilentJobContext extends JobContext {
     }
 
     saveNewPackageFile(catalogSlug: string | undefined, packagefile: PackageFile): Promise<PackageFileWithContext> {
-        return this.context.saveNewPackageFile(catalogSlug, packagefile);
+        if (catalogSlug == null) catalogSlug = "local";
+
+        const majorVersion = new SemVer(packagefile.version).major.toString();
+
+        const filePath = path.join(
+            os.homedir(),
+            "data",
+            catalogSlug,
+            packagefile.packageSlug,
+            majorVersion,
+            packagefile.packageSlug + ".datapm.json"
+        );
+
+        return this.context.saveNewPackageFile(filePath, packagefile);
     }
 
     getPackageFile(

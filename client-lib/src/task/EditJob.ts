@@ -113,7 +113,7 @@ export class EditJob extends Job<EditJobResult> {
 
         let newPackageFile: PackageFile = clone()(oldPackageFile);
 
-        this.jobContext.setCurrentStep("Inspection Result");
+        this.jobContext.setCurrentStep("Current Package Details");
         this.jobContext.print("NONE", `${chalk.gray("Package slug: ")} ${chalk.yellow(oldPackageFile.packageSlug)}`);
         this.jobContext.print(
             "NONE",

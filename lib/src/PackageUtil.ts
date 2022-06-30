@@ -15,6 +15,7 @@ import { PackageFile070 } from "./PackageFile-v0.7.0";
 import { PackageFile080 } from "./PackageFile-v0.8.0";
 import { PackageFile as PackageFile081 } from "./PackageFile-v0.8.1";
 import { PackageFile as PackageFile090, Properties as Properties090 } from "./PackageFile-v0.9.0";
+import { PackageFile as PackageFile0315 } from "./PackageFile-v0.31.5";
 import {
     PackageFile,
     PublishMethod,
@@ -25,7 +26,7 @@ import {
     Properties,
     ValueTypeStatistics,
     Property
-} from "./PackageFile-v0.31.5";
+} from "./PackageFile-v0.32.1";
 import { DATAPM_VERSION } from "./DataPMVersion";
 
 export type DPMPropertyTypes =
@@ -604,6 +605,7 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
         }
 
         packageFile.readmeMarkdown = fs.readFileSync(readmeFileAbsolutePath).toString();
+        delete packageFile.readmeFile;
     }
 
     if (packageFile.licenseFile != null) {
@@ -614,6 +616,7 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
         }
 
         packageFile.licenseMarkdown = fs.readFileSync(licenseFileAbsolutePath).toString();
+        delete packageFile.licenseFile;
     }
 
     return packageFile;
@@ -913,6 +916,25 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         for (const schema of oldPackageFile.schemas) {
             recurseProperties(schema.properties);
         }
+    }
+
+    if ((packageFileObject.$schema as string).endsWith("v0.31.5.json")) {
+        packageFileObject.$schema = (packageFileObject.$schema as string).replace("0.31.5", "0.32.1");
+
+        const oldPackageFile = packageFileObject as PackageFile0315;
+
+        if (oldPackageFile.readmeFile != null && oldPackageFile.readmeMarkdown != null)
+            delete oldPackageFile.readmeFile;
+
+        if (oldPackageFile.licenseFile != null && oldPackageFile.licenseMarkdown != null)
+            delete oldPackageFile.licenseFile;
+
+        if (oldPackageFile.readmeFile == null && oldPackageFile.readmeMarkdown == null)
+            oldPackageFile.readmeMarkdown =
+                "# " + oldPackageFile.displayName ?? oldPackageFile.packageSlug + "\n\n No readme defined";
+
+        if (oldPackageFile.licenseFile == null && oldPackageFile.licenseMarkdown == null)
+            oldPackageFile.licenseMarkdown = "No license defined";
     }
 
     return packageFileObject as PackageFile;

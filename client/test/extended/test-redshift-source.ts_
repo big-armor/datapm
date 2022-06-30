@@ -1,6 +1,6 @@
 import { Redshift } from "aws-sdk";
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import {  Properties, Schema } from "datapm-lib";
 import Knex from "knex";
 import { getRedshiftClusterConfiguration } from "../../src/util/AwsUtil";
 import { removePackageFiles, testCmd, TestResults } from "../integration/test-utils";
@@ -59,7 +59,7 @@ describe("Redshift Source Test", function () {
 	});
 
 	it("Validate the contents of the JSON file", async function () {
-		const newPackageFile = loadPackageFileFromDisk("covid_02_01_2020.datapm.json");
+		const newPackageFile = loadTestPackageFile("covid_02_01_2020");
 		const columns = await knexClient("information_schema.columns")
 			.where({ table_schema: schemaName })
 			.where({ table_name: tableName });

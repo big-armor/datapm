@@ -1,13 +1,31 @@
-import { createApiKey, createTestUser, KEYS, testCmd, removePackageFiles, TEST_SOURCE_FILES } from "./test-utils";
-import { SinkState, loadPackageFileFromDisk } from "datapm-lib";
+import {
+    createApiKey,
+    createTestUser,
+    KEYS,
+    testCmd,
+    removePackageFiles,
+    TEST_SOURCE_FILES,
+    loadTestPackageFile
+} from "./test-utils";
+import { SinkState } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import fs from "fs";
 
+function cleanUp() {
+    removePackageFiles(["countries"]);
+    if (fs.existsSync("countries-v1.json")) fs.unlinkSync("countries-v1.json");
+    if (fs.existsSync("countries.csv")) fs.unlinkSync("countries.csv");
+    if (fs.existsSync("countries.json")) fs.unlinkSync("countries.json");
+    if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
+    if (fs.existsSync("local-countries-1-state.json")) fs.unlinkSync("local-countries-1-state.json");
+}
+
 describe("CSV Offset Tests", function () {
     before(async () => {
         resetConfiguration();
+        cleanUp();
         const userAClient = await createTestUser();
         const apiKey = await createApiKey(userAClient);
         addRegistry({
@@ -17,12 +35,7 @@ describe("CSV Offset Tests", function () {
     });
 
     after(() => {
-        removePackageFiles(["countries"]);
-        if (fs.existsSync("countries-v1.json")) fs.unlinkSync("countries-v1.json");
-        if (fs.existsSync("countries.csv")) fs.unlinkSync("countries.csv");
-        if (fs.existsSync("countries.json")) fs.unlinkSync("countries.json");
-        if (fs.existsSync("local-covid-02-01-2020-1-state.json")) fs.unlinkSync("local-covid-02-01-2020-1-state.json");
-        if (fs.existsSync("local-countries-1-state.json")) fs.unlinkSync("local-countries-1-state.json");
+        cleanUp();
     });
 
     it("Should create a test package", async () => {
@@ -116,7 +129,7 @@ describe("CSV Offset Tests", function () {
 
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("countries.datapm.json");
+        const packageFile = loadTestPackageFile("countries");
 
         expect(packageFile.displayName).equal("countries");
         expect(packageFile.schemas[0].recordCount).equal(5);
@@ -125,7 +138,7 @@ describe("CSV Offset Tests", function () {
     it("Should fetch data first time", async () => {
         const exitCode = await testCmd(
             "fetch",
-            ["countries.datapm.json"],
+            ["local/countries"],
             [
                 {
                     message: "Exclude any attributes from",
@@ -176,7 +189,7 @@ describe("CSV Offset Tests", function () {
 
         const exitCode = await testCmd(
             "fetch",
-            ["countries.datapm.json"],
+            ["local/countries"],
             [
                 {
                     message: "Exclude any attributes from",

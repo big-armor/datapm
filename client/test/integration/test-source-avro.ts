@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties } from "datapm-lib";
-import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs } from "./test-utils";
+import { Properties } from "datapm-lib";
+import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs, loadTestPackageFile } from "./test-utils";
 
 describe("AVRO Source Tests", function () {
     after(() => {
@@ -47,7 +47,7 @@ describe("AVRO Source Tests", function () {
     });
 
     it("Package file content should be correct", async () => {
-        const packageFile = loadPackageFileFromDisk("covid-02-01-2020.datapm.json");
+        const packageFile = loadTestPackageFile("covid-02-01-2020");
 
         expect(packageFile.displayName).equal("covid-02-01-2020");
 

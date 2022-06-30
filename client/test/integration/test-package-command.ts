@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties } from "datapm-lib";
+import { Properties } from "datapm-lib";
 import execa, { ExecaChildProcess } from "execa";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -13,7 +13,8 @@ import {
     TestResults,
     KEYS,
     defaultPromptInputsForCSVs,
-    TEST_SOURCE_FILES
+    TEST_SOURCE_FILES,
+    loadTestPackageFile
 } from "./test-utils";
 
 const generateCommandPrompts = [
@@ -272,7 +273,7 @@ describe("Package Command Tests", async () => {
         expect(results.messageFound, "Found success message").equals(true);
         expect(results.senateClassStatsFound).equals(true);
 
-        const packageFile = loadPackageFileFromDisk("legislators.datapm.json");
+        const packageFile = loadTestPackageFile("legislators");
         const schema = packageFile.schemas[0];
         const properties = schema.properties;
         // eslint-disable-next-line camelcase
@@ -345,7 +346,7 @@ describe("Package Command Tests", async () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("package-a.datapm.json");
+        const packageFile = loadTestPackageFile("package-a");
         expect(packageFile.schemas[0].unit).equals("unit");
         const properties = packageFile.schemas[0].properties as Properties;
         expect(properties.Confirmed.unit).equals("confirmed");
@@ -450,7 +451,7 @@ describe("Package Command Tests", async () => {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const packageFile = loadPackageFileFromDisk("package-b.datapm.json");
+        const packageFile = loadTestPackageFile("package-b");
         const properties = packageFile.schemas[0].properties as Properties;
         const property = properties["State Name"];
 
@@ -531,7 +532,7 @@ describe("Package Command Tests", async () => {
                     results.messageFound = true;
                 }
             });
-            const packageFile = loadPackageFileFromDisk("package-a.datapm.json");
+            const packageFile = loadTestPackageFile("package-a");
             expect(cmdResult.code, "Exit code").equals(0);
             expect(results.messageFound, "Found success message").equals(true);
             expect(packageFile.website).equals("https://test.datapm-not-a-site.io");

@@ -77,7 +77,7 @@ export class PublishJob extends Job<PublishJobResult> {
 
         await task.end(
             "SUCCESS",
-            `Found target package file: ${packageFileWithContext.packageFileUrl.replace("file://", "")}`
+            `Found target package file: ${packageFileWithContext.packageReference.replace("file://", "")}`
         );
 
         this.jobContext.setCurrentStep("Publishing Options");

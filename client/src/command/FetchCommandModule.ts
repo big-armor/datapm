@@ -62,6 +62,10 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             command += `--sourceConnectionConfig '${JSON.stringify(jobResult.result.sourceConnectionConfiguration)}' `;
         }
 
+        if (jobResult.result.sourceCredentialsIdentifier) {
+            command += `--sourceCredentialsIdentifier '${jobResult.result.sourceCredentialsIdentifier}' `;
+        }
+
         if (jobResult.result.sourceConfiguration && Object.keys(jobResult.result.sourceConfiguration).length > 0) {
             command += `--sourceConfig '${JSON.stringify(jobResult.result.sourceConfiguration)}' `;
         }
@@ -76,7 +80,10 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             )}' `;
         }
 
-        if (Object.values(jobResult.result.packageSourceCredentialsConfiguration).length > 0) {
+        if (
+            jobResult.result.sourceCredentialsIdentifier == null &&
+            Object.values(jobResult.result.packageSourceCredentialsConfiguration).length > 0
+        ) {
             command += `--packageSourceCredentialsConfig '${JSON.stringify(
                 jobResult.result.packageSourceCredentialsConfiguration
             )}' `;

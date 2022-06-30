@@ -1,16 +1,12 @@
 // import { expect } from "chai";
-// import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
 // import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
+import { removePackageFiles } from "./test-utils";
 
 describe("FTX Source", () => {
     after(() => {
-        if (fs.existsSync("ftx-btc-usd-trades.datapm.json")) {
-            fs.unlinkSync("ftx-btc-usd-trades.datapm.json");
-            fs.unlinkSync("ftx-btc-usd-trades.README.md");
-            fs.unlinkSync("ftx-btc-usd-trades.LICENSE.md");
-        }
+        removePackageFiles(["ftx-btc-usd-trades"]);
         if (fs.existsSync("trades.csv")) {
             fs.unlinkSync("trades.csv");
         }
@@ -99,7 +95,7 @@ describe("FTX Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("ftx-btc-usd-trades.datapm.json");
+        const packageFile = loadTestPackageFile("ftx-btc-usd-trades");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -110,7 +106,7 @@ describe("FTX Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["ftx-btc-usd-trades.datapm.json"],
+            ["local/ftx-btc-usd-trades"],
             [
                                 {
                     message: "Exclude any attributes from",
@@ -175,7 +171,7 @@ describe("FTX Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["ftx-btc-usd-trades.datapm.json"],
+            ["local/ftx-btc-usd-trades"],
             [
                                 {
                     message: "Exclude any attributes from",

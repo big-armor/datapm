@@ -39,7 +39,11 @@ export async function configureSource(
     if (connectionConfigurationResults === false) {
         return false;
     }
-    connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
+
+    // Modify the orginal connectionConfiguration object with the new values
+    for (const key of Object.keys(connectionConfigurationResults.connectionConfiguration)) {
+        connectionConfiguration[key] = connectionConfigurationResults.connectionConfiguration[key];
+    }
 
     const credentialsConfigurationResults = await obtainCredentialsConfiguration(
         jobContext,
@@ -55,7 +59,10 @@ export async function configureSource(
         return false;
     }
 
-    credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
+    // Modify the orginal credentialConfiguration object with the new values
+    for (const key of Object.keys(credentialsConfigurationResults.credentialsConfiguration)) {
+        credentialsConfiguration[key] = credentialsConfigurationResults.credentialsConfiguration[key];
+    }
 
     const source = await sourceDescription.getSource();
 

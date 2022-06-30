@@ -40,7 +40,7 @@ export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.CHANGE_SOURCE_URIS]: "Changed Source URIs",
     [DifferenceType.REMOVE_HIDDEN_PROPERTY]: "Removed Hidden Property",
     [DifferenceType.CHANGE_CONTACT_EMAIL]: "Change Contact Email",
-    [DifferenceType.REMOVE_STREAM_SET]: "Remove Stream Set",
+    [DifferenceType.REMOVE_STREAM_SET]: "Removed Stream Set",
     [DifferenceType.REMOVE_SOURCE]: "Removed Source",
     [DifferenceType.REMOVE_HIDDEN_SCHEMA]: "Removed Hidden Schema",
     [DifferenceType.CHANGE_PROPERTY_TYPE]: "Changed Property Type",

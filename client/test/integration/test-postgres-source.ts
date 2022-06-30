@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties } from "datapm-lib";
+import { Properties } from "datapm-lib";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
@@ -9,6 +9,7 @@ import {
     createTestPackage,
     getPromptInputs,
     KEYS,
+    loadTestPackageFile,
     PromptInput,
     removePackageFiles,
     testCmd,
@@ -176,7 +177,7 @@ describe("Postgres Source Test", function () {
     });
 
     it("Validate the contents of the JSON file", async function () {
-        const newPackageFile = loadPackageFileFromDisk("covid-02-01-2020.datapm.json");
+        const newPackageFile = loadTestPackageFile("covid-02-01-2020");
         const columns = await knexClient("information_schema.columns").where({ table_name: "covid-02-01-2020" });
         const typeMatch: Record<string, Record<string, [string]>> = {
             boolean: {
@@ -266,7 +267,7 @@ describe("Postgres Source Test", function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", ["postgres.datapm.json"], prompts, async (line: string) => {
+        const cmdResult = await testCmd("fetch", ["local/postgres"], prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 results.messageFound = true;
             }

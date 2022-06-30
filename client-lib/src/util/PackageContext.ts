@@ -28,7 +28,7 @@ export interface PackageFileWithContext {
     permitsSaving: boolean;
     hasPermissionToSave: boolean;
     cantSaveReason: CantSaveReasons | false;
-    packageFileUrl: string;
+    packageReference: string;
     readmeFileUrl: string | undefined;
     licenseFileUrl: string | undefined;
 
@@ -67,7 +67,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         return false;
     }
 
-    get packageFileUrl(): string {
+    get packageReference(): string {
         return (
             this.packageObject.identifier.registryURL +
             "/" +
@@ -147,7 +147,7 @@ export class HttpPackageFileContext implements PackageFileWithContext {
         throw new Error("HttpPackageFileContext does not support saving");
     }
 
-    get packageFileUrl(): string {
+    get packageReference(): string {
         return this.url;
     }
 

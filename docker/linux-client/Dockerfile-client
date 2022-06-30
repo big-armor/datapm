@@ -1,0 +1,20 @@
+# This builds the datapm/client docker image
+# Building this image requires that client has been built locally
+# And requires that the client installer file is in the same directory
+
+FROM ubuntu:20.04
+
+# Install NVM and Node
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 16.14.2
+RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | sh \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+ENV NODE_PATH $NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+# Copy the client files
+COPY dist /opt/datapm
+ENTRYPOINT [ "node", "/opt/datapm/src/main.js", "--" ]

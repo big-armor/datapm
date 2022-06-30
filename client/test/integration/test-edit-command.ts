@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { loadPackageFileFromDisk, PackageFile, Properties } from "datapm-lib";
+import { PackageFile, Properties } from "datapm-lib";
 import faker from "faker";
 import fs from "fs";
 import moment from "moment";
@@ -22,7 +22,8 @@ import {
     writeCSVFile,
     TestResults,
     KEYS,
-    TEST_SOURCE_FILES
+    TEST_SOURCE_FILES,
+    loadTestPackageFile
 } from "./test-utils";
 
 // Prompts
@@ -179,7 +180,7 @@ describe("Edit Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("edit", ["test.datapm.json"], prompts, async (line: string) => {
+        const cmdResult = await testCmd("edit", ["local/test"], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -188,7 +189,7 @@ describe("Edit Package Command Tests", async () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+        const newPackageFile: PackageFile = loadTestPackageFile("test");
 
         expect(newPackageFile.displayName).to.be.string("updated package 100");
         expect(newPackageFile.packageSlug).to.be.string("test");
@@ -233,7 +234,7 @@ describe("Edit Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("edit", ["us-covid.datapm.json"], prompts, async (line: string) => {
+        const cmdResult = await testCmd("edit", ["local/us-covid"], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -251,7 +252,7 @@ describe("Edit Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", ["test.datapm.json"], prompts, async (line: string) => {
+        const cmdResult = await testCmd("publish", ["local/test"], prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("no match found");
@@ -499,13 +500,13 @@ describe("Edit Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("edit", ["package-b.datapm.json"], prompts, async (line: string) => {
+        const cmdResult = await testCmd("edit", ["local/package-b"], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
         });
 
-        const newPackageFile: PackageFile = loadPackageFileFromDisk("package-b.datapm.json");
+        const newPackageFile: PackageFile = loadTestPackageFile("package-b");
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);

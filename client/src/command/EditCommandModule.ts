@@ -34,7 +34,9 @@ export async function editPackage(argv: EditArguments): Promise<void> {
         if (packageFileWithContext.contextType === "localFile") {
             console.log("");
             console.log(chalk.grey("When you are ready, you can publish with the following command"));
-            console.log(chalk.green(`datapm publish ${packageFileWithContext.packageFileUrl.replace("file://", "")}`));
+            console.log(
+                chalk.green(`datapm publish ${packageFileWithContext.packageReference.replace("file://", "")}`)
+            );
             process.exit(0);
         }
 

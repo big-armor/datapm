@@ -5,9 +5,9 @@ import {
     removePackageFiles,
     TEST_SOURCE_FILES,
     testCmd,
-    getPromptInputs
+    getPromptInputs,
+    loadTestPackageFile
 } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
@@ -80,7 +80,7 @@ describe("JSON Tests", function () {
         const exitCode = await testCmd("package", [TEST_SOURCE_FILES.FILE13], prompts);
         expect(exitCode.code).equal(0);
 
-        const packageFile = loadPackageFileFromDisk("daily-prices.datapm.json");
+        const packageFile = loadTestPackageFile("daily-prices");
 
         expect(packageFile.displayName).equal("daily-prices");
         expect(packageFile.schemas[0].recordCount).equal(5953);

@@ -1,18 +1,14 @@
 /** Not always enough data to test...
  * 
  * import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib";
 import { describe } from "mocha";
 import { KEYS, testCmd } from "./test-utils";
 import fs from "fs";
 
 describe("Kraken Spread Source", () => {
     after(() => {
-        if (fs.existsSync("kraken-eth-usd-spread.datapm.json")) {
-            fs.unlinkSync("kraken-eth-usd-spread.datapm.json");
-            fs.unlinkSync("kraken-eth-usd-spread.README.md");
-            fs.unlinkSync("kraken-eth-usd-spread.LICENSE.md");
-        }
+        removePackageFile(["kraken-eth-usd-spread"]);
+
         if (fs.existsSync("spread.csv")) {
             fs.unlinkSync("spread.csv");
         }
@@ -95,7 +91,7 @@ describe("Kraken Spread Source", () => {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(messageFound, "Found warning message").equals(true);
 
-        const packageFile = loadPackageFileFromDisk("kraken-eth-usd-spread.datapm.json");
+        const packageFile = loadTestPackageFile("kraken-eth-usd-spread");
         expect(packageFile.schemas[0].sampleRecords?.length).to.be.greaterThan(0);
     });
 
@@ -107,7 +103,7 @@ describe("Kraken Spread Source", () => {
 
         const cmdResult = await testCmd(
             "fetch",
-            ["kraken-eth-usd-spread.datapm.json"],
+            ["local/kraken-eth-usd-spread"],
             [
                 {
                     message: "Exclude any attributes from",

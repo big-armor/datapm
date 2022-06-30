@@ -10,6 +10,7 @@ import {
     createTestUser,
     getPromptInputs,
     KEYS,
+    loadTestPackageFile,
     PromptInput,
     removePackageFiles,
     testCmd,
@@ -22,11 +23,17 @@ const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);
 
+function cleanUp() {
+    removePackageFiles(["state-codes"]);
+    if (fs.existsSync("package-a-updated.datapm.json")) fs.unlinkSync("package-a-updated.datapm.json");
+}
+
 describe("Publish Package Command Tests", async function () {
     let apiKey = "";
     let packageAFilePath = "";
 
     before(async () => {
+        cleanUp();
         resetConfiguration();
         const userAClient: ApolloClient<NormalizedCacheObject> = await createTestUser();
         apiKey = await createApiKey(userAClient);
@@ -38,7 +45,7 @@ describe("Publish Package Command Tests", async function () {
     });
 
     after(() => {
-        removePackageFiles(["state-codes"]);
+        cleanUp();
         resetConfiguration();
     });
 
@@ -48,12 +55,8 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", ["non-existing.datapm.json"], [], async (line: string) => {
-            if (
-                line.includes(
-                    "is either not a valid package identifier, a valid package url, or url pointing to a valid package file."
-                )
-            ) {
+        const cmdResult = await testCmd("publish", ["local/non-existing"], [], async (line: string) => {
+            if (line.includes("Local package non-existing not found")) {
                 results.messageFound = true;
             }
         });
@@ -95,8 +98,9 @@ describe("Publish Package Command Tests", async function () {
     });
 
     it("Can't publish package without readme file", async function () {
-        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+        const packageFile: PackageFile = loadTestPackageFile(packageAFilePath);
         packageFile.readmeFile = "non-existing";
+        delete packageFile.readmeMarkdown;
         const newPackageFileLocation = "missing-readme.datapm.json";
 
         fs.writeFileSync(newPackageFileLocation, JSON.stringify(packageFile));
@@ -118,8 +122,9 @@ describe("Publish Package Command Tests", async function () {
     });
 
     it("Can't publish package without missing license file", async function () {
-        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+        const packageFile: PackageFile = loadTestPackageFile(packageAFilePath);
         packageFile.licenseFile = "non-existing";
+        delete packageFile.licenseMarkdown;
         const newPackageFileLocation = "missing-license.datapm.json";
         fs.writeFileSync(newPackageFileLocation, JSON.stringify(packageFile));
 
@@ -204,29 +209,21 @@ describe("Publish Package Command Tests", async function () {
         expect(results.messageFound, "Found success message").equals(true);
     });
 
-    it("Publish without readme or license", async function () {
-        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+    it("Cannot publish without readme or license", async function () {
+        const packageFile: PackageFile = loadTestPackageFile(packageAFilePath);
 
         delete packageFile.readmeFile;
+        delete packageFile.readmeMarkdown;
         delete packageFile.licenseFile;
+        delete packageFile.licenseMarkdown;
         packageFile.version = "2.0.0";
         const newPackageFileLocation = "no-readme-or-license.datapm.json";
 
         fs.writeFileSync(newPackageFileLocation, JSON.stringify(packageFile));
 
-        const results: TestResults = {
-            exitCode: -1,
-            messageFound: false
-        };
+        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], []);
 
-        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], async (line: string) => {
-            if (line.includes("Share the command below to fetch the data in this package")) {
-                results.messageFound = true;
-            }
-        });
-
-        expect(cmdResult.code, "Exit code").equals(0);
-        expect(results.messageFound, "Found success message").equals(true);
+        expect(cmdResult.code, "Exit code").equals(1);
 
         fs.unlinkSync(newPackageFileLocation);
     });
@@ -276,13 +273,13 @@ describe("Publish Package Command Tests", async function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+        const packageFile: PackageFile = loadTestPackageFile(packageAFilePath);
 
         expect(packageFile.registries?.length).equals(1);
     });
 
     it("Should save the updated package file version after change during publishing", async function () {
-        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+        const packageFile: PackageFile = loadTestPackageFile(packageAFilePath);
         const newPackageFileLocation = "package-a-updated.datapm.json";
 
         packageFile.schemas[0].title = "new-title";
@@ -305,7 +302,7 @@ describe("Publish Package Command Tests", async function () {
 
         const packageFileAfterPublish: PackageFile = loadPackageFileFromDisk(newPackageFileLocation);
 
-        expect(packageFileAfterPublish.version).equals("3.0.0");
+        expect(packageFileAfterPublish.version).equals("2.0.0");
 
         fs.unlinkSync(newPackageFileLocation);
     });

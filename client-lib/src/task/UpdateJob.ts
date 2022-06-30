@@ -74,7 +74,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             };
         }
 
-        await task.end("SUCCESS", "Found package file");
+        await task.end("SUCCESS", "Found package file: " + packageFileWithContext.packageReference);
 
         task = await this.jobContext.startTask("Checking edit permissions...");
 
@@ -169,13 +169,16 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             let credentialsConfiguration = {};
 
-            if (sourceObject.credentialsIdentifier) {
+            const credentialsIdentifier =
+                sourceObject.updateCredentialsIdentifier ?? sourceObject.credentialsIdentifier;
+
+            if (credentialsIdentifier) {
                 try {
                     credentialsConfiguration =
                         (await this.jobContext.getRepositoryCredential(
                             connector.getType(),
                             repositoryIdentifier,
-                            sourceObject.credentialsIdentifier
+                            credentialsIdentifier
                         )) ?? {};
                 } catch (error) {
                     this.jobContext.print(
@@ -210,20 +213,34 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 );
             }
 
+            // UpdateJob uses sourceObject.updateConfiguration to provide
+            // "defaults" for packges that require user input during fetch
+            const sourceConfiguration = {
+                ...(sourceObject.configuration || {}),
+                ...(sourceObject.updateConfiguration || {})
+            };
+
             const uriInspectionResults = await inspectSource(
                 source,
                 this.jobContext,
                 sourceObject.connectionConfiguration,
                 credentialsConfiguration,
-                sourceObject.configuration || {}
+                sourceConfiguration
             );
+
+            // remove the updateConfiguration related keys, and save the remaining to the source
+            for (const updateOnlyKey of Object.keys(sourceObject.updateConfiguration || {})) {
+                delete sourceConfiguration[updateOnlyKey];
+            }
+
+            sourceObject.configuration = sourceConfiguration;
 
             const streamSets: StreamSet[] = [];
             for (const streamSet of uriInspectionResults.streamSetPreviews) {
                 const streamInspectionResult = await inspectStreamSet(
                     streamSet,
                     this.jobContext,
-                    sourceObject.configuration || {},
+                    sourceConfiguration,
                     this.argv.inspectionSeconds || 30
                 );
 

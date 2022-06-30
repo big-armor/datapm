@@ -1,6 +1,12 @@
 import { expect } from "chai";
-import { loadPackageFileFromDisk, Properties } from "datapm-lib";
-import { defaultPromptInputsForCSVs, removePackageFiles, testCmd, TestResults } from "../integration/test-utils";
+import { Properties } from "datapm-lib";
+import {
+    defaultPromptInputsForCSVs,
+    loadTestPackageFile,
+    removePackageFiles,
+    testCmd,
+    TestResults
+} from "../integration/test-utils";
 
 describe("S3 Source Test", function () {
     const bucketName = "datapm-test";
@@ -40,7 +46,7 @@ describe("S3 Source Test", function () {
     });
 
     it("Validate the contents of the JSON file", async function () {
-        const newPackageFile = loadPackageFileFromDisk("us-covid.datapm.json");
+        const newPackageFile = loadTestPackageFile("us-covid");
         const columns = [
             {
                 title: "submission_date",

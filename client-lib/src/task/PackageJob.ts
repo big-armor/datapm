@@ -302,7 +302,7 @@ export class PackageJob extends Job<PackageJobResult> {
             exitCode: 0,
 
             result: {
-                packageFileLocation: packageFileWithContext.packageFileUrl,
+                packageFileLocation: packageFileWithContext.packageReference,
                 readmeFileLocation: packageFileWithContext.readmeFileUrl,
                 licenseFileLocation: packageFileWithContext.licenseFileUrl
             }
