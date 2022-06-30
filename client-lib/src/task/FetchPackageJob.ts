@@ -47,7 +47,7 @@ export interface FetchPackageJobResult {
     // For fetching a single source outside a package
     sourceConnectionConfiguration: DPMConfiguration;
     sourceConfiguration: DPMConfiguration;
-    sourceCredentialsIdentiifier: string | undefined;
+    sourceCredentialsIdentifier: string | undefined;
     sourceRepositoryIdentifier: string | undefined;
 
     // For fetching from a package that requires additional
@@ -269,6 +269,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                         sourceConnectionConfiguration,
                         sourceCredentialsConfiguration
                     );
+
+                    if (this.args.sourceCredentialsIdentifier)
+                        this.args.packageSourceCredentialsConfig = JSON.stringify({
+                            [sourceConector.getType()]: this.args.sourceCredentialsIdentifier
+                        });
                 }
 
                 this.args.sourceConnectionConfig = JSON.stringify(sourceConnectionConfiguration);
@@ -651,13 +656,6 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
               )
             : undefined;
 
-        /*         const sourceCredentialsIdentifier = sourceConnec.requiresCredentialsConfiguration()
-            ? await sinkConnector.getCredentialsIdentifierFromConfiguration(
-                  sinkConnectionConfiguration,
-                  sinkCredentialsConfiguration
-              )
-            : undefined; */
-
         return {
             exitCode: 0,
             result: {
@@ -673,7 +671,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 sourceConnectionConfiguration: this.args.sourceConnectionConfig
                     ? JSON.parse(this.args.sourceConnectionConfig)
                     : undefined,
-                sourceCredentialsIdentiifier: this.args.sourceCredentialsConfig,
+                sourceCredentialsIdentifier: this.args.sourceCredentialsIdentifier,
                 sourceConfiguration: this.args.sourceConfig ? JSON.parse(this.args.sourceConfig) : undefined,
                 sourceRepositoryIdentifier: this.args.sourceRepositoryIdentifier,
                 excludedSchemaProperties,
