@@ -147,6 +147,8 @@ export async function inspectSourceConnection(
         };
     };
 
+    jobContext.setCurrentStep(repositoryIdentifier + " Configuration and Streams");
+
     jobContext.addAnswerListener(promptAnswerListener);
 
     const inspectionResults = await sourceImplementation.inspectData(

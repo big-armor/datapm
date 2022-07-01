@@ -1,5 +1,4 @@
 import { PackageFile } from "datapm-lib";
-import { Writable } from "stream";
 import { JobContext, CantSaveReasons } from "datapm-client-lib";
 import { PackageFileWithContext } from "datapm-client-lib/src/util/PackageContext";
 import fs from "fs";
@@ -13,7 +12,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         public jobContext: JobContext,
         public packageFile: PackageFile,
         public filePath: string | undefined,
-        public catalogSlug: string
+        public catalogSlug: string | undefined
     ) {}
 
     get contextType(): "localFile" {
@@ -25,7 +24,7 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 
     get hasPermissionToSave(): boolean {
-        const fileLocation = generatePackageFileLocation(this.basePath(), this.packageFile);
+        const fileLocation = generatePackageFileLocation(this.basePath(), this.baseFileName());
 
         if (fs.existsSync(fileLocation)) {
             const fileStats = fs.statSync(fileLocation);
@@ -96,7 +95,21 @@ export class LocalPackageFileContext implements PackageFileWithContext {
 
     basePath(): string {
         if (this.filePath) {
-            return path.dirname(this.filePath);
+            if (this.filePath.startsWith("~")) {
+                this.filePath = this.filePath.replace(/^~/, os.homedir());
+            }
+
+            if (fs.existsSync(this.filePath)) {
+                const stats = fs.statSync(this.filePath);
+
+                if (stats.isDirectory()) {
+                    return this.filePath;
+                }
+            }
+
+            if (this.filePath.endsWith(".json")) return path.dirname(this.filePath);
+
+            return this.filePath.replace(/[\\/]$/, ""); // remove ending separators
         }
 
         const majorVersion = new SemVer(this.packageFile.version).major.toString();
@@ -110,20 +123,29 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         );
     }
 
+    baseFileName(): string {
+        if (this.filePath) {
+            if (fs.existsSync(this.filePath)) {
+                const stats = fs.statSync(this.filePath);
+                if (stats.isFile()) {
+                    const parts = this.filePath.split(path.sep);
+                    const fileName = parts[parts.length - 1];
+                    return fileName.replace(".datapm.json", "");
+                }
+            }
+        }
+
+        return this.packageFile.packageSlug + "-" + this.packageFile.version;
+    }
+
     async writePackageFile(packageFile: PackageFile): Promise<string> {
         const json = JSON.stringify(packageFile, null, " ");
 
-        let packageFileLocation = this.filePath;
+        if (!fs.existsSync(this.basePath())) fs.mkdirSync(this.basePath(), { recursive: true });
 
-        if (packageFileLocation == null) {
-            if (!fs.existsSync(this.basePath())) fs.mkdirSync(this.basePath(), { recursive: true });
+        const packageFileLocation = generatePackageFileLocation(this.basePath(), this.baseFileName());
 
-            packageFileLocation = generatePackageFileLocation(this.basePath(), packageFile);
-        }
-
-        const writeStream = fs.createWriteStream(packageFileLocation);
-
-        await writeFile(writeStream, json);
+        fs.writeFileSync(packageFileLocation, json);
 
         return packageFileLocation;
     }
@@ -134,16 +156,14 @@ export class LocalPackageFileContext implements PackageFileWithContext {
                 ? packageFile.readmeMarkdown
                 : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
 
-        const basePath = this.filePath ? path.dirname(this.filePath) : this.basePath();
+        const basePath = this.basePath();
 
         if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
 
         const readmeFileName = packageFile.readmeFile ? packageFile.readmeFile : packageFile.packageSlug + ".README.md";
         const readmeFileLocation = path.join(basePath, readmeFileName);
 
-        const writable = fs.createWriteStream(readmeFileLocation);
-
-        await writeFile(writable, contents);
+        fs.writeFileSync(readmeFileLocation, contents);
 
         delete packageFile.readmeMarkdown;
         packageFile.readmeFile = readmeFileName;
@@ -157,16 +177,14 @@ export class LocalPackageFileContext implements PackageFileWithContext {
                 ? (packageFile.licenseMarkdown as string)
                 : "# License\n\nLicense not defined. Contact author.";
 
-        const basePath = this.filePath ? path.dirname(this.filePath) : this.basePath();
+        const basePath = this.basePath();
 
         if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
 
         const licenseFile = packageFile.licenseFile ? packageFile.licenseFile : packageFile.packageSlug + ".LICENSE.md";
         const licenseFileLocation = path.join(basePath, licenseFile);
 
-        const writable = fs.createWriteStream(licenseFileLocation);
-
-        await writeFile(writable, contents);
+        fs.writeFileSync(licenseFileLocation, contents);
 
         delete packageFile.licenseMarkdown;
         packageFile.licenseFile = licenseFile;
@@ -175,19 +193,6 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 }
 
-function generatePackageFileLocation(basePath: string, packageFile: PackageFile): string {
-    return path.join(basePath, packageFile.packageSlug + "-" + packageFile.version + ".datapm.json");
-}
-
-async function writeFile(writable: Writable, contents: string) {
-    return new Promise<void>((resolve, reject) => {
-        writable.write(contents, (err) => {
-            writable.end();
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
+function generatePackageFileLocation(basePath: string, baseFileName: string): string {
+    return path.join(basePath, baseFileName + ".datapm.json");
 }
