@@ -1,3 +1,9 @@
+#### 0.32.1 (2022-06-30)
+
+##### New Features
+
+*  Added "local" catalog ([c02effa7](https://github.com/big-armor/datapm/commit/c02effa7c8aa6db5f35b7b6afecbb2d5483b3056))
+
 #### 0.31.39 (2022-06-25)
 
 #### 0.31.38 (2022-06-23)
