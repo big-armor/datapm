@@ -1,3 +1,9 @@
+#### 0.32.2 (2022-07-05)
+
+##### Build System / Dependencies
+
+* **deps:**  bump protobufjs from 6.11.2 to 6.11.3 in /backend ([#504](https://github.com/big-armor/datapm/pull/504)) ([88e540be](https://github.com/big-armor/datapm/commit/88e540be4437c0aefb76b8b606852f281543268d))
+
 #### 0.32.1 (2022-06-30)
 
 ##### New Features
