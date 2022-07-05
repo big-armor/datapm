@@ -9,6 +9,7 @@ import { exit } from "process";
 import os from "os";
 import path from "path";
 import { SemVer } from "semver";
+import { LocalPackageFileContext } from "../util/LocalPackageFileContext";
 
 export class CopyPackageCommandModule {
     async handleCommand(args: CopyJobArguments): Promise<void> {
@@ -99,7 +100,10 @@ export class CopyPackageCommandModule {
         task = await jobContext.startTask("Saving Package File...");
 
         try {
-            await jobContext.saveNewPackageFile("local", packageFileWithContext.packageFile);
+            const packageFileWithContext = new LocalPackageFileContext(jobContext, packageFile, args.dest, undefined);
+
+            await packageFileWithContext.save(packageFile);
+
             task.end("SUCCESS", "Package file saved to " + args.dest);
         } catch (e) {
             task.end("ERROR", "Package file not saved: " + e.message);
