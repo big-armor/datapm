@@ -514,7 +514,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         offSet: number;
         relations?: string[];
     }): Promise<[PackageEntity[], number]> {
-        const ALIAS = "search";
+        const ALIAS = "PackageEntity";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
                 new Brackets((qb) => {
