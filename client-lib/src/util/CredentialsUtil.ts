@@ -3,9 +3,18 @@ import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { JobContext, SilentJobContext } from "../task/JobContext";
+import { Maybe } from "../main";
+
+export type CredentialAndIdentifier = {
+    identifier: string;
+    credential: DPMConfiguration;
+};
 
 /** Requests from the user credentials for each source - without saving those credentials to any configuration file */
-export async function obtainCredentials(jobContext: JobContext, source: Source): Promise<DPMConfiguration> {
+export async function obtainCredentials(
+    jobContext: JobContext,
+    source: Source
+): Promise<Maybe<CredentialAndIdentifier>> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
     if (connectorDescription === undefined) {
@@ -26,7 +35,20 @@ export async function obtainCredentials(jobContext: JobContext, source: Source):
         {}
     );
 
-    return credentialsPromptResponse.credentialsConfiguration;
+    if (!repository.requiresCredentialsConfiguration()) {
+        return null;
+    }
+
+    const identifier = await repository.getCredentialsIdentifierFromConfiguration(
+        source.connectionConfiguration,
+        credentialsPromptResponse.credentialsConfiguration
+    );
+
+    if (identifier == null) {
+        throw new Error("Identifier not supplied by " + source.type);
+    }
+
+    return { identifier, credential: credentialsPromptResponse.credentialsConfiguration };
 }
 
 /** Given a repository and a potentially preconfigured connection and credentials configuration pair,

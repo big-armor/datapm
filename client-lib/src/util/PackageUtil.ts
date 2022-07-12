@@ -8,8 +8,8 @@ import {
     Source
 } from "datapm-lib";
 import { SemVer } from "semver";
-import { CreateVersionInput } from "../generated/graphql";
-import { obtainCredentials } from "./CredentialsUtil";
+import { CreateCredentialDocument, CreateVersionInput } from "../generated/graphql";
+import { CredentialAndIdentifier, obtainCredentials } from "./CredentialsUtil";
 import { identifierToString } from "./IdentifierUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import { exit } from "yargs";
@@ -18,11 +18,10 @@ import numeral from "numeral";
 import { Task } from "../task/Task";
 import { JobContext } from "../task/JobContext";
 import { fetchMultiple } from "../task/FetchPackageJob";
-import internal from "stream";
 import { InspectionResults } from "../main";
 import { inspectSourceConnection } from "./SchemaUtil";
 
-type CredentialsBySourceSlug = Map<string, DPMConfiguration>;
+type CredentialsBySourceSlug = Map<string, CredentialAndIdentifier>;
 
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SCHEMA]: "Removed Schema",
@@ -104,13 +103,14 @@ export async function publishPackageFile(
     packageFile: PackageFile,
     targetRegistries: RegistryReference[]
 ): Promise<boolean> {
-    const credentialsBySourceSlug: CredentialsBySourceSlug = new Map();
+    const credentialsBySourceSlug: CredentialsBySourceSlug = new Map<string, CredentialAndIdentifier>();
 
     let packageFileChanged = false;
 
     for (const source of packageFile.sources) {
         const credentials = await obtainCredentials(jobContext, source);
-        credentialsBySourceSlug.set(source.slug, credentials);
+
+        if (credentials) credentialsBySourceSlug.set(source.slug, credentials);
     }
 
     await attemptPublishPackageFile(jobContext, packageFile, targetRegistries, credentialsBySourceSlug)
@@ -407,16 +407,39 @@ export async function uploadPackageFile(
 
         returnValue.set(registryRef, true);
 
-        if (registryRef.publishMethod === PublishMethod.SCHEMA_ONLY) {
-            for (const source of packageFile.sources) {
-                const sourceCredentials = credentialsBySourceSlug.get(source.slug);
+        // TODO Should this be moved out to a new "uploadPackageCredentials" method?
+        for (const source of packageFile.sources) {
+            const sourceCredentials = credentialsBySourceSlug.get(source.slug);
 
-                if (sourceCredentials == null) {
-                    jobContext.print("WARN", "No credentials found for source " + source.slug);
-                    continue;
+            if (sourceCredentials == null) {
+                jobContext.print("WARN", "No credentials found for source " + source.slug);
+                continue;
+            }
+
+            const task = await jobContext.startTask(
+                "Uploading " + source.slug + " credentials" + sourceCredentials.identifier
+            );
+
+            const response = await registry.getClient().mutate({
+                mutation: CreateCredentialDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: registryRef.catalogSlug,
+                        packageSlug: packageFile.packageSlug
+                    },
+                    sourceSlug: source.slug,
+                    sourceType: source.type,
+                    credentialIdentifier: sourceCredentials.identifier,
+                    credential: sourceCredentials.credential
                 }
+            });
 
-                // Set credentials for package
+            if (response.errors == null) {
+                task.end("ERROR", "Unable to save " + source.slug + " credentials " + sourceCredentials.identifier);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                jobContext.print("ERROR", response.errors![0].message);
+            } else {
+                task.end("SUCCESS", "Saved " + source.slug + " credentials " + sourceCredentials.identifier);
             }
         }
     }

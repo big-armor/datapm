@@ -125,7 +125,9 @@ describe("CSV Offset Tests", function () {
             }
         ];
 
-        const exitCode = await testCmd("package", ["file://./countries.csv"], prompts);
+        const exitCode = await testCmd("package", ["file://./countries.csv"], prompts, async (line) => {
+            console.log(line);
+        });
 
         expect(exitCode.code).equal(0);
 
