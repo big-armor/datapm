@@ -470,7 +470,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         startsWith: string;
         relations?: string[];
     }): Promise<PackageEntity[]> {
-        const ALIAS = "autoCompletePackage";
+        const ALIAS = "PackageEntity";
 
         const queryArray = startsWith
             .replace(process.env["REGISTRY_URL"] as string,"")

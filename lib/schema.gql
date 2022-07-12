@@ -367,6 +367,22 @@ type Package {
     updateMethods: [UpdateMethod!]
 }
 
+type Credential {
+    createdAt: Date
+    updatedAt: Date
+    package: Package
+    creator: User
+    sourceSlug: String
+    sourceType: String
+    credentialIdentifier: String
+}
+
+type CredentialsResult {
+    credentials: [Credential!]
+    hasMore: Boolean!
+    count: Int!
+}
+
 """
 A package issue represents an issue raised for a topic related to the package.
 """
@@ -1378,6 +1394,12 @@ type Query {
     Get user followers count
     """
     userFollowersCount(username: String!): Int!
+
+    """
+    Lists the credential identifiers, but not the credentials themselves
+    """
+    listCredentials(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): CredentialsResult!
+        @hasPackagePermission(permission: EDIT)
 }
 
 type Mutation {
@@ -1754,4 +1776,25 @@ type Mutation {
     Run a named job. Key is a shared key. Job is the name of the job to run
     """
     runJob(key: String!, job: JobType!): Void
+
+    """
+    Set the credentials used by the server to access a specific source in a package
+    """
+    createCredential(
+        identifier: PackageIdentifierInput!
+        sourceSlug: String!
+        sourceType: String!
+        credentialIdentifier: String!
+        credential: JSON!
+    ): Credential! @hasPackagePermission(permission: EDIT)
+
+    """
+    Permanently deletes a credential matching the given parameters
+    """
+    deleteCredential(
+        identifier: PackageIdentifierInput!
+        sourceSlug: String!
+        sourceType: String!
+        credentialIdentifier: String!
+    ): Void @hasPackagePermission(permission: EDIT)
 }

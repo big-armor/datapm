@@ -406,6 +406,19 @@ export async function uploadPackageFile(
         }
 
         returnValue.set(registryRef, true);
+
+        if (registryRef.publishMethod === PublishMethod.SCHEMA_ONLY) {
+            for (const source of packageFile.sources) {
+                const sourceCredentials = credentialsBySourceSlug.get(source.slug);
+
+                if (sourceCredentials == null) {
+                    jobContext.print("WARN", "No credentials found for source " + source.slug);
+                    continue;
+                }
+
+                // Set credentials for package
+            }
+        }
     }
 
     return returnValue;

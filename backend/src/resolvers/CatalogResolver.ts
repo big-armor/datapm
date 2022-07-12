@@ -25,7 +25,7 @@ import { isAuthenticatedContext } from "../util/contextHelpers";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
-import { deletePackageFollowsForUsersWithNoPermissions, packageEntityToGraphqlObject } from "./PackageResolver";
+import { deletePackageFollowsForUsersWithNoPermissions, getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
@@ -464,3 +464,4 @@ export const getCatalogFromCacheOrDbBySlug = async (
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };
+
