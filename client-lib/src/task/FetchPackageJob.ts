@@ -246,6 +246,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             if (sourceConnectorDescription != null) {
                 const configureSourceResults = await configureSource(
                     this.jobContext,
+                    undefined,
                     sourceConnectorDescription,
                     sourceConnectionConfiguration,
                     sourceCredentialsConfiguration,
@@ -434,7 +435,17 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 source.credentialsIdentifier = packageSourceCredentialConfig[source.slug];
             }
 
-            const inspectionResult = await inspectSourceConnection(this.jobContext, source, this.args.defaults);
+            const inspectionResult = await inspectSourceConnection(
+                this.jobContext,
+                packageFileWithContext.catalogSlug
+                    ? {
+                          catalogSlug: packageFileWithContext.catalogSlug,
+                          packageSlug: packageFile.packageSlug
+                      }
+                    : undefined,
+                source,
+                this.args.defaults
+            );
 
             if (Object.keys(inspectionResult.additionalConnectionConfiguration).length > 0) {
                 packageSourceConnectionConfig[source.slug] = inspectionResult.additionalConnectionConfiguration;
@@ -547,6 +558,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
+            packageFileWithContext.catalogSlug
+                ? {
+                      catalogSlug: packageFileWithContext.catalogSlug,
+                      packageSlug: packageFileWithContext.packageFile.packageSlug
+                  }
+                : undefined,
             sinkConnector,
             sinkConnectionConfiguration,
             sinkCredentialsConfiguration,

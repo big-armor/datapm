@@ -10,8 +10,8 @@ CREATE TABLE public."credential" (
     encrypted_credentials TEXT NOT NULL,
     package_id INTEGER NOT NULL REFERENCES package (id) ON DELETE CASCADE,
     creator_id INTEGER NOT NULL REFERENCES public."user" (id) ON DELETE CASCADE,
-    source_type VARCHAR(256) NOT NULL,
-    source_slug VARCHAR(256) NOT NULL,
+    connector_type VARCHAR(256) NOT NULL,
+    repository_identifier VARCHAR(256) NOT NULL,
     credential_identifier VARCHAR(256)
 );
 
@@ -26,7 +26,7 @@ CREATE SEQUENCE public.credential_id_seq AS INTEGER
 ALTER TABLE ONLY public."credential" ALTER COLUMN id SET DEFAULT nextval('public."credential_id_seq"'::regclass);
 
 
-CREATE UNIQUE INDEX IF NOT EXISTS source_credential ON credential(package_id,source_slug,source_type,credential_identifier);
+CREATE UNIQUE INDEX IF NOT EXISTS source_credential ON credential(package_id,connector_type,repository_identifier,credential_identifier);
 
 `
 

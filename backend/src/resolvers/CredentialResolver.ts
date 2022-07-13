@@ -15,8 +15,8 @@ async function credentialEntityToGraphQL(
     return {
         package: await packageEntityToGraphqlObject(context, context.connection, credentialEntity.package),
         createdAt: credentialEntity.createdAt,
-        sourceSlug: credentialEntity.sourceSlug,
-        sourceType: credentialEntity.sourceType,
+        repositoryIdentifier: credentialEntity.repositoryIdentifier,
+        connectorType: credentialEntity.connectorType,
         updatedAt: credentialEntity.updatedAt,
         credentialIdentifier: credentialEntity.credentialIdentifier,
         creator: credentialEntity.creator
@@ -27,7 +27,7 @@ async function credentialEntityToGraphQL(
 
 export const createCredential = async (
         _0: any,
-    { identifier, sourceSlug, sourceType, credentialIdentifier, credential }: { identifier: PackageIdentifierInput; sourceSlug: string, sourceType: string, credentialIdentifier: string, credential: DPMConfiguration },
+    { identifier, connectorType, repositoryIdentifier, credentialIdentifier, credential }: { identifier: PackageIdentifierInput; connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, credential: DPMConfiguration },
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -42,8 +42,8 @@ export const createCredential = async (
 
     const credentialEntity = await context.connection.getCustomRepository(CredentialRepository).createCredential(
         packageEntity,
-        sourceSlug,
-        sourceType,
+        connectorType,
+        repositoryIdentifier,
         credentialIdentifier,
         encryptedCredentials,
         context.me

@@ -7,7 +7,8 @@ import {
     PackageFileWithContext,
     PackageIdentifier,
     TaskStatus,
-    JobContext
+    JobContext,
+    PackageIdentifierInput
 } from "datapm-client-lib";
 import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
@@ -220,6 +221,7 @@ export class CLIJobContext extends JobContext {
     }
 
     async saveRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined, // Not used when saving a credential locally
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string,
@@ -237,6 +239,7 @@ export class CLIJobContext extends JobContext {
     }
 
     async getRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined, // Not used when saving a credential locally
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string

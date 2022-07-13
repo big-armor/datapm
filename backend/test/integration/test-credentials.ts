@@ -52,8 +52,8 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                sourceType: "test",
-                sourceSlug: "test",
+                connectorType: "test",
+                repositoryIdentifier: "test",
                 credentialIdentifier: "test-user",
                 credential: {
                     somethingSomething: "darkSide"
@@ -74,8 +74,8 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                sourceType: "testType",
-                sourceSlug: "testSlug",
+                connectorType: "testType",
+                repositoryIdentifier: "testSlug",
                 credentialIdentifier: "test-user",
                 credential: {
                     somethingSomething: "darkSide"
@@ -85,8 +85,8 @@ describe("Credentials", ()=> {
 
         expect(response.errors).equal(undefined);
 
-        expect(response.data?.createCredential.sourceType).equal("testType");
-        expect(response.data?.createCredential.sourceSlug).equal("testSlug");
+        expect(response.data?.createCredential.connectorType).equal("testType");
+        expect(response.data?.createCredential.repositoryIdentifier).equal("testSlug");
         expect(response.data?.createCredential.credentialIdentifier).equal("test-user");
 
         expect(response.data?.createCredential.creator?.username).equal("testA-credentials");
@@ -128,8 +128,8 @@ describe("Credentials", ()=> {
 
         const credential = response.data.listCredentials.credentials![0];
         
-        expect(credential.sourceType).equal("testType");
-        expect(credential.sourceSlug).equal("testSlug");
+        expect(credential.connectorType).equal("testType");
+        expect(credential.repositoryIdentifier).equal("testSlug");
         expect(credential.credentialIdentifier).equal("test-user");
         expect(credential.creator?.username).equal("testA-credentials");
     });

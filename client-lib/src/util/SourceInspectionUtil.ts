@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DerivedFrom, DPMConfiguration, ParameterType, Properties, Schema, Source, StreamSet } from "datapm-lib";
 import { ConnectorDescription } from "../connector/Connector";
-import { filterBadSchemaProperties, InspectionResults, inspectSource, inspectStreamSet, JobContext } from "../main";
+import {
+    filterBadSchemaProperties,
+    InspectionResults,
+    inspectSource,
+    inspectStreamSet,
+    JobContext,
+    PackageIdentifierInput
+} from "../main";
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import * as SchemaUtil from "../util/SchemaUtil";
@@ -9,6 +16,7 @@ import { validUnit } from "./IdentifierUtil";
 
 export async function configureSource(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     connectorDescription: ConnectorDescription,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
@@ -47,6 +55,7 @@ export async function configureSource(
 
     const credentialsConfigurationResults = await obtainCredentialsConfiguration(
         jobContext,
+        relatedPackage,
         connector,
         connectionConfiguration,
         credentialsConfiguration,

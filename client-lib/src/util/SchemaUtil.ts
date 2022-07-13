@@ -29,6 +29,7 @@ import { JobContext } from "../task/JobContext";
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
 import { createUTCDateTimeFromString, isDate, isDateTime } from "./DateUtil";
 import isNumber from "is-number";
+import { PackageIdentifierInput } from "../main";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -68,6 +69,7 @@ type InternalSourceInspectionResults = InspectionResults & {
  */
 export async function inspectSourceConnection(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     source: Source,
     defaults: boolean | undefined
 ): Promise<InternalSourceInspectionResults> {
@@ -107,6 +109,7 @@ export async function inspectSourceConnection(
         try {
             credentialsConfiguration =
                 (await jobContext.getRepositoryCredential(
+                    relatedPackage,
                     connector.getType(),
                     repositoryIdentifier,
                     source.credentialsIdentifier
@@ -118,6 +121,7 @@ export async function inspectSourceConnection(
 
     const userCredentialsResponse = await obtainCredentialsConfiguration(
         jobContext,
+        relatedPackage,
         connector,
         source.connectionConfiguration,
         credentialsConfiguration,

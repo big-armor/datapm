@@ -1,6 +1,6 @@
 import { Task, MessageType, TaskStatus } from "datapm-client-lib";
 import { JobMessageRequest, JobMessageResponse, JobRequestType, Parameter, ParameterAnswer } from "datapm-lib";
-import {  SocketContext } from "../context";
+import {  AuthenticatedContext, SocketContext } from "../context";
 import SocketIO from 'socket.io';
 import { BackendJobContextBase } from "./BackendJobContextBase";
 
@@ -8,7 +8,7 @@ import { BackendJobContextBase } from "./BackendJobContextBase";
 export class WebsocketJobContext extends BackendJobContextBase {
 
 
-    constructor(public jobId:string, private socketContext:SocketContext, private socket: SocketIO.Socket, private channelName: string) {
+    constructor(public jobId:string, private socketContext:AuthenticatedContext, private socket: SocketIO.Socket, private channelName: string) {
         super(jobId, socketContext);
     }
 

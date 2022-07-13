@@ -3,16 +3,18 @@ import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datap
 import { SemVer } from "semver";
 import { Writable } from "stream";
 import { createOrUpdateVersion } from "../business/CreateVersion";
-import { AuthenticatedContext, Context } from "../context";
+import { AuthenticatedContext } from "../context";
 import { hasPermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
+import { CredentialRepository } from "../repository/CredentialRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { decryptValue, encryptValue } from "../util/EncryptionUtil";
 
 export abstract class BackendJobContextBase extends JobContext {
 
-    constructor(public jobId: string, private context: Context) {
+    constructor(public jobId: string, private context: AuthenticatedContext) {
         super();
     }
 
@@ -26,8 +28,27 @@ export abstract class BackendJobContextBase extends JobContext {
         throw new Error("Method not implemented.");
     }
 
-    saveRepositoryCredential(connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string, credentials: DPMConfiguration): Promise<void> {
-        throw new Error("Method not implemented.");
+    async saveRepositoryCredential(packageIdentifier: PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string, credentials: DPMConfiguration): Promise<void> {
+        
+        if(packageIdentifier === undefined) 
+            throw new Error("Saving repository credentials with an undefined packageIdentifier is not supported on the datapm server.");
+
+        const json = JSON.stringify(credentials);
+        const encryptedValue = encryptValue(json);
+
+        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackage({identifier: packageIdentifier});
+
+        if(packageEntity == null)
+            throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(packageIdentifier));
+
+        await this.context.connection.getCustomRepository(CredentialRepository).createCredential(
+            packageEntity,
+            connectorType,
+            repositoryIdentifier,
+            credentialsIdentifier,
+            encryptedValue,
+            this.context.me
+        )
     }
 
     saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
@@ -38,8 +59,19 @@ export abstract class BackendJobContextBase extends JobContext {
         throw new Error("Method not implemented.");
     }
     
-    getRepositoryCredential(connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string): Promise<DPMConfiguration> {
-        throw new Error("Method not implemented.");
+    async getRepositoryCredential(packageIdentifier:PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string): Promise<DPMConfiguration> {
+
+        if(packageIdentifier === undefined)
+            throw new Error("Backend does not support retrieving credentials when packageIdentifier is undefined");
+
+        const credentialEntity = await this.context.connection.getCustomRepository(CredentialRepository).findCredential(packageIdentifier, connectorType, repositoryIdentifier, credentialsIdentifier);
+
+        if(credentialEntity == null)
+            throw new Error("Credential not found");
+
+        const decryptedValue = decryptValue(credentialEntity.encryptedCredentials);
+
+        return JSON.parse(decryptedValue);
     }
     
 

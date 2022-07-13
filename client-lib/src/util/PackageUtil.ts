@@ -1,12 +1,4 @@
-import {
-    Difference,
-    DifferenceType,
-    DPMConfiguration,
-    PackageFile,
-    PublishMethod,
-    RegistryReference,
-    Source
-} from "datapm-lib";
+import { Difference, DifferenceType, PackageFile, PublishMethod, RegistryReference, Source } from "datapm-lib";
 import { SemVer } from "semver";
 import { CreateCredentialDocument, CreateVersionInput } from "../generated/graphql";
 import { CredentialAndIdentifier, obtainCredentials } from "./CredentialsUtil";
@@ -20,6 +12,8 @@ import { JobContext } from "../task/JobContext";
 import { fetchMultiple } from "../task/FetchPackageJob";
 import { InspectionResults } from "../main";
 import { inspectSourceConnection } from "./SchemaUtil";
+import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
+import { connect } from "superagent";
 
 type CredentialsBySourceSlug = Map<string, CredentialAndIdentifier>;
 
@@ -230,7 +224,15 @@ async function publishData(
 
     for (const source of packageFile.sources) {
         jobContext.setCurrentStep("Inspecting " + source.slug);
-        const inspectionResult = await inspectSourceConnection(jobContext, source, false);
+        const inspectionResult = await inspectSourceConnection(
+            jobContext,
+            {
+                catalogSlug: targetRegistry.catalogSlug,
+                packageSlug: packageFile.packageSlug
+            },
+            source,
+            false
+        );
 
         sourcesAndInspectionResults.push({
             source,
@@ -420,6 +422,20 @@ export async function uploadPackageFile(
                 "Uploading " + source.slug + " credentials" + sourceCredentials.identifier
             );
 
+            const connectorDescription = getConnectorDescriptionByType(source.type);
+
+            if (connectorDescription == null) throw new Error("Could not find connector " + source.type);
+
+            const sourceConnector = await connectorDescription.getConnector();
+
+            const repositoryIdentifier = await sourceConnector.getRepositoryIdentifierFromConfiguration(
+                source.connectionConfiguration
+            );
+
+            if (repositoryIdentifier == null) {
+                jobContext.print("WARN", "No repository identifier provided for connector " + source.type);
+                continue;
+            }
             const response = await registry.getClient().mutate({
                 mutation: CreateCredentialDocument,
                 variables: {
@@ -427,8 +443,8 @@ export async function uploadPackageFile(
                         catalogSlug: registryRef.catalogSlug,
                         packageSlug: packageFile.packageSlug
                     },
-                    sourceSlug: source.slug,
-                    sourceType: source.type,
+                    connectorType: source.type,
+                    repositoryIdentifier: repositoryIdentifier,
                     credentialIdentifier: sourceCredentials.identifier,
                     credential: sourceCredentials.credential
                 }

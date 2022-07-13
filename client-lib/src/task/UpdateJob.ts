@@ -176,6 +176,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 try {
                     credentialsConfiguration =
                         (await this.jobContext.getRepositoryCredential(
+                            packageFileWithContext.catalogSlug
+                                ? {
+                                      catalogSlug: packageFileWithContext.catalogSlug,
+                                      packageSlug: packageFileWithContext.packageFile.packageSlug
+                                  }
+                                : undefined,
                             connector.getType(),
                             repositoryIdentifier,
                             credentialsIdentifier
@@ -190,6 +196,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             const credentialsConfigurationResults = await obtainCredentialsConfiguration(
                 this.jobContext,
+                packageFileWithContext.catalogSlug
+                    ? {
+                          catalogSlug: packageFileWithContext.catalogSlug,
+                          packageSlug: packageFileWithContext.packageFile.packageSlug
+                      }
+                    : undefined,
                 connector,
                 connectionConfiguration,
                 credentialsConfiguration,

@@ -132,6 +132,7 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
             );
 
             await this.jobContext.saveRepositoryCredential(
+                undefined,
                 repository.getType(),
                 repositoryIdentifier,
                 credentialsIdentifier,

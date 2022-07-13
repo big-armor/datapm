@@ -65,6 +65,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
         if (connector.requiresCredentialsConfiguration()) {
             const credentialsResult = await obtainCredentialsConfiguration(
                 this.jobContext,
+                undefined,
                 connector,
                 connectionConfiguration,
                 {},

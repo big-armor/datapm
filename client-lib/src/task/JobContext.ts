@@ -5,6 +5,7 @@ import { PackageFileWithContext, PackageIdentifier } from "../main";
 import { MessageType, Task } from "./Task";
 import os from "os";
 import { SemVer } from "semver";
+import { PackageIdentifierInput } from "../generated/graphql";
 
 /** A JobContext is given to a Job. The context is an implementation specific to
  * where the task is executing (server, command line client, etc). The context implementation
@@ -23,6 +24,7 @@ export abstract class JobContext {
 
     /** Should save a repository credential */
     abstract saveRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined,
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string,
@@ -33,7 +35,16 @@ export abstract class JobContext {
 
     abstract removeRepositoryConfig(type: string, repositoryIdentifer: string): void;
 
+    /**
+     *
+     * @param relatedPackage Used in backend jobcontexts to restrict access on a per package basis
+     * @param connectorType
+     * @param repositoryIdentifier
+     * @param credentialsIdentifier
+     * @returns
+     */
     abstract getRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined,
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
@@ -125,12 +136,14 @@ export class SilentJobContext extends JobContext {
     }
 
     saveRepositoryCredential(
+        relatedPackage: PackageIdentifierInput,
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string,
         credentials: DPMConfiguration
     ): Promise<void> {
         return this.context.saveRepositoryCredential(
+            relatedPackage,
             connectorType,
             repositoryIdentifier,
             credentialsIdentifier,
@@ -147,11 +160,17 @@ export class SilentJobContext extends JobContext {
     }
 
     getRepositoryCredential(
+        relatedPackage: PackageIdentifier,
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
     ): Promise<DPMConfiguration | undefined> {
-        return this.context.getRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier);
+        return this.context.getRepositoryCredential(
+            relatedPackage,
+            connectorType,
+            repositoryIdentifier,
+            credentialsIdentifier
+        );
     }
 
     getRegistryConfigs(): RegistryConfig[] {

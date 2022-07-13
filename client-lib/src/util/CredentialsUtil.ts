@@ -3,7 +3,7 @@ import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
 import { JobContext, SilentJobContext } from "../task/JobContext";
-import { Maybe } from "../main";
+import { Maybe, PackageIdentifierInput } from "../main";
 
 export type CredentialAndIdentifier = {
     identifier: string;
@@ -56,6 +56,7 @@ export async function obtainCredentials(
  * to the local configuration object */
 export async function obtainCredentialsConfiguration(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     connector: Connector,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
@@ -96,6 +97,7 @@ export async function obtainCredentialsConfiguration(
     if (credentialsIdentifier != null) {
         try {
             const savedCredentials = await jobContext.getRepositoryCredential(
+                relatedPackage,
                 connector.getType(),
                 repositoryIdentifier,
                 credentialsIdentifier
@@ -156,6 +158,7 @@ export async function obtainCredentialsConfiguration(
             try {
                 credentialsConfiguration =
                     (await jobContext.getRepositoryCredential(
+                        relatedPackage,
                         connector.getType(),
                         repositoryIdentifier,
                         credentialsPromptResult.credentialsIdentifier
@@ -192,6 +195,7 @@ export async function obtainCredentialsConfiguration(
             jobContext.saveRepositoryConfig(connector.getType(), repositoryConfig);
 
             await jobContext.saveRepositoryCredential(
+                relatedPackage,
                 connector.getType(),
                 repositoryIdentifier,
                 credentialsIdentifier,

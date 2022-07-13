@@ -372,8 +372,8 @@ type Credential {
     updatedAt: Date
     package: Package
     creator: User
-    sourceSlug: String
-    sourceType: String
+    repositoryIdentifier: String
+    connectorType: String
     credentialIdentifier: String
 }
 
@@ -1782,8 +1782,8 @@ type Mutation {
     """
     createCredential(
         identifier: PackageIdentifierInput!
-        sourceSlug: String!
-        sourceType: String!
+        repositoryIdentifier: String!
+        connectorType: String!
         credentialIdentifier: String!
         credential: JSON!
     ): Credential! @hasPackagePermission(permission: EDIT)

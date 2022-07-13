@@ -146,6 +146,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
         const configureSourceResults = await configureSource(
             this.jobContext,
+            undefined,
             maybeConnectorDescription,
             connectionConfiguration,
             credentialsConfiguration,

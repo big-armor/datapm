@@ -111,6 +111,7 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
 
             const credentialsResult = await obtainCredentialsConfiguration(
                 this.jobContext,
+                undefined,
                 connector,
                 newConnectionConfiguration,
                 {},
