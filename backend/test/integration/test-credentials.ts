@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { expect } from "chai";
-import { CreateCredentialDocument, CreatePackageDocument, ListCredentialsDocument } from "./registry-client";
+import { CreateCredentialDocument, CreatePackageDocument, DeleteCredentialDocument, ListCredentialsDocument } from "./registry-client";
 
 describe("Credentials", ()=> {
 
@@ -132,5 +132,58 @@ describe("Credentials", ()=> {
         expect(credential.repositoryIdentifier).equal("testSlug");
         expect(credential.credentialIdentifier).equal("test-user");
         expect(credential.creator?.username).equal("testA-credentials");
+    });
+
+    it("Should not allow deleting by user without access", async () => {
+        const response = await userBClient.mutate({
+            mutation: DeleteCredentialDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "testType",
+                repositoryIdentifier: "testSlug",
+                credentialIdentifier: "test-user"
+            }
+        });
+
+        expect(response.errors).not.equal(null);
+    });
+
+    it("Should delete credential", async () => {
+        const response = await userAClient.mutate({
+            mutation: DeleteCredentialDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "testType",
+                repositoryIdentifier: "testSlug",
+                credentialIdentifier: "test-user"
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+    });
+
+    it("Should list credentials", async () => {
+
+        const response = await userAClient.query({
+            query: ListCredentialsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                limit: 100,
+                offset: 0
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+
+        expect(response.data.listCredentials.credentials?.length).equal(0);
     });
 })

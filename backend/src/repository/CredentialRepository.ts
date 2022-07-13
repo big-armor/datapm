@@ -34,14 +34,18 @@ export class CredentialRepository extends Repository<CredentialEntity> {
     }
 
 
-    public async deleteCredential(identifier: PackageIdentifierInput, repositoryIdentifier: string, connectorType: string, credentialIdentifier: string): Promise<void> {
+    public async deleteCredential(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<void> {
 
-        const credential = await this.findCredential(identifier,repositoryIdentifier,connectorType,credentialIdentifier);
+        const credential = await this.findCredential(identifier, connectorType, repositoryIdentifier, credentialIdentifier);
 
         if(credential == null)
             throw new Error("CREDENTIALS_NOT_FOUND");
 
-        await this.delete(credential);
+
+        await this.manager.nestedTransaction(async (transaction) => {
+            await this.manager.getRepository(CredentialEntity).delete(credential.id);
+        });
+
 
     }
 
@@ -70,12 +74,12 @@ export class CredentialRepository extends Repository<CredentialEntity> {
 
     }
 
-    public async findCredential(identifier: PackageIdentifierInput, repositoryIdentifier: string, connectorType: string, credentialIdentifier: string): Promise<CredentialEntity | undefined> {
+    public async findCredential(identifier: PackageIdentifierInput,connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<CredentialEntity | undefined> {
 
         const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
 
         const credential = await this.createQueryBuilder()
-                .where('"CredentialEntity"."package_id" = :packageId AND "CredentialEntity"."repositoryIdentifier" = :repositoryIdentifier AND "CredentialEntity"."connectorType" = :connectorType AND "CredentialEntity"."credentialIdentifier" = :credentialIdentifier')
+                .where('"CredentialEntity"."package_id" = :packageId AND "CredentialEntity"."repository_identifier" = :repositoryIdentifier AND "CredentialEntity"."connector_type" = :connectorType AND "CredentialEntity"."credential_identifier" = :credentialIdentifier')
                 .setParameter("packageId", packageEntity.id)
                 .setParameter("repositoryIdentifier", repositoryIdentifier)
                 .setParameter("connectorType", connectorType)

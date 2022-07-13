@@ -1793,8 +1793,8 @@ type Mutation {
     """
     deleteCredential(
         identifier: PackageIdentifierInput!
-        sourceSlug: String!
-        sourceType: String!
+        repositoryIdentifier: String!
+        connectorType: String!
         credentialIdentifier: String!
     ): Void @hasPackagePermission(permission: EDIT)
 }

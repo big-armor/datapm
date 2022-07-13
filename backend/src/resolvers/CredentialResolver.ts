@@ -93,15 +93,15 @@ export const listCredentials = async (
 
 export const deleteCredential = async (
         _0: any,
-    { identifier, sourceSlug, sourceType, credentialIdentifier }: { identifier: PackageIdentifierInput; sourceSlug: string, sourceType: string, credentialIdentifier: string},
+    { identifier, connectorType, repositoryIdentifier, credentialIdentifier }: { identifier: PackageIdentifierInput; connectorType: string, repositoryIdentifier: string, credentialIdentifier: string },
     context: AuthenticatedContext,
     info: any
 ) => {
  
     return context.connection.getCustomRepository(CredentialRepository).deleteCredential(
         identifier,
-        sourceSlug,
-        sourceType,
+        connectorType,
+        repositoryIdentifier,
         credentialIdentifier
     );
 }
