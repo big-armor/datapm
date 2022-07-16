@@ -1,6 +1,7 @@
 import { EntityRepository, Repository } from "typeorm";
 import { CredentialEntity } from "../entity/CredentialEntity";
 import { PackageEntity } from "../entity/PackageEntity";
+import { RepositoryEntity } from "../entity/RepositoryEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { PackageIdentifierInput, User } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
@@ -8,27 +9,22 @@ import { PackageRepository } from "./PackageRepository";
 @EntityRepository(CredentialEntity)
 export class CredentialRepository extends Repository<CredentialEntity> {
 
-    async packageCredentials({
-        packageEntity,
-        limit,
-        offset,
+    
+    async repositoryCredentials({
+        repositoryEntity,
         relations = []
     }: {
-        packageEntity: PackageEntity;
-        limit: number,
-        offset: number
+        repositoryEntity: RepositoryEntity;
         relations?: string[];
-    }): Promise<[CredentialEntity[], number]> {
+    }): Promise<CredentialEntity[]> {
 
         const response = await this.createQueryBuilder()
             .where(
-                `("CredentialEntity".package_id = :packageId)`
+                `("CredentialEntity".repository_id = :repositoryId)`
             )
-            .setParameter("packageId", packageEntity.id)
-            .offset(offset)
-            .limit(limit)
+            .setParameter("repositoryId", repositoryEntity.id)
             .addRelations("CredentialEntity", relations)
-            .getManyAndCount();
+            .getMany();
 
         return response;
     }
@@ -50,7 +46,7 @@ export class CredentialRepository extends Repository<CredentialEntity> {
     }
 
 
-    public async createCredential(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, encryptedCredential: string, creator: UserEntity): Promise<CredentialEntity> {
+    public async createCredential(repositoryEntity: RepositoryEntity, connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, encryptedCredential: string, creator: UserEntity): Promise<CredentialEntity> {
 
     
         return await this.manager.transaction( async(entityManager) => {
@@ -59,9 +55,7 @@ export class CredentialRepository extends Repository<CredentialEntity> {
             const credentialEntity = entityManager.create(CredentialEntity);
             credentialEntity.credentialIdentifier = credentialIdentifier;
             credentialEntity.encryptedCredentials = encryptedCredential;
-            credentialEntity.packageId = packageEntity.id;
-            credentialEntity.connectorType = connectorType;
-            credentialEntity.repositoryIdentifier = repositoryIdentifier;
+            credentialEntity.repositoryId = repositoryEntity.id;
             credentialEntity.creatorId = creator.id;
 
             entityManager.save([credentialEntity]);

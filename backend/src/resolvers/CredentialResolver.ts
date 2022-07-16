@@ -5,7 +5,8 @@ import { CredentialRepository } from "../repository/CredentialRepository";
 import { AuthenticatedContext, Context } from "../context";
 import { Credential, CredentialsResult, PackageIdentifierInput } from "../generated/graphql";
 import { getGraphQlRelationName } from "../util/relationNames";
-import { getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
+import { getPackageFromCacheOrDb } from "./PackageResolver";
+import { RepositoryRepository } from "../repository/RepositoryRepository";
 
 async function credentialEntityToGraphQL(
     context:Context,
@@ -13,10 +14,7 @@ async function credentialEntityToGraphQL(
 ): Promise<Credential> {
 
     return {
-        package: await packageEntityToGraphqlObject(context, context.connection, credentialEntity.package),
         createdAt: credentialEntity.createdAt,
-        repositoryIdentifier: credentialEntity.repositoryIdentifier,
-        connectorType: credentialEntity.connectorType,
         updatedAt: credentialEntity.updatedAt,
         credentialIdentifier: credentialEntity.credentialIdentifier,
         creator: credentialEntity.creator
@@ -32,16 +30,16 @@ export const createCredential = async (
     info: any
 ) => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-    const packageEntity = await getPackageFromCacheOrDb(
-        context,
-        identifier,
-        graphQLRelationName
-    );
+
+    const repositoryEntity = await context.connection.getCustomRepository(RepositoryRepository).findRepository(identifier, connectorType, repositoryIdentifier);
+
+    if(repositoryEntity == null)
+        throw new Error("REPOSITORY_NOT_FOUND");
 
     const encryptedCredentials = encryptValue(JSON.stringify(credential));
 
     const credentialEntity = await context.connection.getCustomRepository(CredentialRepository).createCredential(
-        packageEntity,
+        repositoryEntity,
         connectorType,
         repositoryIdentifier,
         credentialIdentifier,
@@ -58,37 +56,6 @@ export const createCredential = async (
     
     return credentialEntityToGraphQL(context, returnValue);
 
-}
-
-export const listCredentials = async (
-        _0: any,
-    { identifier, limit, offset }: { identifier: PackageIdentifierInput; limit: number, offset: number },
-    context: AuthenticatedContext,
-    info: any
-): Promise<CredentialsResult> => {
-    
-    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-
-    const packageEntity = await getPackageFromCacheOrDb(
-        context,
-        identifier,
-        graphQLRelationName
-    );
-
-    const credentialRelations = graphQLRelationName.map(r => r.replace(/^credentials\.?/,"")).filter(r => r.length > 0);
-
-    const [credentials, count] = await context.connection.getCustomRepository(CredentialRepository).packageCredentials({
-        packageEntity,
-        limit,
-        offset,
-        relations: credentialRelations
-    });
-
-    return {
-        credentials: await credentials.asyncMap(async (c) => await credentialEntityToGraphQL(context, c)),
-        count,
-        hasMore: count - (limit + offset) > 0
-    };
 }
 
 export const deleteCredential = async (

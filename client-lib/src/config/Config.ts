@@ -9,7 +9,6 @@ export interface RegistryConfig {
 export interface RepositoryCredentialsConfig {
     identifier: string;
     encryptedConfiguration: string;
-    iv: string; // cryto hash iv value
 }
 export interface RepositoryConfig {
     /** The unique identifer of the repository */

@@ -18,9 +18,16 @@ export abstract class JobContext {
     answerListeners: ((answer: ParameterAnswer<string>) => void)[] = [];
 
     /** Should return all of the repository configs for a given repository type */
-    abstract getRepositoryConfigsByType(type: string): RepositoryConfig[];
+    abstract getRepositoryConfigsByType(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string
+    ): Promise<RepositoryConfig[]>;
 
-    abstract getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined;
+    abstract getRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        identifier: string
+    ): RepositoryConfig | undefined;
 
     /** Should save a repository credential */
     abstract saveRepositoryCredential(
@@ -127,12 +134,19 @@ export class SilentJobContext extends JobContext {
         super();
     }
 
-    getRepositoryConfigsByType(type: string): RepositoryConfig[] {
-        return this.context.getRepositoryConfigsByType(type);
+    async getRepositoryConfigsByType(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string
+    ): Promise<RepositoryConfig[]> {
+        return this.context.getRepositoryConfigsByType(relatedPackage, type);
     }
 
-    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
-        return this.context.getRepositoryConfig(type, identifier);
+    getRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        identifier: string
+    ): RepositoryConfig | undefined {
+        return this.context.getRepositoryConfig(relatedPackage, type, identifier);
     }
 
     saveRepositoryCredential(

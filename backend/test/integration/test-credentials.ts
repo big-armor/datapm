@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { expect } from "chai";
-import { CreateCredentialDocument, CreatePackageDocument, DeleteCredentialDocument, ListCredentialsDocument } from "./registry-client";
+import { CreateCredentialDocument, CreatePackageDocument, CreateRepositoryDocument, DeleteCredentialDocument, DeleteRepositoryDocument, ListRepositoriesDocument, Permission, SetPackagePermissionsDocument } from "./registry-client";
 
 describe("Credentials", ()=> {
 
@@ -43,10 +43,47 @@ describe("Credentials", ()=> {
         expect(userBClient).to.exist;
     })
 
+    it("Should not allow user without package edit permission to create repositories", async() => {
+        const response = await userBClient.mutate({
+            mutation: CreateRepositoryDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository"
+            }
+        });
+
+        expect(response.errors).not.equal(null);
+
+    });
+
+    it("Should create repository", async() => {
+        const response = await userAClient.mutate({
+            mutation: CreateRepositoryDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository"
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+
+        expect(response.data?.createRepository.repositoryIdentifier).equal("test-repository");
+        expect(response.data?.createRepository.connectorType).equal("test-connector");
+
+    });
+
     it("should not allow user without package edit permission to create credentials", async () => {
 
-        const response = await userBClient.query({
-            query: CreateCredentialDocument,
+        const response = await userBClient.mutate({
+            mutation: CreateCredentialDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-credentials",
@@ -74,8 +111,8 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                connectorType: "testType",
-                repositoryIdentifier: "testSlug",
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository",
                 credentialIdentifier: "test-user",
                 credential: {
                     somethingSomething: "darkSide"
@@ -85,18 +122,16 @@ describe("Credentials", ()=> {
 
         expect(response.errors).equal(undefined);
 
-        expect(response.data?.createCredential.connectorType).equal("testType");
-        expect(response.data?.createCredential.repositoryIdentifier).equal("testSlug");
         expect(response.data?.createCredential.credentialIdentifier).equal("test-user");
 
         expect(response.data?.createCredential.creator?.username).equal("testA-credentials");
 
     });
 
-    it("Should not allow user without access to list credentials", async () => {
+    it("Should not allow user without access to list repositories", async () => {
 
         const response = await userBClient.query({
-            query: ListCredentialsDocument,
+            query: ListRepositoriesDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-credentials",
@@ -113,7 +148,7 @@ describe("Credentials", ()=> {
     it("Should list credentials", async () => {
 
         const response = await userAClient.query({
-            query: ListCredentialsDocument,
+            query: ListRepositoriesDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-credentials",
@@ -126,15 +161,57 @@ describe("Credentials", ()=> {
 
         expect(response.errors).equal(undefined);
 
-        const credential = response.data.listCredentials.credentials![0];
+        const repository = response.data.listRepositories.repositories![0];
         
-        expect(credential.connectorType).equal("testType");
-        expect(credential.repositoryIdentifier).equal("testSlug");
-        expect(credential.credentialIdentifier).equal("test-user");
+        expect(repository.connectorType).equal("test-credential");
+        expect(repository.repositoryIdentifier).equal("test-repository");
+        expect(repository.creator?.username).equal("testA-credentials");
+
+        const credential = repository.credentials![0];
+
+        expect(credential.credentialIdentifier).equal("test-credential");
         expect(credential.creator?.username).equal("testA-credentials");
+
     });
 
-    it("Should not allow deleting by user without access", async () => {
+    it("Should give userB package view access", async() => {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                value: {
+                    permissions: [Permission.VIEW],
+                    usernameOrEmailAddress: "testB-credentials"
+                },
+                message: "none"
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+    })
+
+    it("Should now allow user with VIEW permission to list repositories", async () => {
+            
+            const response = await userBClient.query({
+                query: ListRepositoriesDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: "testA-credentials",
+                        packageSlug: "credentials-test",
+                    },
+                    limit: 100,
+                    offset: 0
+                }
+            });
+    
+            expect(response.errors!.length).equal(1);
+
+    });
+
+    it("Should not allow credential deleting by user without access", async () => {
         const response = await userBClient.mutate({
             mutation: DeleteCredentialDocument,
             variables: {
@@ -168,10 +245,10 @@ describe("Credentials", ()=> {
         expect(response.errors).equal(undefined);
     });
 
-    it("Should list credentials", async () => {
+    it("Should not list credential after deleting", async () => {
 
         const response = await userAClient.query({
-            query: ListCredentialsDocument,
+            query: ListRepositoriesDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-credentials",
@@ -184,6 +261,41 @@ describe("Credentials", ()=> {
 
         expect(response.errors).equal(undefined);
 
-        expect(response.data.listCredentials.credentials?.length).equal(0);
+        expect(response.data.listRepositories.repositories![0].credentials?.length).equal(0);
+    });
+
+    it("Should not allow repository deleting by user without access", async () => {
+        const response = await userBClient.mutate({
+            mutation: DeleteRepositoryDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "testType",
+                repositoryIdentifier: "testSlug"
+            }
+        });
+
+        expect(response.errors).not.equal(null);
+    });
+
+    it("Should not list repository after deleting", async () => {
+
+        const response = await userAClient.query({
+            query: ListRepositoriesDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                limit: 100,
+                offset: 0
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+
+        expect(response.data.listRepositories.repositories).equal(0);
     });
 })

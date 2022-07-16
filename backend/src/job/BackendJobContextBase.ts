@@ -1,5 +1,5 @@
-import { CantSaveReasons, JobContext, MessageType, PackageFileWithContext, PackageIdentifier, parsePackageIdentifier, RegistryConfig, RepositoryConfig, Task } from "datapm-client-lib";
-import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
+import { CantSaveReasons, JobContext, MessageType, PackageFileWithContext, PackageIdentifier, parsePackageIdentifier, RegistryConfig, RepositoryConfig, Task, RepositoryCredentialsConfig } from "datapm-client-lib";
+import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile, } from "datapm-lib";
 import { SemVer } from "semver";
 import { Writable } from "stream";
 import { createOrUpdateVersion } from "../business/CreateVersion";
@@ -8,7 +8,9 @@ import { hasPermission, resolvePackagePermissions } from "../directive/hasPackag
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
 import { CredentialRepository } from "../repository/CredentialRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { repositoryEntityToGraphqlObject, RepositoryRepository } from "../repository/RepositoryRepository";
 import { VersionRepository } from "../repository/VersionRepository";
+import { hasPackagePermissions } from "../resolvers/UserPackagePermissionResolver";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { decryptValue, encryptValue } from "../util/EncryptionUtil";
 
@@ -20,11 +22,35 @@ export abstract class BackendJobContextBase extends JobContext {
 
     abstract useDefaults(): boolean;
 
-    getRepositoryConfigsByType(type: string): RepositoryConfig[] {
-        return [];
+    async getRepositoryConfigsByType(relatedPackage: PackageIdentifierInput, connectorType: string): Promise<RepositoryConfig[]> {
+        
+        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: relatedPackage});
+
+        await hasPackagePermissions(this.context, packageEntity.id, Permission.VIEW);
+
+        const repositoryEntities =  await this.context.connection.getCustomRepository(RepositoryRepository).findRepositoriesByConnectorType(relatedPackage, connectorType);
+
+        return repositoryEntities.asyncMap<RepositoryConfig>(async r => {
+
+            const credentials = await this.context.connection.getCustomRepository(CredentialRepository).repositoryCredentials({repositoryEntity: r});
+
+            const credentialsReturn = credentials.map<RepositoryCredentialsConfig>( c => {
+                return {
+                    encryptedConfiguration: c.encryptedCredentials,
+                    identifier: c.credentialIdentifier
+                }
+            });
+
+            return {
+                identifier: r.repositoryIdentifier,
+                connectionConfiguration: JSON.parse(r.connectionConfiguration),
+                credentials: credentialsReturn
+            }
+        });
+
     }
 
-    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
+    getRepositoryConfig(relatedPackage: PackageIdentifierInput, type: string, identifier: string): RepositoryConfig | undefined {
         throw new Error("Method not implemented.");
     }
 
@@ -41,8 +67,16 @@ export abstract class BackendJobContextBase extends JobContext {
         if(packageEntity == null)
             throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(packageIdentifier));
 
+        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+
+        const repositoryEntity = await this.context.connection.getCustomRepository(RepositoryRepository).findRepository(packageIdentifier, connectorType, repositoryIdentifier);
+
+
+        if(repositoryEntity == null) 
+            throw new Error("REPOSITORY_NOT_FOUND - " + repositoryIdentifier);
+
         await this.context.connection.getCustomRepository(CredentialRepository).createCredential(
-            packageEntity,
+            repositoryEntity,
             connectorType,
             repositoryIdentifier,
             credentialsIdentifier,
@@ -52,11 +86,11 @@ export abstract class BackendJobContextBase extends JobContext {
     }
 
     saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
-        throw new Error("Method not implemented.");
+        // TODO implement this with a relatedPackage parameter
     }
 
     removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
-        throw new Error("Method not implemented.");
+        // TODO implement this with a relatedPackage parameter
     }
     
     async getRepositoryCredential(packageIdentifier:PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string): Promise<DPMConfiguration> {
@@ -101,8 +135,38 @@ export abstract class BackendJobContextBase extends JobContext {
         console.log(this.jobId + " " + level + ": " + message);
     }
 
-    saveNewPackageFile(catalogSlug: string | undefined, packagefile: PackageFile): Promise<PackageFileWithContext> {
-        throw new Error("Method not implemented.");
+    async saveNewPackageFile(catalogSlug: string | undefined, packageFile: PackageFile): Promise<PackageFileWithContext> {
+
+        if(catalogSlug === undefined)
+            throw new Error("Catalog slug is undefined");
+
+        const identifier = {
+            catalogSlug,
+            packageSlug: packageFile.packageSlug
+        };
+
+        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
+
+
+        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+
+        const version = await createOrUpdateVersion(this.context, identifier, {
+            packageFile
+        },[] );
+
+        return {
+            hasPermissionToSave: true,
+            contextType: "registry",
+            cantSaveReason: false,
+            packageFile: packageFile,
+            permitsSaving: true,
+            packageReference: catalogSlug + "/" + packageFile.packageSlug,
+            readmeFileUrl: process.env["REGISTRY_URL"] + "/" + catalogSlug + "/" + packageFile.packageSlug,
+            licenseFileUrl: process.env["REGISTRY_URL"] + "/" + catalogSlug + "/" + packageFile.packageSlug,
+            save: async () => {
+                throw new Error("Not implemented");
+            }
+        }
     }
 
 

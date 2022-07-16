@@ -1,9 +1,9 @@
-import {Response, ErrorResponse, SocketError, SocketEvent, StartUploadRequest, PackageStreamsRequest, SetStreamActiveBatchesRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageSinkStateRequest as PackageSinkStateRequest, StartPackageUpdateRequest } from 'datapm-lib';
+import {Response, ErrorResponse, SocketError, SocketEvent, StartUploadRequest, PackageStreamsRequest, SetStreamActiveBatchesRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageSinkStateRequest as PackageSinkStateRequest, StartPackageUpdateRequest, StartPackageRequest } from 'datapm-lib';
 import EventEmitter from 'events';
 import SocketIO from 'socket.io';
 import { AuthenticatedSocketContext, SocketContext } from '../context';
 import { PackageEntity } from '../entity/PackageEntity';
-import { PackageIdentifierInput, Permission } from '../generated/graphql';
+import { CatalogIdentifierInput, PackageIdentifierInput, Permission } from '../generated/graphql';
 import { PackageRepository } from '../repository/PackageRepository';
 import { hasPackageEntityPermissions } from '../resolvers/UserPackagePermissionResolver';
 import { DistributedLockingService } from '../service/distributed-locking-service';
@@ -14,6 +14,10 @@ import { SetActiveBatchesHandler } from './SetActiveBatchesHandler';
 import { SchemaInfoHandler } from './PackageStreamsHandler';
 import { PackageSinkStateHandler } from './PackageSinkStateHandler';
 import { PackageUpdateHandler } from './PackageUpdateHandler';
+import { CatalogEntity } from '../entity/CatalogEntity';
+import { CatalogRepository } from '../repository/CatalogRepository';
+import { hasCatalogPermissions } from '../resolvers/UserCatalogPermissionResolver';
+import { PackageHandler } from './PackageHandler';
 
 export interface RequestHandler extends EventEmitter {
     start(callback:(response:Response) => void):Promise<void>;
@@ -44,6 +48,7 @@ export class SocketConnectionHandler {
         socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
         socket.on(SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(), this.onSetStreamActiveBatches);
         socket.on(SocketEvent.START_PACKAGE_UPDATE.toString(), this.onStartPackageUpdate);
+        socket.on(SocketEvent.START_PACKAGE.toString(), this.onStartPackage);
 
         socket.on('disconnect', this.onDisconnect);
         socket.on('error', () => console.log("Error"));
@@ -55,6 +60,23 @@ export class SocketConnectionHandler {
         this.socket.on(SocketEvent.OPEN_FETCH_CHANNEL.toString(), this.openFetchChannelHandler);
         this.socket.on(SocketEvent.START_DATA_UPLOAD.toString(), this.onUploadData);
         this.socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
+    };
+
+    onStartPackage = async (request: StartPackageRequest, callback:(response:Response) => void): Promise<void> => {
+        if(!isAuthenticatedContext(this.socketContext)) {
+            callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
+            return;
+        }
+
+        try {
+            const handler = new PackageHandler(request, this.socket, this.socketContext as AuthenticatedSocketContext, this.distributedLockingService);
+            this.addRequestHandler(handler);
+            await handler.start(callback);
+        } catch (error) {
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            return;
+        }
     };
 
     onStartPackageUpdate = async (request:StartPackageUpdateRequest, callback:(response:Response)=>void):Promise<void> => {
@@ -178,6 +200,39 @@ export class SocketConnectionHandler {
     }
 
 }
+
+export async function checkCatalogPermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, catalogIdentifier:CatalogIdentifierInput, permission:Permission):Promise<boolean> {
+
+    let catalogEntity: CatalogEntity;
+    try {
+        catalogEntity = await socketContext.connection.getCustomRepository(CatalogRepository).findCatalogBySlugOrFail(
+            catalogIdentifier.catalogSlug
+        )
+    } catch (error) {
+
+        if(error.message.includes("_NOT_VALID")) {
+            callback(new ErrorResponse(error.message, SocketError.NOT_VALID));
+            return false;
+        } else if(error.message.includes("_NOT_FOUND")) {
+            callback(new ErrorResponse("PACKAGE_OR_CATALOG_NOT_FOUND", SocketError.NOT_FOUND));
+        } else {
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+        }
+        return false;
+    }
+
+    const hasPermissions = await hasCatalogPermissions(socketContext, catalogEntity, permission);
+
+    if (!hasPermissions) {
+        const response: ErrorResponse = new ErrorResponse("NOT_AUTHORIZED: You don't have  " + permission + " permission to the catalog " + catalogIdentifier.catalogSlug, SocketError.NOT_AUTHORIZED)
+        callback(response);
+        return false;
+    }
+
+    return true;
+}
+
 
 export async function checkPackagePermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, schemaIdentifier:PackageIdentifierInput, permission:Permission):Promise<boolean> {
 

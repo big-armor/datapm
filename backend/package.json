@@ -109,6 +109,7 @@
         "@types/mustache": "^4.1.1",
         "@types/node": "^16.11.22",
         "@types/nodemailer": "^6.4.0",
+        "@types/pg": "^8.6.5",
         "@types/semver": "^7.3.4",
         "@types/sharp": "^0.26.0",
         "@types/superagent": "^4.1.10",

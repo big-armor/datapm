@@ -80,9 +80,9 @@ export async function obtainCredentialsConfiguration(
 
     if (repositoryIdentifier == null) throw new Error("Could not find repository identifier");
 
-    let repositoryConfig = jobContext
-        .getRepositoryConfigsByType(connector.getType())
-        .find((c) => c.identifier === repositoryIdentifier);
+    let repositoryConfig = (await jobContext.getRepositoryConfigsByType(relatedPackage, connector.getType())).find(
+        (c) => c.identifier === repositoryIdentifier
+    );
 
     if (repositoryConfig == null) {
         repositoryConfig = {

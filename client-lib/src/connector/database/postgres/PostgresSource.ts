@@ -108,7 +108,7 @@ export class PostgresSource implements Source {
 
         return {
             defaultDisplayName:
-                (configuration.tables as string[]).length > 0
+                (configuration.tables as string[]).length > 1
                     ? (configuration.database as string)
                     : (configuration.tables as string[])[0],
             source: this,

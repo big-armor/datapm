@@ -32,6 +32,10 @@ export class WebsocketJobContext extends BackendJobContextBase {
                         throw new Error("No answers received"); 
                     }
 
+                    for(const key of Object.keys(response.answers)){
+                        parameters.find(p => p.name === key)!.configuration[key] = response.answers[key];
+                    }
+
                     resolve(response.answers);
                 }
             });

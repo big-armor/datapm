@@ -128,7 +128,8 @@ import {
     packageUpdateMethods
 } from "./resolvers/PackageResolver";
 
-import { createCredential, listCredentials, deleteCredential } from "./resolvers/CredentialResolver";
+import { createCredential, deleteCredential } from "./resolvers/CredentialResolver";
+import { createRepository, listRepositories, deleteRepository } from "./resolvers/RepositoryResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
 import { validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
@@ -647,7 +648,7 @@ export const resolvers: {
         catalogFollowersCount: catalogFollowersCount,
         collectionFollowersCount: collectionFollowersCount,
         userFollowersCount: userFollowersCount,
-        listCredentials
+        listRepositories
     },
 
     Mutation: {
@@ -693,6 +694,8 @@ export const resolvers: {
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,
+        createRepository,
+        deleteRepository,
         createCredential,
         deleteCredential,
 

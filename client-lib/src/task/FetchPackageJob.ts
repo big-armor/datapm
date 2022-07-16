@@ -541,6 +541,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         const obtainSinkConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
+            packageFileWithContext.catalogSlug
+                ? {
+                      catalogSlug: packageFileWithContext.catalogSlug,
+                      packageSlug: packageFile.packageSlug
+                  }
+                : undefined,
             sinkConnector,
             sinkConnectionConfiguration,
             this.args.sinkRepository,

@@ -1,9 +1,8 @@
-query ListCredentials($identifier: PackageIdentifierInput!, $limit: Int!, $offset: Int!) {
-    listCredentials(identifier: $identifier, limit: $limit, offset: $offset) {
-        credentials {
+query ListRepositories($identifier: PackageIdentifierInput!, $limit: Int!, $offset: Int!) {
+    listRepositories(identifier: $identifier, limit: $limit, offset: $offset) {
+        repositories {
             repositoryIdentifier
             connectorType
-            credentialIdentifier
             createdAt
             updatedAt
             package {
@@ -15,6 +14,17 @@ query ListCredentials($identifier: PackageIdentifierInput!, $limit: Int!, $offse
                     identifier {
                         catalogSlug
                     }
+                }
+            }
+            credentials {
+                credentialIdentifier
+                createdAt
+                updatedAt
+                creator {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
                 }
             }
             creator {

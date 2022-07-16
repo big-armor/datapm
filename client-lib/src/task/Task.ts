@@ -19,6 +19,7 @@ export interface Task {
 
 export interface JobResult<T> {
     exitCode: number;
+    errorMessage?: string;
     result?: T | undefined;
 }
 

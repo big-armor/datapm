@@ -14,6 +14,10 @@ import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { validUnit } from "./IdentifierUtil";
 
+export type ConfigureSourceResponse =
+    | { source: Source; inspectionResults: InspectionResults; filteredSchemas: Record<string, Schema> }
+    | false;
+
 export async function configureSource(
     jobContext: JobContext,
     relatedPackage: PackageIdentifierInput | undefined,
@@ -27,7 +31,7 @@ export async function configureSource(
     includePackagingQuestions = true,
     excludedSchemaProperties: ExcludeSchemaProperties = {},
     renamedSchemaProperties: RenameSchemaProperties = {}
-): Promise<{ source: Source; inspectionResults: InspectionResults; filteredSchemas: Record<string, Schema> } | false> {
+): Promise<ConfigureSourceResponse> {
     const connector = await connectorDescription.getConnector();
     const sourceDescription = await connectorDescription.getSourceDescription();
 
@@ -38,6 +42,7 @@ export async function configureSource(
 
     const connectionConfigurationResults = await obtainConnectionConfiguration(
         jobContext,
+        relatedPackage,
         connector,
         connectionConfiguration,
         repositoryIdentifier,
@@ -300,7 +305,7 @@ export async function renameSchemaPropertyQuestions(
                 }
             ]);
 
-            promptToRenameAttributes = renameAttributesResponse.renameAttributes !== "No";
+            promptToRenameAttributes = renameAttributesResponse.renameAttributes === true;
         } else {
             promptToRenameAttributes = true;
         }
@@ -386,7 +391,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
             }
         ]);
 
-        if (wasDerivedResponse.wasDerived === "No") break;
+        if (wasDerivedResponse.wasDerived !== true) break;
 
         const derivedFromUrlResponse = await jobContext.parameterPrompt([
             {

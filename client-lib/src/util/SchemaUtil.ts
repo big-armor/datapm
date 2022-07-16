@@ -94,7 +94,14 @@ export async function inspectSourceConnection(
 
         jobContext.addAnswerListener(promptAnswerListener);
 
-        await obtainConnectionConfiguration(jobContext, connector, source.connectionConfiguration, undefined, defaults);
+        await obtainConnectionConfiguration(
+            jobContext,
+            relatedPackage,
+            connector,
+            source.connectionConfiguration,
+            undefined,
+            defaults
+        );
 
         jobContext.removeAnswerListener(promptAnswerListener);
     }

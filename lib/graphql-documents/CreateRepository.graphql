@@ -1,18 +1,15 @@
-mutation CreateCredential(
+mutation CreateRepository(
     $identifier: PackageIdentifierInput!
     $connectorType: String!
     $repositoryIdentifier: String!
-    $credentialIdentifier: String!
-    $credential: JSON!
 ) {
-    createCredential(
+    createRepository(
         identifier: $identifier
         connectorType: $connectorType
         repositoryIdentifier: $repositoryIdentifier
-        credentialIdentifier: $credentialIdentifier
-        credential: $credential
     ) {
-        credentialIdentifier
+        connectorType
+        repositoryIdentifier
         createdAt
         updatedAt
         creator {

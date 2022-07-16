@@ -1,0 +1,126 @@
+import { Repository as RepositoryGraphQL, PackageIdentifierInput } from "datapm-client-lib";
+import { Connection, EntityManager, Repository } from "typeorm";
+import { Context } from "../context";
+import { CredentialEntity } from "../entity/CredentialEntity";
+import { PackageEntity } from "../entity/PackageEntity";
+import { RepositoryEntity } from "../entity/RepositoryEntity";
+import { UserEntity } from "../entity/UserEntity";
+import { getPackageFromCacheOrDbByIdOrFail, packageEntityToGraphqlObject } from "../resolvers/PackageResolver";
+import { CredentialRepository } from "./CredentialRepository";
+import { PackageRepository } from "./PackageRepository";
+
+
+export const repositoryEntityToGraphqlObject = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    repositoryEntity: RepositoryEntity
+): Promise<RepositoryGraphQL> => {
+
+    const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, connection, repositoryEntity.packageId, true);
+
+    const credentials = await context.connection.manager.getCustomRepository(CredentialRepository).repositoryCredentials({repositoryEntity});
+
+    return {
+       connectorType: repositoryEntity.connectorType,
+       createdAt: repositoryEntity.createdAt,
+       updatedAt: repositoryEntity.updatedAt,
+       repositoryIdentifier: repositoryEntity.repositoryIdentifier,
+       credentials,
+       creator: repositoryEntity.creator,
+       package: await packageEntityToGraphqlObject(context, connection, packageEntity)
+    };
+};
+
+
+export class RepositoryRepository extends Repository<RepositoryEntity> {
+
+    async packageRepositories({
+        packageEntity,
+        limit,
+        offset,
+        relations = []
+    }: {
+        packageEntity: PackageEntity;
+        limit: number,
+        offset: number
+        relations?: string[];
+    }): Promise<[RepositoryEntity[], number]> {
+
+        const response = await this.createQueryBuilder()
+            .where(
+                `("RepositoryEntity".package_id = :packageId)`
+            )
+            .setParameter("packageId", packageEntity.id)
+            .offset(offset)
+            .limit(limit)
+            .addRelations("RepositoryEntity", relations)
+            .getManyAndCount();
+
+        return response;
+    }
+
+    public async createRepository(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, creator: UserEntity): Promise<RepositoryEntity> {
+
+    
+        return await this.manager.transaction( async(entityManager) => {
+
+            const credentialEntity = entityManager.create(RepositoryEntity);
+            credentialEntity.packageId = packageEntity.id;
+            credentialEntity.connectorType = connectorType;
+            credentialEntity.repositoryIdentifier = repositoryIdentifier;
+            credentialEntity.creatorId = creator.id;
+
+            entityManager.save([credentialEntity]);
+
+            return credentialEntity;
+
+        });
+
+    }
+
+
+    public async deleteRepository(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string): Promise<void> {
+
+        const repository = await this.findRepository(identifier, connectorType, repositoryIdentifier);
+
+        if(repository == null)
+            throw new Error("REPOSITORY_NOT_FOUND");
+
+
+        await this.manager.nestedTransaction(async (transaction) => {
+            await this.manager.getRepository(CredentialEntity).delete(repository.id);
+        });
+
+
+    }
+
+
+    public async findRepository(identifier: PackageIdentifierInput,connectorType: string, repositoryIdentifier: string): Promise<RepositoryEntity | undefined> {
+
+        const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
+
+        const repository = await this.createQueryBuilder()
+                .where('"RepositoryEntity"."package_id" = :packageId AND "RepositoryEntity"."repository_identifier" = :repositoryIdentifier AND "RepositoryEntity"."connector_type" = :connectorType')
+                .setParameter("packageId", packageEntity.id)
+                .setParameter("repositoryIdentifier", repositoryIdentifier)
+                .setParameter("connectorType", connectorType)
+                .getOne();
+
+        return repository;
+    }
+
+    public async findRepositoriesByConnectorType(identifier: PackageIdentifierInput,connectorType: string): Promise<RepositoryEntity[]> {
+
+        const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
+
+        const repositories = await this.createQueryBuilder()
+                .where('"RepositoryEntity"."package_id" = :packageId AND "RepositoryEntity"."repository_identifier" = :repositoryIdentifier')
+                .setParameter("packageId", packageEntity.id)
+                .setParameter("connectorType", connectorType)
+                .getMany();
+
+        return repositories;
+    }
+
+
+}

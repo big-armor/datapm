@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique, ManyToOne, JoinColumn } from "typeorm";
 import { EntityBaseModel } from "./EntityBaseModel";
-import { PackageEntity } from "./PackageEntity";
+import { RepositoryEntity } from "./RepositoryEntity";
 import { UserEntity } from "./UserEntity";
 @Entity({
     name: "credential"
 })
-@Unique(["packageId","repositoryIdentifier","connectorType","credentialIdentifier"])
+@Unique(["repositoryId","credentialIdentifier"])
 export class CredentialEntity extends EntityBaseModel {
 
     @PrimaryGeneratedColumn({name: "id", type: "int"})
@@ -14,12 +14,12 @@ export class CredentialEntity extends EntityBaseModel {
     @Column({ nullable: false, name: "encrypted_credentials" })
     encryptedCredentials: string;
 
-    @ManyToOne(() => PackageEntity, { eager: true })
-    @JoinColumn({ name: "package_id" })
-    package: PackageEntity;
+    @ManyToOne(() => RepositoryEntity, { eager: true })
+    @JoinColumn({ name: "repository_id" })
+    repository: RepositoryEntity;
 
-    @Column({ name: "package_id" })
-    packageId: number;
+    @Column({ name: "repository_id" })
+    repositoryId: number;
 
     @ManyToOne(() => UserEntity, { eager: true })
     @JoinColumn({ name: "creator_id" })
@@ -30,11 +30,5 @@ export class CredentialEntity extends EntityBaseModel {
 
     @Column({ nullable: false, name: "credential_identifier" })
     credentialIdentifier: string;
-
-    @Column({ nullable: false, name: "connector_type" })
-    connectorType: string;
-
-    @Column({ nullable: false, name: "repository_identifier" })
-    repositoryIdentifier: string;
 
 }

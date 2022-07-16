@@ -370,15 +370,28 @@ type Package {
 type Credential {
     createdAt: Date
     updatedAt: Date
-    package: Package
     creator: User
-    repositoryIdentifier: String
-    connectorType: String
     credentialIdentifier: String
+}
+
+type Repository {
+    createdAt: Date
+    updatedAt: Date
+    package: Package
+    credentials: [Credential!]
+    creator: User
+    connectorType: String
+    repositoryIdentifier: String
 }
 
 type CredentialsResult {
     credentials: [Credential!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+type RepositoriesResult {
+    repositories: [Repository!]
     hasMore: Boolean!
     count: Int!
 }
@@ -1398,7 +1411,7 @@ type Query {
     """
     Lists the credential identifiers, but not the credentials themselves
     """
-    listCredentials(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): CredentialsResult!
+    listRepositories(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): RepositoriesResult!
         @hasPackagePermission(permission: EDIT)
 }
 
@@ -1778,6 +1791,15 @@ type Mutation {
     runJob(key: String!, job: JobType!): Void
 
     """
+    Creates a repository used by the server to access a specific source/sink
+    """
+    createRepository(
+        identifier: PackageIdentifierInput!
+        repositoryIdentifier: String!
+        connectorType: String!
+    ): Repository! @hasPackagePermission(permission: EDIT)
+
+    """
     Set the credentials used by the server to access a specific source in a package
     """
     createCredential(
@@ -1787,6 +1809,12 @@ type Mutation {
         credentialIdentifier: String!
         credential: JSON!
     ): Credential! @hasPackagePermission(permission: EDIT)
+
+    """
+    Permanently deletes a repository matching the given parameters
+    """
+    deleteRepository(identifier: PackageIdentifierInput!, repositoryIdentifier: String!, connectorType: String!): Void
+        @hasPackagePermission(permission: EDIT)
 
     """
     Permanently deletes a credential matching the given parameters

@@ -1,0 +1,11 @@
+mutation DeleteRepository(
+    $identifier: PackageIdentifierInput!
+    $connectorType: String!
+    $repositoryIdentifier: String!
+) {
+    deleteRepository(
+        identifier: $identifier
+        connectorType: $connectorType
+        repositoryIdentifier: $repositoryIdentifier
+    )
+}

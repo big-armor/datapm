@@ -149,6 +149,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             const connectionConfigurationResults = await obtainConnectionConfiguration(
                 this.jobContext,
+                packageFileWithContext.catalogSlug
+                    ? {
+                          catalogSlug: packageFileWithContext.catalogSlug,
+                          packageSlug: packageFileWithContext.packageFile.packageSlug
+                      }
+                    : undefined,
                 connector,
                 sourceObject.connectionConfiguration,
                 undefined,
