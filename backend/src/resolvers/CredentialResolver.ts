@@ -5,10 +5,9 @@ import { CredentialRepository } from "../repository/CredentialRepository";
 import { AuthenticatedContext, Context } from "../context";
 import { Credential, CredentialsResult, PackageIdentifierInput } from "../generated/graphql";
 import { getGraphQlRelationName } from "../util/relationNames";
-import { getPackageFromCacheOrDb } from "./PackageResolver";
 import { RepositoryRepository } from "../repository/RepositoryRepository";
 
-async function credentialEntityToGraphQL(
+export async function credentialEntityToGraphQL(
     context:Context,
     credentialEntity: CredentialEntity
 ): Promise<Credential> {

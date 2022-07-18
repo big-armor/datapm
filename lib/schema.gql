@@ -1797,6 +1797,7 @@ type Mutation {
         identifier: PackageIdentifierInput!
         repositoryIdentifier: String!
         connectorType: String!
+        connectionConfiguration: JSON!
     ): Repository! @hasPackagePermission(permission: EDIT)
 
     """

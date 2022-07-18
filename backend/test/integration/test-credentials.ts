@@ -52,7 +52,10 @@ describe("Credentials", ()=> {
                     packageSlug: "credentials-test",
                 },
                 connectorType: "test-connector",
-                repositoryIdentifier: "test-repository"
+                repositoryIdentifier: "test-repository",
+                connectionConfiguration: {
+                    test: "test"
+                }
             }
         });
 
@@ -69,7 +72,10 @@ describe("Credentials", ()=> {
                     packageSlug: "credentials-test",
                 },
                 connectorType: "test-connector",
-                repositoryIdentifier: "test-repository"
+                repositoryIdentifier: "test-repository",
+                connectionConfiguration: {
+                    test: "test"
+                }
             }
         });
 
@@ -145,7 +151,7 @@ describe("Credentials", ()=> {
         expect(response.errors?.length).equal(1);
     });
 
-    it("Should list credentials", async () => {
+    it("Should list repositories", async () => {
 
         const response = await userAClient.query({
             query: ListRepositoriesDocument,
@@ -163,13 +169,13 @@ describe("Credentials", ()=> {
 
         const repository = response.data.listRepositories.repositories![0];
         
-        expect(repository.connectorType).equal("test-credential");
+        expect(repository.connectorType).equal("test-connector");
         expect(repository.repositoryIdentifier).equal("test-repository");
         expect(repository.creator?.username).equal("testA-credentials");
 
         const credential = repository.credentials![0];
 
-        expect(credential.credentialIdentifier).equal("test-credential");
+        expect(credential.credentialIdentifier).equal("test-user");
         expect(credential.creator?.username).equal("testA-credentials");
 
     });
@@ -219,9 +225,9 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                connectorType: "testType",
-                repositoryIdentifier: "testSlug",
-                credentialIdentifier: "test-user"
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository",
+                credentialIdentifier: "test-user",
             }
         });
 
@@ -236,9 +242,9 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                connectorType: "testType",
-                repositoryIdentifier: "testSlug",
-                credentialIdentifier: "test-user"
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository",
+                credentialIdentifier: "test-user",
             }
         });
 
@@ -272,12 +278,28 @@ describe("Credentials", ()=> {
                     catalogSlug: "testA-credentials",
                     packageSlug: "credentials-test",
                 },
-                connectorType: "testType",
-                repositoryIdentifier: "testSlug"
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository"
             }
         });
 
         expect(response.errors).not.equal(null);
+    });
+
+    it("Should delete repository", async () => {
+        const response = await userAClient.mutate({
+            mutation: DeleteRepositoryDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-credentials",
+                    packageSlug: "credentials-test",
+                },
+                connectorType: "test-connector",
+                repositoryIdentifier: "test-repository"
+            }
+        });
+
+        expect(response.errors).equal(undefined);
     });
 
     it("Should not list repository after deleting", async () => {
@@ -296,6 +318,6 @@ describe("Credentials", ()=> {
 
         expect(response.errors).equal(undefined);
 
-        expect(response.data.listRepositories.repositories).equal(0);
+        expect(response.data.listRepositories.repositories?.length).equal(0);
     });
 })

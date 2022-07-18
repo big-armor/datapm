@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, Unique, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { CredentialEntity } from "./CredentialEntity";
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";
 import { UserEntity } from "./UserEntity";
@@ -21,6 +22,11 @@ export class RepositoryEntity extends EntityBaseModel {
     @ManyToOne(() => UserEntity, { eager: true })
     @JoinColumn({ name: "creator_id" })
     creator: UserEntity;
+
+    @OneToMany(() => CredentialEntity, (credential) => credential.repository, {
+        cascade: true
+    })
+    credentials: CredentialEntity[];
 
     @Column({ name: "creator_id" })
     creatorId: number;

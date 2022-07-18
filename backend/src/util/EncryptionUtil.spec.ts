@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { randomUUID } from "crypto";
 import { describe, it } from "mocha";
-import {decryptValue, encryptValue } from "../../src/util/EncryptionUtil"
+import {decryptValue, encryptValue } from "./EncryptionUtil"
 
 describe("Encryption Utils",() => {
     it("Should encrypt/decrypt values", () => {

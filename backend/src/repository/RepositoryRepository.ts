@@ -1,5 +1,6 @@
 import { Repository as RepositoryGraphQL, PackageIdentifierInput } from "datapm-client-lib";
-import { Connection, EntityManager, Repository } from "typeorm";
+import { DPMConfiguration } from "datapm-lib";
+import { Connection, EntityManager, EntityRepository, Repository } from "typeorm";
 import { Context } from "../context";
 import { CredentialEntity } from "../entity/CredentialEntity";
 import { PackageEntity } from "../entity/PackageEntity";
@@ -31,7 +32,7 @@ export const repositoryEntityToGraphqlObject = async (
     };
 };
 
-
+@EntityRepository(RepositoryEntity)
 export class RepositoryRepository extends Repository<RepositoryEntity> {
 
     async packageRepositories({
@@ -59,20 +60,21 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
         return response;
     }
 
-    public async createRepository(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, creator: UserEntity): Promise<RepositoryEntity> {
+    public async createRepository(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, connectionConfiguration: DPMConfiguration, creator: UserEntity): Promise<RepositoryEntity> {
 
     
         return await this.manager.transaction( async(entityManager) => {
 
-            const credentialEntity = entityManager.create(RepositoryEntity);
-            credentialEntity.packageId = packageEntity.id;
-            credentialEntity.connectorType = connectorType;
-            credentialEntity.repositoryIdentifier = repositoryIdentifier;
-            credentialEntity.creatorId = creator.id;
+            const repositoryEntity = entityManager.create(RepositoryEntity);
+            repositoryEntity.packageId = packageEntity.id;
+            repositoryEntity.connectorType = connectorType;
+            repositoryEntity.repositoryIdentifier = repositoryIdentifier;
+            repositoryEntity.creatorId = creator.id;
+            repositoryEntity.connectionConfiguration = JSON.stringify(connectionConfiguration);
 
-            entityManager.save([credentialEntity]);
+            entityManager.save([repositoryEntity]);
 
-            return credentialEntity;
+            return repositoryEntity;
 
         });
 
@@ -81,21 +83,22 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
 
     public async deleteRepository(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string): Promise<void> {
 
-        const repository = await this.findRepository(identifier, connectorType, repositoryIdentifier);
-
-        if(repository == null)
-            throw new Error("REPOSITORY_NOT_FOUND");
-
-
         await this.manager.nestedTransaction(async (transaction) => {
-            await this.manager.getRepository(CredentialEntity).delete(repository.id);
+
+            const repository = await transaction.getCustomRepository(RepositoryRepository).findRepository(identifier, connectorType, repositoryIdentifier);
+
+            if(repository == null)
+                throw new Error("REPOSITORY_NOT_FOUND");
+
+
+            await transaction.getRepository(RepositoryEntity).remove(repository);
         });
 
 
     }
 
 
-    public async findRepository(identifier: PackageIdentifierInput,connectorType: string, repositoryIdentifier: string): Promise<RepositoryEntity | undefined> {
+    public async findRepository(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string): Promise<RepositoryEntity | undefined> {
 
         const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
 

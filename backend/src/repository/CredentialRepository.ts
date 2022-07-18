@@ -5,6 +5,7 @@ import { RepositoryEntity } from "../entity/RepositoryEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { PackageIdentifierInput, User } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
+import { RepositoryRepository } from "./RepositoryRepository";
 
 @EntityRepository(CredentialEntity)
 export class CredentialRepository extends Repository<CredentialEntity> {
@@ -68,15 +69,20 @@ export class CredentialRepository extends Repository<CredentialEntity> {
 
     }
 
-    public async findCredential(identifier: PackageIdentifierInput,connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<CredentialEntity | undefined> {
+    public async findCredential(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<CredentialEntity | undefined> {
 
-        const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
+        const repositoryEntity = await this.manager.getCustomRepository(RepositoryRepository).findRepository(
+            identifier,
+            connectorType,
+            repositoryIdentifier
+        );
+
+        if(repositoryEntity == null)
+            throw new Error("REPOSITORY_NOT_FOUND");
 
         const credential = await this.createQueryBuilder()
-                .where('"CredentialEntity"."package_id" = :packageId AND "CredentialEntity"."repository_identifier" = :repositoryIdentifier AND "CredentialEntity"."connector_type" = :connectorType AND "CredentialEntity"."credential_identifier" = :credentialIdentifier')
-                .setParameter("packageId", packageEntity.id)
-                .setParameter("repositoryIdentifier", repositoryIdentifier)
-                .setParameter("connectorType", connectorType)
+                .where('"CredentialEntity"."repository_id" = :repositoryId AND "CredentialEntity"."credential_identifier" = :credentialIdentifier')
+                .setParameter("repositoryId", repositoryEntity.id)
                 .setParameter("credentialIdentifier", credentialIdentifier)
                 .getOne();
 

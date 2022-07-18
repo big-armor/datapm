@@ -11,7 +11,7 @@ CREATE TABLE public."repository" (
     creator_id INTEGER NOT NULL REFERENCES public."user" (id) ON DELETE CASCADE,
     connector_type VARCHAR(256) NOT NULL,
     connection_configuration TEXT NOT NULL,
-    repository_identifier VARCHAR(256) NOT NULL,
+    repository_identifier VARCHAR(256) NOT NULL
 );
 
 
@@ -25,8 +25,9 @@ CREATE SEQUENCE public.repository_id_seq AS INTEGER
 
 ALTER TABLE ONLY public."repository" ALTER COLUMN id SET DEFAULT nextval('public."repository_id_seq"'::regclass);
 
-CREATE UNIQUE INDEX IF NOT EXISTS uniqueRepositories ON credential(package_id,connector_type,repository_identifier);
+CREATE UNIQUE INDEX IF NOT EXISTS uniqueRepositories ON repository(package_id,connector_type,repository_identifier);
 
+ALTER TABLE public.repository ADD CONSTRAINT repository_pkey PRIMARY KEY (id);
 
 
 
@@ -37,7 +38,7 @@ CREATE TABLE public."credential" (
     encrypted_credentials TEXT NOT NULL,
     repository_id INTEGER NOT NULL REFERENCES repository (id) ON DELETE CASCADE,
     creator_id INTEGER NOT NULL REFERENCES public."user" (id) ON DELETE CASCADE,
-    credential_identifier VARCHAR(256)
+    credential_identifier VARCHAR(256) NOT NULL
 );
 
 CREATE SEQUENCE public.credential_id_seq AS INTEGER
@@ -52,6 +53,8 @@ ALTER TABLE ONLY public."credential" ALTER COLUMN id SET DEFAULT nextval('public
 
 
 CREATE UNIQUE INDEX IF NOT EXISTS source_credential ON credential(repository_id,credential_identifier);
+
+ALTER TABLE public.credential ADD CONSTRAINT credential_pkey PRIMARY KEY (id);
 
 `
 

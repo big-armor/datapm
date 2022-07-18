@@ -5,6 +5,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
 import { RepositoryEntity } from "../entity/RepositoryEntity";
 import { RepositoryRepository } from "../repository/RepositoryRepository";
+import { credentialEntityToGraphQL } from "./CredentialResolver";
 
 async function repositoryEntityToGraphQL(
     context:Context,
@@ -17,7 +18,8 @@ async function repositoryEntityToGraphQL(
         repositoryIdentifier: repositoryEntity.repositoryIdentifier,
         connectorType: repositoryEntity.connectorType,
         updatedAt: repositoryEntity.updatedAt,
-        creator: repositoryEntity.creator
+        creator: repositoryEntity.creator,
+        credentials: repositoryEntity.credentials ? await repositoryEntity.credentials.asyncMap(c => credentialEntityToGraphQL(context, c)) : undefined
     }
 
 }
@@ -25,7 +27,7 @@ async function repositoryEntityToGraphQL(
 
 export const createRepository = async (
         _0: any,
-    { identifier, connectorType, repositoryIdentifier }: { identifier: PackageIdentifierInput; connectorType: string, repositoryIdentifier: string },
+    { identifier, connectorType, repositoryIdentifier, connectionConfiguration }: { identifier: PackageIdentifierInput; connectorType: string, repositoryIdentifier: string, connectionConfiguration: DPMConfiguration },
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -40,7 +42,8 @@ export const createRepository = async (
         packageEntity,
         connectorType,
         repositoryIdentifier,
-        context.me
+        connectionConfiguration,
+        context.me,
     )
 
     const returnValue = await context.connection.getRepository(RepositoryEntity).findOne(repositoryEntity.id, {
