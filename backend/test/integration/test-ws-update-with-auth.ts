@@ -16,6 +16,7 @@ import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { Client } from "pg";
 import fs from "fs";
+import path from "path";
 
 
 /** Tests when the registry is used as a proxy for a published data package */
@@ -39,7 +40,7 @@ describe("Package Job With Authentication Tests", async () => {
 
     before(async function() {
 
-        this.timeout(10000); 
+        this.timeout(200000);
 
         console.log("Starting postgres source container");
         postgresContainer = await new GenericContainer("postgres")
@@ -71,11 +72,8 @@ describe("Package Job With Authentication Tests", async () => {
 
         await postgresClient.connect();
 
-        const testData = fs.readFileSync("test/data-files/postgres-test-data.sql");
+        const testData = fs.readFileSync(path.join("test","data-files","postgres-test-data.sql"));
         await postgresClient.query(testData.toString())
-                        
-
-
 
     });
 
@@ -294,7 +292,7 @@ describe("Package Job With Authentication Tests", async () => {
     });
 
     it("Modify database schema", async () => {
-        const testData = fs.readFileSync("test/data-files/postgres-test-update.sql");
+        const testData = fs.readFileSync(path.join("test","data-files","postgres-test-update.sql"));
         await postgresClient.query(testData.toString());
     })
 
