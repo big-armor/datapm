@@ -371,7 +371,7 @@ async function handleJobMessages(client: Socket, channelName: string, messageHan
         
     client.on(channelName, (message: JobMessageRequest, responseCallback:(response:any) => void) => {
         exitCallback(message);
-        console.log(JSON.stringify(message));
+        // console.log(JSON.stringify(message));
 
         if(message.requestType === JobRequestType.END_TASK) {
             responseCallback(new JobMessageResponse(JobRequestType.END_TASK));
