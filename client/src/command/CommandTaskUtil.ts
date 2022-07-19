@@ -72,11 +72,18 @@ export class CLIJobContext extends JobContext {
         return packageFileWithContext;
     }
 
-    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
+    async getRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        identifier: string
+    ): Promise<RepositoryConfig | undefined> {
         return getRepositoryConfig(type, identifier);
     }
 
-    getRepositoryConfigsByType(type: string): RepositoryConfig[] {
+    async getRepositoryConfigsByType(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string
+    ): Promise<RepositoryConfig[]> {
         return getRepositoryConfigs(type);
     }
 
@@ -230,11 +237,19 @@ export class CLIJobContext extends JobContext {
         await saveRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier, credentials);
     }
 
-    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
+    async saveRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryConfig: RepositoryConfig
+    ): Promise<void> {
         saveRepositoryConfig(type, repositoryConfig);
     }
 
-    removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
+    async removeRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryIdentifer: string
+    ): Promise<void> {
         removeRepositoryConfig(type, repositoryIdentifer);
     }
 

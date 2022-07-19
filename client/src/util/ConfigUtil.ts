@@ -145,7 +145,9 @@ export async function getRepositoryCredential(
 
     if (!secretKey) throw new Error("Could not get secret key");
 
-    const jsonString = decrypt(credentials.iv, credentials.encryptedConfiguration, secretKey);
+    const hash = JSON.parse(credentials.encryptedConfiguration) as { iv: string; value: string };
+
+    const jsonString = decrypt(hash.iv, hash.value, secretKey);
 
     return JSON.parse(jsonString);
 }
@@ -176,8 +178,7 @@ export async function saveRepositoryCredential(
 
     repositoryConfig.credentials.push({
         identifier: credentialsIdentifier,
-        encryptedConfiguration: hash.content,
-        iv: hash.iv
+        encryptedConfiguration: JSON.stringify({ value: hash.content, iv: hash.iv })
     });
 
     saveRepositoryConfigInternal(repositoryType, repositoryConfig);
