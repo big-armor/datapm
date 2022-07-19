@@ -47,21 +47,35 @@ export class CredentialRepository extends Repository<CredentialEntity> {
     }
 
 
-    public async createCredential(repositoryEntity: RepositoryEntity, connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, encryptedCredential: string, creator: UserEntity): Promise<CredentialEntity> {
+    public async createOrUpdateCredential(repositoryEntity: RepositoryEntity, connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, encryptedCredential: string, creator: UserEntity): Promise<CredentialEntity> {
 
     
         return await this.manager.transaction( async(entityManager) => {
 
+            const credential = await entityManager.getCustomRepository(CredentialRepository).findOne(undefined, {
+                where: {
+                    repositoryId: repositoryEntity.id,
+                    credentialIdentifier: credentialIdentifier                }
+            });
 
-            const credentialEntity = entityManager.create(CredentialEntity);
-            credentialEntity.credentialIdentifier = credentialIdentifier;
-            credentialEntity.encryptedCredentials = encryptedCredential;
-            credentialEntity.repositoryId = repositoryEntity.id;
-            credentialEntity.creatorId = creator.id;
+            if(credential != null) {
+                credential.encryptedCredentials = encryptedCredential;
+                await entityManager.save(credential);
+                return credential;
+            } else {
 
-            entityManager.save([credentialEntity]);
+                const credentialEntity = entityManager.create(CredentialEntity);
+                credentialEntity.credentialIdentifier = credentialIdentifier;
+                credentialEntity.encryptedCredentials = encryptedCredential;
+                credentialEntity.repositoryId = repositoryEntity.id;
+                credentialEntity.creatorId = creator.id;
 
-            return credentialEntity;
+                entityManager.save([credentialEntity]);
+
+                return credentialEntity;
+            }
+
+
         })
 
 

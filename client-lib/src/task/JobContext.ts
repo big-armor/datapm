@@ -27,7 +27,7 @@ export abstract class JobContext {
         relatedPackage: PackageIdentifierInput | undefined,
         type: string,
         identifier: string
-    ): RepositoryConfig | undefined;
+    ): Promise<RepositoryConfig | undefined>;
 
     /** Should save a repository credential */
     abstract saveRepositoryCredential(
@@ -38,9 +38,17 @@ export abstract class JobContext {
         credentials: DPMConfiguration
     ): Promise<void>;
 
-    abstract saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void;
+    abstract saveRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        connectorType: string,
+        repositoryConfig: RepositoryConfig
+    ): Promise<void>;
 
-    abstract removeRepositoryConfig(type: string, repositoryIdentifer: string): void;
+    abstract removeRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        connectorType: string,
+        repositoryIdentifer: string
+    ): Promise<void>;
 
     /**
      *
@@ -145,7 +153,7 @@ export class SilentJobContext extends JobContext {
         relatedPackage: PackageIdentifierInput | undefined,
         type: string,
         identifier: string
-    ): RepositoryConfig | undefined {
+    ): Promise<RepositoryConfig | undefined> {
         return this.context.getRepositoryConfig(relatedPackage, type, identifier);
     }
 
@@ -165,12 +173,20 @@ export class SilentJobContext extends JobContext {
         );
     }
 
-    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
-        return this.context.saveRepositoryConfig(type, repositoryConfig);
+    saveRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryConfig: RepositoryConfig
+    ): Promise<void> {
+        return this.context.saveRepositoryConfig(relatedPackage, type, repositoryConfig);
     }
 
-    removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
-        return this.context.removeRepositoryConfig(type, repositoryIdentifer);
+    removeRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryIdentifer: string
+    ): Promise<void> {
+        return this.context.removeRepositoryConfig(relatedPackage, type, repositoryIdentifer);
     }
 
     getRepositoryCredential(

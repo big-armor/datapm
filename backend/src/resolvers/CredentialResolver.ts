@@ -37,7 +37,7 @@ export const createCredential = async (
 
     const encryptedCredentials = encryptValue(JSON.stringify(credential));
 
-    const credentialEntity = await context.connection.getCustomRepository(CredentialRepository).createCredential(
+    const credentialEntity = await context.connection.getCustomRepository(CredentialRepository).createOrUpdateCredential(
         repositoryEntity,
         connectorType,
         repositoryIdentifier,

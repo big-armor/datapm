@@ -416,6 +416,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             this.args.packageSourceConnectionConfig ?? "{}"
         );
 
+        // Map of source slugs to credential identifier strings
         const packageSourceCredentialConfig: { [sourceSlug: string]: string } = JSON.parse(
             this.args.packageSourceCredentialsConfig ?? "{}"
         );

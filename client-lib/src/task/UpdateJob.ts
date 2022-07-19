@@ -175,10 +175,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             let credentialsConfiguration = {};
 
-            const credentialsIdentifier =
-                sourceObject.updateCredentialsIdentifier ?? sourceObject.credentialsIdentifier;
-
-            if (credentialsIdentifier) {
+            if (sourceObject.credentialsIdentifier) {
                 try {
                     credentialsConfiguration =
                         (await this.jobContext.getRepositoryCredential(
@@ -190,7 +187,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                                 : undefined,
                             connector.getType(),
                             repositoryIdentifier,
-                            credentialsIdentifier
+                            sourceObject.credentialsIdentifier
                         )) ?? {};
                 } catch (error) {
                     this.jobContext.print(

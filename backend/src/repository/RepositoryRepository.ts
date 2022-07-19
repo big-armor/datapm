@@ -60,21 +60,42 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
         return response;
     }
 
-    public async createRepository(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, connectionConfiguration: DPMConfiguration, creator: UserEntity): Promise<RepositoryEntity> {
+    public async createOrUpdateRepository(packageEntity: PackageEntity, connectorType: string, repositoryIdentifier: string, connectionConfiguration: DPMConfiguration, creator: UserEntity): Promise<RepositoryEntity> {
 
     
         return await this.manager.transaction( async(entityManager) => {
+            
+            const existingRepository = await entityManager.findOne(RepositoryEntity, {
+                where: {
+                    repositoryIdentifier, 
+                    connectorType,
+                    packageId: packageEntity.id
+                }
+            });
 
-            const repositoryEntity = entityManager.create(RepositoryEntity);
-            repositoryEntity.packageId = packageEntity.id;
-            repositoryEntity.connectorType = connectorType;
-            repositoryEntity.repositoryIdentifier = repositoryIdentifier;
-            repositoryEntity.creatorId = creator.id;
-            repositoryEntity.connectionConfiguration = JSON.stringify(connectionConfiguration);
+            if(existingRepository != null) {
 
-            entityManager.save([repositoryEntity]);
+                existingRepository.connectionConfiguration = JSON.stringify(connectionConfiguration);
+                await entityManager.save(existingRepository);
+                return existingRepository;
 
-            return repositoryEntity;
+            } else {
+
+                const repositoryEntity = entityManager.create(RepositoryEntity);
+                repositoryEntity.packageId = packageEntity.id;
+                repositoryEntity.connectorType = connectorType;
+                repositoryEntity.repositoryIdentifier = repositoryIdentifier;
+                repositoryEntity.creatorId = creator.id;
+                repositoryEntity.connectionConfiguration = JSON.stringify(connectionConfiguration);
+
+                await entityManager.save(repositoryEntity);
+
+                return repositoryEntity;
+
+            }
+
+            
+
 
         });
 
@@ -98,7 +119,7 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
     }
 
 
-    public async findRepository(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string): Promise<RepositoryEntity | undefined> {
+    public async findRepository(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string, relations: string[] = []): Promise<RepositoryEntity | undefined> {
 
         const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
 
@@ -107,6 +128,7 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
                 .setParameter("packageId", packageEntity.id)
                 .setParameter("repositoryIdentifier", repositoryIdentifier)
                 .setParameter("connectorType", connectorType)
+                .addRelations("RepositoryEntity", relations)
                 .getOne();
 
         return repository;
@@ -117,7 +139,7 @@ export class RepositoryRepository extends Repository<RepositoryEntity> {
         const packageEntity = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
 
         const repositories = await this.createQueryBuilder()
-                .where('"RepositoryEntity"."package_id" = :packageId AND "RepositoryEntity"."repository_identifier" = :repositoryIdentifier')
+                .where('"RepositoryEntity"."package_id" = :packageId AND "RepositoryEntity"."connector_type" = :connectorType')
                 .setParameter("packageId", packageEntity.id)
                 .setParameter("connectorType", connectorType)
                 .getMany();

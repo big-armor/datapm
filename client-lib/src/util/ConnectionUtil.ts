@@ -25,7 +25,11 @@ export async function obtainConnectionConfiguration(
     jobContext.setCurrentStep(connectorDescription?.getDisplayName() + " Connection");
 
     if (repositoryIdentifier != null) {
-        const repository = jobContext.getRepositoryConfig(relatedPackage, connector.getType(), repositoryIdentifier);
+        const repository = await jobContext.getRepositoryConfig(
+            relatedPackage,
+            connector.getType(),
+            repositoryIdentifier
+        );
 
         if (repository != null) {
             // purposefully made connectionConfiguration overwrite the saved repostiory config

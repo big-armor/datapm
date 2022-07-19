@@ -70,7 +70,7 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
             throw new Error("Repository identifier not provided.");
         }
 
-        const repositoryConfig = this.jobContext.getRepositoryConfig(
+        const repositoryConfig = await this.jobContext.getRepositoryConfig(
             undefined,
             connectorDescription.getType(),
             this.argv.repositoryIdentifier
@@ -94,9 +94,9 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
             newConnectionConfiguration
         );
 
-        this.jobContext.removeRepositoryConfig(this.argv.repositoryType, this.argv.repositoryIdentifier);
+        this.jobContext.removeRepositoryConfig(undefined, this.argv.repositoryType, this.argv.repositoryIdentifier);
 
-        this.jobContext.saveRepositoryConfig(connectorDescription.getType(), {
+        this.jobContext.saveRepositoryConfig(undefined, connectorDescription.getType(), {
             identifier: newRepositoryIdentifier,
             connectionConfiguration: newConnectionConfiguration,
             credentials: repositoryConfig.credentials

@@ -49,7 +49,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
 
         const task = await this.jobContext.startTask("Saving connection configuration...");
 
-        const existingRepsitoryConfig = this.jobContext.getRepositoryConfig(
+        const existingRepsitoryConfig = await this.jobContext.getRepositoryConfig(
             this.argv.catalogSlug && this.argv.packageSlug
                 ? { catalogSlug: this.argv.catalogSlug, packageSlug: this.argv.packageSlug }
                 : undefined,
@@ -57,7 +57,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
             repositoryIdentifier
         );
 
-        this.jobContext.saveRepositoryConfig(connectorDescription.getType(), {
+        this.jobContext.saveRepositoryConfig(undefined, connectorDescription.getType(), {
             identifier: repositoryIdentifier,
             connectionConfiguration,
             credentials: existingRepsitoryConfig ? existingRepsitoryConfig.credentials : []

@@ -3,17 +3,15 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
 import {
-    CreatePackageDocument,
-    CreateVersionDocument,
     LoginDocument,
     ActivityLogEventType,
     PackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { JobMessageType, PublishMethod, StartPackageUpdateResponse, ErrorResponse, StartPackageUpdateRequest, SocketResponseType, SocketEvent, JobMessageResponse, JobMessageRequest, JobRequestType, StartPackageResponse, StartPackageRequest, Parameter, ParameterAnswer } from "datapm-lib";
+import { StartPackageUpdateResponse, ErrorResponse, StartPackageUpdateRequest, SocketResponseType, SocketEvent, JobMessageResponse, JobMessageRequest, JobRequestType, StartPackageResponse, StartPackageRequest, ParameterAnswer } from "datapm-lib";
 import { describe, it } from "mocha";
 import { Socket } from "socket.io-client";
-import { ActivityLogLine, dataServerPort, findActivityLogLine, serverLogLines } from "./setup";
+import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { Client } from "pg";
@@ -37,7 +35,11 @@ describe("Package Job With Authentication Tests", async () => {
     let userAStreamingClient:Socket;
     let userBStreamingClient:Socket;
 
-    before(async () => {
+    let postgresClient:Client;
+
+    before(async function() {
+
+        this.timeout(10000); 
 
         console.log("Starting postgres source container");
         postgresContainer = await new GenericContainer("postgres")
@@ -54,7 +56,7 @@ describe("Package Job With Authentication Tests", async () => {
         console.log("test postgress server port  " + postgresPort);
 
 
-        const postgresClient = new Client({
+        postgresClient = new Client({
             host: postgresHost,
             port: postgresPort,
             user: "postgres",
@@ -78,6 +80,10 @@ describe("Package Job With Authentication Tests", async () => {
     });
 
     after(async () => {
+
+        if(postgresClient)
+            await postgresClient.end();
+
         if(userAStreamingClient
             && userAStreamingClient.connected) {
             userAStreamingClient.close();
@@ -91,6 +97,10 @@ describe("Package Job With Authentication Tests", async () => {
         if(anonymousStreamingClient
             && anonymousStreamingClient.connected) {
             anonymousStreamingClient.close();
+        }
+
+        if(postgresContainer) {
+            await postgresContainer.stop();
         }
     });
 
@@ -282,6 +292,11 @@ describe("Package Job With Authentication Tests", async () => {
         expect(jobExitMessage.exitCode).equal(0);
 
     });
+
+    it("Modify database schema", async () => {
+        const testData = fs.readFileSync("test/data-files/postgres-test-update.sql");
+        await postgresClient.query(testData.toString());
+    })
 
     it("Run Update Package Job using websocket", async function() {
 

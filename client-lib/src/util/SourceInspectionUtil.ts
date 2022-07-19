@@ -141,7 +141,8 @@ export async function configureSource(
         streamSets,
         type: source.sourceType(),
         connectionConfiguration,
-        configuration: sourceConfiguration
+        configuration: sourceConfiguration,
+        credentialsIdentifier: credentialsConfigurationResults.credentialsIdentifier
     };
 
     if (Object.keys(schemas).length === 0) {

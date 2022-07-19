@@ -1,14 +1,12 @@
 import { CantSaveReasons, JobContext, MessageType, PackageFileWithContext, PackageIdentifier, parsePackageIdentifier, RegistryConfig, RepositoryConfig, Task, RepositoryCredentialsConfig } from "datapm-client-lib";
 import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile, } from "datapm-lib";
-import { SemVer } from "semver";
-import { Writable } from "stream";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { AuthenticatedContext } from "../context";
 import { hasPermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
 import { CredentialRepository } from "../repository/CredentialRepository";
 import { PackageRepository } from "../repository/PackageRepository";
-import { repositoryEntityToGraphqlObject, RepositoryRepository } from "../repository/RepositoryRepository";
+import { RepositoryRepository } from "../repository/RepositoryRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { hasPackagePermissions } from "../resolvers/UserPackagePermissionResolver";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
@@ -50,17 +48,30 @@ export abstract class BackendJobContextBase extends JobContext {
 
     }
 
-    getRepositoryConfig(relatedPackage: PackageIdentifierInput, type: string, identifier: string): RepositoryConfig | undefined {
-        throw new Error("Method not implemented.");
+    async getRepositoryConfig(relatedPackage: PackageIdentifierInput, type: string, identifier: string): Promise<RepositoryConfig | undefined> {
+        
+        
+        const repositoryEntity = await this.context.connection.getCustomRepository(RepositoryRepository).findRepository(relatedPackage, type, identifier, ["credentials"]);
+
+        if(repositoryEntity == null)
+            return undefined;
+
+        return {
+            identifier: repositoryEntity.repositoryIdentifier,
+            connectionConfiguration: JSON.parse(repositoryEntity.connectionConfiguration),
+            credentials: repositoryEntity.credentials.map<RepositoryCredentialsConfig>( c => {
+                return {
+                    encryptedConfiguration: c.encryptedCredentials,
+                    identifier: c.credentialIdentifier
+                }
+            })
+        }
     }
 
     async saveRepositoryCredential(packageIdentifier: PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string, credentials: DPMConfiguration): Promise<void> {
         
         if(packageIdentifier === undefined) 
             throw new Error("Saving repository credentials with an undefined packageIdentifier is not supported on the datapm server.");
-
-        const json = JSON.stringify(credentials);
-        const encryptedValue = encryptValue(json);
 
         const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackage({identifier: packageIdentifier});
 
@@ -71,11 +82,13 @@ export abstract class BackendJobContextBase extends JobContext {
 
         const repositoryEntity = await this.context.connection.getCustomRepository(RepositoryRepository).findRepository(packageIdentifier, connectorType, repositoryIdentifier);
 
-
         if(repositoryEntity == null) 
             throw new Error("REPOSITORY_NOT_FOUND - " + repositoryIdentifier);
 
-        await this.context.connection.getCustomRepository(CredentialRepository).createCredential(
+        const json = JSON.stringify(credentials);
+        const encryptedValue = encryptValue(json);
+
+        await this.context.connection.getCustomRepository(CredentialRepository).createOrUpdateCredential(
             repositoryEntity,
             connectorType,
             repositoryIdentifier,
@@ -85,12 +98,35 @@ export abstract class BackendJobContextBase extends JobContext {
         )
     }
 
-    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
-        // TODO implement this with a relatedPackage parameter
+    async saveRepositoryConfig(relatedPackage: PackageIdentifierInput | undefined, connectorType: string, repositoryConfig: RepositoryConfig): Promise<void> {
+        
+        if(relatedPackage === undefined)
+            throw new Error("Backend does not support saving repository configs when packageIdentifier is undefined");
+
+        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackage({identifier: relatedPackage});
+
+        if(packageEntity == null)
+            throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(relatedPackage));
+
+        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+
+        await this.context.connection.getCustomRepository(RepositoryRepository).createOrUpdateRepository(packageEntity, connectorType, repositoryConfig.identifier,repositoryConfig.connectionConfiguration, this.context.me);
     }
 
-    removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
-        // TODO implement this with a relatedPackage parameter
+    async removeRepositoryConfig(relatedPackage: PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifer: string): Promise<void> {
+
+        if(relatedPackage === undefined)
+            throw new Error("Backend does not support removing repository configs when packageIdentifier is undefined");
+
+        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackage({identifier: relatedPackage});
+
+        if(packageEntity == null)
+            throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(relatedPackage));
+
+        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+
+        await this.context.connection.getCustomRepository(RepositoryRepository).deleteRepository(relatedPackage, connectorType, repositoryIdentifer);
+
     }
     
     async getRepositoryCredential(packageIdentifier:PackageIdentifierInput | undefined, connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string): Promise<DPMConfiguration> {
@@ -122,7 +158,13 @@ export abstract class BackendJobContextBase extends JobContext {
     }
 
     getRegistryConfig(url: string): RegistryConfig | undefined {
-        throw new Error("Method not implemented.");
+
+        if(process.env["REGISTRY_URL"] !== url)
+            throw new Error("Server does not support getting other registry configs");
+
+        return {
+            url: process.env["REGISTRY_URL"]
+        }
     }
 
     abstract _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>>;
@@ -228,32 +270,6 @@ export abstract class BackendJobContextBase extends JobContext {
             catalogSlug: identifier.catalogSlug,
             cantSaveReason
         }
-    }
-
-
-
-    getPackageFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }> {
-        throw new Error("Method not implemented.");
-    }
-
-    getReadMeFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>{
-        throw new Error("Method not implemented.");
-    }
-
-    getLicenseFileWritable(
-        catalogSlug: string | undefined,
-        packageSlug: string,
-        _version: SemVer
-    ): Promise<{ writable: Writable; location: string }>{
-        throw new Error("Method not implemented.");
     }
 
 }

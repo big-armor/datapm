@@ -38,7 +38,7 @@ export const createRepository = async (
         graphQLRelationName
     );
 
-    const repositoryEntity = await context.connection.getCustomRepository(RepositoryRepository).createRepository(
+    const repositoryEntity = await context.connection.getCustomRepository(RepositoryRepository).createOrUpdateRepository(
         packageEntity,
         connectorType,
         repositoryIdentifier,

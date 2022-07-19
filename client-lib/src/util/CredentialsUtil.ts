@@ -192,7 +192,7 @@ export async function obtainCredentialsConfiguration(
         );
 
         if (credentialsIdentifier) {
-            jobContext.saveRepositoryConfig(connector.getType(), repositoryConfig);
+            await jobContext.saveRepositoryConfig(relatedPackage, connector.getType(), repositoryConfig);
 
             await jobContext.saveRepositoryCredential(
                 relatedPackage,

@@ -1,0 +1,1 @@
+ALTER TABLE test RENAME COLUMN name TO name_new;

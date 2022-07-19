@@ -7,7 +7,9 @@ export interface RegistryConfig {
 }
 
 export interface RepositoryCredentialsConfig {
+    /** The unique identifier of the credential (ex: username). Provided by the Connector implemementation. */
     identifier: string;
+
     encryptedConfiguration: string;
 }
 export interface RepositoryConfig {
