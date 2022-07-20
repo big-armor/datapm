@@ -25,6 +25,7 @@ export async function generatePackage(args: PackageCommandArguments): Promise<vo
     const jobResult = await job.execute();
 
     if (jobResult.exitCode !== 0) {
+        console.error(chalk.red(`Error: ${jobResult.errorMessage}`));
         exit(jobResult.exitCode);
     }
 

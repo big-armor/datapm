@@ -51,7 +51,7 @@ describe("Postgres Source Test", function () {
         this.timeout(200000);
 
         console.log("Starting postgres source container");
-        postgresContainer = await new GenericContainer("postgres")
+        postgresContainer = await new GenericContainer("postgres", "13.3")
             .withEnv("POSTGRES_PASSWORD", "postgres")
             .withEnv("POSTGRES_DB", "datapm")
             .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })
@@ -268,6 +268,7 @@ describe("Postgres Source Test", function () {
         };
 
         const cmdResult = await testCmd("fetch", ["local/postgres"], prompts, async (line: string) => {
+            console.log(line);
             if (line.includes("datapm fetch ")) {
                 results.messageFound = true;
             }
