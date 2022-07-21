@@ -29,6 +29,7 @@
         "package:windows:bundle": "gulp bundleWindows",
         "pretest": "cd ../client-lib && npm run codegen",
         "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 --max-old-space-size=8192 -r ts-node/register test/integration/*.ts",
+        "pretest:debug": "npm run pretest",
         "test:debug": "CREDENTIALS_SECRET_KEY=test npx mocha --slow 3000 --timeout 999999 --max-old-space-size=8192 -r ts-node/register",
         "test:full": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 --max-old-space-size=8192 -r ts-node/register test/**/*.ts",
         "lint": "npm run eslint",

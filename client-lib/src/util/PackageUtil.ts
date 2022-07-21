@@ -231,7 +231,8 @@ async function publishData(
                 packageSlug: packageFile.packageSlug
             },
             source,
-            false
+            false,
+            true
         );
 
         sourcesAndInspectionResults.push({

@@ -66,12 +66,20 @@ type InternalSourceInspectionResults = InspectionResults & {
 
 /** Given a source, run an inspection. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
+ *
+ * @param source The source to inspect
+ * @param context The context to use for inspection
+ * @param configuration The configuration to use for inspection
+ * @param jobContext The job context to use for inspection
+ * @param defaults Whether to use default values for prompts when possible
+ * @param useSourceCredentialIdentifier Whether to use the source credential identifier, defined in the source object, as the default credentials
  */
 export async function inspectSourceConnection(
     jobContext: JobContext,
     relatedPackage: PackageIdentifierInput | undefined,
     source: Source,
-    defaults: boolean | undefined
+    defaults: boolean | undefined,
+    useSourceCredentialIdentifier: boolean | undefined
 ): Promise<InternalSourceInspectionResults> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
@@ -112,7 +120,7 @@ export async function inspectSourceConnection(
 
     let credentialsConfiguration = {};
 
-    if (source.credentialsIdentifier) {
+    if ((defaults || useSourceCredentialIdentifier) && source.credentialsIdentifier) {
         try {
             credentialsConfiguration =
                 (await jobContext.getRepositoryCredential(
