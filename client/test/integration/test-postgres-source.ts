@@ -184,6 +184,9 @@ describe("Postgres Source Test", function () {
                 type: ["boolean"]
             },
             bigint: {
+                type: ["string"]
+            },
+            integer: {
                 type: ["integer"]
             },
             real: {
@@ -267,8 +270,8 @@ describe("Postgres Source Test", function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", ["local/postgres"], prompts, async (line: string) => {
-            console.log(line);
+        const cmdResult = await testCmd("fetch", ["local/covid-02-01-2020"], prompts, async (line: string) => {
+            // console.log(line);
             if (line.includes("datapm fetch ")) {
                 results.messageFound = true;
             }
