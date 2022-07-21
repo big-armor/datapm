@@ -102,7 +102,7 @@ describe("Package Job With Authentication Tests", async () => {
         }
     });
 
-    it("Create users A & B", async function () {
+    it("Create users A", async function () {
         this.timeout(10000);
         
         userAClient = await createUser(
@@ -112,6 +112,14 @@ describe("Package Job With Authentication Tests", async () => {
             "testA-ws-update-postgres@test.datapm.io",
             "passwordA!"
         );
+        expect(userAClient).to.exist;
+
+    });
+
+
+    it("Create users B", async function () {
+        this.timeout(10000);
+        
         userBClient = await createUser(
             "FirstB",
             "LastB",
@@ -119,9 +127,13 @@ describe("Package Job With Authentication Tests", async () => {
             "testB-ws-update-postgres@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
+
         expect(userBClient).to.exist;
 
+    });
+
+    it("User A login", async function () {
+        this.timeout(10000);
 
          const userALogin = await anonymousClient.mutate({
             mutation: LoginDocument,
@@ -135,6 +147,12 @@ describe("Package Job With Authentication Tests", async () => {
             throw new Error("Authentication didn't work for user A");
         }
 
+        userAToken += userALogin.data.login;
+    });
+
+    it("User B login", async function () {
+        this.timeout(10000);
+        
         const userBLogin = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
@@ -147,7 +165,6 @@ describe("Package Job With Authentication Tests", async () => {
             throw new Error("Authentication didn't work for user B");
         }
 
-        userAToken += userALogin.data.login;
         userBToken += userBLogin.data.login;
     });
 
