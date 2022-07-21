@@ -11,8 +11,9 @@ export type CredentialAndIdentifier = {
 };
 
 /** Requests from the user credentials for each source - without saving those credentials to any configuration file */
-export async function obtainCredentials(
+export async function obtainCredentialsImmutable(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     source: Source
 ): Promise<Maybe<CredentialAndIdentifier>> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
@@ -26,11 +27,34 @@ export async function obtainCredentials(
         throw new Error(`Could not find repository implementation for type ${source.type}`);
     }
 
+    let credentialsConfiguration: DPMConfiguration = {};
+
+    const connector = await connectorDescription.getConnector();
+
+    const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+        source.connectionConfiguration
+    );
+
+    if (source.credentialsIdentifier) {
+        const credential = await jobContext.getRepositoryCredential(
+            relatedPackage,
+            source.type,
+            repositoryIdentifier,
+            source.credentialsIdentifier
+        );
+
+        if (credential !== undefined) {
+            credentialsConfiguration = credential;
+
+            jobContext.log("INFO", `Using credentials ${source.credentialsIdentifier} for ${repositoryIdentifier}`);
+        }
+    }
+
     const credentialsPromptResponse = await promptForCredentials(
         jobContext,
         repository,
         source.connectionConfiguration,
-        {},
+        credentialsConfiguration,
         false,
         {}
     );

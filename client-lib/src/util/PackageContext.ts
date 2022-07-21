@@ -108,6 +108,8 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
     }
 
     async save(packageFile: PackageFile): Promise<void> {
+        this.packageFile = packageFile;
+
         const publishMethod = packageFile.registries?.find(
             (r) =>
                 r.url.toLowerCase() === this.registryUrl.toLowerCase() &&
@@ -127,7 +129,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
             }
         ];
 
-        await publishPackageFile(this.jobContext, packageFile, targetRegistries);
+        await publishPackageFile(this.jobContext, this, targetRegistries);
     }
 }
 

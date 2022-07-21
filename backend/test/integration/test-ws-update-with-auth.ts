@@ -103,6 +103,8 @@ describe("Package Job With Authentication Tests", async () => {
     });
 
     it("Create users A & B", async function () {
+        this.timeout(10000);
+        
         userAClient = await createUser(
             "FirstA",
             "LastA",

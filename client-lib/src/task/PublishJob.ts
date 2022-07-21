@@ -286,7 +286,7 @@ export class PublishJob extends Job<PublishJobResult> {
             }
         }
 
-        await publishPackageFile(this.jobContext, packageFile, targetRegistries);
+        await publishPackageFile(this.jobContext, packageFileWithContext, targetRegistries);
 
         if (packageFileWithContext.permitsSaving && packageFileWithContext.hasPermissionToSave) {
             await packageFileWithContext.save(packageFile);

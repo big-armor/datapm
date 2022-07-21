@@ -324,7 +324,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
         });
 
         this.jobContext.print("NONE", "");
-        this.jobContext.print("NONE", chalk.magenta("Schema Refinement"));
+        this.jobContext.print("NONE", chalk.magenta("Upload"));
 
         differences = comparePackages(oldPackageFile, newPackageFile);
 

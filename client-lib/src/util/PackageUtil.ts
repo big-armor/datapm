@@ -1,7 +1,7 @@
 import { Difference, DifferenceType, PackageFile, PublishMethod, RegistryReference, Source } from "datapm-lib";
 import { SemVer } from "semver";
 import { CreateCredentialDocument, CreateVersionInput } from "../generated/graphql";
-import { CredentialAndIdentifier, obtainCredentials } from "./CredentialsUtil";
+import { CredentialAndIdentifier, obtainCredentialsImmutable } from "./CredentialsUtil";
 import { identifierToString } from "./IdentifierUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import { exit } from "yargs";
@@ -10,10 +10,9 @@ import numeral from "numeral";
 import { Task } from "../task/Task";
 import { JobContext } from "../task/JobContext";
 import { fetchMultiple } from "../task/FetchPackageJob";
-import { InspectionResults } from "../main";
+import { PackageFileWithContext, InspectionResults } from "../main";
 import { inspectSourceConnection } from "./SchemaUtil";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
-import { connect } from "superagent";
 
 type CredentialsBySourceSlug = Map<string, CredentialAndIdentifier>;
 
@@ -94,15 +93,26 @@ export interface PublishProgress {
 /** Returns boolean of whether the package file was changed during the saving process */
 export async function publishPackageFile(
     jobContext: JobContext,
-    packageFile: PackageFile,
+    packageFileWithContext: PackageFileWithContext,
     targetRegistries: RegistryReference[]
 ): Promise<boolean> {
     const credentialsBySourceSlug: CredentialsBySourceSlug = new Map<string, CredentialAndIdentifier>();
 
     let packageFileChanged = false;
 
+    const packageFile = packageFileWithContext.packageFile;
+
     for (const source of packageFile.sources) {
-        const credentials = await obtainCredentials(jobContext, source);
+        const credentials = await obtainCredentialsImmutable(
+            jobContext,
+            packageFileWithContext.catalogSlug
+                ? {
+                      catalogSlug: packageFileWithContext.catalogSlug,
+                      packageSlug: packageFile.packageSlug
+                  }
+                : undefined,
+            source
+        );
 
         if (credentials) credentialsBySourceSlug.set(source.slug, credentials);
     }
