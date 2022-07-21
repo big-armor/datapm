@@ -30,7 +30,7 @@ import { JobContext } from "./JobContext";
 import { validPackageDisplayName, validShortPackageDescription, validVersion } from "../util/IdentifierUtil";
 import numeral from "numeral";
 import { PackageFileWithContext } from "../main";
-import { configureSource } from "../util/SourceInspectionUtil";
+import { configureSource, ConfigureSourceResponse } from "../util/SourceInspectionUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PackageJobResult {
@@ -46,6 +46,12 @@ export class PackageJobArguments {
     configuration?: string;
     references?: string[];
     catalogSlug?: string;
+    packageTitle?: string;
+    packageSlug?: string;
+    version?: string;
+    description?: string;
+    website?: string;
+    sampleRecordCount?: number;
     repositoryIdentifier?: string;
     credentialsIdentifier?: string;
     inspectionSeconds?: number;
@@ -144,17 +150,32 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        const configureSourceResults = await configureSource(
-            this.jobContext,
-            maybeConnectorDescription,
-            connectionConfiguration,
-            credentialsConfiguration,
-            sourceConfiguration,
-            this.args.repositoryIdentifier,
-            this.args.credentialsIdentifier,
-            this.args.inspectionSeconds,
-            true
-        );
+        const packageIdentifier =
+            this.args.packageSlug && this.args.catalogSlug
+                ? {
+                      catalogSlug: this.args.catalogSlug,
+                      packageSlug: this.args.packageSlug
+                  }
+                : undefined;
+
+        let configureSourceResults: ConfigureSourceResponse;
+
+        try {
+            configureSourceResults = await configureSource(
+                this.jobContext,
+                packageIdentifier,
+                maybeConnectorDescription,
+                connectionConfiguration,
+                credentialsConfiguration,
+                sourceConfiguration,
+                this.args.repositoryIdentifier,
+                this.args.credentialsIdentifier,
+                this.args.inspectionSeconds,
+                true
+            );
+        } catch (error) {
+            return { exitCode: 1, errorMessage: error.message };
+        }
 
         if (configureSourceResults === false) {
             return { exitCode: 1 };
@@ -166,7 +187,11 @@ export class PackageJob extends Job<PackageJobResult> {
 
         // Prompt Display Name
         let displayNameResponse: ParameterAnswer<"displayName">;
-        if (this.args.defaults) {
+        if (this.args.packageTitle != null) {
+            displayNameResponse = {
+                displayName: this.args.packageTitle
+            };
+        } else if (this.args.defaults) {
             displayNameResponse = {
                 displayName: sourceInspectionResults.defaultDisplayName
             };
@@ -197,72 +222,112 @@ export class PackageJob extends Job<PackageJobResult> {
 
         if (this.args.defaults) {
             responses = {
-                packageSlug: suggestedSlug,
-                version: "1.0.0",
-                description: `Generated from ${this.args.references}`,
-                website: "", // TODO - Better websites defaults. Handle github, etc,
-                sampleRecordCount: 100
+                packageSlug: this.args.packageSlug ?? suggestedSlug,
+                version: this.args.version ?? "1.0.0",
+                description: this.args.description ?? `Generated from ${this.args.references}`,
+                website: this.args.website ?? "", // TODO - Better websites defaults. Handle github, etc,
+                sampleRecordCount: Math.max(this.args.sampleRecordCount ?? 100, 100)
             };
             this.jobContext.print("NONE", `Default package short name: ${responses.packageSlug}`);
             this.jobContext.print("NONE", `Default starting version: ${responses.version}`);
             this.jobContext.print("NONE", `Default short package description: ${responses.description}`);
         } else {
-            responses = await this.jobContext.parameterPrompt([
-                {
-                    type: ParameterType.Text,
-                    name: "packageSlug",
-                    configuration: {},
-                    message: "Package short name?",
-                    defaultValue: suggestedSlug,
-                    validate: (value) => {
-                        if (typeof value !== "string") {
-                            return "Must be a string";
+            const shortNameResponse: string =
+                this.args.packageSlug ??
+                (
+                    await this.jobContext.parameterPrompt([
+                        {
+                            type: ParameterType.Text,
+                            name: "packageSlug",
+                            configuration: {},
+                            message: "Package short name?",
+                            defaultValue: suggestedSlug,
+                            validate: (value) => {
+                                if (typeof value !== "string") {
+                                    return "Must be a string";
+                                }
+
+                                const slugValid = packageSlugValid(value);
+
+                                if (slugValid === "PACKAGE_SLUG_INVALID") {
+                                    return "Must include only letters, numbers, periods, underscores, and hyphens";
+                                } else if (slugValid === "PACKAGE_SLUG_REQUIRED") {
+                                    return "A slug is required";
+                                } else if (slugValid === "PACKAGE_SLUG_TOO_LONG") {
+                                    return "Must be less than 39 charaters";
+                                }
+
+                                return true;
+                            }
                         }
+                    ])
+                ).packageSlug;
 
-                        const slugValid = packageSlugValid(value);
-
-                        if (slugValid === "PACKAGE_SLUG_INVALID") {
-                            return "Must include only letters, numbers, periods, underscores, and hyphens";
-                        } else if (slugValid === "PACKAGE_SLUG_REQUIRED") {
-                            return "A slug is required";
-                        } else if (slugValid === "PACKAGE_SLUG_TOO_LONG") {
-                            return "Must be less than 39 charaters";
+            const versionResponse: string =
+                this.args.version ??
+                (
+                    await this.jobContext.parameterPrompt([
+                        {
+                            type: ParameterType.Text,
+                            name: "version",
+                            configuration: {},
+                            message: "Starting version?",
+                            defaultValue: "1.0.0",
+                            validate: validVersion
                         }
+                    ])
+                ).version;
 
-                        return true;
-                    }
-                },
-                {
-                    type: ParameterType.Text,
-                    name: "version",
-                    configuration: {},
-                    message: "Starting version?",
-                    defaultValue: "1.0.0",
-                    validate: validVersion
-                },
-                {
-                    type: ParameterType.Text,
-                    name: "description",
-                    configuration: {},
-                    message: "Short package description?",
-                    validate: validShortPackageDescription
-                },
-                {
-                    type: ParameterType.Text,
-                    name: "website",
-                    configuration: {},
-                    message: "Website?",
-                    validate: validUrl
-                },
-                {
-                    type: ParameterType.Number,
-                    name: "sampleRecordCount",
-                    message: "Number of sample records?",
-                    configuration: {},
-                    defaultValue: 100,
-                    validate: validSampleRecordCount
-                }
-            ]);
+            const descriptionResponse: string =
+                this.args.description ??
+                (
+                    await this.jobContext.parameterPrompt([
+                        {
+                            type: ParameterType.Text,
+                            name: "description",
+                            configuration: {},
+                            message: "Short package description?",
+                            validate: validShortPackageDescription
+                        }
+                    ])
+                ).description;
+
+            const websiteResponse: string =
+                this.args.website ??
+                (
+                    await this.jobContext.parameterPrompt([
+                        {
+                            type: ParameterType.Text,
+                            name: "website",
+                            configuration: {},
+                            message: "Website?",
+                            validate: validUrl
+                        }
+                    ])
+                ).website;
+
+            const sampleRecordCountResponse: number =
+                this.args.sampleRecordCount ??
+                (
+                    await this.jobContext.parameterPrompt([
+                        {
+                            type: ParameterType.Number,
+                            name: "sampleRecordCount",
+                            message: "Number of sample records?",
+                            configuration: {},
+                            defaultValue: 100,
+                            validate: validSampleRecordCount
+                        }
+                    ])
+                ).sampleRecordCount;
+
+            responses = {
+                packageSlug: shortNameResponse,
+                version: versionResponse,
+                description: descriptionResponse,
+                website: websiteResponse,
+                sampleRecordCount: sampleRecordCountResponse
+            };
         }
 
         for (const schema of Object.values(schemas)) {

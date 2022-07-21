@@ -3,12 +3,15 @@ import { getConnectorDescriptionByType, getConnectorDescriptions } from "../conn
 import { promptForCredentials } from "../util/CredentialsUtil";
 import { Job, JobResult } from "./Task";
 import { JobContext } from "./JobContext";
+import { PackageIdentifierInput } from "../main";
 
 export class AddRepositoryCredentialsJobResult {}
 
 export class CredentialsAddArguments {
     repositoryType?: string;
     repositoryIdentifier?: string;
+    catalogSlug?: string;
+    packageSlug?: string;
     defaults?: boolean | undefined;
 }
 
@@ -51,7 +54,18 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
             throw new Error("Repository type " + this.args.repositoryType + " not found.");
         }
 
-        const existingConfiguration = this.jobContext.getRepositoryConfigsByType(this.args.repositoryType);
+        const relatedPackage: PackageIdentifierInput | undefined =
+            this.args.catalogSlug && this.args.packageSlug
+                ? {
+                      catalogSlug: this.args.catalogSlug,
+                      packageSlug: this.args.packageSlug
+                  }
+                : undefined;
+
+        const existingConfiguration = await this.jobContext.getRepositoryConfigsByType(
+            relatedPackage,
+            this.args.repositoryType
+        );
 
         if (existingConfiguration.length === 0) {
             this.jobContext.print(
@@ -132,6 +146,7 @@ export class AddRepositoryCredentialsJob extends Job<AddRepositoryCredentialsJob
             );
 
             await this.jobContext.saveRepositoryCredential(
+                undefined,
                 repository.getType(),
                 repositoryIdentifier,
                 credentialsIdentifier,

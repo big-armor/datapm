@@ -1,0 +1,24 @@
+mutation CreateRepository(
+    $identifier: PackageIdentifierInput!
+    $connectorType: String!
+    $repositoryIdentifier: String!
+    $connectionConfiguration: JSON!
+) {
+    createRepository(
+        identifier: $identifier
+        connectorType: $connectorType
+        repositoryIdentifier: $repositoryIdentifier
+        connectionConfiguration: $connectionConfiguration
+    ) {
+        connectorType
+        repositoryIdentifier
+        createdAt
+        updatedAt
+        creator {
+            username
+            firstName
+            lastName
+            nameIsPublic
+        }
+    }
+}

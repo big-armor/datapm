@@ -45,7 +45,8 @@ export enum SocketEvent {
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesRequest",
     SCHEMA_INFO_REQUEST = "schemaInfoRequest",
     PACKAGE_VERSION_SINK_STATE_REQUEST = "packageVersionSinkStateRequest",
-    START_PACKAGE_UPDATE = "startPackageUpdate"
+    START_PACKAGE_UPDATE = "startPackageUpdate",
+    START_PACKAGE = "startPackage"
 }
 
 export enum SocketError {
@@ -64,7 +65,8 @@ export enum SocketResponseType {
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
     OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse",
     PACKAGE_VERSION_SINK_STATE_RESPONSE = "packageVersionSinkStateResponse",
-    START_PACKAGE_UPDATE_RESPONSE = "startPackageUpdateResponse"
+    START_PACKAGE_UPDATE_RESPONSE = "startPackageUpdateResponse",
+    START_PACKAGE_RESPONSE = "startPackageResponse"
 }
 
 export interface Request {
@@ -285,6 +287,31 @@ export class DataStop implements FetchRequest {
 
 export class DataStopAcknowledge implements FetchResponse {
     responseType = FetchResponseType.STOP_ACKNOWLEDGE;
+}
+
+/** Sent by a client requesting that a package job be started */
+export class StartPackageRequest implements Request {
+    requestType = SocketEvent.START_PACKAGE;
+    catalogSlug: string;
+    packageSlug: string;
+    packageTitle: string;
+    packageDescription: string;
+
+    constructor(catalogSlug: string, packageSlug: string, packageTitle: string, packageDescription: string) {
+        this.catalogSlug = catalogSlug;
+        this.packageSlug = packageSlug;
+        this.packageTitle = packageTitle;
+        this.packageDescription = packageDescription;
+    }
+}
+
+export class StartPackageResponse implements Response {
+    responseType = SocketResponseType.START_PACKAGE_RESPONSE;
+    public channelName: string;
+
+    constructor(channelName: string) {
+        this.channelName = channelName;
+    }
 }
 
 /** Sent by a client requesting that the schema contents of a package be updated.  */

@@ -21,7 +21,6 @@ import {
     ActivityLogResult,
     UpdateMethod
 } from "../generated/graphql";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
@@ -34,7 +33,6 @@ import { hasPackageEntityPermissions } from "./UserPackagePermissionResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import {
     catalogEntityToGraphQL,
-    getCatalogByIdentifier,
     getCatalogFromCacheOrDbById,
     getCatalogFromCacheOrDbBySlug
 } from "./CatalogResolver";
@@ -52,6 +50,7 @@ import {
 } from "./FollowResolver";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { isAuthenticatedContext } from "../util/contextHelpers";
+
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -738,3 +737,4 @@ export const getPackageVersionsFromCacheOrDbById = async (
         context.connection.getCustomRepository(VersionRepository).findVersions({ packageId, relations });
     return await context.cache.loadPackageVersions(packageId, versionsPromiseFunction);
 };
+

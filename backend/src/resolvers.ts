@@ -128,6 +128,9 @@ import {
     packageUpdateMethods
 } from "./resolvers/PackageResolver";
 
+import { createCredential, deleteCredential } from "./resolvers/CredentialResolver";
+import { createRepository, listRepositories, deleteRepository } from "./resolvers/RepositoryResolver";
+
 import { validatePassword } from "./directive/ValidPasswordDirective";
 import { validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
 import { validateUsername } from "./directive/ValidUsernameDirective";
@@ -644,7 +647,8 @@ export const resolvers: {
         packageIssueFollowersCount: packageIssueFollowersCount,
         catalogFollowersCount: catalogFollowersCount,
         collectionFollowersCount: collectionFollowersCount,
-        userFollowersCount: userFollowersCount
+        userFollowersCount: userFollowersCount,
+        listRepositories
     },
 
     Mutation: {
@@ -690,6 +694,11 @@ export const resolvers: {
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,
+        createRepository,
+        deleteRepository,
+        createCredential,
+        deleteCredential,
+
 
         // Package issues
         createPackageIssue: createPackageIssue,
@@ -730,6 +739,8 @@ export const resolvers: {
         savePlatformSettings: savePlatformSettings,
 
         runJob,
+
+        
 
     }
 };

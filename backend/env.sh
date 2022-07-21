@@ -14,6 +14,13 @@ export REGISTRY_NAME=${REGISTRY_NAME:="DataPM Local Development"}
 # NEVER SHARE THE JWT KEY, IT IS A SECRET
 export JWT_KEY=${JWT_KEY:="!!!!REPLACE_ME_AND_KEEP_SECRET!!!"}
 
+# ENCRYPTION_ENGINE Currently only supports nodejs, will in the future
+# support Google Cloud Key Management System (KMS), and others
+export ENCRYPTION_ENGINE="nodejs"
+
+# NODEJS_ENCRYPTION_KEY Used only when ENCRYPTION_ENGINE is set to nodejs
+export NODEJS_ENCRYPTION_KEY="!!!!REPLACE_ME_AND_KEEP_SECRET!!!!!"
+
 # TYPEORM is the libray used to communicate with the PostgreSQL database
 export TYPEORM_PORT=${TYPEORM_PORT:=5432}
 export TYPEORM_DATABASE=${TYPEORM_DATABASE:="datapm"}

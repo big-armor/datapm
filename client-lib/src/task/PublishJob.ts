@@ -346,10 +346,7 @@ export class PublishJob extends Job<PublishJobResult> {
             if (publishTypeSelection.method === PublishMethod.SCHEMA_ONLY) {
                 if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
                     // Credentials are required, so tell the user they will have to enter
-                    this.jobContext.print(
-                        "INFO",
-                        "Access to this data requires access credentials, and those access credentials will not be published to the server."
-                    );
+                    this.jobContext.print("INFO", "Access to this data requires credentials.");
                     this.jobContext.print(
                         "INFO",
                         "You will need to share the access credentials with the users of this package manually."
@@ -362,7 +359,7 @@ export class PublishJob extends Job<PublishJobResult> {
 
                     this.jobContext.print(
                         "WARN",
-                        "Because this package requires access credentials, this package can not be made public"
+                        "The access credentials you used to connect will be published to the server, so that it can perform periodic refreshes of the data package. These credentials will not be made available to other users."
                     );
 
                     break;

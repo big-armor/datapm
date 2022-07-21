@@ -29,6 +29,7 @@ import { JobContext } from "../task/JobContext";
 import { obtainConnectionConfiguration } from "./ConnectionUtil";
 import { createUTCDateTimeFromString, isDate, isDateTime } from "./DateUtil";
 import isNumber from "is-number";
+import { PackageIdentifierInput } from "../main";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -65,11 +66,20 @@ type InternalSourceInspectionResults = InspectionResults & {
 
 /** Given a source, run an inspection. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
+ *
+ * @param source The source to inspect
+ * @param context The context to use for inspection
+ * @param configuration The configuration to use for inspection
+ * @param jobContext The job context to use for inspection
+ * @param defaults Whether to use default values for prompts when possible
+ * @param useSourceCredentialIdentifier Whether to use the source credential identifier, defined in the source object, as the default credentials
  */
 export async function inspectSourceConnection(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     source: Source,
-    defaults: boolean | undefined
+    defaults: boolean | undefined,
+    useSourceCredentialIdentifier: boolean | undefined
 ): Promise<InternalSourceInspectionResults> {
     const connectorDescription = getConnectorDescriptionByType(source.type);
 
@@ -92,7 +102,14 @@ export async function inspectSourceConnection(
 
         jobContext.addAnswerListener(promptAnswerListener);
 
-        await obtainConnectionConfiguration(jobContext, connector, source.connectionConfiguration, undefined, defaults);
+        await obtainConnectionConfiguration(
+            jobContext,
+            relatedPackage,
+            connector,
+            source.connectionConfiguration,
+            undefined,
+            defaults
+        );
 
         jobContext.removeAnswerListener(promptAnswerListener);
     }
@@ -103,10 +120,11 @@ export async function inspectSourceConnection(
 
     let credentialsConfiguration = {};
 
-    if (source.credentialsIdentifier) {
+    if ((defaults || useSourceCredentialIdentifier) && source.credentialsIdentifier) {
         try {
             credentialsConfiguration =
                 (await jobContext.getRepositoryCredential(
+                    relatedPackage,
                     connector.getType(),
                     repositoryIdentifier,
                     source.credentialsIdentifier
@@ -118,6 +136,7 @@ export async function inspectSourceConnection(
 
     const userCredentialsResponse = await obtainCredentialsConfiguration(
         jobContext,
+        relatedPackage,
         connector,
         source.connectionConfiguration,
         credentialsConfiguration,

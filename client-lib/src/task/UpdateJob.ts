@@ -149,6 +149,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             const connectionConfigurationResults = await obtainConnectionConfiguration(
                 this.jobContext,
+                packageFileWithContext.catalogSlug
+                    ? {
+                          catalogSlug: packageFileWithContext.catalogSlug,
+                          packageSlug: packageFileWithContext.packageFile.packageSlug
+                      }
+                    : undefined,
                 connector,
                 sourceObject.connectionConfiguration,
                 undefined,
@@ -169,16 +175,19 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             let credentialsConfiguration = {};
 
-            const credentialsIdentifier =
-                sourceObject.updateCredentialsIdentifier ?? sourceObject.credentialsIdentifier;
-
-            if (credentialsIdentifier) {
+            if (sourceObject.credentialsIdentifier) {
                 try {
                     credentialsConfiguration =
                         (await this.jobContext.getRepositoryCredential(
+                            packageFileWithContext.catalogSlug
+                                ? {
+                                      catalogSlug: packageFileWithContext.catalogSlug,
+                                      packageSlug: packageFileWithContext.packageFile.packageSlug
+                                  }
+                                : undefined,
                             connector.getType(),
                             repositoryIdentifier,
-                            credentialsIdentifier
+                            sourceObject.credentialsIdentifier
                         )) ?? {};
                 } catch (error) {
                     this.jobContext.print(
@@ -190,6 +199,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
 
             const credentialsConfigurationResults = await obtainCredentialsConfiguration(
                 this.jobContext,
+                packageFileWithContext.catalogSlug
+                    ? {
+                          catalogSlug: packageFileWithContext.catalogSlug,
+                          packageSlug: packageFileWithContext.packageFile.packageSlug
+                      }
+                    : undefined,
                 connector,
                 connectionConfiguration,
                 credentialsConfiguration,

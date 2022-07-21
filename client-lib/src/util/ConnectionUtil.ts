@@ -3,10 +3,11 @@ import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { JobContext } from "../task/JobContext";
 import { RepositoryConfig } from "../config/Config";
-import { getConnectorDescriptionByType } from "../main";
+import { getConnectorDescriptionByType, PackageIdentifierInput } from "../main";
 
 export async function obtainConnectionConfiguration(
     jobContext: JobContext,
+    relatedPackage: PackageIdentifierInput | undefined,
     connector: Connector,
     connectionConfiguration: DPMConfiguration,
     repositoryIdentifier: string | undefined,
@@ -24,7 +25,11 @@ export async function obtainConnectionConfiguration(
     jobContext.setCurrentStep(connectorDescription?.getDisplayName() + " Connection");
 
     if (repositoryIdentifier != null) {
-        const repository = jobContext.getRepositoryConfig(connector.getType(), repositoryIdentifier);
+        const repository = await jobContext.getRepositoryConfig(
+            relatedPackage,
+            connector.getType(),
+            repositoryIdentifier
+        );
 
         if (repository != null) {
             // purposefully made connectionConfiguration overwrite the saved repostiory config
@@ -42,7 +47,7 @@ export async function obtainConnectionConfiguration(
     let savedRepositories: RepositoryConfig[] = [];
 
     if (connector.userSelectableConnectionHistory())
-        savedRepositories = jobContext.getRepositoryConfigsByType(connector.getType());
+        savedRepositories = await jobContext.getRepositoryConfigsByType(relatedPackage, connector.getType());
 
     const pendingParameters = await connector.getConnectionParameters(connectionConfiguration);
 

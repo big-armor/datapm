@@ -34,7 +34,8 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
 
         if (this.argv.repositoryIdentifier == null) {
             // select repository from configuration
-            const existingConnectionConfigurations = this.jobContext.getRepositoryConfigsByType(
+            const existingConnectionConfigurations = await this.jobContext.getRepositoryConfigsByType(
+                undefined,
                 connectorDescription.getType()
             );
 
@@ -69,9 +70,11 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
             throw new Error("Repository identifier not provided.");
         }
 
-        const repositoryConfig = this.jobContext
-            .getRepositoryConfigsByType(connectorDescription.getType())
-            .find((c) => c.identifier === this.argv.repositoryIdentifier);
+        const repositoryConfig = await this.jobContext.getRepositoryConfig(
+            undefined,
+            connectorDescription.getType(),
+            this.argv.repositoryIdentifier
+        );
 
         if (repositoryConfig == null) {
             throw new Error("Repository configuration " + this.argv.repositoryIdentifier + " not found.");
@@ -91,9 +94,9 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
             newConnectionConfiguration
         );
 
-        this.jobContext.removeRepositoryConfig(this.argv.repositoryType, this.argv.repositoryIdentifier);
+        this.jobContext.removeRepositoryConfig(undefined, this.argv.repositoryType, this.argv.repositoryIdentifier);
 
-        this.jobContext.saveRepositoryConfig(connectorDescription.getType(), {
+        this.jobContext.saveRepositoryConfig(undefined, connectorDescription.getType(), {
             identifier: newRepositoryIdentifier,
             connectionConfiguration: newConnectionConfiguration,
             credentials: repositoryConfig.credentials
@@ -111,6 +114,7 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
 
             const credentialsResult = await obtainCredentialsConfiguration(
                 this.jobContext,
+                undefined,
                 connector,
                 newConnectionConfiguration,
                 {},

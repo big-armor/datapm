@@ -7,7 +7,8 @@ import {
     PackageFileWithContext,
     PackageIdentifier,
     TaskStatus,
-    JobContext
+    JobContext,
+    PackageIdentifierInput
 } from "datapm-client-lib";
 import { DPMConfiguration, PackageFile, Parameter, ParameterAnswer } from "datapm-lib";
 import { cliHandleParameters } from "../util/CLIParameterUtils";
@@ -71,11 +72,18 @@ export class CLIJobContext extends JobContext {
         return packageFileWithContext;
     }
 
-    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
+    async getRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        identifier: string
+    ): Promise<RepositoryConfig | undefined> {
         return getRepositoryConfig(type, identifier);
     }
 
-    getRepositoryConfigsByType(type: string): RepositoryConfig[] {
+    async getRepositoryConfigsByType(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string
+    ): Promise<RepositoryConfig[]> {
         return getRepositoryConfigs(type);
     }
 
@@ -220,6 +228,7 @@ export class CLIJobContext extends JobContext {
     }
 
     async saveRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined, // Not used when saving a credential locally
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string,
@@ -228,15 +237,24 @@ export class CLIJobContext extends JobContext {
         await saveRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier, credentials);
     }
 
-    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
+    async saveRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryConfig: RepositoryConfig
+    ): Promise<void> {
         saveRepositoryConfig(type, repositoryConfig);
     }
 
-    removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
+    async removeRepositoryConfig(
+        relatedPackage: PackageIdentifierInput | undefined,
+        type: string,
+        repositoryIdentifer: string
+    ): Promise<void> {
         removeRepositoryConfig(type, repositoryIdentifer);
     }
 
     async getRepositoryCredential(
+        relatedPackage: PackageIdentifierInput | undefined, // Not used when saving a credential locally
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string

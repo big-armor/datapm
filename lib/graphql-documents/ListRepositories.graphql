@@ -1,0 +1,40 @@
+query ListRepositories($identifier: PackageIdentifierInput!, $limit: Int!, $offset: Int!) {
+    listRepositories(identifier: $identifier, limit: $limit, offset: $offset) {
+        repositories {
+            repositoryIdentifier
+            connectorType
+            createdAt
+            updatedAt
+            package {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                catalog {
+                    identifier {
+                        catalogSlug
+                    }
+                }
+            }
+            credentials {
+                credentialIdentifier
+                createdAt
+                updatedAt
+                creator {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
+                }
+            }
+            creator {
+                username
+                firstName
+                lastName
+                nameIsPublic
+            }
+        }
+        hasMore
+        count
+    }
+}

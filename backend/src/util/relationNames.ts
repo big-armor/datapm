@@ -46,7 +46,7 @@ export function getRelationNames(obj: object, parentNames: string = ""): string[
         "catalogs",
         "issues",
         "comments",
-        "creator",
+        // "creator",
         "catalog",
         "follows",
         "packageIdentifier"

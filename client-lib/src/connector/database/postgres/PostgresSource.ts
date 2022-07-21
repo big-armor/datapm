@@ -5,6 +5,7 @@ import { Transform } from "stream";
 import { table } from "console";
 import { TYPE } from "./PostgresConnectorDescription";
 import { JobContext } from "../../../task/JobContext";
+import pg from "pg";
 
 export class PostgresSource implements Source {
     sourceType(): string {
@@ -77,6 +78,10 @@ export class PostgresSource implements Source {
         configuration: DPMConfiguration,
         context: JobContext
     ): Promise<InspectionResults> {
+        /* pg.types.setTypeParser(pg.types.builtins.INT8, (value: string) => {
+            return parseInt(value);
+        }); */
+
         let remainingParameter = await this.getInspectParameters(
             connectionConfiguration,
             credentialsConfiguration,
@@ -108,7 +113,7 @@ export class PostgresSource implements Source {
 
         return {
             defaultDisplayName:
-                (configuration.tables as string[]).length > 0
+                (configuration.tables as string[]).length > 1
                     ? (configuration.database as string)
                     : (configuration.tables as string[])[0],
             source: this,
