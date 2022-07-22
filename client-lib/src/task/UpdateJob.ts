@@ -243,11 +243,6 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 sourceConfiguration
             );
 
-            // remove the updateConfiguration related keys, and save the remaining to the source
-            for (const updateOnlyKey of Object.keys(sourceObject.updateConfiguration || {})) {
-                delete sourceConfiguration[updateOnlyKey];
-            }
-
             sourceObject.configuration = sourceConfiguration;
 
             const streamSets: StreamSet[] = [];
@@ -268,6 +263,12 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                     updateMethods: streamInspectionResult.updateMethods
                 });
             }
+
+            // remove the updateConfiguration related keys, and save the remaining to the source
+            for (const updateOnlyKey of Object.keys(sourceObject.updateConfiguration || {})) {
+                delete sourceConfiguration[updateOnlyKey];
+            }
+
             newPackageFile.sources.push({
                 ...sourceObject,
                 streamSets: streamSets

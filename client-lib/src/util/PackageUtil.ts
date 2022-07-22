@@ -425,13 +425,8 @@ export async function uploadPackageFile(
             const sourceCredentials = credentialsBySourceSlug.get(source.slug);
 
             if (sourceCredentials == null) {
-                jobContext.print("WARN", "No credentials found for source " + source.slug);
                 continue;
             }
-
-            const task = await jobContext.startTask(
-                "Uploading " + source.slug + " credentials" + sourceCredentials.identifier
-            );
 
             const connectorDescription = getConnectorDescriptionByType(source.type);
 
@@ -447,6 +442,11 @@ export async function uploadPackageFile(
                 jobContext.print("WARN", "No repository identifier provided for connector " + source.type);
                 continue;
             }
+
+            const task = await jobContext.startTask(
+                "Uploading " + source.slug + " credentials" + sourceCredentials.identifier
+            );
+
             const response = await registry.getClient().mutate({
                 mutation: CreateCredentialDocument,
                 variables: {
