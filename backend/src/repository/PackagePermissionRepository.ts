@@ -1,8 +1,7 @@
-import { EntityRepository, EntityManager, DeleteResult, Connection } from "typeorm";
+import { EntityRepository, EntityManager, DeleteResult } from "typeorm";
 
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
-import { UserRepository } from "./UserRepository";
-import { Permission, PackageIdentifier, PackageIdentifierInput, User } from "../generated/graphql";
+import { Permission, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -44,19 +43,6 @@ export async function getAllPackagePermissions(
 @EntityRepository()
 export class PackagePermissionRepository {
     constructor(private manager: EntityManager) {}
-
-    public async hasPermission(userId: number, packageEntity: PackageEntity, permission: Permission): Promise<boolean> {
-        if (packageEntity.isPublic && permission == Permission.VIEW) {
-            return true;
-        }
-
-        const permissionsEntity = await this.findPackagePermissions({ packageId: packageEntity.id, userId });
-        if (!permissionsEntity) {
-            return false;
-        }
-
-        return permissionsEntity.permissions.some((p) => p === permission);
-    }
 
     public findPackagePermissions({
         packageId,

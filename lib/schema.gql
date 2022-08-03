@@ -113,6 +113,10 @@ enum ActivityLogEventType {
     PACKAGE_FETCHED
     PACKAGE_PUBLIC_CHANGED
     PACKAGE_EDIT
+    PACKAGE_USER_PERMISSION_ADDED_UPDATED
+    PACKAGE_USER_PERMISSION_REMOVED
+    PACKAGE_GROUP_PERMISSION_ADDED_UPDATED
+    PACKAGE_GROUP_PERMISSION_REMOVED
 
     DATA_BATCH_UPLOAD_STARTED
     DATA_BATCH_UPLOAD_STOPPED
@@ -145,6 +149,10 @@ enum ActivityLogEventType {
     COLLECTION_PACKAGE_ADDED
     COLLECTION_PACKAGE_REMOVED
     COLLECTION_PUBLIC_CHANGED
+    COLLECTION_USER_PERMISSION_ADDED_UPDATED
+    COLLECTION_USER_PERMISSION_REMOVED
+    COLLECTION_GROUP_PERMISSION_ADDED_UPDATED
+    COLLECTION_GROUP_PERMISSION_REMOVED
 
     CATALOG_CREATED
     CATALOG_DELETED
@@ -153,6 +161,10 @@ enum ActivityLogEventType {
     CATALOG_EDIT
     CATALOG_PACKAGE_ADDED
     CATALOG_PACKAGE_REMOVED
+    CATALOG_USER_PERMISSION_ADDED_UPDATED
+    CATALOG_USER_PERMISSION_REMOVED
+    CATALOG_GROUP_PERMISSION_ADDED_UPDATED
+    CATALOG_GROUP_PERMISSION_REMOVED
 
     USER_CREATED
     USER_DELETED
@@ -306,6 +318,11 @@ directive @hasPackagePermission(permission: Permission) on OBJECT | FIELD_DEFINI
 Whether the requesting user has the specified permission on the collection
 """
 directive @hasCollectionPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Whether the requesting user has the specified permission on the group (not the associated resources)
+"""
+directive @hasGroupPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
 
 """
 Whether the catalog slug provided is valid
@@ -594,6 +611,7 @@ type ActivityLog {
     targetPackageIssue: PackageIssue
     targetPackageVersion: Version
     targetCollection: Collection
+    targetUser: User
     targetCatalog: Catalog
     eventType: ActivityLogEventType!
     changeType: ActivityLogChangeType
@@ -1413,6 +1431,11 @@ type Query {
     """
     listRepositories(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): RepositoriesResult!
         @hasPackagePermission(permission: EDIT)
+
+    """
+    Returns a group by it's slug
+    """
+    group(groupSlug: String! @hasGroupPermission(permission: VIEW)): Group!
 }
 
 type Mutation {
@@ -1826,4 +1849,51 @@ type Mutation {
         connectorType: String!
         credentialIdentifier: String!
     ): Void @hasPackagePermission(permission: EDIT)
+
+    createGroup(groupSlug: String!, name: String!): Group! @isAuthenticated
+
+    updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!): Group!
+
+    deleteGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE)): Group!
+
+    addOrUpdateUserToGroup(
+        groupSlug: String! @hasGroupPermission(permission: MANAGE)
+        username: String!
+        permissions: [Permission!]!
+    ): GroupUser!
+
+    removeUserFromGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE), username: String!): Group!
+
+    addOrUpdateGroupToCollection(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        collectionSlug: String! @hasCollectionPermission(permission: MANAGE)
+        permissions: [Permission!]!
+    ): GroupCollectionPermission!
+
+    removeGroupFromCollection(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        collectionSlug: String! @hasCollectionPermission(permission: MANAGE)
+    ): Void
+
+    addOrUpdateGroupToPackage(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        permissions: [Permission!]!
+    ): GroupPackagePermission!
+
+    removeGroupFromPackage(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): Void
+
+    addOrUpdateGroupToCatalog(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        catalogSlug: String! @hasCatalogPermission(permission: MANAGE)
+        permissions: [Permission!]!
+    ): GroupCatalogPermission!
+
+    removeGroupFromCatalog(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        catalogSlug: String! @hasCatalogPermission(permission: MANAGE)
+    ): Void
 }

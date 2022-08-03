@@ -4,7 +4,8 @@ import { Connection } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { PackageIdentifierInput, Permission, SetPackagePermissionInput, UserStatus } from "../generated/graphql";
+import { ActivityLogEventType, PackageIdentifierInput, Permission, SetPackagePermissionInput, UserStatus } from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -14,58 +15,6 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
 
-export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
-    const packagePromiseFunction = () =>
-        context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
-    const packageEntity = await context.cache.loadPackage(packageId, packagePromiseFunction);
-
-    if (permission == Permission.VIEW) {
-        const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, packageId);
-        if (packageEntity?.isPublic) {
-            return true;
-        }
-    }
-
-    if (!isAuthenticatedContext(context)) {
-        return false;
-    }
-
-    const userId = (context as AuthenticatedContext).me.id;
-    const permissionPromiseFunction = () =>
-        context.connection
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity, permission);
-
-    return await context.cache.loadPackagePermissionsStatusById(packageId, permission, permissionPromiseFunction);
-};
-
-export const hasPackageEntityPermissions = async (
-    context: Context,
-    packageEntity: PackageEntity,
-    permission: Permission
-):Promise<Boolean> => {
-    if (permission == Permission.VIEW) {
-        if (packageEntity?.isPublic) {
-            return true;
-        }
-    }
-
-    if (!isAuthenticatedContext(context)) {
-        return false;
-    }
-
-    const userId = (context as AuthenticatedContext).me.id;
-    const permissionPromiseFunction = () =>
-        context.connection
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity, permission);
-
-    return await context.cache.loadPackagePermissionsStatusById(
-        packageEntity.id,
-        permission,
-        permissionPromiseFunction
-    );
-};
 
 export const setPackagePermissions = async (
     _0: any,
@@ -111,10 +60,19 @@ export const setPackagePermissions = async (
                     await deletePackageIssuesFollowsByUserId(transaction, packageEntity.id, user.id);
                 }
 
-                return await packagePermissionRepository.removePackagePermissionForUser({
+                await packagePermissionRepository.removePackagePermissionForUser({
                     identifier,
                     user
                 });
+
+                await createActivityLog(transaction, {
+                    userId: context.me.id,
+                    eventType: ActivityLogEventType.PACKAGE_USER_PERMISSION_REMOVED,
+                    targetPackageId: packageEntity.id,
+                    targetUserId: user.id
+                });
+
+                return;
             }
 
             if (user == null) {
@@ -140,6 +98,13 @@ export const setPackagePermissions = async (
                 identifier,
                 userId: user.id,
                 permissions: userPackagePermission.permissions
+            });
+
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.PACKAGE_USER_PERMISSION_ADDED_UPDATED,
+                targetPackageId: packageEntity.id,
+                targetUserId: user.id
             });
         });
     });

@@ -44,14 +44,52 @@ export async function resolveCatalogPermissionsForEntity(context: Context, catal
     }
 
     const userPermission = await getCatalogPermissionsFromCacheOrDb(context, catalog.id, user!.id);
-    userPermission?.permissions.forEach((p) => {
-        if (!permissions.includes(p)) {
-            permissions.push(p);
-        }
-    });
 
-    return permissions;
+    const allPermissions =  permissions.concat(userPermission);
+
+    return allPermissions.filter((v, i, a) => a.indexOf(v) === i);
+
 }
+
+
+
+export async function hasCatalogPermission(
+    permission: Permission,
+    context: Context,
+    identifier: CatalogIdentifierInput
+): Promise<Boolean> {
+
+    const isAuthenicatedContext = isAuthenticatedContext(context);
+
+    // Check that the package exists
+    const permissions = await resolveCatalogPermissions(context, identifier,  isAuthenicatedContext ? (context as AuthenticatedContext).me : undefined);
+
+    return permissions.includes(permission);
+   
+}
+
+export async function hasCatalogPermissionOrFail(    
+    permission: Permission,
+    context: Context,
+    identifier: CatalogIdentifierInput
+): Promise<true> {
+
+    const hasPermissionBoolean = await hasCatalogPermission(permission, context, identifier);
+
+     if (hasPermissionBoolean) {
+        return true;
+    }
+
+    const isAuthenicatedContext = isAuthenticatedContext(context);
+
+    if (!isAuthenicatedContext) {
+        throw new AuthenticationError("NOT_AUTHENTICATED");
+    }
+
+    throw new ForbiddenError("NOT_AUTHORIZED");
+
+}
+
 export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
         const fields = object.getFields();

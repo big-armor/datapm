@@ -367,6 +367,31 @@ export const logCollection = async (
     return collectionEntityToGraphQL(loadedLog.targetCollection as CollectionEntity);
 };
 
+export const logUser = async (
+    parent: ActivityLog,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<User | null> => {
+    const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
+        "targetUser"
+    ]);
+    if (!cachedLog.targetUserId) {
+        return null;
+    }
+
+    let targetUserEntity = cachedLog.targetUser;
+    if (targetUserEntity) {
+        return targetUserEntity;
+    }
+
+    const loadedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, true, [
+        "targetUser"
+    ]);
+    return loadedLog.targetUser;
+};
+
+
 export const getActivityLogFromCacheOrDbByIdOrFail = async (
     context: Context,
     connection: EntityManager | Connection,

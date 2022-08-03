@@ -23,13 +23,13 @@ import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
 import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
-import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
 import { Connection, EntityManager } from "typeorm";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { GraphQLResolveInfo } from "graphql";
 import { createOrUpdateVersion } from "../business/CreateVersion";
+import { hasPackagePermission } from "../directive/hasPackagePermissionDirective";
 
 export const versionEntityToGraphqlObject = async (
     context: Context,
@@ -255,10 +255,12 @@ export const versionAuthor = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<User | null> => {
-    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier, ["author"], true);
-    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+    if (!(await hasPackagePermission( Permission.VIEW, context, parent.identifier ))) {
         return null;
     }
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier, ["author"], true);
+
     return version.author;
 };
 
@@ -277,10 +279,11 @@ export const versionCreatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
-    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+    if (!(await hasPackagePermission( Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
 
     return version.createdAt;
 };
@@ -292,10 +295,12 @@ export const versionUpdateMethods = async (
     info: any
 ): Promise<UpdateMethod[] | null> => {
 
-    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
-    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier ))) {
         return null;
     }
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
+
 
     return version.updateMethods;
 
@@ -307,10 +312,11 @@ export const versionUpdatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
-    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier ))) {
         return null;
     }
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
 
     return version.updatedAt;
 };

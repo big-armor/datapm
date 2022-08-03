@@ -172,6 +172,7 @@ import {
     logPackage,
     logPackageIssue,
     logPropertiesEdited,
+    logUser,
     myActivity,
     myFollowingActivity,
     packageActivities
@@ -215,6 +216,9 @@ import {
     userFollowers,
     userFollowersCount
 } from "./resolvers/FollowResolver";
+
+import { createGroup, updateGroup, deleteGroup, addOrUpdateUserToGroup, removeUserFromGroup } from "./resolvers/GroupResolver";
+import { addOrUpdateGroupToPackage,removeGroupFromPackage } from "./resolvers/GroupPackagePermissionResolver";
 
 import {
     getPlatformSettingsByKey,
@@ -548,7 +552,8 @@ export const resolvers: {
         targetPackage: logPackage,
         targetPackageIssue: logPackageIssue,
         targetCatalog: logCatalog,
-        targetCollection: logCollection
+        targetCollection: logCollection,
+        targetUser: logUser
     },
 
     Query: {
@@ -698,6 +703,15 @@ export const resolvers: {
         deleteRepository,
         createCredential,
         deleteCredential,
+
+        // Groups
+        createGroup,
+        updateGroup,
+        deleteGroup,
+        addOrUpdateUserToGroup,
+        removeUserFromGroup,
+        addOrUpdateGroupToPackage,
+        removeGroupFromPackage,
 
 
         // Package issues

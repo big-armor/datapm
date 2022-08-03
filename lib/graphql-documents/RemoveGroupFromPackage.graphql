@@ -1,0 +1,3 @@
+mutation RemoveGroupFromPackage($groupSlug: String!, $packageIdentifier: PackageIdentifierInput!) {
+    removeGroupFromPackage(groupSlug: $groupSlug, packageIdentifier: $packageIdentifier)
+}

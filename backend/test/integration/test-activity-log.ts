@@ -21,7 +21,10 @@ import {
     DeletePackageDocument,
     CreateCatalogDocument,
     DeleteCatalogDocument,
-    CreateVersionMutation
+    CreateVersionMutation,
+    SetUserCollectionPermissionsDocument,
+    Permission,
+    SetPackagePermissionsDocument
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -491,6 +494,100 @@ describe("Activity Log Tests", async () => {
 
         expect(line).to.be.not.undefined;
     });
+    
+    it("Should show PACKAGE_USER_PERMISSION_ADDED_UPDATED", async function() {
+        const response = await userOneClient.mutate({
+            mutation: SetPackagePermissionsDocument, 
+            variables: {
+                identifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                message: "test message",
+                value: {
+                    permissions: [Permission.VIEW],
+                    usernameOrEmailAddress: "testTwo-packages"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const activityLogResponse = await userOneClient.query({
+            query: MyActivityDocument,
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.PACKAGE_USER_PERMISSION_ADDED_UPDATED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(
+            ActivityLogEventType.PACKAGE_USER_PERMISSION_ADDED_UPDATED
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
+            "testTwo-packages"
+        );
+
+
+    })
+
+    it("Should show COLLECTION_USER_PERMISSION_ADDED_UPDATED", async function() {
+
+        const response = await userTwoClient.mutate({
+            mutation: SetUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "activityLog"
+                },
+                value: {
+                    permissions: [Permission.VIEW],
+                    usernameOrEmailAddress: "testOne-packages"
+                },
+                message: "Added testOne-packages"
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const activityLogResponse = await userTwoClient.query({
+            query: MyActivityDocument,
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.COLLECTION_USER_PERMISSION_ADDED_UPDATED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(
+            ActivityLogEventType.COLLECTION_USER_PERMISSION_ADDED_UPDATED
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userTwo.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetCollection!.identifier.collectionSlug).to.equal(
+            "activityLog"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
+            "testOne-packages"
+        );
+
+    })
 
     it("Should show COLLECTION_ADD_PACKAGE", async function () {
         let response = await userTwoClient.mutate({
@@ -573,8 +670,8 @@ describe("Activity Log Tests", async () => {
         expect(userOneActivityResponse.data.packageActivities.logs[0]?.user?.username).to.equal(userTwo.username);
         expect(
             userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.identifier.collectionSlug
-        ).to.equal("private");
-        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.name).to.equal("private");
+        ).to.equal("activityLog");
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.name).to.equal("Activity Log Test Collection");
         expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
             "testOne-packages"
         );

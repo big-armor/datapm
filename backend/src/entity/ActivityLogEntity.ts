@@ -68,6 +68,10 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "target_collection_id", nullable: true })
     public targetCollectionId?: number;
 
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_user_id" })
+    public targetUser: UserEntity | null;
+
     @Column({ name: "target_data_batch_id", nullable: true })
     public targetDataBatchId?: number;
     

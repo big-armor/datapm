@@ -2,7 +2,7 @@ import { UserInputError, ValidationError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
-import { resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
+import { hasCatalogPermission, resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import {
@@ -26,7 +26,6 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
 import { deletePackageFollowsForUsersWithNoPermissions, getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
-import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
@@ -46,13 +45,14 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
 };
 
 export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
         return {
             catalogSlug: "private",
             registryURL: getEnvVariable("REGISTRY_URL")
         };
     }
+
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     return {
         registryURL: getEnvVariable("REGISTRY_URL"),
@@ -61,11 +61,11 @@ export const catalogIdentifier = async (parent: Catalog, _1: any, context: Conte
 };
 
 export const catalogWebsite = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
         return null;
     }
-
+    
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.website;
 };
 
@@ -80,10 +80,11 @@ export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
-        return "private";
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+        return null;
     }
+    
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     if (catalog.description != null) {
         return catalog.displayName;
@@ -94,10 +95,11 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
         return null;
     }
+    
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     if (catalog.description != null) {
         return catalog.description;
@@ -108,10 +110,11 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
         return null;
     }
+
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     return await getUserFromCacheOrDbById(context, context.connection, catalog.creatorId, getGraphQlRelationName(info));
 };
@@ -147,13 +150,13 @@ export const userCatalogs = async (
 };
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
+    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+        return null;
+    }
+    
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;
-
-    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
-        return [];
-    }
 
     const packages = await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
         catalogId: catalog.id,
@@ -207,7 +210,7 @@ export const updateCatalog = async (
         if (
             value.isPublic != null &&
             value.isPublic != catalog.isPublic &&
-            !(await hasCatalogPermissions(context, catalog, Permission.MANAGE))
+            !(await hasCatalogPermission(Permission.MANAGE, context, identifier))
         ) {
             throw new ValidationError("NOT_AUTHORIZED - must be manager to set public status");
         }

@@ -1,35 +1,19 @@
 import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
-import { CatalogEntity } from "../entity/CatalogEntity";
-import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
+import { GroupCatalogPermissionRepository } from "../repository/GroupCatalogPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
-import { isAuthenticatedContext } from "../util/contextHelpers";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
-import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
+import { getCatalogFromCacheOrDbByIdOrFail, getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 import { deleteCatalogFollowByUserId } from "./FollowResolver";
 import { deletePackageFollowsForUsersWithNoPermissions } from "./PackageResolver";
-
-export const hasCatalogPermissions = async (context: Context, catalog: CatalogEntity, permission: Permission) => {
-    if (permission == Permission.VIEW) {
-        if (catalog?.isPublic || catalog?.unclaimed) {
-            return true;
-        }
-    }
-
-    if (!isAuthenticatedContext(context)) {
-        return false;
-    }
-
-    const authenicatedContext = context as AuthenticatedContext;
+import { getUserFromCacheOrDbById } from "./UserResolver";
 
 
-    return await getCatalogPermissionsStatusFromCacheOrDb(context, catalog.id, permission);
-};
 
 export const setUserCatalogPermission = async (
     _0: any,
@@ -142,30 +126,102 @@ export const deleteUserCatalogPermissions = async (
     });
 };
 
-export const getCatalogPermissionsStatusFromCacheOrDb = async (
-    context: Context,
-    catalogId: number,
-    permission: Permission
-) => {
-    if (!isAuthenticatedContext(context)) {
-        return false;
-    }
-
-    const authenicatedContext = context as AuthenticatedContext;
-
-    const userId = authenicatedContext.me.id;
-    const permissionsPromiseFunction = () =>
-        context.connection
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .hasPermission(userId, catalogId, permission);
-
-    return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromiseFunction);
-};
-
+/** The catalog specific permissions (not the packages in the catalog) */
 export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
-    const catalogPermissionsPromiseFunction = () =>
-        context.connection
+    const catalogPermissionsPromiseFunction = async () => {
+
+        const userPermissions = await context.connection
             .getCustomRepository(UserCatalogPermissionRepository)
-            .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;
+            .findCatalogPermissions({ catalogId, userId });
+
+        const userGroupPermissions = await context.connection.getCustomRepository(GroupCatalogPermissionRepository).getCatalogPermissionsByUser({
+            catalogId,
+            userId
+        });
+
+        const permissions: Permission[] = [];
+
+        if(userPermissions) {
+            userPermissions.permissions.forEach((permission) => {
+                if(!permissions.includes(permission))
+                    permissions.push(permission);
+            });
+        }
+
+        if(userGroupPermissions) {
+            userGroupPermissions.forEach((groupPermission) => {
+                groupPermission.permissions.forEach((permission) => {
+                    if(!permissions.includes(permission))
+                        permissions.push(permission);
+                });
+            });
+        }
+
+        const catalog = await getCatalogFromCacheOrDbByIdOrFail(context, context.connection, catalogId);
+
+        const user = await getUserFromCacheOrDbById(context, context.connection, userId);
+
+        if(catalog.slug === user.username) {
+            permissions.push(Permission.VIEW);
+            permissions.push(Permission.EDIT);
+            permissions.push(Permission.MANAGE);
+        }
+
+        return permissions;
+        
+    }
+    
     return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };
+
+
+
+/** The permissions for all packages in the catalog (not the catalog itself) */
+export const getCatalogPackagePermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
+    const catalogPermissionsPromiseFunction = async () => {
+
+        const userPermissions = await context.connection
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .findCatalogPermissions({ catalogId, userId });
+
+        const userGroupPermissions = await context.connection.getCustomRepository(GroupCatalogPermissionRepository).getCatalogPermissionsByUser({
+            catalogId,
+            userId
+        });
+
+        const permissions: Permission[] = [];
+
+        if(userPermissions) {
+            userPermissions.packagePermission.forEach((permission) => {
+                if(!permissions.includes(permission))
+                    permissions.push(permission);
+            });
+        }
+
+        if(userGroupPermissions) {
+            userGroupPermissions.forEach((groupPermission) => {
+                groupPermission.packagePermission.forEach((permission) => {
+                    if(!permissions.includes(permission))
+                        permissions.push(permission);
+                });
+            });
+        }
+
+        const catalog = await getCatalogFromCacheOrDbByIdOrFail(context, context.connection, catalogId);
+
+        const user = await getUserFromCacheOrDbById(context, context.connection, userId);
+
+        if(catalog.slug === user.username) {
+            permissions.push(Permission.VIEW);
+            permissions.push(Permission.EDIT);
+            permissions.push(Permission.MANAGE);
+        }
+
+        return permissions;
+        
+    }
+    
+    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
+};
+
+

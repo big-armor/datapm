@@ -1,6 +1,7 @@
 import { ActivityLogEntity } from "./entity/ActivityLogEntity";
 import { CatalogEntity } from "./entity/CatalogEntity";
 import { CollectionEntity } from "./entity/CollectionEntity";
+import { GroupEntity } from "./entity/GroupEntity";
 import { PackageEntity } from "./entity/PackageEntity";
 import { UserCatalogPermissionEntity } from "./entity/UserCatalogPermissionEntity";
 import { UserEntity } from "./entity/UserEntity";
@@ -10,6 +11,10 @@ import { PackageIdentifier, PackageIdentifierInput, Permission, VersionIdentifie
 
 export class SessionCache {
     private readonly cache = new Map<string, Promise<any>>();
+
+    public clear(): void {
+        this.cache.clear();
+    }
 
     public storePackageToCache(packageEntity: PackageEntity): void {
         const cacheId = this.buildDataKeyForPackageId(packageEntity.id);
@@ -119,8 +124,8 @@ export class SessionCache {
 
     public async loadPackagePermissionsById(
         id: number,
-        permissionPromise: () => Promise<UserPackagePermissionEntity>
-    ): Promise<UserPackagePermissionEntity> {
+        permissionPromise: () => Promise<Permission[]>
+    ): Promise<Permission[]> {
         const cacheId = this.buildDataKeyForPackagePermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
@@ -134,20 +139,19 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadCatalogPermissionsStatusById(
+    public async loadCatalogPermissionsById(
         id: number,
-        permission: Permission,
-        permissionPromise: () => Promise<Boolean>
-    ): Promise<Boolean> {
-        const cacheId = this.buildDataKeyForCatalogPermission(id, permission);
+        permissionPromise: () => Promise<Permission[]>
+    ): Promise<Permission[]> {
+        const cacheId = this.buildDataKeyForCatalogPermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadCatalogPermissionsById(
+    public async loadCollectionPermissionsById(
         id: number,
-        permissionPromise: () => Promise<UserCatalogPermissionEntity>
-    ): Promise<UserCatalogPermissionEntity> {
-        const cacheId = this.buildDataKeyForCatalogPermissions(id);
+        permissionPromise: () => Promise<Permission[]>
+    ): Promise<Permission[]> {
+        const cacheId = this.buildDataKeyForCollection(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
@@ -187,6 +191,34 @@ export class SessionCache {
         this.cache.set(dataKey, resolvedDataPromise);
         return resolvedDataPromise;
     }
+
+    public async loadGroup(
+        id: number,
+        groupPromise: () => Promise<GroupEntity>,
+        forceReload?: boolean
+    ): Promise<GroupEntity> {
+        const cacheId = this.buildDataKeyForGroupId(id);
+        return this.loadDataAsync(cacheId, groupPromise, forceReload);
+    }
+
+    public async loadGroupBySlug(
+        groupSlug: string,
+        groupPromise: () => Promise<GroupEntity>,
+        forceReload?: boolean
+    ): Promise<GroupEntity> {
+        const cacheId = this.buildDataKeyForGroupSlug(groupSlug);
+        return this.loadDataAsync(cacheId, groupPromise, forceReload);
+    }
+
+    public async loadGroupPermissionsById(
+        groupId: number,
+        groupPromise: () => Promise<Permission[]>,
+        forceReload?: boolean
+    ): Promise<Permission[]> {
+        const cacheId = this.buildDataKeyForGroupPermissionsId(groupId);
+        return this.loadDataAsync(cacheId, groupPromise, forceReload);
+    }
+   
 
     private buildDataKeyForUserId(id: number): string {
         return "USER_ID-" + id;
@@ -265,5 +297,25 @@ export class SessionCache {
 
     private buildDataKeyForCollectionPermission(id: number, permission: Permission): string {
         return "COLLECTION_PERMISSION_ID-" + id + "_" + permission;
+    }
+
+    private buildDataKeyForCollection(id: number): string {
+        return "COLLECTION_PERMISSION_ID-" + id;
+    }
+
+    private buildDataKeyForGroups(): string {
+        return "GROUPS";
+    }
+
+    private buildDataKeyForGroupId(id: number): string {
+        return "GROUP_ID-" + id;
+    }
+
+    private buildDataKeyForGroupSlug(slug: string): string {
+        return "GROUP_SLUG-" + slug;
+    }
+
+    private buildDataKeyForGroupPermissionsId(id: number): string {
+        return "GROUP_PERMISSIONS_ID-" + id;
     }
 }

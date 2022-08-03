@@ -18,9 +18,10 @@ import { ValidateImageUploadDirective } from "./directive/ValidImageUploadDirect
 import { ValidBase64ImageUploadDirective } from "./directive/ValidBase64ImageUploadDirective";
 import { ValidUsernameOrEmailAddressDirective } from "./directive/ValidUsernameOrEmailAddressDirective";
 import { ValidateMarkdownDirective } from "./directive/ValidMarkdownDirective";
+import { HasGroupPermissionDirective } from "./directive/hasGroupPermissionDirective.ts";
 
 const SCHEMAS_DIRECTORY = "node_modules/datapm-lib/";
-const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql"];
+const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql", "group-schema.gql"];
 
 const readFile = promisify(fs.readFile);
 
@@ -35,6 +36,7 @@ export async function makeSchema() {
             isAuthenticated: IsAuthenticatedDirective,
             hasCatalogPermission: HasCatalogPermissionDirective,
             hasCollectionPermission: HasCollectionPermissionDirective,
+            hasGroupPermission: HasGroupPermissionDirective,
             hasPackagePermission: HasPackagePermissionDirective,
             isAdmin: IsAdminDirective,
             validEmailAddress: ValidEmailDirective,

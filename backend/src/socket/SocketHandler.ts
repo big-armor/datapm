@@ -5,7 +5,6 @@ import { AuthenticatedSocketContext, SocketContext } from '../context';
 import { PackageEntity } from '../entity/PackageEntity';
 import { CatalogIdentifierInput, PackageIdentifierInput, Permission } from '../generated/graphql';
 import { PackageRepository } from '../repository/PackageRepository';
-import { hasPackageEntityPermissions } from '../resolvers/UserPackagePermissionResolver';
 import { DistributedLockingService } from '../service/distributed-locking-service';
 import { isAuthenticatedContext } from '../util/contextHelpers';
 import { DataFetchHandler } from './DataFetchHandler';
@@ -16,8 +15,9 @@ import { PackageSinkStateHandler } from './PackageSinkStateHandler';
 import { PackageUpdateHandler } from './PackageUpdateHandler';
 import { CatalogEntity } from '../entity/CatalogEntity';
 import { CatalogRepository } from '../repository/CatalogRepository';
-import { hasCatalogPermissions } from '../resolvers/UserCatalogPermissionResolver';
 import { PackageHandler } from './PackageHandler';
+import { hasPackagePermission } from '../directive/hasPackagePermissionDirective';
+import { hasCatalogPermission } from '../directive/hasCatalogPermissionDirective';
 
 export interface RequestHandler extends EventEmitter {
     start(callback:(response:Response) => void):Promise<void>;
@@ -63,6 +63,9 @@ export class SocketConnectionHandler {
     };
 
     onStartPackage = async (request: StartPackageRequest, callback:(response:Response) => void): Promise<void> => {
+
+        this.socketContext.cache.clear();
+
         if(!isAuthenticatedContext(this.socketContext)) {
             callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
             return;
@@ -80,6 +83,9 @@ export class SocketConnectionHandler {
     };
 
     onStartPackageUpdate = async (request:StartPackageUpdateRequest, callback:(response:Response)=>void):Promise<void> => {
+
+        this.socketContext.cache.clear();
+
         if(!isAuthenticatedContext(this.socketContext)) {
             callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
             return;
@@ -100,6 +106,7 @@ export class SocketConnectionHandler {
 
     openFetchChannelHandler = async (data:OpenFetchChannelRequest, callback:(response:Response)=>void):Promise<void> => {
 
+        this.socketContext.cache.clear();
 
         try {
             const dataFetchHandler = new DataFetchHandler(data,this.socket,this.socketContext);
@@ -114,6 +121,8 @@ export class SocketConnectionHandler {
     }
 
      onUploadData = async (request:StartUploadRequest, callback:(response:Response)=>void): Promise<void>  => {
+
+        this.socketContext.cache.clear();
 
         if(!isAuthenticatedContext(this.socketContext)) {
             callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
@@ -136,9 +145,9 @@ export class SocketConnectionHandler {
 
     onGetPackageSinkState = async (request:PackageSinkStateRequest, callback:(response:Response)=>void): Promise<void>  => {
 
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: request.identifier});
+        this.socketContext.cache.clear();
 
-        const hasPermission = await hasPackageEntityPermissions(this.socketContext,packageEntity,Permission.VIEW);
+        const hasPermission = await hasPackagePermission(Permission.VIEW, this.socketContext, request.identifier);
 
         if(!hasPermission) {
             callback(new ErrorResponse("Not authorized", SocketError.NOT_AUTHORIZED));
@@ -152,9 +161,9 @@ export class SocketConnectionHandler {
 
     onGetSchemaInfo = async (request:PackageStreamsRequest, callback:(response:Response)=>void): Promise<void>  => {
 
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: request.identifier});
+        this.socketContext.cache.clear();
 
-        const hasPermission = await hasPackageEntityPermissions(this.socketContext,packageEntity,Permission.VIEW);
+        const hasPermission = await hasPackagePermission(Permission.VIEW, this.socketContext, request.identifier);
 
         if(!hasPermission) {
             callback(new ErrorResponse("Not authorized", SocketError.NOT_AUTHORIZED));
@@ -176,6 +185,8 @@ export class SocketConnectionHandler {
     }
 
     onSetStreamActiveBatches = async (request:SetStreamActiveBatchesRequest, callback:(response:Response)=>void): Promise<void> => {
+
+        this.socketContext.cache.clear();
 
         if(!isAuthenticatedContext(this.socketContext)) {
             callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
@@ -222,7 +233,7 @@ export async function checkCatalogPermission(socket: SocketIO.Socket, socketCont
         return false;
     }
 
-    const hasPermissions = await hasCatalogPermissions(socketContext, catalogEntity, permission);
+    const hasPermissions = await hasCatalogPermission(permission, socketContext, catalogIdentifier);
 
     if (!hasPermissions) {
         const response: ErrorResponse = new ErrorResponse("NOT_AUTHORIZED: You don't have  " + permission + " permission to the catalog " + catalogIdentifier.catalogSlug, SocketError.NOT_AUTHORIZED)
@@ -255,9 +266,9 @@ export async function checkPackagePermission(socket: SocketIO.Socket, socketCont
         return false;
     }
 
-    const hasPermissions = await hasPackageEntityPermissions(socketContext, packageEntity, permission);
+    const hasPermission = await hasPackagePermission(permission, socketContext, schemaIdentifier);
 
-    if (!hasPermissions) {
+    if (!hasPermission) {
         const response: ErrorResponse = new ErrorResponse("NOT_AUTHORIZED: You don't have  " + permission + " permission to the package " + schemaIdentifier.catalogSlug + "/" + schemaIdentifier.packageSlug,SocketError.NOT_AUTHORIZED)
         callback(response);
         return false;

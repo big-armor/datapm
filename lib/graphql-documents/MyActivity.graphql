@@ -50,6 +50,13 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                 }
                 displayName
             }
+            targetUser {
+                emailAddress
+                username
+                firstName
+                lastName
+                displayName
+            }
             propertiesEdited
             eventType
             changeType

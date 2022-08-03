@@ -37,6 +37,7 @@ export async function createActivityLog(connection: EntityManager | Connection, 
     activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
     activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
     activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
+    activityLog.targetUserId = activityLogTemp.targetUserId;
     activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
     activityLog.removedItemName = activityLogTemp.removedItemName;
     activityLog.removedItemId = activityLogTemp.removedItemId;
@@ -78,6 +79,12 @@ export async function createActivityLog(connection: EntityManager | Connection, 
             .findOneOrFail({ id: activityLogTemp.targetCollectionId });
 
         activityLog.targetCollectionSlug = collection.collectionSlug;
+    }
+
+    if(activityLogTemp.targetUserId) {
+        const user = await connection.getRepository(UserEntity).findOneOrFail({ id: activityLogTemp.targetUserId });
+
+        activityLog.targetUsername = user.username;
     }
 
     if (activityLogTemp.targetDataBatchId) {
