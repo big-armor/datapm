@@ -77,7 +77,7 @@ export const deleteGroup = async (
     info: any
 ) => {
 
-    return await context.connection.transaction(async (manager) => {
+    await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
         await createActivityLog(manager, {

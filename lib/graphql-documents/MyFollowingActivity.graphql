@@ -15,6 +15,10 @@ query MyFollowingActivity($offset: Int!, $limit: Int!) {
                 }
                 displayName
             }
+            targetGroup {
+                name
+                slug
+            }
             targetPackageIssue {
                 packageIdentifier {
                     catalogSlug

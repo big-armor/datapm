@@ -1861,7 +1861,7 @@ type Mutation {
 
     updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!): Group!
 
-    deleteGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE)): Group!
+    deleteGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE)): Void
 
     addOrUpdateUserToGroup(
         groupSlug: String! @hasGroupPermission(permission: MANAGE)

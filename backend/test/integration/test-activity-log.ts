@@ -21,6 +21,7 @@ import {
     DeletePackageDocument,
     CreateCatalogDocument,
     DeleteCatalogDocument,
+    DeleteGroupDocument,
     CreateVersionMutation,
     SetUserCollectionPermissionsDocument,
     Permission,
@@ -124,7 +125,7 @@ describe("Activity Log Tests", async () => {
             serverLogLines.find((l: any) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
-                        activityLogLine.eventType == ActivityLogEventType.PACKAGE_CREATED &&
+                        activityLogLine.eventType == ActivityLogEventType.GROUP_CREATED &&
                         activityLogLine.username == userOne.username &&
                         activityLogLine.targetGroupSlug == "test-activity-log"
                     );
@@ -1155,6 +1156,30 @@ describe("Activity Log Tests", async () => {
                         activityLogLine.eventType == ActivityLogEventType.CATALOG_DELETED &&
                         activityLogLine.username == userOne.username &&
                         activityLogLine.targetCatalogSlug == "testOne-packages-catalog2"
+                    );
+                })
+            )
+        ).to.be.not.undefined;
+    });
+
+
+    it("Should show GROUP_DELETED", async function () {
+        const deleteGroupResponse = await userOneClient.mutate({
+            mutation: DeleteGroupDocument,
+            variables: {
+                    groupSlug: "test-activity-log"
+            }
+        });
+
+        expect(deleteGroupResponse.errors == null).to.equal(true);
+
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.GROUP_DELETED &&
+                        activityLogLine.username == userOne.username &&
+                        activityLogLine.targetGroupSlug == "test-activity-log"
                     );
                 })
             )

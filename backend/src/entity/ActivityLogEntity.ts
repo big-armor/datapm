@@ -77,7 +77,7 @@ export class ActivityLogEntity extends EntityBaseModel {
     public targetGroupId?: number;
 
     @ManyToOne(() => GroupEntity, { onDelete: "CASCADE", eager: true })
-    @JoinColumn({ name: "target_catalog_id" })
+    @JoinColumn({ name: "target_group_id" })
     public targetGroup: GroupEntity | null;
 
     @Column({ name: "target_data_batch_id", nullable: true })
@@ -108,6 +108,7 @@ export class ActivityLogEntity extends EntityBaseModel {
     public targetPackageIdentifier?: string;
     public targetVersionNumber?: string;
     public targetCatalogSlug?: string;
+    public targetGroupSlug?: string;
     public targetCollectionSlug?: string;
     public username?: string;
     public targetUsername?: string;

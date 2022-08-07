@@ -4,6 +4,7 @@ import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
 import { FollowEntity } from "../entity/FollowEntity";
+import { GroupEntity } from "../entity/GroupEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
@@ -39,6 +40,7 @@ export async function createActivityLog(connection: EntityManager | Connection, 
     activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
     activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
     activityLog.targetUserId = activityLogTemp.targetUserId;
+    activityLog.targetGroupId = activityLogTemp.targetGroupId;
     activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
     activityLog.removedItemName = activityLogTemp.removedItemName;
     activityLog.removedItemId = activityLogTemp.removedItemId;
@@ -94,6 +96,11 @@ export async function createActivityLog(connection: EntityManager | Connection, 
             .findOneOrFail({ id: activityLogTemp.targetDataBatchId });
 
         activityLog.targetBatchNumber = batchEntity.batch;
+    }
+
+    if(activityLogTemp.targetGroupId) {
+        const group = await connection.getRepository(GroupEntity).findOneOrFail({ id: activityLogTemp.targetGroupId });
+        activityLog.targetGroupSlug = group.slug;
     }
 
     await connection.getCustomRepository(ActivityLogRepository).createLog(activityLog);

@@ -1,0 +1,3 @@
+mutation DeleteGroup($groupSlug: String!) {
+    deleteGroup(groupSlug: $groupSlug)
+}

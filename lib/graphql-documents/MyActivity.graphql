@@ -31,6 +31,10 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                     emailAddress
                 }
             }
+            targetGroup {
+                name
+                slug
+            }
             targetPackageVersion {
                 identifier {
                     versionMajor
