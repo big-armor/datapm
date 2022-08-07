@@ -170,6 +170,12 @@ enum ActivityLogEventType {
     USER_DELETED
     USER_EDIT
     USER_STATUS_CHANGED
+
+    GROUP_CREATED
+    GROUP_DELETED
+    GROUP_EDIT
+    GROUP_MEMBER_REMOVED
+    GROUP_MEMBER_PERMISSION_ADDED_UPDATED
 }
 
 enum ActivityLogChangeType {
@@ -612,6 +618,7 @@ type ActivityLog {
     targetPackageVersion: Version
     targetCollection: Collection
     targetUser: User
+    targetGroup: Group
     targetCatalog: Catalog
     eventType: ActivityLogEventType!
     changeType: ActivityLogChangeType

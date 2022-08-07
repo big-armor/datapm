@@ -143,9 +143,16 @@ export const removePackagePermissions = async (
             await deletePackageIssuesFollowsByUserId(transaction, packageEntity.id, user.id);
         }
 
-        return transaction.getCustomRepository(PackagePermissionRepository).removePackagePermissionForUser({
+        await transaction.getCustomRepository(PackagePermissionRepository).removePackagePermissionForUser({
             identifier,
             user
+        });
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.PACKAGE_USER_PERMISSION_REMOVED,
+            targetPackageId: packageEntity.id,
+            targetUserId: user.id
         });
     });
 };

@@ -8,6 +8,7 @@ import { CollectionEntity } from "./CollectionEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 import { PackageIssueEntity } from "./PackageIssueEntity";
 import { DataBatchEntity } from "./DataBatchEntity";
+import { GroupEntity } from "./GroupEntity";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
@@ -71,6 +72,13 @@ export class ActivityLogEntity extends EntityBaseModel {
     @ManyToOne(() => UserEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_user_id" })
     public targetUser: UserEntity | null;
+
+    @Column({ name: "target_group_id", nullable: true })
+    public targetGroupId?: number;
+
+    @ManyToOne(() => GroupEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_catalog_id" })
+    public targetGroup: GroupEntity | null;
 
     @Column({ name: "target_data_batch_id", nullable: true })
     public targetDataBatchId?: number;

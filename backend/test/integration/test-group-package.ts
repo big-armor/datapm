@@ -312,6 +312,5 @@ it("package should not be available anonymously", async function () {
         ).equal(true);
     });
 
-
     
-})
+});

@@ -12,6 +12,7 @@ import {
     Catalog,
     Collection,
     CollectionIdentifierInput,
+    Group,
     Package,
     PackageIdentifierInput,
     PackageIssue,
@@ -389,6 +390,32 @@ export const logUser = async (
         "targetUser"
     ]);
     return loadedLog.targetUser;
+};
+
+
+export const logGroup = async (
+    parent: ActivityLog,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Group | null> => {
+
+    const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
+        "targetGroup"
+    ]);
+    if (!cachedLog.targetGroupId) {
+        return null;
+    }
+
+    let targetGroupEntity = cachedLog.targetGroup;
+    if (targetGroupEntity) {
+        return targetGroupEntity;
+    }
+
+    const loadedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, true, [
+        "targetGroup"
+    ]);
+    return loadedLog.targetGroup;
 };
 
 

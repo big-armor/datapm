@@ -67,6 +67,8 @@ ALTER TABLE public."credential" ALTER COLUMN updated_at TYPE TIMESTAMP WITH TIME
 ALTER TABLE public."repository" ALTER COLUMN created_at TYPE TIMESTAMP WITH TIME ZONE USING created_at AT TIME ZONE 'UTC';
 ALTER TABLE public."repository" ALTER COLUMN updated_at TYPE TIMESTAMP WITH TIME ZONE USING updated_at AT TIME ZONE 'UTC';
 
+ALTER TABLE public."activity_log" ADD COLUMN "group_id" INTEGER REFERENCES public."group" (id) ON DELETE CASCADE;
+
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'COLLECTION_USER_PERMISSION_ADDED_UPDATED';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'COLLECTION_GROUP_PERMISSION_ADDED_UPDATED';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'COLLECTION_USER_PERMISSION_REMOVED';
@@ -82,6 +84,13 @@ ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_GROUP_PERMISSION_ADDE
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_USER_PERMISSION_REMOVED';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_GROUP_PERMISSION_REMOVED';
 
+
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_CREATED'
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_DELETED'
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_EDIT'
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_ADDED'
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_REMOVED'
+ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_PERMISSION_UPDATED'
 `
 
 export class Group1658499088645 implements MigrationInterface {

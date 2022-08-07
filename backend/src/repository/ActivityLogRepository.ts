@@ -19,6 +19,7 @@ export interface ActivityLogTemp {
     targetCatalogId?: number;
     targetCollectionId?: number;
     targetUserId?: number;
+    targetGroupId?: number;
     targetDataBatchId?: number;
     propertiesEdited?: string[];
     removedItemName?: string;

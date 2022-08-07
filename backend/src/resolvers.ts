@@ -168,6 +168,7 @@ import {
     logAuthor,
     logCatalog,
     logCollection,
+    logGroup,
     logId,
     logPackage,
     logPackageIssue,
@@ -553,7 +554,8 @@ export const resolvers: {
         targetPackageIssue: logPackageIssue,
         targetCatalog: logCatalog,
         targetCollection: logCollection,
-        targetUser: logUser
+        targetUser: logUser,
+        targetGroup: logGroup
     },
 
     Query: {

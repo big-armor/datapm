@@ -24,7 +24,9 @@ import {
     CreateVersionMutation,
     SetUserCollectionPermissionsDocument,
     Permission,
-    SetPackagePermissionsDocument
+    SetPackagePermissionsDocument,
+    RemovePackagePermissionsDocument,
+    CreateGroupDocument
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -87,6 +89,50 @@ describe("Activity Log Tests", async () => {
             })
         );
         expect(line).to.be.not.undefined;
+    });
+
+    it("Should show GROUP_CREATED", async function() {
+
+        const response = await userOneClient.query({
+            query: CreateGroupDocument,
+            variables: {
+                name: "Test Activity Log",
+                groupSlug: "test-activity-log",
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(response.data.createGroup).to.exist;
+        expect(response.data.createGroup.name).to.equal("Test Activity Log");
+        expect(response.data.createGroup.slug).to.equal("test-activity-log");
+
+        const logResponse = await userOneClient.query({
+            query: MyActivityDocument,
+            variables: { filter: { eventType: [ActivityLogEventType.GROUP_CREATED], limit: 100, offset: 0 } }
+        });
+
+        expect(logResponse.data).to.exist;
+        expect(logResponse.data.myActivity).to.exist;
+        expect(logResponse.data.myActivity.logs.length).to.equal(1);
+        expect(logResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal("test-activity-log");
+        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.name).to.equal(
+            "Test Activity Log"
+        );
+
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.PACKAGE_CREATED &&
+                        activityLogLine.username == userOne.username &&
+                        activityLogLine.targetGroupSlug == "test-activity-log"
+                    );
+                })
+            )
+        ).to.be.not.undefined;
+
+
     });
 
     it("Should show PACKAGE_CREATED", async function () {
@@ -946,6 +992,51 @@ describe("Activity Log Tests", async () => {
         );
 
         expect(line).to.be.not.undefined;
+    });
+
+    it("Should show PACKAGE_USER_PERMISSION_REMOVED", async function() {
+
+        let response = await userOneClient.mutate({
+            mutation: RemovePackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                usernameOrEmailAddress: "testTwo-packages"
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const activityLogResponse = await userOneClient.query({
+            query: MyActivityDocument,
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.PACKAGE_USER_PERMISSION_REMOVED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(
+            ActivityLogEventType.PACKAGE_USER_PERMISSION_REMOVED
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
+            "testTwo-packages"
+        );
+
     });
 
     it("Should show COLLECTION_DELETE", async function () {

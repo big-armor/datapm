@@ -1,8 +1,10 @@
+import { ActivityLogEventType } from "datapm-client-lib";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupEntity } from "../entity/GroupEntity";
 import { GroupUserEntity } from "../entity/GroupUserEntity";
 import { Permission } from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupUserRepository } from "../repository/GroupUserRepository";
 import { getUserFromCacheOrDbByUsername } from "./UserResolver";
 
@@ -32,6 +34,12 @@ export const createGroup = async (
 
         manager.save(groupUserEntity);
 
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.GROUP_CREATED,
+            targetGroupId: groupEntity.id,
+        });
+
         return returnEntity;
 
     });
@@ -50,6 +58,12 @@ export const updateGroup = async (
 
         groupEntity.name = name;
 
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.GROUP_EDIT,
+            targetGroupId: groupEntity.id,
+        });
+
         return await manager.save(groupEntity);
     });
 
@@ -65,6 +79,12 @@ export const deleteGroup = async (
 
     return await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
+
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.GROUP_DELETED,
+            targetGroupId: groupEntity.id,
+        });
 
         return await manager.remove(groupEntity);
 
@@ -82,6 +102,13 @@ export const addOrUpdateUserToGroup = async (
         const groupEntity = await findGroup(manager, groupSlug);
 
         const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.GROUP_MEMBER_PERMISSION_ADDED_UPDATED,
+            targetGroupId: groupEntity.id,
+            targetUserId: userEntity.id
+        });
 
         return context.connection.getCustomRepository(GroupUserRepository).addOrUpdateUserToGroup({
             groupId: groupEntity.id,
@@ -107,6 +134,13 @@ export const removeUserFromGroup = async (
         const groupUserEntity =  await manager.getRepository(GroupUserEntity).findOneOrFail({
             groupId: groupEntity.id,
             userId: userEntity.id,
+        });
+
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.GROUP_MEMBER_REMOVED,
+            targetGroupId: groupEntity.id,
+            targetUserId: userEntity.id
         });
 
         await manager.remove(groupUserEntity);

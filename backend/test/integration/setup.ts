@@ -42,6 +42,7 @@ export interface ActivityLogLine {
     targetPackageIdentifier?: string;
     targetVersionNumber?: string;
     targetCatalogSlug?: string;
+    targetGroupSlug?: string;
     targetCollectionSlug?: string;
     targetUsername?: string;
     propertiesEdited?: string[];
