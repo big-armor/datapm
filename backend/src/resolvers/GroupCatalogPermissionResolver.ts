@@ -24,9 +24,31 @@ export const groupCatalogPermissionEntityToGraphqlObject = async (
         group: groupEntity,
         catalog: catalogEntityToGraphQL(catalogEntityLoaded),
         permissions: groupCatalogPermissionEntity.permissions,
+        packagePermissions: groupCatalogPermissionEntity.packagePermissions,
         updatedAt: groupCatalogPermissionEntity.updatedAt
     };
 };
+
+
+export const groupsByCatalog = async (
+        _0: any,
+    { catalogIdentifier }: { catalogIdentifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, catalogIdentifier, []);
+
+    const groups = await context.connection.getRepository(GroupCatalogPermissionEntity).find({
+        where: {
+            catalogId: catalogEntity.id
+        }
+    });
+
+    return groups.map((g) => groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, g));
+
+}
+
 
 export const addOrUpdateGroupToCatalog = async (
         _0: any,

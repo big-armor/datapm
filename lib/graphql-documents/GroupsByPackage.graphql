@@ -1,0 +1,19 @@
+query GroupsByPackage($packageIdentifier: PackageIdentifierInput!) {
+    groupsByPackage(packageIdentifier: $packageIdentifier) {
+        group {
+            name
+            slug
+            users {
+                user {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
+                    displayName
+                }
+                permissions
+            }
+        }
+        permissions
+    }
+}

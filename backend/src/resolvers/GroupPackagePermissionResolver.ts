@@ -29,6 +29,26 @@ export const groupPackagePermissionEntityToGraphqlObject = async (
     };
 };
 
+export const groupsByPackage = async (
+        _0: any,
+    { packageIdentifier }: { packageIdentifier: PackageIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+
+    const packageEntity = await getPackageFromCacheOrDb(context, packageIdentifier, []);
+
+    const groups = await context.connection.getRepository(GroupPackagePermissionEntity).find({
+        where: {
+            packageId: packageEntity.id
+        }
+    });
+
+    return groups.map((g) => groupPackagePermissionEntityToGraphqlObject(context, context.connection.manager, g));
+
+}
+
+
 export const addOrUpdateGroupToPackage = async (
         _0: any,
     { groupSlug, packageIdentifier, permissions }: { groupSlug: string, packageIdentifier: PackageIdentifierInput, permissions: Permission[] },

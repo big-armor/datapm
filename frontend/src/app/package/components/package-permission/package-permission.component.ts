@@ -31,6 +31,7 @@ export class PackagePermissionComponent implements OnInit {
     public package: Package;
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
+    public groups: any[] = [];
 
     private unsubscribe$ = new Subject();
 

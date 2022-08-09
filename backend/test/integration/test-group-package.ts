@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromPackageDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByPackageDocument, PackageDocument, Permission, RemoveGroupFromPackageDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -87,7 +87,7 @@ it("Should allow user to create a package", async function () {
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 
-it("package should not be available anonymously", async function () {
+    it("package should not be available anonymously", async function () {
         let response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
@@ -163,6 +163,26 @@ it("package should not be available anonymously", async function () {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
+
+    });
+
+    it("Should return group list for package", async() => {
+        const response = await userAClient.query({
+            query: GroupsByPackageDocument,
+            variables: {
+                packageIdentifier: {
+                    catalogSlug: "testA-group-package",
+                    packageSlug: "congressional-legislators"                }
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+        expect(response.data.groupsByPackage.length).to.equal(1);
+        expect(response.data.groupsByPackage[0].group?.slug).equal("test-group-package");
+
+        expect(response.data.groupsByPackage[0].permissions?.length).equal(1);
+        expect(response.data.groupsByPackage[0].permissions![0]).equal(Permission.VIEW);
+        
 
     });
 

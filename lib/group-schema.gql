@@ -29,6 +29,7 @@ type GroupCatalogPermission {
     group: Group
     catalog: Catalog
     permissions: [Permission!]
+    packagePermissions: [Permission!]
     createdAt: Date
     updatedAt: Date
     creator: User

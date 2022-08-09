@@ -1,0 +1,20 @@
+query GroupsByCatalog($catalogIdentifier: CatalogIdentifierInput!) {
+    groupsByCatalog(catalogIdentifier: $catalogIdentifier) {
+        group {
+            name
+            slug
+            users {
+                user {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
+                    displayName
+                }
+                permissions
+            }
+        }
+        permissions
+        packagePermissions
+    }
+}

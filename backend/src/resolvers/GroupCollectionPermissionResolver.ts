@@ -29,6 +29,26 @@ export const groupCollectionPermissionEntityToGraphqlObject = async (
     };
 };
 
+
+export const groupsByCollection = async (
+        _0: any,
+    { collectionIdentifier }: { collectionIdentifier: CollectionIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection.manager, collectionIdentifier.collectionSlug, []);
+
+    const groups = await context.connection.getRepository(GroupCollectionPermissionEntity).find({
+        where: {
+            collectionId: collectionEntity.id
+        }
+    });
+
+    return groups.map((g) => groupCollectionPermissionEntityToGraphqlObject(context, context.connection.manager, g));
+
+}
+
 export const addOrUpdateGroupToCollection = async (
         _0: any,
     { groupSlug, collectionIdentifier, permissions }: { groupSlug: string, collectionIdentifier: CollectionIdentifierInput, permissions: Permission[] },

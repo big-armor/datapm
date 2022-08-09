@@ -26,7 +26,7 @@ import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
 import { isRequestingUserOrAdmin } from "./util/contextHelpers";
-import { DATAPM_VERSION, parsePackageFileJSON, validatePackageFile } from "datapm-lib";
+import { DATAPM_VERSION, parsePackageFileJSON } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
     addPackageToCollection,
@@ -219,7 +219,7 @@ import {
 } from "./resolvers/FollowResolver";
 
 import { createGroup, updateGroup, deleteGroup, addOrUpdateUserToGroup, removeUserFromGroup } from "./resolvers/GroupResolver";
-import { addOrUpdateGroupToPackage,removeGroupFromPackage } from "./resolvers/GroupPackagePermissionResolver";
+import { addOrUpdateGroupToPackage,removeGroupFromPackage, groupsByPackage } from "./resolvers/GroupPackagePermissionResolver";
 
 import {
     getPlatformSettingsByKey,
@@ -229,8 +229,8 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
-import { addOrUpdateGroupToCatalog, removeGroupFromCatalog } from "./resolvers/GroupCatalogPermissionResolver";
-import { addOrUpdateGroupToCollection, removeGroupFromCollection } from "./resolvers/GroupCollectionPermissionResolver";
+import { addOrUpdateGroupToCatalog, removeGroupFromCatalog, groupsByCatalog } from "./resolvers/GroupCatalogPermissionResolver";
+import { addOrUpdateGroupToCollection, removeGroupFromCollection, groupsByCollection } from "./resolvers/GroupCollectionPermissionResolver";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -657,7 +657,10 @@ export const resolvers: {
         catalogFollowersCount: catalogFollowersCount,
         collectionFollowersCount: collectionFollowersCount,
         userFollowersCount: userFollowersCount,
-        listRepositories
+        listRepositories,
+        groupsByPackage,
+        groupsByCatalog,
+        groupsByCollection,
     },
 
     Mutation: {
@@ -718,7 +721,6 @@ export const resolvers: {
         removeUserFromGroup,
         addOrUpdateGroupToPackage,
         removeGroupFromPackage,
-
 
         // Package issues
         createPackageIssue: createPackageIssue,

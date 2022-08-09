@@ -1,0 +1,19 @@
+query GroupsByCollection($collectionIdentifier: CollectionIdentifierInput!) {
+    groupsByCollection(collectionIdentifier: $collectionIdentifier) {
+        group {
+            name
+            slug
+            users {
+                user {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
+                    displayName
+                }
+                permissions
+            }
+        }
+        permissions
+    }
+}

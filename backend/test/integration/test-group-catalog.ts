@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCatalogDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -312,7 +312,7 @@ it("Should allow user to create a package", async function () {
     
     });
 
-    it("Grant group manage access to package", async () => {
+    it("Grant group manage access to catalog", async () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
@@ -328,6 +328,27 @@ it("Should allow user to create a package", async function () {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
+    });
+
+    it("Should return group list for catalog", async() => {
+        const response = await userAClient.query({
+            query: GroupsByCatalogDocument,
+            variables: {
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog",
+                }
+            }
+        });
+
+         expect(response.errors == null).equal(true);
+        expect(response.data.groupsByCatalog.length).to.equal(1);
+        expect(response.data.groupsByCatalog[0].group?.slug).equal("test-group-catalog");
+
+        expect(response.data.groupsByCatalog[0].permissions?.length).equal(1);
+        expect(response.data.groupsByCatalog[0].permissions![0]).equal(Permission.VIEW);
+
+        expect(response.data.groupsByCatalog[0].packagePermissions?.length).equal(3);
+        
     });
 
 

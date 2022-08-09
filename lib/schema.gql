@@ -1119,6 +1119,27 @@ type Query {
     ): [UserCollectionPermissions!]!
 
     """
+    Returns all of the users for a given catalog
+    """
+    groupsByPackage(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): [GroupPackagePermission!]!
+
+    """
+    Returns all of the users for a given catalog
+    """
+    groupsByCatalog(
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): [GroupCatalogPermission!]!
+
+    """
+    Returns all of the users for a given collection
+    """
+    groupsByCollection(
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+    ): [GroupCollectionPermission!]!
+
+    """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
     """
     user(username: String! @validUsername): User!

@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCollectionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Collection Access", () => {
@@ -181,6 +181,7 @@ describe("Group Collection Access", () => {
         expect(response.errors == null, "no errors").to.equal(true);
     });
 
+    
     it("Grant group view access to catalog and packages", async () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
@@ -246,6 +247,24 @@ describe("Group Collection Access", () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
+    });
+
+    it("Should return group list for collection", async() => {
+        const response = await userAClient.query({
+            query: GroupsByCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "testA-group-collection"
+                }
+            }
+        });
+
+         expect(response.errors == null).equal(true);
+        expect(response.data.groupsByCollection.length).to.equal(1);
+        expect(response.data.groupsByCollection[0].group?.slug).equal("test-group-collection");
+
+        expect(response.data.groupsByCollection[0].permissions?.length).equal(1);
+        expect(response.data.groupsByCollection[0].permissions![0]).equal(Permission.VIEW);        
     });
 
     it("UserB should not be able to view collection", async () => {
