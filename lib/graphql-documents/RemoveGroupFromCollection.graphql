@@ -1,0 +1,3 @@
+mutation RemoveGroupFromCollection($groupSlug: String!, $collectionIdentifier: CollectionIdentifierInput!) {
+    removeGroupFromCollection(groupSlug: $groupSlug, collectionIdentifier: $collectionIdentifier)
+}

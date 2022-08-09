@@ -1,0 +1,22 @@
+mutation AddOrUpdateGroupToCollection(
+    $groupSlug: String!
+    $collectionIdentifier: CollectionIdentifierInput!
+    $permissions: [Permission!]!
+) {
+    addOrUpdateGroupToCollection(groupSlug: $groupSlug, collectionIdentifier: $collectionIdentifier, permissions: $permissions) {
+        group {
+            slug
+            name
+        }
+        collection {
+            identifier {
+                registryURL
+                collectionSlug
+            }
+            name
+            description
+            myPermissions
+            isPublic
+        }
+    }
+}

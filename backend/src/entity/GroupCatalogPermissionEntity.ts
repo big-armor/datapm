@@ -31,7 +31,7 @@ export class GroupCatalogPermissionEntity extends EntityBaseModel {
     permissions: Permission[];
 
     @Column("enum", { array: true, name: "package_permissions", enum: Permission })
-    packagePermission: Permission[];
+    packagePermissions: Permission[];
 
     @ManyToOne(() => UserEntity, { eager: true })
     @JoinColumn({ name: "creator_id" })

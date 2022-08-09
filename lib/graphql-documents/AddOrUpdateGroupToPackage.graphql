@@ -1,4 +1,4 @@
-mutation addOrUpdateGroupToPackage(
+mutation AddOrUpdateGroupToPackage(
     $groupSlug: String!
     $packageIdentifier: PackageIdentifierInput!
     $permissions: [Permission!]!

@@ -29,11 +29,13 @@ export class GroupCollectionPermissionRepository {
     }
 
     async createOrUpdateGroupCollectionPermission({
+        creatorId,
         collectionId,
         groupId,
         permissions,
         relations = []
     }: {
+        creatorId: number;
         collectionId: number;
         groupId: number;
         permissions: Permission[],
@@ -57,7 +59,8 @@ export class GroupCollectionPermissionRepository {
         const groupPermission =  this.manager.getRepository(GroupCollectionPermissionEntity).create({
             groupId,
             collectionId,
-            permissions
+            permissions,
+            creatorId
         });
 
         await this.manager.save(groupPermission);

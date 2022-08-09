@@ -29,14 +29,18 @@ export class GroupCatalogPermissionRepository {
     }
 
     async createOrUpdateGroupCatalogPermission({
+        creatorId,
         catalogId,
         groupId,
         permissions,
+        packagePermissions,
         relations = []
     }: {
+        creatorId: number;
         catalogId: number;
         groupId: number;
         permissions: Permission[],
+        packagePermissions: Permission[],
         relations?: string[];
     }): Promise<GroupCatalogPermissionEntity> {
 
@@ -50,14 +54,16 @@ export class GroupCatalogPermissionRepository {
 
         if(entity) {
             entity.permissions = permissions;
+            entity.packagePermissions = packagePermissions;
             return this.manager.save(entity);
         }
-
 
         const groupPermission =  this.manager.getRepository(GroupCatalogPermissionEntity).create({
             groupId,
             catalogId,
-            permissions
+            permissions,
+            creatorId,
+            packagePermissions
         });
 
         await this.manager.save(groupPermission);

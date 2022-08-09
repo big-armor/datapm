@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromPackageDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -15,15 +15,15 @@ describe("Group Package Access", () => {
         userAClient = await createUser(
             "FirstA",
             "LastA",
-            "testA-group-package",
-            "testA-group-package@test.datapm.io",
+            "testA-group-catalog",
+            "testA-group-catalog@test.datapm.io",
             "passwordA!"
         );
         userBClient = await createUser(
             "FirstB",
             "LastB",
-            "testB-group-package",
-            "testB-group-package@test.datapm.io",
+            "testB-group-catalog",
+            "testB-group-catalog@test.datapm.io",
             "passwordB!"
         );
         expect(userAClient).to.exist;
@@ -35,7 +35,7 @@ it("Should allow user to create a package", async function () {
             mutation: CreatePackageDocument,
             variables: {
                 value: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators",
                     displayName: "Congressional Legislators",
                     description: "Test upload of congressional legislators"
@@ -44,10 +44,10 @@ it("Should allow user to create a package", async function () {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-group-package");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-group-catalog");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-group-package");
+        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-group-catalog");
         expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
         expect(response.data!.createPackage.latestVersion).to.equal(null);
     });
@@ -63,7 +63,7 @@ it("Should allow user to create a package", async function () {
                 mutation: CreateVersionDocument,
                 variables: {
                     identifier: {
-                        catalogSlug: "testA-group-package",
+                        catalogSlug: "testA-group-catalog",
                         packageSlug: "congressional-legislators"
                     },
                     value: {
@@ -77,7 +77,7 @@ it("Should allow user to create a package", async function () {
         }
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-group-package");
+        expect(response.data!.createVersion.author?.username).equal("testA-group-catalog");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
 
@@ -87,12 +87,12 @@ it("Should allow user to create a package", async function () {
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 
-it("package should not be available anonymously", async function () {
+    it("package should not be available anonymously", async function () {
         let response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 }
             }
@@ -110,7 +110,7 @@ it("package should not be available anonymously", async function () {
             query: PackageDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 }
             }
@@ -140,7 +140,7 @@ it("package should not be available anonymously", async function () {
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
                 groupSlug: "test-group",
-                username: "testB-group-package",
+                username: "testB-group-catalog",
                 permissions: [Permission.VIEW]
             }
         });
@@ -148,15 +148,15 @@ it("package should not be available anonymously", async function () {
         expect(response.errors == null, "no errors").to.equal(true);
     });
 
-    it("Grant group view access to package", async () => {
+    it("Grant group view access to catalog and packages", async () => {
         const response = await userAClient.mutate({
-            mutation: AddOrUpdateGroupToPackageDocument,
+            mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
                 groupSlug: "test-group",
-                packageIdentifier: {
-                    catalogSlug: "testA-group-package",
-                    packageSlug: "congressional-legislators"
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog"
                 },
+                packagePermissions: [Permission.VIEW],
                 permissions: [Permission.VIEW]
             }
 
@@ -171,7 +171,7 @@ it("package should not be available anonymously", async function () {
             query: PackageDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 }
             }
@@ -187,7 +187,7 @@ it("package should not be available anonymously", async function () {
             mutation: UpdatePackageDocument, 
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 },
                 value: {
@@ -204,14 +204,14 @@ it("package should not be available anonymously", async function () {
 
     it("Grant group edit access to package", async () => {
         const response = await userAClient.mutate({
-            mutation: AddOrUpdateGroupToPackageDocument,
+            mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
                 groupSlug: "test-group",
-                packageIdentifier: {
-                    catalogSlug: "testA-group-package",
-                    packageSlug: "congressional-legislators"
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog"
                 },
-                permissions: [Permission.VIEW, Permission.EDIT]
+                permissions: [Permission.VIEW],
+                packagePermissions: [Permission.VIEW, Permission.EDIT,  Permission.MANAGE]
             }
 
         });
@@ -226,7 +226,7 @@ it("package should not be available anonymously", async function () {
             mutation: UpdatePackageDocument, 
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 },
                 value: {
@@ -240,15 +240,69 @@ it("package should not be available anonymously", async function () {
 
     });
 
+    it("UserB should no be able to edit catalog", async() => {
+
+        const response = await userBClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-group-catalog"
+                },
+                value: {
+                    displayName: "Test Catalog2"
+                }
+            }
+        });
+        
+        expect(response.errors != null, "should have errors").to.equal(true);
+    
+
+    });
+
+    it("Grant group edit access to package", async () => {
+        const response = await userAClient.mutate({
+            mutation: AddOrUpdateGroupToCatalogDocument,
+            variables: {
+                groupSlug: "test-group",
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog"
+                },
+                permissions: [Permission.VIEW, Permission.EDIT],
+                packagePermissions: [Permission.VIEW, Permission.EDIT,  Permission.MANAGE]
+            }
+
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+
+    });
+
+    it("Should allow UserB to edit catalog", async () => {
+        const response = await userBClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-group-catalog"
+                },
+                value: {
+                    displayName: "Test Catalog2"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(response.data?.updateCatalog.displayName).to.equal("Test Catalog2");
+                
+    });
+
     it("UserB should not be able to remove a group", async () => {
 
         const response = await userBClient.mutate({
-            mutation: RemoveGroupFromPackageDocument,
+            mutation: RemoveGroupFromCatalogDocument,
             variables: {
                 groupSlug: "test-group",
-                packageIdentifier: {
-                    catalogSlug: "testA-group-package",
-                    packageSlug: "congressional-legislators"
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog",
                 }
             }
         });
@@ -260,14 +314,14 @@ it("package should not be available anonymously", async function () {
 
     it("Grant group manage access to package", async () => {
         const response = await userAClient.mutate({
-            mutation: AddOrUpdateGroupToPackageDocument,
+            mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
                 groupSlug: "test-group",
-                packageIdentifier: {
-                    catalogSlug: "testA-group-package",
-                    packageSlug: "congressional-legislators"
-                },
-                permissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE]
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog"
+                },                
+                packagePermissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
+                permissions: [Permission.VIEW]
             }
 
         });
@@ -277,15 +331,14 @@ it("package should not be available anonymously", async function () {
     });
 
 
-    it("UserB should be able to remove a group", async () => {
+    it("UserA should be able to remove a group", async () => {
 
-        const response = await userBClient.mutate({
-            mutation: RemoveGroupFromPackageDocument,
+        const response = await userAClient.mutate({
+            mutation: RemoveGroupFromCatalogDocument,
             variables: {
                 groupSlug: "test-group",
-                packageIdentifier: {
-                    catalogSlug: "testA-group-package",
-                    packageSlug: "congressional-legislators"
+                catalogIdentifier: {
+                    catalogSlug: "testA-group-catalog"
                 }
             }
         });
@@ -299,7 +352,7 @@ it("package should not be available anonymously", async function () {
             query: PackageDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "testA-group-package",
+                    catalogSlug: "testA-group-catalog",
                     packageSlug: "congressional-legislators"
                 }
             }

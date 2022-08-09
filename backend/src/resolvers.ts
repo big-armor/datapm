@@ -229,6 +229,8 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
+import { addOrUpdateGroupToCatalog, removeGroupFromCatalog } from "./resolvers/GroupCatalogPermissionResolver";
+import { addOrUpdateGroupToCollection, removeGroupFromCollection } from "./resolvers/GroupCollectionPermissionResolver";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -689,6 +691,8 @@ export const resolvers: {
         deleteCatalog: deleteCatalog,
         setCatalogAvatarImage: setCatalogAvatarImage,
         deleteCatalogAvatarImage: deleteCatalogAvatarImage,
+        addOrUpdateGroupToCatalog: addOrUpdateGroupToCatalog,
+        removeGroupFromCatalog: removeGroupFromCatalog,
 
         // Catalog Permissions
         setUserCatalogPermission: setUserCatalogPermission,
@@ -738,6 +742,8 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+        addOrUpdateGroupToCollection: addOrUpdateGroupToCollection,
+        removeGroupFromCollection: removeGroupFromCollection,
 
         // Collection Permissions
         setUserCollectionPermissions: setUserCollectionPermissions,

@@ -1,7 +1,8 @@
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupCatalogPermissionEntity } from "../entity/GroupCatalogPermissionEntity";
-import { GroupCatalogPermission, CatalogIdentifierInput, Permission } from "../generated/graphql";
+import { GroupCatalogPermission, CatalogIdentifierInput, Permission, ActivityLogEventType } from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupCatalogPermissionRepository } from "../repository/GroupCatalogPermissionRepository";
 import { getCatalogFromCacheOrDbByIdOrFail, getCatalogFromCacheOrDbOrFail, catalogEntityToGraphQL } from "./CatalogResolver";
 import { findGroup, getGroupFromCacheOrDbByIdOrFail } from "./GroupResolver";
@@ -29,22 +30,35 @@ export const groupCatalogPermissionEntityToGraphqlObject = async (
 
 export const addOrUpdateGroupToCatalog = async (
         _0: any,
-    { groupSlug, catalogIdentifier, permissions }: { groupSlug: string, catalogIdentifier: CatalogIdentifierInput, permissions: Permission[] },
+    { groupSlug, catalogIdentifier, permissions, packagePermissions }: { groupSlug: string, catalogIdentifier: CatalogIdentifierInput, permissions: Permission[], packagePermissions: Permission[] },
     context: AuthenticatedContext,
     info: any
 ) => {
 
-    const groupEntity = await findGroup(context.connection.manager, groupSlug);
+    return context.connection.transaction(async (transaction) => {
 
-    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, catalogIdentifier, []);
+        const groupEntity = await findGroup(transaction, groupSlug);
 
-    const groupPermission =  await context.connection.manager.getCustomRepository(GroupCatalogPermissionRepository).createOrUpdateGroupCatalogPermission({
-        groupId: groupEntity.id,
-        catalogId: catalogEntity.id,
-        permissions
+        const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, catalogIdentifier, []);
+
+        const groupPermission =  await transaction.getCustomRepository(GroupCatalogPermissionRepository).createOrUpdateGroupCatalogPermission({
+            groupId: groupEntity.id,
+            catalogId: catalogEntity.id,
+            permissions,
+            creatorId: context.me.id,
+            packagePermissions
+        });
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.CATALOG_GROUP_PERMISSION_ADDED_UPDATED,
+            targetGroupId: groupEntity.id,
+            targetCatalogId: catalogEntity.id
+        });
+
+        return groupCatalogPermissionEntityToGraphqlObject(context, transaction, groupPermission);
+
     });
-
-    return groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, groupPermission);
 
 }
 
@@ -61,14 +75,24 @@ export const removeGroupFromCatalog = async (
 
         const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, catalogIdentifier, []);
 
-        const groupPermission =  await manager.getRepository(GroupCatalogPermissionEntity).findOneOrFail({
+        const groupPermission =  await manager.getRepository(GroupCatalogPermissionEntity).findOne({
             groupId: groupEntity.id,
             catalogId: catalogEntity.id
         });
 
+        if(!groupPermission) {
+            throw new Error("NOT_FOUND - Group does not have permission to catalog");
+        }
+
         await manager.getRepository(GroupCatalogPermissionEntity).remove(groupPermission);
 
-        return groupCatalogPermissionEntityToGraphqlObject(context, manager, groupPermission);
+        await createActivityLog(manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.CATALOG_GROUP_PERMISSION_REMOVED,
+            targetGroupId: groupEntity.id,
+            targetCatalogId: catalogEntity.id
+        });
+
     });
     
 

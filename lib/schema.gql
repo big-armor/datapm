@@ -1873,13 +1873,13 @@ type Mutation {
 
     addOrUpdateGroupToCollection(
         groupSlug: String! @hasGroupPermission(permission: VIEW)
-        collectionSlug: String! @hasCollectionPermission(permission: MANAGE)
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
         permissions: [Permission!]!
     ): GroupCollectionPermission!
 
     removeGroupFromCollection(
         groupSlug: String! @hasGroupPermission(permission: VIEW)
-        collectionSlug: String! @hasCollectionPermission(permission: MANAGE)
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
     ): Void
 
     addOrUpdateGroupToPackage(
@@ -1895,12 +1895,13 @@ type Mutation {
 
     addOrUpdateGroupToCatalog(
         groupSlug: String! @hasGroupPermission(permission: VIEW)
-        catalogSlug: String! @hasCatalogPermission(permission: MANAGE)
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
         permissions: [Permission!]!
+        packagePermissions: [Permission!]!
     ): GroupCatalogPermission!
 
     removeGroupFromCatalog(
         groupSlug: String! @hasGroupPermission(permission: VIEW)
-        catalogSlug: String! @hasCatalogPermission(permission: MANAGE)
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
     ): Void
 }

@@ -200,7 +200,7 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (context: Context
 
         if(userGroupPermissions) {
             userGroupPermissions.forEach((groupPermission) => {
-                groupPermission.packagePermission.forEach((permission) => {
+                groupPermission.packagePermissions.forEach((permission) => {
                     if(!permissions.includes(permission))
                         permissions.push(permission);
                 });

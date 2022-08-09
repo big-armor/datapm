@@ -1,0 +1,31 @@
+mutation AddOrUpdateGroupToCatalog(
+    $groupSlug: String!
+    $catalogIdentifier: CatalogIdentifierInput!
+    $permissions: [Permission!]!
+    $packagePermissions: [Permission!]!
+) {
+    addOrUpdateGroupToCatalog(
+        groupSlug: $groupSlug
+        catalogIdentifier: $catalogIdentifier
+        permissions: $permissions
+        packagePermissions: $packagePermissions
+    ) {
+        group {
+            slug
+            name
+        }
+
+        catalog {
+            identifier {
+                registryURL
+                catalogSlug
+            }
+            displayName
+            description
+            website
+            myPermissions
+            isPublic
+            unclaimed
+        }
+    }
+}
