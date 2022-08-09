@@ -127,7 +127,7 @@ it("package should not be available anonymously", async function () {
         const response = await userAClient.mutate({
             mutation: CreateGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 name: "Test Group"
             }
         });
@@ -139,7 +139,7 @@ it("package should not be available anonymously", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 username: "testB-group-package",
                 permissions: [Permission.VIEW]
             }
@@ -152,7 +152,7 @@ it("package should not be available anonymously", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToPackageDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 packageIdentifier: {
                     catalogSlug: "testA-group-package",
                     packageSlug: "congressional-legislators"
@@ -206,7 +206,7 @@ it("package should not be available anonymously", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToPackageDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 packageIdentifier: {
                     catalogSlug: "testA-group-package",
                     packageSlug: "congressional-legislators"
@@ -245,7 +245,7 @@ it("package should not be available anonymously", async function () {
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromPackageDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 packageIdentifier: {
                     catalogSlug: "testA-group-package",
                     packageSlug: "congressional-legislators"
@@ -262,7 +262,7 @@ it("package should not be available anonymously", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToPackageDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 packageIdentifier: {
                     catalogSlug: "testA-group-package",
                     packageSlug: "congressional-legislators"
@@ -282,7 +282,7 @@ it("package should not be available anonymously", async function () {
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromPackageDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-package",
                 packageIdentifier: {
                     catalogSlug: "testA-group-package",
                     packageSlug: "congressional-legislators"

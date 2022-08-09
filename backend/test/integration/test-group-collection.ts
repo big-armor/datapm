@@ -6,7 +6,7 @@ import { describe } from "mocha";
 import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
-describe("Group Package Access", () => {
+describe("Group Collection Access", () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient = createAnonymousClient();
@@ -160,7 +160,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: CreateGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 name: "Test Group"
             }
         });
@@ -172,7 +172,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 username: "testB-group-collection",
                 permissions: [Permission.VIEW]
             }
@@ -185,7 +185,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-collection"
                 },
@@ -235,7 +235,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCollectionDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 collectionIdentifier: {
                     collectionSlug: "testA-group-collection"
                 },
@@ -287,7 +287,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCollectionDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 collectionIdentifier: {
                     collectionSlug: "testA-group-collection"
                 },
@@ -323,7 +323,7 @@ describe("Group Package Access", () => {
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromCollectionDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 collectionIdentifier: {
                     collectionSlug: "testA-group-collection"
                 }
@@ -340,7 +340,7 @@ describe("Group Package Access", () => {
         const response = await userAClient.mutate({
             mutation: RemoveGroupFromCollectionDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-collection",
                 collectionIdentifier: {
                     collectionSlug: "testA-group-collection"
                 }

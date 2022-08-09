@@ -127,7 +127,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: CreateGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 name: "Test Group"
             }
         });
@@ -139,7 +139,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 username: "testB-group-catalog",
                 permissions: [Permission.VIEW]
             }
@@ -152,7 +152,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
                 },
@@ -206,7 +206,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
                 },
@@ -263,7 +263,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
                 },
@@ -300,7 +300,7 @@ it("Should allow user to create a package", async function () {
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog",
                 }
@@ -316,7 +316,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
                 },                
@@ -336,7 +336,7 @@ it("Should allow user to create a package", async function () {
         const response = await userAClient.mutate({
             mutation: RemoveGroupFromCatalogDocument,
             variables: {
-                groupSlug: "test-group",
+                groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
                 }
