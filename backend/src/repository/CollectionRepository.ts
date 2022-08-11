@@ -87,11 +87,16 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<[CollectionEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
-        const response = await this.createQueryBuilderWithUserConditions(user?.id, Permission.EDIT)
+        const query = this.createQueryBuilderWithUserConditions(user?.id, Permission.VIEW)
+            .andWhere(`("CollectionEntity"."creator_id" = :targetUserId)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
-            .addRelations("CollectionEntity", relations)
+            .addRelations("CollectionEntity", relations);
+
+        const queryString = query.getQuery();
+
+        const response = await query
             .getManyAndCount();
 
         return response;
@@ -218,13 +223,13 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 
         if (!userId) {
-            return queryBuilder.where('("CollectionEntity"."is_public")');
+            return queryBuilder.where('("CollectionEntity"."is_public" is true)');
         }
 
         return queryBuilder
             .where(
                 `(
-                    ("CollectionEntity"."is_public")
+                    ("CollectionEntity"."is_public" is true)
                     OR 
                     ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND :permission = any(permissions)))
                     OR

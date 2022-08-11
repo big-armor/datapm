@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCollectionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCollectionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, SearchCollectionsDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Collection Access", () => {
@@ -335,6 +335,21 @@ describe("Group Collection Access", () => {
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data?.updateCollection.name).to.equal("Test Collection2");
                 
+    });
+
+    it("Should include collection in search for userB", async () => {
+        const response = await userBClient.query({
+            query: SearchCollectionsDocument,
+            variables: {
+                query: "Test Collection2",
+                limit: 10,
+                offset: 0
+            }
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(response.data!.searchCollections.collections?.length).to.equal(1);
+        expect(response.data!.searchCollections.collections![0].name).to.equal("Test Collection2");
     });
 
     it("UserB should not be able to remove a group", async () => {
