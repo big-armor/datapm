@@ -19,6 +19,7 @@ import { ValidBase64ImageUploadDirective } from "./directive/ValidBase64ImageUpl
 import { ValidUsernameOrEmailAddressDirective } from "./directive/ValidUsernameOrEmailAddressDirective";
 import { ValidateMarkdownDirective } from "./directive/ValidMarkdownDirective";
 import { HasGroupPermissionDirective } from "./directive/hasGroupPermissionDirective.ts";
+import { ValidGroupSlugDirective } from "./directive/ValidGroupSlugDirective";
 
 const SCHEMAS_DIRECTORY = "node_modules/datapm-lib/";
 const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql", "group-schema.gql"];
@@ -44,6 +45,7 @@ export async function makeSchema() {
             validUsernameOrEmailAddress: ValidUsernameOrEmailAddressDirective,
             validPassword: ValidPasswordDirective,
             validCatalogSlug: ValidCatalogSlugDirective,
+            validGroupSlug: ValidGroupSlugDirective,
             validPackageSlug: ValidPackageSlugDirective,
             validCollectionSlug: ValidCollectionSlugDirective,
             validImageUpload: ValidateImageUploadDirective,

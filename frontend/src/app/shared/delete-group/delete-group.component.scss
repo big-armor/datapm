@@ -1,0 +1,30 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+#deleteGroup {
+    width: 500px;
+    position: relative;
+
+    .oneline-input {
+        ::ng-deep input.mat-input-element {
+            width: unset;
+            border: none;
+            color: var(--gray-1-color);
+            border-bottom: 2px solid var(--danger-color);
+            background: transparent;
+            outline: transparent solid 1px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    #deleteGroup {
+        min-width: 400px;
+    }
+}
+
+@media (max-width: 576px) {
+    #deleteGroup {
+        min-width: 260px;
+    }
+}

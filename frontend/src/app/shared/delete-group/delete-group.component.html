@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="deleteGroup">
+            <div mat-dialog-title id="contentTitle">Delete Group</div>
+            <div mat-dialog-content id="contentBorder">
+                <div>
+                    <p>This action is permanent and can not be undone.</p>
+                </div>
+
+                <div>
+                    <p>
+                        Type <span class="slug">{{ data.groupSlug }}</span> here
+                    </p>
+                </div>
+
+                <div class="oneline-input pb-3 pt-2">
+                    <input matInput [(ngModel)]="confirmVal" autocomplete="off" />
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-between">
+                <button mat-dialog-close class="modal-close-btn">Cancel</button>
+                <button class="btn-delete" (click)="confirm()" [disabled]="confirmVal !== data.groupSlug">
+                    <span *ngIf="state !== 'LOADING'">Delete</span>
+                    <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -20,7 +20,8 @@ import {
     FollowResolvers,
     ActivityLogResolvers,
     BuilderIOSettings,
-    BuilderIOPage
+    BuilderIOPage,
+    GroupResolvers
 } from "./generated/graphql";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
@@ -218,7 +219,7 @@ import {
     userFollowersCount
 } from "./resolvers/FollowResolver";
 
-import { createGroup, updateGroup, deleteGroup, addOrUpdateUserToGroup, removeUserFromGroup } from "./resolvers/GroupResolver";
+import { createGroup, updateGroup, deleteGroup, addOrUpdateUserToGroup, removeUserFromGroup, myGroupPermissions, myGroups } from "./resolvers/GroupResolver";
 import { addOrUpdateGroupToPackage,removeGroupFromPackage, groupsByPackage } from "./resolvers/GroupPackagePermissionResolver";
 
 import {
@@ -293,6 +294,7 @@ export const resolvers: {
     AutoCompleteResult: AutoCompleteResultResolvers;
     Follow: FollowResolvers;
     ActivityLog: ActivityLogResolvers;
+    Group: GroupResolvers;
 } = {
     AutoCompleteResult: {
         packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
@@ -559,6 +561,13 @@ export const resolvers: {
         targetUser: logUser,
         targetGroup: logGroup
     },
+    Group: {
+        myPermissions: myGroupPermissions,
+        // TODO 
+        // packages: groupPackages,
+        // catalogs: groupCatalogs,
+        // collections: groupCollections
+    },
 
     Query: {
         registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
@@ -661,6 +670,7 @@ export const resolvers: {
         groupsByPackage,
         groupsByCatalog,
         groupsByCollection,
+        myGroups: myGroups
     },
 
     Mutation: {

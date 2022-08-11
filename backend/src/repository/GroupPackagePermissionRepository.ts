@@ -6,6 +6,9 @@ import { Permission } from "../generated/graphql";
 export class GroupPackagePermissionRepository {
     constructor(private manager: EntityManager) {}
 
+    /** This is only in the context of a user's package permission via being a member of a group. But not via direct
+     * package assignment, or through catalog level package permissions.
+     */
     async getPackagePermissionsByUser({
         packageId,
         userId,

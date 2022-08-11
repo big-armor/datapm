@@ -20,6 +20,10 @@ const AUTHENTICATED_USER_PACKAGES_QUERY = `
         ("PackageEntity"."isPublic" is false and "PackageEntity"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.package_permission))) 
         or 
         ("PackageEntity"."isPublic" is false and "PackageEntity".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission)))
+        or
+        ("PackageEntity"."isPublic" is false and "PackageEntity".id in (select gp.package_id from group_package_permissions gp WHERE :permission = ANY(gp.permissions) AND gp.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+        or
+        ("PackageEntity"."isPublic" is false and "PackageEntity".catalog_id in (select gc.catalog_id from group_catalog_permissions gc WHERE :permission = ANY(gc.package_permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
     )`;
 const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
 

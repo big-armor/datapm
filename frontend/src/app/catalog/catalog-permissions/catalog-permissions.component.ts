@@ -20,6 +20,7 @@ import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../services/dialog/dialog.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { getHighestPermission } from "src/app/services/permissions.service";
 
 @Component({
     selector: "app-catalog-permissions",
@@ -164,7 +165,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
                     pendingInvitationAcceptance: item.user.username.includes("@"),
-                    permission: this.findHighestPermission(item.permissions)
+                    permission: getHighestPermission(item.permissions)
                 }));
             });
     }
@@ -192,18 +193,6 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                 }
                 this.getUserList();
             });
-    }
-
-    private findHighestPermission(userPermissions: Permission[]): Permission {
-        const permissions = [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
-
-        for (const permission of permissions) {
-            if (userPermissions.includes(permission)) {
-                return permission;
-            }
-        }
-
-        return Permission.NONE;
     }
 
     private getPermissionArrayFrom(permission: Permission): Permission[] {

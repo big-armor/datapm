@@ -8,6 +8,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeletePackageComponent } from "src/app/shared/delete-package/delete-package.component";
 import {
+    GroupsByPackageGQL,
     Package,
     Permission,
     RemovePackagePermissionsGQL,
@@ -19,8 +20,9 @@ import {
 import { PackageResponse, PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../../services/dialog/dialog.service";
-import { getEffectivePermissions } from "../../../services/permissions.service";
+import { getEffectivePermissions, getHighestPermission } from "../../../services/permissions.service";
 import { MovePackageComponent, MovePackageDialogData } from "src/app/shared/move-package/move-package.component";
+import { AddGroupComponent } from "../add-group/add-group.component";
 
 @Component({
     selector: "app-package-permission",
@@ -38,6 +40,7 @@ export class PackagePermissionComponent implements OnInit {
     constructor(
         private dialog: MatDialog,
         private usersByPackage: UsersByPackageGQL,
+        private groupsByPackage: GroupsByPackageGQL,
         private updatePackage: UpdatePackageGQL,
         private packageService: PackageService,
         private removeUserPackagePermission: RemovePackagePermissionsGQL,
@@ -54,6 +57,7 @@ export class PackagePermissionComponent implements OnInit {
             this.package = p?.package;
             if (this.canManage) {
                 this.getUserList();
+                this.getGroupList();
             } else {
                 this.router.navigate([".."], { relativeTo: this.route });
             }
@@ -72,6 +76,21 @@ export class PackagePermissionComponent implements OnInit {
             }
         });
     }
+
+    public addGroup(): void {
+        
+        const dialogRef = this.dialog.open(AddGroupComponent, {
+            width: "550px",
+            data: this.package
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.getGroupList();
+            }
+        });
+        
+    } 
 
     public updatePermission(username: string, permission: Permission): void {
         this.setUserPermission(username, getEffectivePermissions(permission));
@@ -165,6 +184,26 @@ export class PackagePermissionComponent implements OnInit {
             });
     }
 
+    private getGroupList(): void {
+        if (!this.package) {
+            return;
+        }
+
+        this.groupsByPackage
+            .fetch({
+                packageIdentifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                }
+            })
+            .subscribe(({ data }) => {
+                this.groups = data.groupsByPackage.map((item) => ({
+                    name: item.group.name,
+                    permission: getHighestPermission(item.permissions)
+                }));
+            });
+    }
+
     private setUserPermission(username: string, permissions: Permission[]): void {
         this.setPackagePermissions
             .mutate({
@@ -188,18 +227,6 @@ export class PackagePermissionComponent implements OnInit {
                 }
                 this.getUserList();
             });
-    }
-
-    private findHighestPermission(userPermissions: Permission[]): Permission {
-        const permissions = [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
-
-        for (const permission of permissions) {
-            if (userPermissions.includes(permission)) {
-                return permission;
-            }
-        }
-
-        return Permission.NONE;
     }
 
     private getUserName(user: User): string {

@@ -40,6 +40,9 @@
                     [username]="username"
                     *ngSwitchCase="'user-following'"
                 ></app-user-following>
+                <app-user-groups
+                    *ngSwitchCase="'user-groups'"
+                ></app-user-groups>
                 <app-user-details *ngSwitchDefault></app-user-details>
             </div>
 

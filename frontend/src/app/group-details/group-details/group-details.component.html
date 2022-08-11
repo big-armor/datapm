@@ -1,0 +1,89 @@
+<div class="group-details container-fluid px-0 pt-2">
+    <div *ngIf="state === 'SUCCESS'">
+        <div class="container">
+            <app-cover [groupSlug]="groupSlug"></app-cover>
+
+            <div class="group-header pr-2">
+                <div *ngIf="group.myPermissions.includes('MANAGE')" class="groups-public">
+                    <span *ngIf="group?.isPublic" class="public-text">public</span>
+                    <span *ngIf="!group?.isPublic" class="not-public-text">not public</span>
+                </div>
+                <div class="d-flex bd-highlight">
+                    <div class="bd-highlight">
+                        <div class="text-main-title mb-1">Group: {{ group?.name }}</div>
+                    </div>
+                </div>
+                <div class="text-light-gray">{{ groupSlug }}</div>
+                <div class="text-dark-gray">
+                    {{ group?.description }}
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <mat-tab-group
+                [(selectedIndex)]="currentTab"
+                (selectedTabChange)="updateTabParam()"
+                class="group-tabs mt-3"
+            >
+                <mat-tab label="Users"></mat-tab>
+                <mat-tab label="Packages"></mat-tab>
+                <mat-tab label="Catalogs"></mat-tab>
+                <mat-tab label="Collections"></mat-tab>
+                <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
+            </mat-tab-group>
+        </div>
+        <hr class="header-border" />
+
+        <div class="container">
+            <div *ngIf="currentTab === 1">
+                <div class="mt-4" *ngIf="group.packages?.length > 0">
+                    <p class="text-dark-gray ml-3">This group permissions set on these packages. The group may have additional access to other packages through catalog level permissions. Check the catalog tab above.</p>
+                    <div class="mt-2 mb-4 pl-3">
+                        <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
+                    </div>
+                </div>
+                <div class="container">
+                    <app-package-item
+                        [item]="package"
+                        [hasImage]="true"
+                        actionButtonText="Remove Group Access"
+                        [shouldShowActionButton]="canEdit"
+                        (action)="removePackage(package)"
+                        *ngFor="let package of group.packages"
+                    >
+                    </app-package-item>
+                </div>
+                <div class="dpm-no-data" *ngIf="!group.packages?.length">
+                    <p class="text-dark-gray ml-3">
+                        This group has no direct package permissions. Check the catalog tab for more permissions.
+                    </p>
+                    <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+                </div>
+            </div>
+            <app-group-followers *ngIf="currentTab === 1" [group]="group"></app-group-followers>
+            <app-group-permissions
+                (groupEdited)="setGroupVariables($event)"
+                [group]="group"
+                *ngIf="currentTab === 2"
+            ></app-group-permissions>
+        </div>
+    </div>
+
+    <div class="container">
+        <div *ngIf="state === 'NOT_AUTHORIZED'">
+            <div class="dpm-no-data">
+                <p class="text-dark-gray ml-3">You do not have permission to view this group.</p>
+            </div>
+        </div>
+
+        <div *ngIf="state === 'NOT_FOUND'">
+            <div class="dpm-no-data">
+                <p class="text-dark-gray ml-3">The requested group was not found.</p>
+            </div>
+        </div>
+        <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+    </div>
+</div>

@@ -338,6 +338,11 @@ directive @validCatalogSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 """
 Whether the catalog slug provided is valid
 """
+directive @validGroupSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the catalog slug provided is valid
+"""
 directive @validPackageSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
@@ -1160,6 +1165,16 @@ type Query {
     myCatalogs: [Catalog]! @isAuthenticated
 
     """
+    Returns all groups the user can view
+    """
+    myGroups: [Group!]! @isAuthenticated
+
+    """
+    Returns a single group
+    """
+    group(groupSlug: String! @hasGroupPermission(permission: VIEW)): Group!
+
+    """
     Returns catalogs matching the query string (which can include boolean logic combinations) with pagination
     """
     searchCatalogs(query: String!, offSet: Int!, limit: Int!): SearchCatalogsResult!
@@ -1459,11 +1474,6 @@ type Query {
     """
     listRepositories(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): RepositoriesResult!
         @hasPackagePermission(permission: EDIT)
-
-    """
-    Returns a group by it's slug
-    """
-    group(groupSlug: String! @hasGroupPermission(permission: VIEW)): Group!
 }
 
 type Mutation {
@@ -1878,7 +1888,7 @@ type Mutation {
         credentialIdentifier: String!
     ): Void @hasPackagePermission(permission: EDIT)
 
-    createGroup(groupSlug: String!, name: String!): Group! @isAuthenticated
+    createGroup(groupSlug: String! @validGroupSlug, name: String!): Group! @isAuthenticated
 
     updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!): Group!
 

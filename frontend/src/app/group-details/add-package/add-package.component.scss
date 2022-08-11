@@ -1,0 +1,44 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+#addPackage {
+    width: 100%;
+
+    .flat-input {
+        display: inline;
+    }
+
+    .add-package-text {
+        font-family: $family-roboto;
+        letter-spacing: 0.7px;
+        font-weight: $weight-400;
+    }
+
+    .mat-option {
+        height: 75px;
+        padding: 5px 10px;
+        line-height: 75px;
+        ::ng-deep.avatar {
+            line-height: 20px;
+            margin-right: 10px;
+        }
+    }
+
+    .save-btn {
+        width: 210px;
+        padding: 2px 10px;
+    }
+}
+
+.mat-selected {
+    color: var(--gray-1-color) !important;
+}
+
+@media (max-width: 576px) {
+    #addPackage {
+        .add-package-text {
+            font-size: 12px;
+            margin-bottom: 0px !important;
+        }
+    }
+}

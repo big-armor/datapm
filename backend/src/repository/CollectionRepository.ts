@@ -2,7 +2,7 @@ import { UserInputError } from "apollo-server";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { Collection, CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { Collection, CreateCollectionInput, Permission, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
@@ -87,10 +87,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<[CollectionEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
-        const response = await this.createQueryBuilderWithUserConditions(user?.id)
-            .andWhere(
-                `("CollectionEntity".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'EDIT' = ANY( permissions) ))`
-            )
+        const response = await this.createQueryBuilderWithUserConditions(user?.id, Permission.EDIT)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
@@ -150,7 +147,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         userId: number,
         relations?: string[]
     ): Promise<CollectionEntity[]> {
-        return this.createQueryBuilderWithUserConditions(userId)
+        return this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
             .setParameter("userId", userId)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getMany();
@@ -167,7 +164,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<CollectionEntity[]> {
         const ALIAS = "autoCompleteCollection";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user?.id)
+        const entities = await this.createQueryBuilderWithUserConditions(user?.id, Permission.VIEW)
             .andWhere(
                 `(LOWER("CollectionEntity"."slug") LIKE :queryLike OR LOWER("CollectionEntity"."name") LIKE :queryLike)`,
                 {
@@ -189,7 +186,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         relations?: string[]
     ): Promise<[CollectionEntity[], number]> {
         return (
-            this.createQueryBuilderWithUserConditions(userId)
+            this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
                 .andWhere(
                     "(name_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query))"
                 )
@@ -208,7 +205,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         relations?: string[]
     ): Promise<[CollectionEntity[], number]> {
         const ALIAS = "latestCollections";
-        return this.createQueryBuilderWithUserConditions(userId)
+        return this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
             .andWhere('EXISTS (SELECT 1 FROM collection_package WHERE collection_id = "CollectionEntity"."id")')
             .orderBy('"CollectionEntity"."updated_at"', "DESC")
             .limit(limit)
@@ -217,7 +214,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             .getManyAndCount();
     }
 
-    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<CollectionEntity> {
+    private createQueryBuilderWithUserConditions(userId: number | undefined, permission: Permission): SelectQueryBuilder<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 
         if (!userId) {
@@ -226,9 +223,17 @@ export class CollectionRepository extends Repository<CollectionEntity> {
 
         return queryBuilder
             .where(
-                `(("CollectionEntity"."is_public") OR ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
+                `(
+                    ("CollectionEntity"."is_public")
+                    OR 
+                    ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND :permission = any(permissions)))
+                    OR
+                    ("CollectionEntity"."id" IN (select gc.collection_id FROM group_collection_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+                 )
+                `
             )
-            .setParameter("userId", userId);
+            .setParameter("userId", userId)
+            .setParameter("permission", permission);
     }
 
 
@@ -260,4 +265,6 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             )
             .getCount();
     }
+
+
 }

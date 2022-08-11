@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCatalogDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AutoCompleteCatalogDocument, AutoCompletePackageDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCatalogDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -180,6 +180,30 @@ it("Should allow user to create a package", async function () {
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data!.package.displayName).to.equal("Congressional Legislators");
     });
+
+    it("Package should appear in userB auto-complete", async () => {
+        const response = await userBClient.query({
+            query: AutoCompletePackageDocument,
+            variables: {
+                startsWith: "Congressional"
+            }
+        });
+
+        expect(response.error == null, "no errors").equal(true);
+        expect(response.data!.autoComplete.packages?.find(p => p.identifier.catalogSlug == "testA-group-catalog" && p.identifier.packageSlug == "congressional-legislators") != null).equal(true);
+    });
+
+    it("Catalog should appear in userB auto-complete", async () => {
+        const response = await userBClient.query({
+            query: AutoCompleteCatalogDocument,
+            variables: {
+                startsWith: "testA-group-catalog",
+            }
+        });
+
+        expect(response.error == null, "no errors").equal(true);
+        expect(response.data!.autoComplete.catalogs?.find(c => c.identifier.catalogSlug == "testA-group-catalog") != null).equal(true);
+    })
 
     it("UserB should not be able to modify package", async () => {
 

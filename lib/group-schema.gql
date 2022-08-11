@@ -2,9 +2,13 @@ type Group {
     slug: String!
     name: String
     users: [GroupUser!]
+    myPermissions: [Permission!]
     createdAt: Date
     updatedAt: Date
     creator: User
+    packages: [GroupPackagePermission!]
+    catalogs: [GroupCatalogPermission!]
+    collections: [GroupCollectionPermission!]
 }
 
 type GroupUser {

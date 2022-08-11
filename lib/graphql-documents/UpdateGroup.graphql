@@ -1,0 +1,7 @@
+mutation UpdateGroup($groupSlug: String!, $name: String!) {
+    updateGroup(groupSlug: $groupSlug, name: $name) {
+        slug
+        name
+        myPermissions
+    }
+}

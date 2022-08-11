@@ -53,7 +53,7 @@ export async function getCatalogOrFail({
 @EntityRepository(CatalogEntity)
 export class CatalogRepository extends Repository<CatalogEntity> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: UserEntity | null, permission: Permission) {
+    createQueryBuilderWithUserConditions(user: UserEntity | undefined, permission: Permission) {
         if (user == null) {
             return this.manager
                 .getRepository(CatalogEntity)
@@ -66,6 +66,8 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                     "CatalogEntity"."isPublic" is true 
                     or 
                     ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
+                    or
+                    ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select gc.catalog_id from group_catalog_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
                 )`,
                 { userId: user.id, permission }
             );
@@ -285,7 +287,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }): Promise<CatalogEntity[]> {
         const ALIAS = "autoCompleteCatalog";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user || null, Permission.VIEW)
+        const entities = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `(LOWER("CatalogEntity"."slug") LIKE :valueLike OR LOWER("CatalogEntity"."displayName") LIKE :valueLike)`,
                 {
@@ -409,4 +411,5 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             )
             .getCount();
     }
+
 }

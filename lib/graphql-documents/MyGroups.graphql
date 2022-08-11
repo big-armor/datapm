@@ -1,0 +1,7 @@
+query MyGroups {
+    myGroups {
+        slug
+        name
+        myPermissions
+    }
+}

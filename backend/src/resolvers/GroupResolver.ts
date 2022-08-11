@@ -1,11 +1,13 @@
 import { ActivityLogEventType } from "datapm-client-lib";
-import { Connection, EntityManager } from "typeorm";
+import { Connection, EntityManager, Not, Any, Like} from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
+import { resolveGroupPermissionsForEntity } from "../directive/hasGroupPermissionDirective.ts";
 import { GroupEntity } from "../entity/GroupEntity";
 import { GroupUserEntity } from "../entity/GroupUserEntity";
-import { Permission } from "../generated/graphql";
+import { Group, Permission } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupUserRepository } from "../repository/GroupUserRepository";
+
 import { getUserFromCacheOrDbByUsername } from "./UserResolver";
 
 export const createGroup = async (
@@ -98,6 +100,10 @@ export const addOrUpdateUserToGroup = async (
     info: any
 ) => {
 
+    if(permissions.length == 0) {
+        return removeUserFromGroup(_0,{groupSlug,username},context, info);
+    }
+
     return await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
@@ -110,7 +116,20 @@ export const addOrUpdateUserToGroup = async (
             targetUserId: userEntity.id
         });
 
-        return context.connection.getCustomRepository(GroupUserRepository).addOrUpdateUserToGroup({
+        if(!permissions.includes(Permission.MANAGE)) {
+            const existingPermission = await manager.getRepository(GroupUserEntity).findOne({
+                where: {
+                    groupId: groupEntity.id,
+                    userId: userEntity.id
+                }
+            });
+
+            if(existingPermission && existingPermission.permissions.includes(Permission.MANAGE)) {
+                await ensureOtherManagers(manager, groupEntity.id, userEntity.id);
+            }
+        }
+
+        return manager.getCustomRepository(GroupUserRepository).addOrUpdateUserToGroup({
             groupId: groupEntity.id,
             userId: userEntity.id,
             permissions,
@@ -128,13 +147,17 @@ export const removeUserFromGroup = async (
 ) => {
 
     return await context.connection.transaction(async (manager) => {
-        const groupEntity = await findGroup(manager, groupSlug);
+        const groupEntity = await findGroup(manager, groupSlug );
         const userEntity = await getUserFromCacheOrDbByUsername(context, username);
 
         const groupUserEntity =  await manager.getRepository(GroupUserEntity).findOneOrFail({
             groupId: groupEntity.id,
             userId: userEntity.id,
         });
+
+        if(groupUserEntity.permissions.includes(Permission.MANAGE)) {
+            await ensureOtherManagers(manager, groupEntity.id, userEntity.id);
+        }
 
         await createActivityLog(manager, {
             userId: context!.me!.id,
@@ -150,19 +173,55 @@ export const removeUserFromGroup = async (
     })
 }
 
+/** Throws an error if there are no users that have the Manage permission on a group, other than the user
+ * that is provided. 
+ */
+async function ensureOtherManagers(entityManager: EntityManager, groupId: number, userId:number ): Promise<void> {
+    const otherGroupUsers = await entityManager.getRepository(GroupUserEntity).createQueryBuilder()
+        .where('"GroupUserEntity"."group_id" = :groupId AND "GroupUserEntity"."user_id" <> :userId AND "GroupUserEntity"."permissions" @> ARRAY[\'MANAGE\'::user_package_permission_permission_enum]')
+        .setParameters({
+            userId,
+            groupId
+        })
+        .getOne();
 
-export const findGroup = async (manager: EntityManager, groupSlug: string) => {
+    if(otherGroupUsers == null) {
+        throw new Error("NOT_VALID - Can not remove the last manager from the group");
+    };
+}
+
+
+export const findGroup = async (manager: EntityManager, groupSlug: string, relations:string[] = []) => {
 
     const groupEntity = await manager.getRepository(GroupEntity).findOne({
             where: {
                 slug: groupSlug,
             },
+            relations
         });
 
     if(groupEntity == null)
         throw new Error("GROUP_NOT_FOUND - " + groupSlug);
     
     return groupEntity;
+
+}
+
+export const myGroups = async (
+    _0: any,
+    {  }: { },
+    context: AuthenticatedContext,
+    info: any
+) => {
+
+    const groupEntity = await context.connection.getRepository(GroupUserEntity).find({
+            where: {
+                userId: context.me.id
+            },
+            relations: ["group"]
+        });
+    
+    return groupEntity.map(us => us.group);
 
 }
 
@@ -207,3 +266,30 @@ export const getGroupPermissionsFromCacheOrDb = async (context: Context, groupId
     
     return context.cache.loadGroupPermissionsById(groupId, permissionsPromiseFunction);
 };
+
+export const myGroupPermissions = async (parent: Group, _0: any, context: AuthenticatedContext) => {
+    const groupEntity = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection.manager, parent.slug);
+
+    return resolveGroupPermissionsForEntity(
+        context,
+        groupEntity,
+        context.me
+    );
+};
+
+
+/* export const groupPackages = async (parent: Group, _0: any, context: AuthenticatedContext, info: any) => {
+    const group = await getGroupFromCacheOrDbBySlugOrFail(context,context.connection, parent.slug);
+    
+    const user: UserEntity | undefined = (context as AuthenticatedContext).me;
+
+    const packages = await context.connection.getCustomRepository(PackageRepository).groupPackagesForUser({
+        groupId: group.id,
+        user,
+        relations: getGraphQlRelationName(info)
+    });
+
+    return packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
+};
+
+*/

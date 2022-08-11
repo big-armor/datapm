@@ -1,0 +1,64 @@
+query Group($groupSlug: String!) {
+    group(groupSlug: $groupSlug) {
+        slug
+        name
+        myPermissions
+        packages {
+            permissions
+            package {
+                identifier {
+                    registryURL
+                    catalogSlug
+                    packageSlug
+                }
+                catalog {
+                    identifier {
+                        catalogSlug
+                    }
+                    displayName
+                    myPermissions
+                    isPublic
+                    unclaimed
+                }
+                creator {
+                    username
+                    firstName
+                    lastName
+                    nameIsPublic
+                }
+                isPublic
+                myPermissions
+                displayName
+                description
+            }
+        }
+        collections {
+            permissions
+            collection {
+                identifier {
+                    collectionSlug
+                }
+                name
+                description
+                isPublic
+                isRecommended
+            }
+        }
+        catalogs {
+            permissions
+            packagePermissions
+            catalog {
+                identifier {
+                    registryURL
+                    catalogSlug
+                }
+                displayName
+                description
+                website
+                myPermissions
+                isPublic
+                unclaimed
+            }
+        }
+    }
+}

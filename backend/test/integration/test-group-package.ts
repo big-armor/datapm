@@ -3,7 +3,7 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByPackageDocument, PackageDocument, Permission, RemoveGroupFromPackageDocument, UpdatePackageDocument } from "./registry-client";
+import { AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GetLatestPackagesDocument, GroupsByPackageDocument, PackageDocument, Permission, RemoveGroupFromPackageDocument, UpdatePackageDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -221,6 +221,22 @@ it("Should allow user to create a package", async function () {
 
     });
 
+    it("Package should be in userB's latestPackages", async function() {
+
+        const response = await userBClient.query({
+            query: GetLatestPackagesDocument,
+            variables: {
+                limit: 10,
+                offset: 0
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+
+        expect(response.data.latestPackages.packages![0].identifier.catalogSlug).equal("testA-group-package");
+        expect(response.data.latestPackages.packages![0].identifier.packageSlug).equal("congressional-legislators");
+
+    });
 
     it("Grant group edit access to package", async () => {
         const response = await userAClient.mutate({
