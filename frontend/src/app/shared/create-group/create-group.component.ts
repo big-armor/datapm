@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { CreateGroupGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
+import { I } from "@angular/cdk/keycodes";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
 
@@ -31,6 +32,9 @@ export class CreateGroupComponent implements OnDestroy {
             }),
             groupSlug: new FormControl(data?.input, {
                 validators: [Validators.required]
+            }),
+            description: new FormControl(data?.input, {
+                validators: [Validators.required]
             })
         });
 
@@ -44,7 +48,8 @@ export class CreateGroupComponent implements OnDestroy {
     public nameChanged(value:string):void {
         this.form.setValue({
             name: this.form.value.name,
-            groupSlug: (this.form.value.name as string).toLowerCase().replace(/\s+/g, "-")
+            groupSlug: (this.form.value.name as string).toLowerCase().replace(/\s+/g, "-"),
+            description: this.form.value.description
         })
     }
 
@@ -76,6 +81,10 @@ export class CreateGroupComponent implements OnDestroy {
 
                         if(error.message.includes("GROUP_SLUG_INVALID")) {
                             this.error = "The slug (shortname) must contain only lower case characters, numbers, and dashes (hyphens)";
+                        }
+
+                        if(error.message.startsWith("NOT_UNIQUE")) {
+                            this.error = "The slug is not unique. Choose a different slug";
                         }
                     }
 

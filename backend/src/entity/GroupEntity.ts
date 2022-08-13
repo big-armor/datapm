@@ -14,6 +14,9 @@ export class GroupEntity extends EntityBaseModel {
     @Column({ length: 256, name: "name", type: "varchar", nullable: false })
     name: string;
 
+    @Column({ name: "description", type: "text", nullable: false })
+    description: string;
+
     @Column({ length: 256, name: "slug", type: "varchar", nullable: false })
     slug: string;
 

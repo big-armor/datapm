@@ -3,6 +3,7 @@ query GroupsByCollection($collectionIdentifier: CollectionIdentifierInput!) {
         group {
             name
             slug
+            description
             users {
                 user {
                     username

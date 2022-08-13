@@ -1,0 +1,63 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+#editCatalog {
+    min-width: 600px;
+
+    .catalog-avatar {
+        display: block;
+        margin-left: 30px;
+        width: 100px;
+        height: 55px;
+        transform: translateY(-45px);
+    }
+
+    #contentBorder {
+        border-top: 0px;
+    }
+
+    app-cover {
+        display: block;
+        height: 150px;
+
+        ::ng-deep > div {
+            height: 100%;
+
+            img {
+                min-width: 100%;
+                width: unset;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    #editCatalog {
+        min-width: 400px;
+        .catalog-avatar {
+            margin-left: 15px;
+            margin-bottom: -80px;
+            width: 80px;
+            height: unset;
+            transform: translateY(-88px);
+        }
+        app-cover {
+            ::ng-deep > div {
+                img {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #editCatalog {
+        min-width: 260px;
+        button.save-btn {
+            top: 0px !important;
+        }
+    }
+}

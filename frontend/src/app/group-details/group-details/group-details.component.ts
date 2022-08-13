@@ -50,10 +50,8 @@ export class GroupDetailsComponent implements OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private groupGQL: GroupGQL,
-        private removePackageFromGroupGQL: RemovePackageFromGroupGQL,
         private dialog: MatDialog,
         private getFollowGQL: GetFollowGQL,
-        private groupFollowersCountGQL: GroupFollowersCountGQL,
         private authenticationService: AuthenticationService
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {

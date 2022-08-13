@@ -12,20 +12,31 @@ import { getUserFromCacheOrDbByUsername } from "./UserResolver";
 
 export const createGroup = async (
         _0: any,
-    { groupSlug, name }: { groupSlug: string, name: string},
+    { groupSlug, name, description }: { groupSlug: string, name: string, description: string},
     context: AuthenticatedContext,
     info: any
 ) => {
 
     return await context.connection.transaction(async (manager) => {
+
+        const existingGroup = await manager.getRepository(GroupEntity).findOne({
+            where: {
+                slug: groupSlug
+            }
+        });
+
+        if(existingGroup != null) {
+            throw new Error("NOT_UNIQUE - Group slug already exists");
+        }
+
         const groupEntity =  manager.getRepository(GroupEntity).create({
             name,
             slug: groupSlug,
+            description,
             creatorId: context.me.id,
         });
 
         const returnEntity =  await manager.save(groupEntity);
-
 
         const groupUserEntity =  manager.getRepository(GroupUserEntity).create({
             groupId: returnEntity.id,
@@ -50,7 +61,7 @@ export const createGroup = async (
 
 export const updateGroup = async (
         _0: any,
-    { groupSlug, name }: { groupSlug: string, name: string},
+    { groupSlug, name, description }: { groupSlug: string, name: string, description: string},
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -59,6 +70,7 @@ export const updateGroup = async (
         const groupEntity = await findGroup(manager, groupSlug);
 
         groupEntity.name = name;
+        groupEntity.description = description;
 
         await createActivityLog(manager, {
             userId: context!.me!.id,

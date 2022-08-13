@@ -139,6 +139,14 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
+    public async loadCatalogPackagePermissionsById(
+        id: number,
+        permissionPromise: () => Promise<Permission[]>
+    ): Promise<Permission[]> {
+        const cacheId = this.buildDataKeyForCatalogPackagePermissions(id);
+        return this.loadDataAsync(cacheId, permissionPromise);
+    }
+
     public async loadCatalogPermissionsById(
         id: number,
         permissionPromise: () => Promise<Permission[]>
@@ -271,12 +279,12 @@ export class SessionCache {
         return "CATALOG_PERMISSIONS_ID-" + id;
     }
 
-    private buildDataKeyForPackagePermission(id: number, permission: Permission): string {
-        return "PACKAGE_PERMISSION_ID-" + id + "_" + permission;
+    private buildDataKeyForCatalogPackagePermissions(id: number): string {
+        return "CATALOG_PACKAGE_PERMISSIONS_ID-" + id;
     }
 
-    private buildDataKeyForCatalogPermission(id: number, permission: Permission): string {
-        return "CATALOG_PERMISSION_ID-" + id + "_" + permission;
+    private buildDataKeyForPackagePermission(id: number, permission: Permission): string {
+        return "PACKAGE_PERMISSION_ID-" + id + "_" + permission;
     }
 
     private buildDataKeyForCatalogId(id: number): string {

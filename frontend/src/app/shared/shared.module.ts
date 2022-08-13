@@ -79,6 +79,7 @@ import { FollowersComponent } from "./followers/followers.component";
 import { UpdateMethodPipe } from "../package/pipes/update-method.pipe";
 import { UserGroupsComponent } from "../shared/user-details/user-groups/user-groups.component";
 import { CreateGroupComponent } from "../shared/create-group/create-group.component";
+import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
 
 @NgModule({
     declarations: [
@@ -119,6 +120,7 @@ import { CreateGroupComponent } from "../shared/create-group/create-group.compon
         UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
+        EditGroupComponent,
         UserDetailsComponent,
         SimpleCreateComponent,
         DeletePackageComponent,
@@ -187,6 +189,7 @@ import { CreateGroupComponent } from "../shared/create-group/create-group.compon
         InputComponent,
         InputErrorPipe,
         EditCollectionComponent,
+        EditGroupComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
         CreateCollectionComponent,

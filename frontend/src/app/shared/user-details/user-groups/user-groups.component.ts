@@ -5,6 +5,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { CreateGroupComponent } from "../../create-group/create-group.component";
 import { getHighestPermission } from "src/app/services/permissions.service";
 import { DeleteGroupComponent } from "../../delete-group/delete-group.component";
+import { EditGroupComponent } from "../../edit-group/edit-group.component";
 
 
 
@@ -77,6 +78,21 @@ export class UserGroupsComponent {
 
     public hasManagerPermission(group:Group) {
         return group.myPermissions?.includes(Permission.MANAGE);
+    }
+
+    public editGroup(group:Group) {
+
+        const dlgRef = this.dialog.open(EditGroupComponent, {
+            data: group
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed) {
+                this.refreshGroups();
+            }
+        });
+        
+
     }
 
     public deleteGroup(group:Group) {

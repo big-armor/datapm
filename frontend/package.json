@@ -21,6 +21,7 @@
         "test:ci": "npm run codegen && ng test --watch false  --browsers=ChromeHeadlessNoSandbox",
         "lint": "ng lint",
         "e2e": "ng e2e",
+        "precodegen": "cd ../lib && npm run build && cd ../backend",
         "codegen": "npx @graphql-codegen/cli --config codegen.yml"
     },
     "browser": {

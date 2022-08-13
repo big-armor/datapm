@@ -1888,9 +1888,9 @@ type Mutation {
         credentialIdentifier: String!
     ): Void @hasPackagePermission(permission: EDIT)
 
-    createGroup(groupSlug: String! @validGroupSlug, name: String!): Group! @isAuthenticated
+    createGroup(groupSlug: String! @validGroupSlug, name: String!, description: String!): Group! @isAuthenticated
 
-    updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!): Group!
+    updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!, description: String!): Group!
 
     deleteGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE)): Void
 

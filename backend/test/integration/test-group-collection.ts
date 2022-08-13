@@ -161,7 +161,8 @@ describe("Group Collection Access", () => {
             mutation: CreateGroupDocument,
             variables: {
                 groupSlug: "test-group-collection",
-                name: "Test Group"
+                name: "Test Group",
+                description: "Test group",
             }
         });
 

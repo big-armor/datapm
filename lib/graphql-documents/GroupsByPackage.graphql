@@ -3,6 +3,7 @@ query GroupsByPackage($packageIdentifier: PackageIdentifierInput!) {
         group {
             name
             slug
+            description
             users {
                 user {
                     username

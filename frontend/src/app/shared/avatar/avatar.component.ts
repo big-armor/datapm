@@ -66,7 +66,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
             this.getUserAvatarImage(this.user.username);
         } else if (changes.catalog && changes.catalog.currentValue) {
             this.catalog = changes.catalog.currentValue;
-            this.letter = this.catalog.displayName.substr(0, 1).toUpperCase();
+            this.letter = this.catalog.displayName?.substr(0, 1).toUpperCase();
             this.getCatalogAvatarImage(this.catalog.identifier.catalogSlug);
         } else {
             this.state = State.LOADED;

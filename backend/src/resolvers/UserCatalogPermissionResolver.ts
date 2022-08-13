@@ -221,7 +221,7 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (context: Context
         
     }
     
-    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
+    return context.cache.loadCatalogPackagePermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };
 
 

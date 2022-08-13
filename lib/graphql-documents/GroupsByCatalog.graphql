@@ -2,6 +2,7 @@ query GroupsByCatalog($catalogIdentifier: CatalogIdentifierInput!) {
     groupsByCatalog(catalogIdentifier: $catalogIdentifier) {
         group {
             name
+            description
             slug
             users {
                 user {

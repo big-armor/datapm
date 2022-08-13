@@ -154,7 +154,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         userId: number;
         relations?: string[];
     }) {
-        const ALIAS = "userPackagePermission";
+        const ALIAS = "userCatalogPermissions";
         return this.manager
             .getRepository(UserCatalogPermissionEntity)
             .createQueryBuilder(ALIAS)

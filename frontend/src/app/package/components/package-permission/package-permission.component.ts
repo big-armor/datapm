@@ -179,7 +179,7 @@ export class PackagePermissionComponent implements OnInit {
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
                     pendingInvitationAcceptance: item.user.username.includes("@"),
-                    permission: this.findHighestPermission(item.permissions)
+                    permission: getHighestPermission(item.permissions)
                 }));
             });
     }

@@ -128,7 +128,8 @@ it("Should allow user to create a package", async function () {
             mutation: CreateGroupDocument,
             variables: {
                 groupSlug: "test-group-package",
-                name: "Test Group"
+                name: "Test Group",
+                description: "Test group for testing package access"
             }
         });
 

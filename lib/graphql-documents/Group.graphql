@@ -2,6 +2,7 @@ query Group($groupSlug: String!) {
     group(groupSlug: $groupSlug) {
         slug
         name
+        description
         myPermissions
         packages {
             permissions

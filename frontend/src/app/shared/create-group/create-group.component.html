@@ -13,6 +13,14 @@
                 <input formControlName="groupSlug" class="flat-input" [value]="slugValue" placeholder="Slug" />
             </div>
         </div>
+
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <textarea formControlName="description" class="flat-input"></textarea>
+            </div>
+        </div>
+
         <div class="text-danger pl-3" *ngIf="state === 'ERROR'">
             {{ error }}
         </div>

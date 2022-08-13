@@ -1,6 +1,7 @@
 type Group {
     slug: String!
     name: String
+    description: String
     users: [GroupUser!]
     myPermissions: [Permission!]
     createdAt: Date

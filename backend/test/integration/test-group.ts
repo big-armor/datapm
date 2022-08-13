@@ -33,11 +33,27 @@ describe("Group tests", () => {
             mutation: CreateGroupDocument,
             variables: {
                 groupSlug: "test-group",
-                name: "Test Group"
+                name: "Test Group",
+                description: "Test Group Description"
             }
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
+    });
+
+    it("Should not be able to create create a group with the same slug", async () => {
+        const response = await userAClient.mutate({
+            mutation: CreateGroupDocument,
+            variables: {
+                groupSlug: "test-group",
+                name: "Test Group2",
+                description: "Test Group Description"
+            }
+        });
+
+        expect(response.errors != null, "has errors").to.equal(true);
+        expect(response.errors![0].message.startsWith("NOT_UNIQUE")).equal(true);
+
     });
 
     it("UserA should have all permissions", async () => {
@@ -88,7 +104,8 @@ describe("Group tests", () => {
             mutation: UpdateGroupDocument,
             variables: {
                 groupSlug: "test-group",
-                name: "New Name"
+                name: "New Name",
+                description: "New Description"
             }
         });
 
