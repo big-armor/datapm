@@ -1,0 +1,7 @@
+<div class="container mt-4 pt-2">
+    <div class="text-main-title">Manage Group</div>
+    <button class="app-outlined-button mr-2" (click)="editGroup()">Edit Group Details</button>
+    <button class="app-outlined-button" *ngIf="group.myPermissions.includes(Permission.MANAGE)" (click)="deleteGroup()">
+        Delete This Group
+    </button>
+</div>

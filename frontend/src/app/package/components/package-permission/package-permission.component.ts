@@ -22,7 +22,7 @@ import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { getEffectivePermissions, getHighestPermission } from "../../../services/permissions.service";
 import { MovePackageComponent, MovePackageDialogData } from "src/app/shared/move-package/move-package.component";
-import { AddGroupComponent } from "../add-group/add-group.component";
+import { AddGroupPackagePermissionsComponent } from "../../../group/add-group-package-permissions/add-group-package-permissions.component";
 
 @Component({
     selector: "app-package-permission",
@@ -78,8 +78,7 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public addGroup(): void {
-        
-        const dialogRef = this.dialog.open(AddGroupComponent, {
+        const dialogRef = this.dialog.open(AddGroupPackagePermissionsComponent, {
             width: "550px",
             data: this.package
         });
@@ -89,8 +88,7 @@ export class PackagePermissionComponent implements OnInit {
                 this.getGroupList();
             }
         });
-        
-    } 
+    }
 
     public updatePermission(username: string, permission: Permission): void {
         this.setUserPermission(username, getEffectivePermissions(permission));

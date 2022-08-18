@@ -4,7 +4,13 @@ import { Connection } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { ActivityLogEventType, PackageIdentifierInput, Permission, SetPackagePermissionInput, UserStatus } from "../generated/graphql";
+import {
+    ActivityLogEventType,
+    PackageIdentifierInput,
+    Permission,
+    SetPackagePermissionInput,
+    UserStatus
+} from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -14,7 +20,6 @@ import { isAuthenticatedContext } from "../util/contextHelpers";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
-
 
 export const setPackagePermissions = async (
     _0: any,
@@ -69,7 +74,8 @@ export const setPackagePermissions = async (
                     userId: context.me.id,
                     eventType: ActivityLogEventType.PACKAGE_USER_PERMISSION_REMOVED,
                     targetPackageId: packageEntity.id,
-                    targetUserId: user.id
+                    targetUserId: user.id,
+                    permissions: userPackagePermission.permissions
                 });
 
                 return;

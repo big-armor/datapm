@@ -1,22 +1,14 @@
 <div class="group-details container-fluid px-0 pt-2">
     <div *ngIf="state === 'SUCCESS'">
         <div class="container">
-            <app-cover [groupSlug]="groupSlug"></app-cover>
-
-            <div class="group-header pr-2">
-                <div *ngIf="group.myPermissions.includes('MANAGE')" class="groups-public">
-                    <span *ngIf="group?.isPublic" class="public-text">public</span>
-                    <span *ngIf="!group?.isPublic" class="not-public-text">not public</span>
+            <div class="d-flex bd-highlight">
+                <div class="bd-highlight">
+                    <div class="text-main-title mb-1">Group: {{ group?.name }}</div>
                 </div>
-                <div class="d-flex bd-highlight">
-                    <div class="bd-highlight">
-                        <div class="text-main-title mb-1">Group: {{ group?.name }}</div>
-                    </div>
-                </div>
-                <div class="text-light-gray">{{ groupSlug }}</div>
-                <div class="text-dark-gray">
-                    {{ group?.description }}
-                </div>
+            </div>
+            <div class="text-light-gray">{{ groupSlug }}</div>
+            <div class="text-dark-gray">
+                {{ group?.description }}
             </div>
         </div>
 
@@ -36,9 +28,17 @@
         <hr class="header-border" />
 
         <div class="container">
+            <app-group-permissions
+                (groupEdited)="getGroupDetails($event)"
+                [group]="group"
+                *ngIf="currentTab === 0"
+            ></app-group-permissions>
             <div *ngIf="currentTab === 1">
                 <div class="mt-4" *ngIf="group.packages?.length > 0">
-                    <p class="text-dark-gray ml-3">This group permissions set on these packages. The group may have additional access to other packages through catalog level permissions. Check the catalog tab above.</p>
+                    <p class="text-dark-gray ml-3">
+                        This group permissions set on these packages. The group may have additional access to other
+                        packages through catalog level permissions. Check the catalog tab above.
+                    </p>
                     <div class="mt-2 mb-4 pl-3">
                         <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
                     </div>
@@ -61,12 +61,12 @@
                     <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
                 </div>
             </div>
-            <app-group-followers *ngIf="currentTab === 1" [group]="group"></app-group-followers>
-            <app-group-permissions
-                (groupEdited)="setGroupVariables($event)"
+
+            <app-group-manage
+                (groupEdited)="getGroupDetails($event)"
                 [group]="group"
-                *ngIf="currentTab === 2"
-            ></app-group-permissions>
+                *ngIf="currentTab === 4"
+            ></app-group-manage>
         </div>
     </div>
 

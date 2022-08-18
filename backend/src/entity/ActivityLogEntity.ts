@@ -82,7 +82,7 @@ export class ActivityLogEntity extends EntityBaseModel {
 
     @Column({ name: "target_data_batch_id", nullable: true })
     public targetDataBatchId?: number;
-    
+
     @ManyToOne(() => PackageEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_data_batch_id" })
     public targetDataBatch?: DataBatchEntity | null;
@@ -94,14 +94,17 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "properties_edited", array: true, type: "text" })
     public propertiesEdited?: string[];
 
+    @Column({ name: "permissions", array: true, type: "text" })
+    public permissions?: string[];
+
     @Column({
         name: "additional_properties",
-        type: 'jsonb',
+        type: "jsonb",
         array: false,
         default: () => "'{}'::jsonb",
-        nullable: false,
+        nullable: false
     })
-    public additionalProperties?: {[key: string]: any};
+    public additionalProperties?: { [key: string]: any };
 
     // The following are not persisted to the database
     // but are used during logging to the console.

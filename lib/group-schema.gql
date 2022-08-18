@@ -7,9 +7,9 @@ type Group {
     createdAt: Date
     updatedAt: Date
     creator: User
-    packages: [GroupPackagePermission!]
-    catalogs: [GroupCatalogPermission!]
-    collections: [GroupCollectionPermission!]
+    packagePermissions: [GroupPackagePermission!]
+    catalogPermissions: [GroupCatalogPermission!]
+    collectionPermissions: [GroupCollectionPermission!]
 }
 
 type GroupUser {

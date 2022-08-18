@@ -625,6 +625,7 @@ type ActivityLog {
     targetUser: User
     targetGroup: Group
     targetCatalog: Catalog
+    permissions: [String!]
     eventType: ActivityLogEventType!
     changeType: ActivityLogChangeType
     createdAt: Date!
@@ -999,6 +1000,14 @@ input SetPackagePermissionInput {
 The properties for setting a specific user's permissions on a collection
 """
 input SetUserCollectionPermissionsInput {
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
+    permissions: [Permission!]!
+}
+
+"""
+The properties for setting a specific user's permissions in a group
+"""
+input SetUserGroupPermissionsInput {
     usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
@@ -1896,9 +1905,8 @@ type Mutation {
 
     addOrUpdateUserToGroup(
         groupSlug: String! @hasGroupPermission(permission: MANAGE)
-        username: String!
-        permissions: [Permission!]!
-    ): GroupUser!
+        userPermissions: [SetUserGroupPermissionsInput!]!
+    ): Void
 
     removeUserFromGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE), username: String!): Group!
 

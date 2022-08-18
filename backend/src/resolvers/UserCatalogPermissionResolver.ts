@@ -2,7 +2,14 @@ import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
 import { UserEntity } from "../entity/UserEntity";
-import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
+import {
+    ActivityLogEventType,
+    CatalogIdentifierInput,
+    Permission,
+    SetUserCatalogPermissionInput,
+    UserStatus
+} from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { GroupCatalogPermissionRepository } from "../repository/GroupCatalogPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -12,8 +19,6 @@ import { getCatalogFromCacheOrDbByIdOrFail, getCatalogFromCacheOrDbOrFail } from
 import { deleteCatalogFollowByUserId } from "./FollowResolver";
 import { deletePackageFollowsForUsersWithNoPermissions } from "./PackageResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
-
-
 
 export const setUserCatalogPermission = async (
     _0: any,
@@ -70,6 +75,7 @@ export const setUserCatalogPermission = async (
                         .createInviteUser(userCatalogPermission.usernameOrEmailAddress);
 
                     inviteUsers.push(inviteUser);
+                    user = inviteUser;
                 } else {
                     throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
                 }
@@ -80,6 +86,14 @@ export const setUserCatalogPermission = async (
                     existingUsers.push(user);
                 }
             }
+
+            await createActivityLog(transaction, {
+                userId: context.me!.id,
+                eventType: ActivityLogEventType.CATALOG_USER_PERMISSION_ADDED_UPDATED,
+                targetCatalogId: catalog.id,
+                targetUserId: user.id,
+                permissions: userCatalogPermission.permission
+            });
 
             await transaction.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
                 identifier,
@@ -119,6 +133,13 @@ export const deleteUserCatalogPermissions = async (
             await Promise.all(packageFollowRemovalPromises);
         }
 
+        await createActivityLog(transaction, {
+            userId: context.me!.id,
+            eventType: ActivityLogEventType.CATALOG_USER_PERMISSION_REMOVED,
+            targetCatalogId: catalogEntity.id,
+            targetUserId: user.id
+        });
+
         return transaction.getCustomRepository(UserCatalogPermissionRepository).deleteUserCatalogPermissionsForUser({
             identifier,
             user
@@ -129,30 +150,29 @@ export const deleteUserCatalogPermissions = async (
 /** The catalog specific permissions (not the packages in the catalog) */
 export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
     const catalogPermissionsPromiseFunction = async () => {
-
         const userPermissions = await context.connection
             .getCustomRepository(UserCatalogPermissionRepository)
             .findCatalogPermissions({ catalogId, userId });
 
-        const userGroupPermissions = await context.connection.getCustomRepository(GroupCatalogPermissionRepository).getCatalogPermissionsByUser({
-            catalogId,
-            userId
-        });
+        const userGroupPermissions = await context.connection
+            .getCustomRepository(GroupCatalogPermissionRepository)
+            .getCatalogPermissionsByUser({
+                catalogId,
+                userId
+            });
 
         const permissions: Permission[] = [];
 
-        if(userPermissions) {
+        if (userPermissions) {
             userPermissions.permissions.forEach((permission) => {
-                if(!permissions.includes(permission))
-                    permissions.push(permission);
+                if (!permissions.includes(permission)) permissions.push(permission);
             });
         }
 
-        if(userGroupPermissions) {
+        if (userGroupPermissions) {
             userGroupPermissions.forEach((groupPermission) => {
                 groupPermission.permissions.forEach((permission) => {
-                    if(!permissions.includes(permission))
-                        permissions.push(permission);
+                    if (!permissions.includes(permission)) permissions.push(permission);
                 });
             });
         }
@@ -161,48 +181,48 @@ export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catal
 
         const user = await getUserFromCacheOrDbById(context, context.connection, userId);
 
-        if(catalog.slug === user.username) {
+        if (catalog.slug === user.username) {
             permissions.push(Permission.VIEW);
             permissions.push(Permission.EDIT);
             permissions.push(Permission.MANAGE);
         }
 
         return permissions;
-        
-    }
-    
+    };
+
     return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };
 
-
-
 /** The permissions for all packages in the catalog (not the catalog itself) */
-export const getCatalogPackagePermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
+export const getCatalogPackagePermissionsFromCacheOrDb = async (
+    context: Context,
+    catalogId: number,
+    userId: number
+) => {
     const catalogPermissionsPromiseFunction = async () => {
-
         const userPermissions = await context.connection
             .getCustomRepository(UserCatalogPermissionRepository)
             .findCatalogPermissions({ catalogId, userId });
 
-        const userGroupPermissions = await context.connection.getCustomRepository(GroupCatalogPermissionRepository).getCatalogPermissionsByUser({
-            catalogId,
-            userId
-        });
+        const userGroupPermissions = await context.connection
+            .getCustomRepository(GroupCatalogPermissionRepository)
+            .getCatalogPermissionsByUser({
+                catalogId,
+                userId
+            });
 
         const permissions: Permission[] = [];
 
-        if(userPermissions) {
+        if (userPermissions) {
             userPermissions.packagePermission.forEach((permission) => {
-                if(!permissions.includes(permission))
-                    permissions.push(permission);
+                if (!permissions.includes(permission)) permissions.push(permission);
             });
         }
 
-        if(userGroupPermissions) {
+        if (userGroupPermissions) {
             userGroupPermissions.forEach((groupPermission) => {
                 groupPermission.packagePermissions.forEach((permission) => {
-                    if(!permissions.includes(permission))
-                        permissions.push(permission);
+                    if (!permissions.includes(permission)) permissions.push(permission);
                 });
             });
         }
@@ -211,17 +231,14 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (context: Context
 
         const user = await getUserFromCacheOrDbById(context, context.connection, userId);
 
-        if(catalog.slug === user.username) {
+        if (catalog.slug === user.username) {
             permissions.push(Permission.VIEW);
             permissions.push(Permission.EDIT);
             permissions.push(Permission.MANAGE);
         }
 
         return permissions;
-        
-    }
-    
+    };
+
     return context.cache.loadCatalogPackagePermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };
-
-

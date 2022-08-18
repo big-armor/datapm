@@ -3,7 +3,28 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToCollectionDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AddPackageToCollectionDocument, CollectionDocument, CreateCollectionDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCollectionDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromCollectionDocument, RemoveGroupFromPackageDocument, SearchCollectionsDocument, UpdateCatalogDocument, UpdateCollectionDocument, UpdatePackageDocument } from "./registry-client";
+import {
+    AddOrUpdateGroupToCatalogDocument,
+    AddOrUpdateGroupToCollectionDocument,
+    AddOrUpdateGroupToPackageDocument,
+    AddOrUpdateUserToGroupDocument,
+    AddPackageToCollectionDocument,
+    CollectionDocument,
+    CreateCollectionDocument,
+    CreateGroupDocument,
+    CreatePackageDocument,
+    CreateVersionDocument,
+    GroupsByCollectionDocument,
+    PackageDocument,
+    Permission,
+    RemoveGroupFromCatalogDocument,
+    RemoveGroupFromCollectionDocument,
+    RemoveGroupFromPackageDocument,
+    SearchCollectionsDocument,
+    UpdateCatalogDocument,
+    UpdateCollectionDocument,
+    UpdatePackageDocument
+} from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Collection Access", () => {
@@ -87,7 +108,7 @@ describe("Group Collection Access", () => {
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 
-    it("Should create a collection", async function() {
+    it("Should create a collection", async function () {
         const response = await userAClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
@@ -96,7 +117,6 @@ describe("Group Collection Access", () => {
                     name: "Test Collection",
                     description: "Test collection",
                     isPublic: false
-                    
                 }
             }
         });
@@ -104,12 +124,12 @@ describe("Group Collection Access", () => {
         expect(response.errors == null, "no errors").to.equal(true);
     });
 
-    it("Should add package to collection", async function() {
+    it("Should add package to collection", async function () {
         const response = await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
-                    collectionSlug: "testA-group-collection",
+                    collectionSlug: "testA-group-collection"
                 },
                 packageIdentifier: {
                     catalogSlug: "testA-group-collection",
@@ -126,7 +146,7 @@ describe("Group Collection Access", () => {
             query: CollectionDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testA-group-collection",
+                    collectionSlug: "testA-group-collection"
                 }
             }
         });
@@ -162,7 +182,7 @@ describe("Group Collection Access", () => {
             variables: {
                 groupSlug: "test-group-collection",
                 name: "Test Group",
-                description: "Test group",
+                description: "Test group"
             }
         });
 
@@ -174,15 +194,16 @@ describe("Group Collection Access", () => {
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
                 groupSlug: "test-group-collection",
-                username: "testB-group-collection",
-                permissions: [Permission.VIEW]
+                userPermissions: {
+                    usernameOrEmailAddress: "testB-group-collection",
+                    permissions: [Permission.VIEW]
+                }
             }
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
     });
 
-    
     it("Grant group view access to catalog and packages", async () => {
         const response = await userAClient.mutate({
             mutation: AddOrUpdateGroupToCatalogDocument,
@@ -194,11 +215,9 @@ describe("Group Collection Access", () => {
                 packagePermissions: [Permission.VIEW],
                 permissions: [Permission.VIEW]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
     it("UserB should be able to view package", async () => {
@@ -217,9 +236,8 @@ describe("Group Collection Access", () => {
     });
 
     it("UserB should not be able to view collection", async () => {
-
-        const response =  await userBClient.mutate({
-            mutation: CollectionDocument, 
+        const response = await userBClient.mutate({
+            mutation: CollectionDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testA-group-collection"
@@ -229,9 +247,7 @@ describe("Group Collection Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
-
     });
-
 
     it("Grant group edit access to view collection", async () => {
         const response = await userAClient.mutate({
@@ -243,14 +259,12 @@ describe("Group Collection Access", () => {
                 },
                 permissions: [Permission.VIEW]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
-    it("Should return group list for collection", async() => {
+    it("Should return group list for collection", async () => {
         const response = await userAClient.query({
             query: GroupsByCollectionDocument,
             variables: {
@@ -260,18 +274,17 @@ describe("Group Collection Access", () => {
             }
         });
 
-         expect(response.errors == null).equal(true);
+        expect(response.errors == null).equal(true);
         expect(response.data.groupsByCollection.length).to.equal(1);
         expect(response.data.groupsByCollection[0].group?.slug).equal("test-group-collection");
 
         expect(response.data.groupsByCollection[0].permissions?.length).equal(1);
-        expect(response.data.groupsByCollection[0].permissions![0]).equal(Permission.VIEW);        
+        expect(response.data.groupsByCollection[0].permissions![0]).equal(Permission.VIEW);
     });
 
     it("UserB should not be able to view collection", async () => {
-
-        const response =  await userBClient.mutate({
-            mutation: CollectionDocument, 
+        const response = await userBClient.mutate({
+            mutation: CollectionDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testA-group-collection"
@@ -282,11 +295,9 @@ describe("Group Collection Access", () => {
         expect(response.errors == null, "no errors").to.equal(true);
 
         expect(response.data!.collection.name).to.equal("Test Collection");
-
     });
 
-    it("UserB should no be able to edit collection", async() => {
-
+    it("UserB should no be able to edit collection", async () => {
         const response = await userBClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
@@ -298,9 +309,8 @@ describe("Group Collection Access", () => {
                 }
             }
         });
-        
+
         expect(response.errors != null, "should have errors").to.equal(true);
-    
     });
 
     it("Grant group edit access to collection", async () => {
@@ -313,11 +323,9 @@ describe("Group Collection Access", () => {
                 },
                 permissions: [Permission.VIEW, Permission.EDIT]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
     it("Should allow UserB to edit collection", async () => {
@@ -335,7 +343,6 @@ describe("Group Collection Access", () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data?.updateCollection.name).to.equal("Test Collection2");
-                
     });
 
     it("Should include collection in search for userB", async () => {
@@ -354,7 +361,6 @@ describe("Group Collection Access", () => {
     });
 
     it("UserB should not be able to remove a group", async () => {
-
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromCollectionDocument,
             variables: {
@@ -367,11 +373,9 @@ describe("Group Collection Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
-    
     });
 
     it("UserA should be able to remove a group", async () => {
-
         const response = await userAClient.mutate({
             mutation: RemoveGroupFromCollectionDocument,
             variables: {
@@ -383,7 +387,6 @@ describe("Group Collection Access", () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-    
     });
 
     it("Collection should not be available to user B", async function () {
@@ -402,6 +405,4 @@ describe("Group Collection Access", () => {
             "should have not authorization error"
         ).equal(true);
     });
-
-    
 });

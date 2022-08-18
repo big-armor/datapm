@@ -126,8 +126,7 @@ export const setUserCollectionPermissions = async (
                 } else {
                     existingUsers.push(user);
                 }
-
-           }
+            }
 
             await transaction.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
                 identifier,
@@ -138,11 +137,10 @@ export const setUserCollectionPermissions = async (
                 userId: context.me.id,
                 eventType: ActivityLogEventType.COLLECTION_USER_PERMISSION_ADDED_UPDATED,
                 targetCollectionId: collectionEntity.id,
-                targetUserId: user.id
+                targetUserId: user.id,
+                permissions: userCollectionPermission.permissions
             });
-
         });
-
     });
 
     await asyncForEach(inviteUsers, async (user) => {
@@ -190,57 +188,44 @@ export const deleteUserCollectionPermissions = async (
     });
 };
 
-export const getCollectionPermissionsFromCacheOrDb = async (
-    context: Context,
-    collection: CollectionEntity,
-) => {
-
-
+export const getCollectionPermissionsFromCacheOrDb = async (context: Context, collection: CollectionEntity) => {
     if (!isAuthenticatedContext(context)) {
-
-        if(collection.isPublic)
-            return [Permission.VIEW];
-        else 
-            return [];
+        if (collection.isPublic) return [Permission.VIEW];
+        else return [];
     }
 
     const userId = (context as AuthenticatedContext).me.id;
 
     const collectionPromiseFunction = async () => {
-
         const userPermissions = await context.connection
             .getCustomRepository(UserCollectionPermissionRepository)
             .findCollectionPermissions({ collectionId: collection.id, userId });
 
-        const userGroupPermissions = await context.connection.getCustomRepository(GroupCollectionPermissionRepository).getCollectionPermissionsByUser({
-            collectionId: collection.id,
-            userId
-        });
+        const userGroupPermissions = await context.connection
+            .getCustomRepository(GroupCollectionPermissionRepository)
+            .getCollectionPermissionsByUser({
+                collectionId: collection.id,
+                userId
+            });
 
         const permissions: Permission[] = [];
 
-        if(userPermissions) {
+        if (userPermissions) {
             userPermissions.permissions.forEach((permission) => {
-                if(!permissions.includes(permission))
-                    permissions.push(permission);
+                if (!permissions.includes(permission)) permissions.push(permission);
             });
         }
 
-        if(userGroupPermissions) {
+        if (userGroupPermissions) {
             userGroupPermissions.forEach((groupPermission) => {
                 groupPermission.permissions.forEach((permission) => {
-                    if(!permissions.includes(permission))
-                        permissions.push(permission);
+                    if (!permissions.includes(permission)) permissions.push(permission);
                 });
             });
         }
 
         return permissions;
-        
-    }
+    };
 
-    return await context.cache.loadCollectionPermissionsById(
-        collection.id,
-        collectionPromiseFunction
-    );
+    return await context.cache.loadCollectionPermissionsById(collection.id, collectionPromiseFunction);
 };

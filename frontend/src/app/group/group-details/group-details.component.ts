@@ -1,28 +1,13 @@
-import { Component, Input, OnDestroy } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { Component, OnDestroy } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import {
-    FollowDialogComponent,
-    FollowDialogResult
-} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
-import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditGroupComponent } from "src/app/shared/edit-group/edit-group.component";
-import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
-import {
-    Group,
-    GroupGQL,
-    Follow,
-    FollowIdentifierInput,
-    GetFollowGQL,
-    Package,
-    Permission,
-    User
-} from "src/generated/graphql";
-import { AddPackageComponent } from "../add-package/add-package.component";
+import { Group, GroupGQL, Follow, Package, Permission, User, RemoveGroupFromPackageGQL } from "src/generated/graphql";
+import { AddGroupPackagePermissionsComponent } from "../add-group-package-permissions/add-group-package-permissions.component";
 
 type GroupDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
 
@@ -40,7 +25,7 @@ export class GroupDetailsComponent implements OnDestroy {
 
     public currentUser: User;
 
-    private tabs = ["", "followers"];
+    private tabs = ["", "packages", "catalogs", "collections"];
 
     public groupFollow: Follow;
     public followersCount: number;
@@ -51,7 +36,7 @@ export class GroupDetailsComponent implements OnDestroy {
         private router: Router,
         private groupGQL: GroupGQL,
         private dialog: MatDialog,
-        private getFollowGQL: GetFollowGQL,
+        private removeGroupPackage: RemoveGroupFromPackageGQL,
         private authenticationService: AuthenticationService
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
@@ -67,22 +52,6 @@ export class GroupDetailsComponent implements OnDestroy {
     public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
-    }
-
-    public createFollow() {
-        const dlgRef = this.dialog.open(FollowDialogComponent, {
-            width: "500px"
-        });
-    }
-
-    public sharePackage() {
-        const dialogRef = this.dialog.open(ShareDialogComponent, {
-            data: {
-                displayName: this.group.name,
-                url: "groups/" + this.group.identifier.groupSlug
-            },
-            width: "450px"
-        });
     }
 
     public updateTabParam() {
@@ -107,9 +76,7 @@ export class GroupDetailsComponent implements OnDestroy {
         this.state = "LOADING";
         this.groupGQL
             .fetch({
-                identifier: {
-                    groupSlug: this.groupSlug
-                }
+                groupSlug: this.groupSlug
             })
             .subscribe(
                 ({ errors, data }) => {
@@ -120,7 +87,6 @@ export class GroupDetailsComponent implements OnDestroy {
                         return;
                     }
                     this.group = data.group as Group;
-                    this.loadFollowersCount();
                     if (this.group.myPermissions.includes(Permission.MANAGE)) {
                         this.tabs.push("manage");
                     }
@@ -136,7 +102,6 @@ export class GroupDetailsComponent implements OnDestroy {
                         }
                     });
                     this.state = "SUCCESS";
-                    this.getFollow();
                 },
                 () => {
                     this.state = "ERROR";
@@ -149,7 +114,7 @@ export class GroupDetailsComponent implements OnDestroy {
     }
 
     public addPackage() {
-        const dialogRef = this.dialog.open(AddPackageComponent, {
+        const dialogRef = this.dialog.open(AddGroupPackagePermissionsComponent, {
             data: {
                 group: this.group
             },
@@ -164,11 +129,9 @@ export class GroupDetailsComponent implements OnDestroy {
     }
 
     public removePackage(p: Package) {
-        this.removePackageFromGroupGQL
+        this.removeGroupPackage
             .mutate({
-                groupIdentifier: {
-                    groupSlug: this.groupSlug
-                },
+                groupSlug: this.groupSlug,
                 packageIdentifier: {
                     catalogSlug: p.identifier.catalogSlug,
                     packageSlug: p.identifier.packageSlug
@@ -200,98 +163,5 @@ export class GroupDetailsComponent implements OnDestroy {
 
     public get canEdit() {
         return this.group && this.group.myPermissions?.includes(Permission.EDIT);
-    }
-
-    public follow(): void {
-        const followDialogRef = this.openFollowModal();
-        if (followDialogRef) {
-            followDialogRef.afterClosed().subscribe((result) => {
-                if (!result) {
-                    return;
-                }
-
-                this.updatePackageFollow(result.follow);
-            });
-        }
-    }
-
-    private loadFollowersCount(): void {
-        const variables = {
-            identifier: {
-                groupSlug: this.group.identifier.groupSlug
-            }
-        };
-
-        this.groupFollowersCountGQL.fetch(variables).subscribe((countResponse) => {
-            if (countResponse.error) {
-                return;
-            }
-
-            const responseData = countResponse.data;
-            this.followersCount = responseData.groupFollowersCount;
-        });
-    }
-
-    private getFollow(): void {
-        if (!this.currentUser) {
-            return;
-        }
-
-        this.getFollowGQL
-            .fetch({
-                follow: this.buildFollowIdentifier()
-            })
-            .subscribe((response) => {
-                this.updatePackageFollow(response.data?.getFollow);
-                const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
-
-                if (shouldOpenFollowModal) {
-                    if (!this.isFollowing) {
-                        this.follow();
-                    }
-                    this.router.navigate([], { preserveFragment: true });
-                }
-            });
-    }
-
-    private buildFollowIdentifier(): FollowIdentifierInput {
-        return {
-            group: {
-                groupSlug: this.groupSlug
-            }
-        };
-    }
-
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
-        if (!this.currentUser) {
-            this.openLoginDialog();
-        } else {
-            return this.openFollowDialog();
-        }
-    }
-
-    private updatePackageFollow(follow: Follow): void {
-        this.groupFollow = follow;
-        this.isFollowing = follow != null;
-    }
-
-    private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
-        return this.dialog.open(FollowDialogComponent, {
-            width: "500px",
-            data: {
-                follow: this.groupFollow,
-                followIdentifier: this.buildFollowIdentifier()
-            }
-        });
-    }
-
-    private openLoginDialog(): void {
-        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
-        this.dialog
-            .open(LoginDialogComponent, {
-                disableClose: true
-            })
-            .afterClosed()
-            .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }
 }

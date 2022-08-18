@@ -6,16 +6,11 @@ import { getEffectivePermissions } from "src/app/services/permissions.service";
 import { ChipData } from "src/app/shared/user-invite-input/chip-data";
 import { ChipState } from "src/app/shared/user-invite-input/chip-state";
 import { UserInviteInputComponent } from "src/app/shared/user-invite-input/user-invite-input.component";
-import {
-    Collection,
-    Permission,
-    SetUserCollectionPermissionsGQL,
-    SetUserCollectionPermissionsInput
-} from "src/generated/graphql";
+import { AddOrUpdateUserToGroupGQL, Group, Permission } from "src/generated/graphql";
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
-    CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS = "CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"
+    CANNOT_SET_GROUP_CREATOR_PERMISSIONS = "CANNOT_SET_GROUP_CREATOR_PERMISSIONS"
 }
 @Component({
     selector: "app-add-user",
@@ -43,9 +38,9 @@ export class AddUserComponent implements OnInit {
     private effectivePermissions: Permission[];
 
     constructor(
-        private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
+        private addOrUpdateUserToGroup: AddOrUpdateUserToGroupGQL,
         private dialogRef: MatDialogRef<AddUserComponent>,
-        @Inject(MAT_DIALOG_DATA) public collection: Collection
+        @Inject(MAT_DIALOG_DATA) public group: Group
     ) {
         this.updateSelectedPermission(Permission.VIEW);
     }
@@ -82,13 +77,11 @@ export class AddUserComponent implements OnInit {
 
     private submitForm(): void {
         this.state = "LOADING";
-        this.setUserCollectionPermissionsGQL
+        this.addOrUpdateUserToGroup
             .mutate({
-                identifier: {
-                    collectionSlug: this.collection.identifier.collectionSlug
-                },
-                value: this.buildPermissionsArray(),
-                message: this.messageControl.value
+                groupSlug: this.group.slug,
+                permissions: this.effectivePermissions,
+                username: this.usernameControl.value
             })
             .subscribe(
                 ({ errors, data }) => {
@@ -98,8 +91,8 @@ export class AddUserComponent implements OnInit {
                         const firstErrorMessage = errors[0].message;
                         if (firstErrorMessage.includes("USER_NOT_FOUND")) {
                             this.error = ErrorType.USER_NOT_FOUND;
-                        } else if (firstErrorMessage.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS")) {
-                            this.error = ErrorType.CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS;
+                        } else if (firstErrorMessage.includes("CANNOT_SET_GROUP_CREATOR_PERMISSIONS")) {
+                            this.error = ErrorType.CANNOT_SET_GROUP_CREATOR_PERMISSIONS;
                         } else {
                             this.error = firstErrorMessage;
                         }
@@ -119,14 +112,5 @@ export class AddUserComponent implements OnInit {
 
     private hasErrorsInAddedUsers(): boolean {
         return this.usersChips.some((c) => ChipState.ERROR === c.state);
-    }
-
-    private buildPermissionsArray(): SetUserCollectionPermissionsInput[] {
-        return this.usersChips.map((c) => {
-            return {
-                usernameOrEmailAddress: c.usernameOrEmailAddress,
-                permissions: this.effectivePermissions
-            };
-        });
     }
 }

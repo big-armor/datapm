@@ -49,7 +49,7 @@ import { EditPropertyDialogComponent } from "./components/package-schema/edit-pr
 import { EditPackageMarkdownComponent } from "./components/edit-package-markdown/edit-package-markdown.component";
 import { EditWebsiteDialogComponent } from "./components/package-info/edit-website-dialog/edit-website-dialog.component";
 import { PackageFollowersComponent } from "./components/package-followers/package-followers.component";
-import { AddGroupComponent } from './components/add-group/add-group.component';
+import { AddGroupPackagePermissionsComponent } from "../group/add-group-package-permissions/add-group-package-permissions.component";
 
 @NgModule({
     declarations: [
@@ -78,7 +78,7 @@ import { AddGroupComponent } from './components/add-group/add-group.component';
         EditPackageMarkdownComponent,
         EditWebsiteDialogComponent,
         PackageFollowersComponent,
-        AddGroupComponent
+        AddGroupPackagePermissionsComponent
     ],
     imports: [
         CommonModule,

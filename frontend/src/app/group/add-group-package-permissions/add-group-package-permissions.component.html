@@ -1,13 +1,16 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addGroup">
-    <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
+    <div mat-dialog-title id="contentTitle">Add Package Permissions For Group</div>
     <div mat-dialog-content id="contentBorder">
         <div class="bd-highlight shadow-div">
             <label class="div-question pl-1 mb-0">Group</label>
             <mat-select [formControl]="groupControl" [value]="selectedGroupSlug">
-                    <mat-option *ngFor="let groupOption of groups" [value]="groupOption.slug">
-                        {{ groupOption.name }}
-                    </mat-option>
+                <mat-option *ngFor="let groupOption of groups" [value]="groupOption.slug">
+                    {{ groupOption.name }}
+                </mat-option>
             </mat-select>
+            <label class="div-question pl-1 mb-0">Package</label>
+            <app-package-autocomplete [form]="form"></app-package-autocomplete>
+
             <div class="permission-div modal-select mt-3 w-50">
                 <label class="div-question pl-1 mb-0">Package permissions</label>
                 <mat-form-field appearance="fill" class="w-100">
@@ -27,9 +30,7 @@
                         <ng-container *ngSwitchCase="'GROUP_NOT_FOUND'">
                             There is no group with that name on this registry.
                         </ng-container>
-                        <ng-container *ngSwitchDefault>
-                            Error occured while adding a group permission
-                        </ng-container>
+                        <ng-container *ngSwitchDefault> Error occured while adding a group permission </ng-container>
                     </ng-container>
                 </div>
             </div>

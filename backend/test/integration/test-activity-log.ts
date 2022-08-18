@@ -37,8 +37,6 @@ import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
 import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
 
-
-
 describe("Activity Log Tests", async () => {
     let userOne: any;
     let userTwo: any;
@@ -96,13 +94,13 @@ describe("Activity Log Tests", async () => {
         expect(line).to.be.not.undefined;
     });
 
-    it("Should show GROUP_CREATED", async function() {
-
+    it("Should show GROUP_CREATED", async function () {
         const response = await userOneClient.query({
             query: CreateGroupDocument,
             variables: {
                 name: "Test Activity Log",
                 groupSlug: "test-activity-log",
+                description: "Test Activity Log Description"
             }
         });
 
@@ -121,9 +119,7 @@ describe("Activity Log Tests", async () => {
         expect(logResponse.data.myActivity.logs.length).to.equal(1);
         expect(logResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
         expect(logResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal("test-activity-log");
-        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.name).to.equal(
-            "Test Activity Log"
-        );
+        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.name).to.equal("Test Activity Log");
 
         expect(
             serverLogLines.find((l: any) =>
@@ -136,27 +132,33 @@ describe("Activity Log Tests", async () => {
                 })
             )
         ).to.be.not.undefined;
-
-
     });
 
-    it("Should show GROUP_MEMBER_PERMISSION_ADDED_UPDATED", async function() {
+    it("Should show GROUP_MEMBER_PERMISSION_ADDED_UPDATED", async function () {
         const response = await userOneClient.query({
             query: AddOrUpdateUserToGroupDocument,
             variables: {
                 groupSlug: "test-activity-log",
-                permissions: [Permission.MANAGE],
-                username: userTwo.username
+                userPermissions: [
+                    {
+                        permissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
+                        usernameOrEmailAddress: userTwo.username
+                    }
+                ]
             }
         });
 
         expect(response.data).to.exist;
-        expect(response.data.addOrUpdateUserToGroup).to.exist;
-        expect(response.data.addOrUpdateUserToGroup.group?.slug).to.equal("test-activity-log");
 
         const logResponse = await userOneClient.query({
             query: MyActivityDocument,
-            variables: { filter: { eventType: [ActivityLogEventType.GROUP_MEMBER_PERMISSION_ADDED_UPDATED], limit: 100, offset: 0 } }
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.GROUP_MEMBER_PERMISSION_ADDED_UPDATED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
         });
 
         expect(logResponse.data).to.exist;
@@ -164,10 +166,13 @@ describe("Activity Log Tests", async () => {
         expect(logResponse.data.myActivity.logs.length).to.equal(1);
         expect(logResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
         expect(logResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal("test-activity-log");
-        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.name).to.equal(
-            "Test Activity Log"
-        );
+        expect(logResponse.data.myActivity.logs[0]?.targetGroup!.name).to.equal("Test Activity Log");
         expect(logResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(userTwo.username);
+        expect(logResponse.data.myActivity.logs[0]?.permissions).to.deep.equal([
+            Permission.VIEW,
+            Permission.EDIT,
+            Permission.MANAGE
+        ]);
 
         expect(
             serverLogLines.find((l: any) =>
@@ -180,7 +185,7 @@ describe("Activity Log Tests", async () => {
                 })
             )
         ).to.be.not.undefined;
-    })
+    });
 
     it("Should show PACKAGE_CREATED", async function () {
         const createPackageResponse = await userOneClient.mutate({
@@ -587,10 +592,10 @@ describe("Activity Log Tests", async () => {
 
         expect(line).to.be.not.undefined;
     });
-    
-    it("Should show PACKAGE_USER_PERMISSION_ADDED_UPDATED", async function() {
+
+    it("Should show PACKAGE_USER_PERMISSION_ADDED_UPDATED", async function () {
         const response = await userOneClient.mutate({
-            mutation: SetPackagePermissionsDocument, 
+            mutation: SetPackagePermissionsDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testOne-packages",
@@ -630,14 +635,10 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
-        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
-            "testTwo-packages"
-        );
-
-
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal("testTwo-packages");
     });
 
-    it("Should show PACKAGE_GROUP_PERMISSION_ADDED_UPDATED", async function() {
+    it("Should show PACKAGE_GROUP_PERMISSION_ADDED_UPDATED", async function () {
         const response = await userOneClient.mutate({
             mutation: AddOrUpdateGroupToPackageDocument,
             variables: {
@@ -653,7 +654,7 @@ describe("Activity Log Tests", async () => {
         expect(response.errors == null, "no errors").true;
         expect(response.data?.addOrUpdateGroupToPackage.group?.slug).to.equal("test-activity-log");
 
-         const activityLogResponse = await userOneClient.query({
+        const activityLogResponse = await userOneClient.query({
             query: MyActivityDocument,
             variables: {
                 filter: {
@@ -678,12 +679,10 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
-        expect(activityLogResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal(
-            "test-activity-log"
-        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal("test-activity-log");
     });
 
-    it("Should show PACKAGE_GROUP_PERMISSION_REMOVED", async function() {
+    it("Should show PACKAGE_GROUP_PERMISSION_REMOVED", async function () {
         const response = await userOneClient.mutate({
             mutation: RemoveGroupFromPackageDocument,
             variables: {
@@ -721,14 +720,10 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
-        expect(activityLogResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal(
-            "test-activity-log"
-        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetGroup!.slug).to.equal("test-activity-log");
+    });
 
-    })
-
-    it("Should show COLLECTION_USER_PERMISSION_ADDED_UPDATED", async function() {
-
+    it("Should show COLLECTION_USER_PERMISSION_ADDED_UPDATED", async function () {
         const response = await userTwoClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
@@ -766,11 +761,8 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetCollection!.identifier.collectionSlug).to.equal(
             "activityLog"
         );
-        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
-            "testOne-packages"
-        );
-
-    })
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal("testOne-packages");
+    });
 
     it("Should show COLLECTION_ADD_PACKAGE", async function () {
         let response = await userTwoClient.mutate({
@@ -854,7 +846,9 @@ describe("Activity Log Tests", async () => {
         expect(
             userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.identifier.collectionSlug
         ).to.equal("activityLog");
-        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.name).to.equal("Activity Log Test Collection");
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.name).to.equal(
+            "Activity Log Test Collection"
+        );
         expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
             "testOne-packages"
         );
@@ -1131,8 +1125,7 @@ describe("Activity Log Tests", async () => {
         expect(line).to.be.not.undefined;
     });
 
-    it("Should show PACKAGE_USER_PERMISSION_REMOVED", async function() {
-
+    it("Should show PACKAGE_USER_PERMISSION_REMOVED", async function () {
         let response = await userOneClient.mutate({
             mutation: RemovePackagePermissionsDocument,
             variables: {
@@ -1170,10 +1163,7 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
-        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal(
-            "testTwo-packages"
-        );
-
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetUser!.username).to.equal("testTwo-packages");
     });
 
     it("Should show COLLECTION_DELETE", async function () {
@@ -1298,7 +1288,7 @@ describe("Activity Log Tests", async () => {
         ).to.be.not.undefined;
     });
 
-    it("Should show GROUP_MEMBER_DELETED", async function() {
+    it("Should show GROUP_MEMBER_DELETED", async function () {
         const response = await userOneClient.mutate({
             mutation: RemoveUserFromGroupDocument,
             variables: {
@@ -1321,14 +1311,13 @@ describe("Activity Log Tests", async () => {
                 })
             )
         ).to.be.not.undefined;
-
-    })
+    });
 
     it("Should show GROUP_DELETED", async function () {
         const deleteGroupResponse = await userOneClient.mutate({
             mutation: DeleteGroupDocument,
             variables: {
-                    groupSlug: "test-activity-log"
+                groupSlug: "test-activity-log"
             }
         });
 

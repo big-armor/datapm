@@ -1,8 +1,15 @@
 import { Component, Inject, OnInit, ViewChild } from "@angular/core";
-import { FormGroup, FormControl } from "@angular/forms";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { PageState } from "src/app/models/page-state";
-import { AddOrUpdateGroupToPackageGQL, Group, MyGroupsGQL, Package, Permission } from "src/generated/graphql";
+import {
+    AddOrUpdateGroupToPackageGQL,
+    Group,
+    MyGroupsGQL,
+    Package,
+    PackageIdentifierInput,
+    Permission
+} from "src/generated/graphql";
 import { getEffectivePermissions } from "src/app/services/permissions.service";
 
 enum ErrorType {
@@ -10,13 +17,17 @@ enum ErrorType {
     CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS = "CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"
 }
 
-@Component({
-  selector: 'app-add-group',
-  templateUrl: './add-group.component.html',
-  styleUrls: ['./add-group.component.scss']
-})
-export class AddGroupComponent implements OnInit {
+type Data = {
+    group?: Group;
+    package?: Package;
+};
 
+@Component({
+    selector: "app-add-group",
+    templateUrl: "./add-group-package-permissions.component.html",
+    styleUrls: ["./add-group-package-permissions.component.scss"]
+})
+export class AddGroupPackagePermissionsComponent implements OnInit {
     public form: FormGroup;
     public state: PageState = "INIT";
     public error: ErrorType | string = null;
@@ -25,8 +36,8 @@ export class AddGroupComponent implements OnInit {
 
     public permission: Permission;
 
-    public selectedGroupSlug:string;
-    public groups:Group[] = [];
+    public selectedGroupSlug: string;
+    public groups: Group[] = [];
 
     public loading: boolean;
 
@@ -34,18 +45,24 @@ export class AddGroupComponent implements OnInit {
 
     private effectivePermissions: Permission[];
 
+    public packageNameControl: FormControl = new FormControl("", [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\/[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/)
+    ]);
+
     constructor(
-        @Inject(MAT_DIALOG_DATA) public userPackage: Package,
+        @Inject(MAT_DIALOG_DATA) public data: Data,
         private addOrUpdateGroupToPackage: AddOrUpdateGroupToPackageGQL,
-        private myGroups:MyGroupsGQL,
-        private dialogRef: MatDialogRef<AddGroupComponent>
+        private myGroups: MyGroupsGQL,
+        private dialogRef: MatDialogRef<AddGroupPackagePermissionsComponent>
     ) {
         this.updateSelectedPermission(Permission.VIEW);
     }
 
     public ngOnInit(): void {
         this.form = new FormGroup({
-            group: this.groupControl
+            group: this.groupControl,
+            packageSlug: this.packageNameControl
         });
 
         this.updateGroups();
@@ -69,16 +86,13 @@ export class AddGroupComponent implements OnInit {
     }
 
     private updateGroups(): void {
-
-      this.myGroups.fetch()
-        .subscribe(
-            ({ errors,data }) => {
+        this.myGroups.fetch().subscribe(
+            ({ errors, data }) => {
                 if (errors) {
                     this.state = "ERROR";
 
                     const firstErrorMessage = errors[0].message;
                     this.error = firstErrorMessage;
-                    
 
                     this.loading = false;
                     return;
@@ -89,20 +103,22 @@ export class AddGroupComponent implements OnInit {
             () => {
                 this.state = "ERROR";
                 this.loading = false;
-            });
-
+            }
+        );
     }
 
     private submitForm(): void {
-
         this.state = "LOADING";
         this.loading = true;
+
+        const packageIdentifierParts = this.form.value.packageSlug.split("/");
+
         this.addOrUpdateGroupToPackage
             .mutate({
-                groupSlug: this.selectedGroupSlug,
+                groupSlug: this.form.value.group,
                 packageIdentifier: {
-                    catalogSlug: this.userPackage.identifier.catalogSlug,
-                    packageSlug: this.userPackage.identifier.packageSlug
+                    catalogSlug: packageIdentifierParts[0],
+                    packageSlug: packageIdentifierParts[1]
                 },
                 permissions: this.effectivePermissions
             })
@@ -132,5 +148,4 @@ export class AddGroupComponent implements OnInit {
                 }
             );
     }
-
 }

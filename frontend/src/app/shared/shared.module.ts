@@ -20,7 +20,7 @@ import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 import { ImageUploadModalComponent } from "./image-upload-modal/image-upload-modal.component";
 import { PackageItemComponent } from "./package-item/package-item.component";
 import { CollectionItemComponent } from "./collection-item/collection-item.component";
-import { CatalogItemComponent  } from "./catalog-item/catalog-item.component";
+import { CatalogItemComponent } from "./catalog-item/catalog-item.component";
 import { ForgotPasswordDialogComponent } from "./header/forgot-password-dialog/forgot-password-dialog.component";
 import { LoginDialogComponent } from "./header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.component";
@@ -80,6 +80,8 @@ import { UpdateMethodPipe } from "../package/pipes/update-method.pipe";
 import { UserGroupsComponent } from "../shared/user-details/user-groups/user-groups.component";
 import { CreateGroupComponent } from "../shared/create-group/create-group.component";
 import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
+import { UserItemComponent } from "../shared/user-item/user-item.component";
+import { PackageAutocompleteComponent } from "./package-autocomplete/package-autocomplete.component";
 
 @NgModule({
     declarations: [
@@ -88,6 +90,7 @@ import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
         TimeAgoPipe,
         ImageUploadModalComponent,
         PackageItemComponent,
+        UserItemComponent,
         CollectionItemComponent,
         CatalogItemComponent,
         ForgotPasswordDialogComponent,
@@ -138,7 +141,9 @@ import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
         HeroComponent,
         FollowersComponent,
         UserGroupsComponent,
-        UpdateMethodPipe
+        UpdateMethodPipe,
+        PackageAutocompleteComponent,
+        PackageAutocompleteComponent
     ],
     imports: [
         CommonModule,
@@ -172,6 +177,7 @@ import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
         FooterComponent,
         TimeAgoPipe,
         PackageItemComponent,
+        UserItemComponent,
         CollectionItemComponent,
         CatalogItemComponent,
         ForgotPasswordDialogComponent,
@@ -213,7 +219,8 @@ import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
         UserFollowingComponent,
         UserGroupsComponent,
         HeroComponent,
-        FollowersComponent
+        FollowersComponent,
+        PackageAutocompleteComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

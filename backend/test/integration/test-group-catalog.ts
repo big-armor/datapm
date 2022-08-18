@@ -3,7 +3,23 @@ import { ApolloClient } from "@apollo/client/core";
 import { expect } from "chai";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
-import { AddOrUpdateGroupToCatalogDocument, AddOrUpdateGroupToPackageDocument, AddOrUpdateUserToGroupDocument, AutoCompleteCatalogDocument, AutoCompletePackageDocument, CreateGroupDocument, CreatePackageDocument, CreateVersionDocument, GroupsByCatalogDocument, PackageDocument, Permission, RemoveGroupFromCatalogDocument, RemoveGroupFromPackageDocument, UpdateCatalogDocument, UpdatePackageDocument } from "./registry-client";
+import {
+    AddOrUpdateGroupToCatalogDocument,
+    AddOrUpdateGroupToPackageDocument,
+    AddOrUpdateUserToGroupDocument,
+    AutoCompleteCatalogDocument,
+    AutoCompletePackageDocument,
+    CreateGroupDocument,
+    CreatePackageDocument,
+    CreateVersionDocument,
+    GroupsByCatalogDocument,
+    PackageDocument,
+    Permission,
+    RemoveGroupFromCatalogDocument,
+    RemoveGroupFromPackageDocument,
+    UpdateCatalogDocument,
+    UpdatePackageDocument
+} from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Group Package Access", () => {
@@ -30,7 +46,7 @@ describe("Group Package Access", () => {
         expect(userBClient).to.exist;
     });
 
-it("Should allow user to create a package", async function () {
+    it("Should allow user to create a package", async function () {
         let response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
@@ -141,8 +157,12 @@ it("Should allow user to create a package", async function () {
             mutation: AddOrUpdateUserToGroupDocument,
             variables: {
                 groupSlug: "test-group-catalog",
-                username: "testB-group-catalog",
-                permissions: [Permission.VIEW]
+                userPermissions: [
+                    {
+                        usernameOrEmailAddress: "testB-group-catalog",
+                        permissions: [Permission.VIEW]
+                    }
+                ]
             }
         });
 
@@ -160,11 +180,9 @@ it("Should allow user to create a package", async function () {
                 packagePermissions: [Permission.VIEW],
                 permissions: [Permission.VIEW]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
     it("UserB should be able to view package", async () => {
@@ -191,25 +209,32 @@ it("Should allow user to create a package", async function () {
         });
 
         expect(response.error == null, "no errors").equal(true);
-        expect(response.data!.autoComplete.packages?.find(p => p.identifier.catalogSlug == "testA-group-catalog" && p.identifier.packageSlug == "congressional-legislators") != null).equal(true);
+        expect(
+            response.data!.autoComplete.packages?.find(
+                (p) =>
+                    p.identifier.catalogSlug == "testA-group-catalog" &&
+                    p.identifier.packageSlug == "congressional-legislators"
+            ) != null
+        ).equal(true);
     });
 
     it("Catalog should appear in userB auto-complete", async () => {
         const response = await userBClient.query({
             query: AutoCompleteCatalogDocument,
             variables: {
-                startsWith: "testA-group-catalog",
+                startsWith: "testA-group-catalog"
             }
         });
 
         expect(response.error == null, "no errors").equal(true);
-        expect(response.data!.autoComplete.catalogs?.find(c => c.identifier.catalogSlug == "testA-group-catalog") != null).equal(true);
-    })
+        expect(
+            response.data!.autoComplete.catalogs?.find((c) => c.identifier.catalogSlug == "testA-group-catalog") != null
+        ).equal(true);
+    });
 
     it("UserB should not be able to modify package", async () => {
-
-        const response =  await userBClient.mutate({
-            mutation: UpdatePackageDocument, 
+        const response = await userBClient.mutate({
+            mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-group-catalog",
@@ -223,9 +248,7 @@ it("Should allow user to create a package", async function () {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
-
     });
-
 
     it("Grant group edit access to package", async () => {
         const response = await userAClient.mutate({
@@ -236,19 +259,16 @@ it("Should allow user to create a package", async function () {
                     catalogSlug: "testA-group-catalog"
                 },
                 permissions: [Permission.VIEW],
-                packagePermissions: [Permission.VIEW, Permission.EDIT,  Permission.MANAGE]
+                packagePermissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
     it("UserB should be able to modify package", async () => {
-
-        const response =  await userBClient.mutate({
-            mutation: UpdatePackageDocument, 
+        const response = await userBClient.mutate({
+            mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-group-catalog",
@@ -262,11 +282,9 @@ it("Should allow user to create a package", async function () {
 
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data?.updatePackage.description).to.equal("This is a test package");
-
     });
 
-    it("UserB should no be able to edit catalog", async() => {
-
+    it("UserB should no be able to edit catalog", async () => {
         const response = await userBClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
@@ -278,10 +296,8 @@ it("Should allow user to create a package", async function () {
                 }
             }
         });
-        
-        expect(response.errors != null, "should have errors").to.equal(true);
-    
 
+        expect(response.errors != null, "should have errors").to.equal(true);
     });
 
     it("Grant group edit access to package", async () => {
@@ -293,13 +309,11 @@ it("Should allow user to create a package", async function () {
                     catalogSlug: "testA-group-catalog"
                 },
                 permissions: [Permission.VIEW, Permission.EDIT],
-                packagePermissions: [Permission.VIEW, Permission.EDIT,  Permission.MANAGE]
+                packagePermissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
     it("Should allow UserB to edit catalog", async () => {
@@ -317,24 +331,21 @@ it("Should allow user to create a package", async function () {
 
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data?.updateCatalog.displayName).to.equal("Test Catalog2");
-                
     });
 
     it("UserB should not be able to remove a group", async () => {
-
         const response = await userBClient.mutate({
             mutation: RemoveGroupFromCatalogDocument,
             variables: {
                 groupSlug: "test-group-catalog",
                 catalogIdentifier: {
-                    catalogSlug: "testA-group-catalog",
+                    catalogSlug: "testA-group-catalog"
                 }
             }
         });
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
-    
     });
 
     it("Grant group manage access to catalog", async () => {
@@ -344,28 +355,26 @@ it("Should allow user to create a package", async function () {
                 groupSlug: "test-group-catalog",
                 catalogIdentifier: {
                     catalogSlug: "testA-group-catalog"
-                },                
+                },
                 packagePermissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
                 permissions: [Permission.VIEW]
             }
-
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-
     });
 
-    it("Should return group list for catalog", async() => {
+    it("Should return group list for catalog", async () => {
         const response = await userAClient.query({
             query: GroupsByCatalogDocument,
             variables: {
                 catalogIdentifier: {
-                    catalogSlug: "testA-group-catalog",
+                    catalogSlug: "testA-group-catalog"
                 }
             }
         });
 
-         expect(response.errors == null).equal(true);
+        expect(response.errors == null).equal(true);
         expect(response.data.groupsByCatalog.length).to.equal(1);
         expect(response.data.groupsByCatalog[0].group?.slug).equal("test-group-catalog");
 
@@ -373,12 +382,9 @@ it("Should allow user to create a package", async function () {
         expect(response.data.groupsByCatalog[0].permissions![0]).equal(Permission.VIEW);
 
         expect(response.data.groupsByCatalog[0].packagePermissions?.length).equal(3);
-        
     });
 
-
     it("UserA should be able to remove a group", async () => {
-
         const response = await userAClient.mutate({
             mutation: RemoveGroupFromCatalogDocument,
             variables: {
@@ -390,7 +396,6 @@ it("Should allow user to create a package", async function () {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-    
     });
 
     it("package should not be available to user B", async function () {
@@ -410,6 +415,4 @@ it("Should allow user to create a package", async function () {
             "should have not authorization error"
         ).equal(true);
     });
-
-    
 });

@@ -34,8 +34,8 @@ export class UserDetailsPageComponent implements OnChanges, OnInit {
                 { name: "packages", value: "packages" },
                 { name: "collections", value: "collections" },
                 { name: "catalogs", value: "catalogs" },
-                { name: "following", value: "user-following" },
-                { name: "groups", value: "user-groups" }
+                { name: "following", value: "following" },
+                { name: "groups", value: "groups" }
             ];
         } else {
             this.tabs = [

@@ -7,7 +7,6 @@ import { UserEntity } from "./UserEntity";
 })
 @Unique(["slug"])
 export class GroupEntity extends EntityBaseModel {
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -26,5 +25,4 @@ export class GroupEntity extends EntityBaseModel {
 
     @Column({ name: "creator_id" })
     creatorId: number;
-
 }

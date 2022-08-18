@@ -4,21 +4,21 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatTableModule } from "@angular/material/table";
 
-import { CollectionPermissionsComponent } from "./collection-permissions.component";
+import { GroupPermissionsComponent } from "./group-manage.component";
 
-describe("CollectionPermissionsComponent", () => {
-    let component: CollectionPermissionsComponent;
-    let fixture: ComponentFixture<CollectionPermissionsComponent>;
+describe("GroupPermissionsComponent", () => {
+    let component: GroupPermissionsComponent;
+    let fixture: ComponentFixture<GroupPermissionsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CollectionPermissionsComponent],
+            declarations: [GroupPermissionsComponent],
             imports: [MatDialogModule, MatSlideToggleModule, MatTableModule, MatSnackBarModule]
         }).compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(CollectionPermissionsComponent);
+        fixture = TestBed.createComponent(GroupPermissionsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -1,5 +1,5 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
-    <div mat-dialog-title id="contentTitle" class="pb-3">Share {{ collection.name }}</div>
+    <div mat-dialog-title id="contentTitle" class="pb-3">Share {{ group.name }}</div>
     <div mat-dialog-content id="contentBorder">
         <div class="d-flex flex-row bd-highlight pt-2 shadow-div">
             <div class="bd-highlight w-100">
@@ -10,19 +10,8 @@
                     (loadingStateChange)="onLoadingStatusChange($event)"
                 >
                 </app-user-invite-input>
-                <div class="textarea-input">
-                    <label class="div-question pl-1">Message</label>
-                    <mat-form-field class="w-100" appearance="outline">
-                        <textarea
-                            [formControl]="messageControl"
-                            matInput
-                            placeholder="Write message"
-                            rows="4"
-                        ></textarea>
-                    </mat-form-field>
-                </div>
                 <div class="permission-div modal-select w-50">
-                    <label class="div-question pl-1 mb-0">Collection permissions</label>
+                    <label class="div-question pl-1 mb-0">Group permissions</label>
                     <mat-form-field appearance="fill" class="w-100">
                         <mat-select (selectionChange)="updateSelectedPermission($event.value)" [value]="permission">
                             <mat-option value="VIEW">View </mat-option>
@@ -33,8 +22,8 @@
                 </div>
                 <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
                     <ng-container [ngSwitch]="error">
-                        <ng-container *ngSwitchCase="'CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS'">
-                            You can not change the permissions of the collection owner.
+                        <ng-container *ngSwitchCase="'CANNOT_SET_GROUP_CREATOR_PERMISSIONS'">
+                            You can not change the permissions of the group owner.
                         </ng-container>
                         <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
                             There is no user with that username on this registry.
@@ -55,7 +44,7 @@
                             Message cannot contain HTML tags.
                         </ng-container>
                         <ng-container *ngSwitchDefault>
-                            Error occured while adding a user permission to the collection
+                            Error occured while adding a user permission to the group
                         </ng-container>
                     </ng-container>
                 </div>

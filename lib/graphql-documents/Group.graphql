@@ -4,7 +4,7 @@ query Group($groupSlug: String!) {
         name
         description
         myPermissions
-        packages {
+        packagePermissions {
             permissions
             package {
                 identifier {
@@ -33,7 +33,7 @@ query Group($groupSlug: String!) {
                 description
             }
         }
-        collections {
+        collectionPermissions {
             permissions
             collection {
                 identifier {
@@ -45,7 +45,7 @@ query Group($groupSlug: String!) {
                 isRecommended
             }
         }
-        catalogs {
+        catalogPermissions {
             permissions
             packagePermissions
             catalog {

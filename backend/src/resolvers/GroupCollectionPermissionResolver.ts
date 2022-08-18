@@ -1,23 +1,37 @@
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupCollectionPermissionEntity } from "../entity/GroupCollectionPermissionEntity";
-import { GroupCollectionPermission, CollectionIdentifierInput, Permission, ActivityLogEventType } from "../generated/graphql";
+import {
+    GroupCollectionPermission,
+    CollectionIdentifierInput,
+    Permission,
+    ActivityLogEventType
+} from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupCollectionPermissionRepository } from "../repository/GroupCollectionPermissionRepository";
-import { getCollectionFromCacheOrDbOrFail, collectionEntityToGraphQL, getCollectionFromCacheOrDbById } from "./CollectionResolver";
+import {
+    getCollectionFromCacheOrDbOrFail,
+    collectionEntityToGraphQL,
+    getCollectionFromCacheOrDbById
+} from "./CollectionResolver";
 import { findGroup, getGroupFromCacheOrDbByIdOrFail } from "./GroupResolver";
-
-
 
 export const groupCollectionPermissionEntityToGraphqlObject = async (
     context: Context,
     connection: EntityManager,
     groupCollectionPermissionEntity: GroupCollectionPermissionEntity
 ): Promise<GroupCollectionPermission> => {
+    const collectionEntityLoaded = await getCollectionFromCacheOrDbById(
+        context,
+        connection,
+        groupCollectionPermissionEntity.collectionId
+    );
 
-    const collectionEntityLoaded = await getCollectionFromCacheOrDbById(context, connection, groupCollectionPermissionEntity.collectionId);
-
-    const groupEntity = await getGroupFromCacheOrDbByIdOrFail(context, connection, groupCollectionPermissionEntity.groupId);
+    const groupEntity = await getGroupFromCacheOrDbByIdOrFail(
+        context,
+        connection,
+        groupCollectionPermissionEntity.groupId
+    );
 
     return {
         creator: groupCollectionPermissionEntity.creator,
@@ -29,15 +43,18 @@ export const groupCollectionPermissionEntityToGraphqlObject = async (
     };
 };
 
-
 export const groupsByCollection = async (
-        _0: any,
+    _0: any,
     { collectionIdentifier }: { collectionIdentifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
-
-    const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection.manager, collectionIdentifier.collectionSlug, []);
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+        context,
+        context.connection.manager,
+        collectionIdentifier.collectionSlug,
+        []
+    );
 
     const groups = await context.connection.getRepository(GroupCollectionPermissionEntity).find({
         where: {
@@ -46,62 +63,71 @@ export const groupsByCollection = async (
     });
 
     return groups.map((g) => groupCollectionPermissionEntityToGraphqlObject(context, context.connection.manager, g));
-
-}
+};
 
 export const addOrUpdateGroupToCollection = async (
-        _0: any,
-    { groupSlug, collectionIdentifier, permissions }: { groupSlug: string, collectionIdentifier: CollectionIdentifierInput, permissions: Permission[] },
+    _0: any,
+    {
+        groupSlug,
+        collectionIdentifier,
+        permissions
+    }: { groupSlug: string; collectionIdentifier: CollectionIdentifierInput; permissions: Permission[] },
     context: AuthenticatedContext,
     info: any
 ) => {
-
     return await context.connection.transaction(async (transaction) => {
-
         const groupEntity = await findGroup(context.connection.manager, groupSlug);
 
-        const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionIdentifier.collectionSlug, []);
+        const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+            context,
+            context.connection,
+            collectionIdentifier.collectionSlug,
+            []
+        );
 
-        const groupPermission =  await context.connection.manager.getCustomRepository(GroupCollectionPermissionRepository).createOrUpdateGroupCollectionPermission({
-            groupId: groupEntity.id,
-            collectionId: collectionEntity.id,
-            permissions,
-            creatorId: context.me.id
-        });
+        const groupPermission = await context.connection.manager
+            .getCustomRepository(GroupCollectionPermissionRepository)
+            .createOrUpdateGroupCollectionPermission({
+                groupId: groupEntity.id,
+                collectionId: collectionEntity.id,
+                permissions,
+                creatorId: context.me.id
+            });
 
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.COLLECTION_GROUP_PERMISSION_ADDED_UPDATED,
             targetGroupId: groupEntity.id,
-            targetCollectionId: collectionEntity.id
+            targetCollectionId: collectionEntity.id,
+            permissions
         });
 
         return groupCollectionPermissionEntityToGraphqlObject(context, context.connection.manager, groupPermission);
     });
-
-
-
-}
+};
 
 export const removeGroupFromCollection = async (
-        _0: any,
-    { groupSlug, collectionIdentifier }: { groupSlug: string, collectionIdentifier: CollectionIdentifierInput },
+    _0: any,
+    { groupSlug, collectionIdentifier }: { groupSlug: string; collectionIdentifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
-
     await context.connection.transaction(async (manager) => {
-
         const groupEntity = await findGroup(manager, groupSlug);
 
-        const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionIdentifier.collectionSlug, []);
+        const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+            context,
+            context.connection,
+            collectionIdentifier.collectionSlug,
+            []
+        );
 
-        const groupPermission =  await manager.getRepository(GroupCollectionPermissionEntity).findOne({
+        const groupPermission = await manager.getRepository(GroupCollectionPermissionEntity).findOne({
             groupId: groupEntity.id,
             collectionId: collectionEntity.id
         });
 
-        if(!groupPermission) {
+        if (!groupPermission) {
             throw new Error("NOT_FOUND - Group does not have permission to this collection");
         }
 
@@ -116,6 +142,4 @@ export const removeGroupFromCollection = async (
 
         return groupCollectionPermissionEntityToGraphqlObject(context, manager, groupPermission);
     });
-    
-
-}
+};

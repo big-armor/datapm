@@ -219,8 +219,22 @@ import {
     userFollowersCount
 } from "./resolvers/FollowResolver";
 
-import { createGroup, updateGroup, deleteGroup, addOrUpdateUserToGroup, removeUserFromGroup, myGroupPermissions, myGroups } from "./resolvers/GroupResolver";
-import { addOrUpdateGroupToPackage,removeGroupFromPackage, groupsByPackage } from "./resolvers/GroupPackagePermissionResolver";
+import {
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    addOrUpdateUserToGroup,
+    removeUserFromGroup,
+    myGroupPermissions,
+    myGroups,
+    group
+} from "./resolvers/GroupResolver";
+import {
+    addOrUpdateGroupToPackage,
+    removeGroupFromPackage,
+    groupsByPackage,
+    packagePermissionsByGroupForUser
+} from "./resolvers/GroupPackagePermissionResolver";
 
 import {
     getPlatformSettingsByKey,
@@ -230,8 +244,16 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
-import { addOrUpdateGroupToCatalog, removeGroupFromCatalog, groupsByCatalog } from "./resolvers/GroupCatalogPermissionResolver";
-import { addOrUpdateGroupToCollection, removeGroupFromCollection, groupsByCollection } from "./resolvers/GroupCollectionPermissionResolver";
+import {
+    addOrUpdateGroupToCatalog,
+    removeGroupFromCatalog,
+    groupsByCatalog
+} from "./resolvers/GroupCatalogPermissionResolver";
+import {
+    addOrUpdateGroupToCollection,
+    removeGroupFromCollection,
+    groupsByCollection
+} from "./resolvers/GroupCollectionPermissionResolver";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -249,25 +271,23 @@ export const getPageContentByRoute = async (
         return { catalog };
     }
 
-    const builderIOSettings = await getDeserializedPublicPlatformSettingsByKey(
+    const builderIOSettings = (await getDeserializedPublicPlatformSettingsByKey(
         _0,
         { key: "builder-io-settings" },
         context,
         info
-    ) as BuilderIOSettings;
+    )) as BuilderIOSettings;
 
+    let template = builderIOSettings.templates?.find((t) => t.key === route);
 
-    let template = builderIOSettings.templates?.find(t => t.key === route);
-
-    if(!template) {
-        template = builderIOSettings.templates?.find(t => t.key === "404");
-
+    if (!template) {
+        template = builderIOSettings.templates?.find((t) => t.key === "404");
     }
 
     const builderIOPage: BuilderIOPage = {
         apiKey: builderIOSettings.apiKey,
         template
-    }
+    };
 
     return { builderIOPage };
 };
@@ -528,7 +548,7 @@ export const resolvers: {
         updatedAt: packageUpdatedAt,
         viewedCount: packageViewedCount,
         isPublic: packageIsPublic,
-        updateMethods: packageUpdateMethods,
+        updateMethods: packageUpdateMethods
     },
     PackageIssue: {
         author: getPackageIssueAuthor,
@@ -563,8 +583,7 @@ export const resolvers: {
     },
     Group: {
         myPermissions: myGroupPermissions,
-        // TODO 
-        // packages: groupPackages,
+        packagePermissions: packagePermissionsByGroupForUser
         // catalogs: groupCatalogs,
         // collections: groupCollections
     },
@@ -575,7 +594,7 @@ export const resolvers: {
                 status: RegistryStatus.SERVING_REQUESTS,
                 version: DATAPM_VERSION,
                 registryUrl: process.env["REGISTRY_URL"] as string
-            }
+            };
         },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             return await getUserFromCacheOrDbByUsername(context, context.me.username, getGraphQlRelationName(info));
@@ -670,7 +689,8 @@ export const resolvers: {
         groupsByPackage,
         groupsByCatalog,
         groupsByCollection,
-        myGroups: myGroups
+        myGroups: myGroups,
+        group: group
     },
 
     Mutation: {
@@ -761,7 +781,7 @@ export const resolvers: {
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
-        // Version 
+        // Version
         createVersion: createVersion,
         deleteVersion: deleteVersion,
 
@@ -772,9 +792,6 @@ export const resolvers: {
 
         savePlatformSettings: savePlatformSettings,
 
-        runJob,
-
-        
-
+        runJob
     }
 };

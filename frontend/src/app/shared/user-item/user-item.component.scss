@@ -1,0 +1,33 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+.user-item {
+    cursor: pointer;
+    border: 1px solid var(--gray-9-color);
+    box-shadow: none;
+    background-color: var(--gray-7-color);
+    transition: background-color 0.5s ease;
+
+    &:hover {
+        background-color: var(--custom-secondary-color);
+        transition: background-color 0.5s ease;
+    }
+
+    .img-cover {
+        margin-right: 6px;
+    }
+}
+
+@media (max-width: 1200px) {
+}
+
+@media (max-width: 992px) {
+    
+}
+
+@media (max-width: 575px) {
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}

@@ -41,7 +41,8 @@ export const activtyLogEntityToGraphQL = async function (
         changeType: activityLogEntity.changeType,
         createdAt: activityLogEntity.createdAt,
         updatedAt: activityLogEntity.updatedAt,
-        propertiesEdited: activityLogEntity.propertiesEdited
+        propertiesEdited: activityLogEntity.propertiesEdited,
+        permissions: activityLogEntity.permissions
     };
 
     if (activityLogEntity.userId) {
@@ -392,14 +393,12 @@ export const logUser = async (
     return loadedLog.targetUser;
 };
 
-
 export const logGroup = async (
     parent: ActivityLog,
     _1: any,
     context: AuthenticatedContext,
     info: any
 ): Promise<Group | null> => {
-
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetGroup"
     ]);
@@ -417,7 +416,6 @@ export const logGroup = async (
     ]);
     return loadedLog.targetGroup;
 };
-
 
 export const getActivityLogFromCacheOrDbByIdOrFail = async (
     context: Context,

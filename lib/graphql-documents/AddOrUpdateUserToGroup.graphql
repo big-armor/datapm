@@ -1,26 +1,3 @@
-mutation AddOrUpdateUserToGroup($groupSlug: String!, $username: String!, $permissions: [Permission!]!) {
-    addOrUpdateUserToGroup(groupSlug: $groupSlug, username: $username, permissions: $permissions) {
-        user { 
-                username
-                firstName
-                lastName
-                nameIsPublic
-                displayName
-        }
-        permissions
-        group {
-            slug
-            name
-            users {
-                user { 
-                    username
-                    firstName
-                    lastName
-                    nameIsPublic
-                    displayName
-                }
-                permissions
-            }
-        }
-    }
+mutation AddOrUpdateUserToGroup($groupSlug: String!, $userPermissions: [SetUserGroupPermissionsInput!]!) {
+    addOrUpdateUserToGroup(groupSlug: $groupSlug, userPermissions: $userPermissions)
 }
