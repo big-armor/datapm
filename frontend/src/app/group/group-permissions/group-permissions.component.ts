@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { getHighestPermission } from "src/app/services/permissions.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { EditGroupComponent } from "src/app/shared/edit-group/edit-group.component";
 import { AddOrUpdateUserToGroupGQL, Group, Permission, UpdateGroupGQL, User } from "src/generated/graphql";
@@ -32,6 +33,10 @@ export class GroupPermissionsComponent implements OnChanges {
             if (!this.group.myPermissions.includes(Permission.MANAGE)) {
                 this.columnsToDisplay = ["name", "permission"];
             }
+
+            this.group.users?.forEach((groupUser: any) => {
+                groupUser.permission = getHighestPermission(groupUser.permissions);
+            });
         }
     }
 
@@ -73,8 +78,12 @@ export class GroupPermissionsComponent implements OnChanges {
         this.addOrUpdateUserToGroupGQL
             .mutate({
                 groupSlug: this.group?.slug,
-                permissions,
-                username
+                userPermissions: [
+                    {
+                        permissions,
+                        usernameOrEmailAddress: username
+                    }
+                ]
             })
             .subscribe(({ errors }) => {
                 if (errors) {
@@ -82,6 +91,8 @@ export class GroupPermissionsComponent implements OnChanges {
                         this.snackBarService.openSnackBar("Can not change the group creator permissions.", "Ok");
                     else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
                 }
+
+                this.groupEdited.emit();
             });
     }
 

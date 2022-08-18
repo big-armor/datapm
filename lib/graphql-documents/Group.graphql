@@ -61,5 +61,15 @@ query Group($groupSlug: String!) {
                 unclaimed
             }
         }
+        users {
+            user {
+                username
+                firstName
+                lastName
+                displayName
+                nameIsPublic
+            }
+            permissions
+        }
     }
 }

@@ -21,12 +21,13 @@ import {
     ActivityLogResolvers,
     BuilderIOSettings,
     BuilderIOPage,
-    GroupResolvers
+    GroupResolvers,
+    UserStatus
 } from "./generated/graphql";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isRequestingUserOrAdmin } from "./util/contextHelpers";
+import { isAuthenticatedAsAdmin, isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { DATAPM_VERSION, parsePackageFileJSON } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
@@ -227,7 +228,8 @@ import {
     removeUserFromGroup,
     myGroupPermissions,
     myGroups,
-    group
+    group,
+    groupUsers
 } from "./resolvers/GroupResolver";
 import {
     addOrUpdateGroupToPackage,
@@ -432,11 +434,23 @@ export const resolvers: {
     }),
     User: {
         username: async (parent: User, _1: any, context: Context) => {
-            if (!parent.username) {
-                return parent.emailAddress as string;
+            return parent.username;
+        },
+        displayName: async (parent: User, _1: any, context: Context) => {
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+
+            if (user.status === UserStatus.PENDING_SIGN_UP) {
+                if (isAuthenticatedAsAdmin(context)) {
+                    return user.emailAddress + " (pending sign up)";
+                }
+
+                const emailParts = user.emailAddress.split("@");
+                return emailParts[0] + " (pending sign up)";
             }
 
-            return parent.username;
+            const returnValue = user.displayName || user.username;
+
+            return returnValue;
         },
         firstName: async (parent: User, _1: any, context: Context) => {
             const user = await getUserFromCacheOrDbByUsername(context, parent.username);
@@ -583,7 +597,8 @@ export const resolvers: {
     },
     Group: {
         myPermissions: myGroupPermissions,
-        packagePermissions: packagePermissionsByGroupForUser
+        packagePermissions: packagePermissionsByGroupForUser,
+        users: groupUsers
         // catalogs: groupCatalogs,
         // collections: groupCollections
     },

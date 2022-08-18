@@ -1,5 +1,5 @@
 import { ValidationError } from "apollo-server";
-import { ActivityLogEventType, User, UserStatus } from "datapm-client-lib";
+import { ActivityLogEventType, UserStatus } from "datapm-client-lib";
 import { emailAddressValid } from "datapm-lib";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
@@ -7,11 +7,12 @@ import { resolveGroupPermissionsForEntity } from "../directive/hasGroupPermissio
 import { GroupEntity } from "../entity/GroupEntity";
 import { GroupUserEntity } from "../entity/GroupUserEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { Group, Permission, SetUserGroupPermissionsInput } from "../generated/graphql";
+import { Group, GroupUser, Permission, SetUserGroupPermissionsInput } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupUserRepository } from "../repository/GroupUserRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
+import { getGraphQlRelationName } from "../util/relationNames";
 import { sendInviteUser, sendShareNotification } from "../util/smtpUtil";
 
 import { getUserFromCacheOrDbByUsername } from "./UserResolver";
@@ -328,4 +329,22 @@ export const myGroupPermissions = async (parent: Group, _0: any, context: Authen
     const groupEntity = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection.manager, parent.slug);
 
     return resolveGroupPermissionsForEntity(context, groupEntity, context.me);
+};
+
+export const groupUsers = async (
+    parent: Group,
+    _0: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<GroupUser[]> => {
+    const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
+
+    const groupUsers = await context.connection.getRepository(GroupUserEntity).find({
+        where: {
+            groupId: group.id
+        },
+        relations: getGraphQlRelationName(info)
+    });
+
+    return groupUsers;
 };

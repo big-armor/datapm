@@ -186,6 +186,8 @@ export class SessionCache {
         dataPromiseFunction: () => Promise<any>,
         forceReload?: boolean
     ): Promise<any> {
+        if (dataKey == null) return null;
+
         const cachedData = this.cache.get(dataKey);
         if (cachedData && !forceReload) {
             return cachedData;
@@ -226,7 +228,6 @@ export class SessionCache {
         const cacheId = this.buildDataKeyForGroupPermissionsId(groupId);
         return this.loadDataAsync(cacheId, groupPromise, forceReload);
     }
-   
 
     private buildDataKeyForUserId(id: number): string {
         return "USER_ID-" + id;

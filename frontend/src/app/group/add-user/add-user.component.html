@@ -1,5 +1,5 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
-    <div mat-dialog-title id="contentTitle" class="pb-3">Share {{ group.name }}</div>
+    <div mat-dialog-title id="contentTitle" class="pb-3">Add/Update {{ group.name }} Members</div>
     <div mat-dialog-content id="contentBorder">
         <div class="d-flex flex-row bd-highlight pt-2 shadow-div">
             <div class="bd-highlight w-100">
@@ -23,7 +23,7 @@
                 <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
                     <ng-container [ngSwitch]="error">
                         <ng-container *ngSwitchCase="'CANNOT_SET_GROUP_CREATOR_PERMISSIONS'">
-                            You can not change the permissions of the group owner.
+                            You can not reduce the permissions of the last group manager.
                         </ng-container>
                         <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
                             There is no user with that username on this registry.

@@ -80,8 +80,10 @@ export class AddUserComponent implements OnInit {
         this.addOrUpdateUserToGroup
             .mutate({
                 groupSlug: this.group.slug,
-                permissions: this.effectivePermissions,
-                username: this.usernameControl.value
+                userPermissions: this.usersChips.map((c) => ({
+                    permissions: this.effectivePermissions,
+                    usernameOrEmailAddress: c.usernameOrEmailAddress
+                }))
             })
             .subscribe(
                 ({ errors, data }) => {
@@ -91,7 +93,7 @@ export class AddUserComponent implements OnInit {
                         const firstErrorMessage = errors[0].message;
                         if (firstErrorMessage.includes("USER_NOT_FOUND")) {
                             this.error = ErrorType.USER_NOT_FOUND;
-                        } else if (firstErrorMessage.includes("CANNOT_SET_GROUP_CREATOR_PERMISSIONS")) {
+                        } else if (firstErrorMessage.includes("NOT_VALID")) {
                             this.error = ErrorType.CANNOT_SET_GROUP_CREATOR_PERMISSIONS;
                         } else {
                             this.error = firstErrorMessage;

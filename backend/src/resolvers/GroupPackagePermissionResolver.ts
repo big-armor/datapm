@@ -7,6 +7,7 @@ import {
     ActivityLogEventType,
     Group,
     GroupPackagePermission,
+    GroupUser,
     PackageIdentifierInput,
     Permission
 } from "../generated/graphql";
