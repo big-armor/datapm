@@ -7,6 +7,8 @@ import { I } from "@angular/cdk/keycodes";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
 
+export type CreateGroupResult = { groupSlug: string };
+
 @Component({
     selector: "app-create-group",
     templateUrl: "./create-group.component.html",
@@ -19,8 +21,8 @@ export class CreateGroupComponent implements OnDestroy {
     public state: State = "INIT";
     public error = "";
 
-    public slugValue:string = "";
-    
+    public slugValue: string = "";
+
     constructor(
         private dialogRef: MatDialogRef<CreateGroupComponent>,
         private createGroup: CreateGroupGQL,
@@ -37,7 +39,6 @@ export class CreateGroupComponent implements OnDestroy {
                 validators: [Validators.required]
             })
         });
-
     }
 
     public ngOnDestroy(): void {
@@ -45,12 +46,12 @@ export class CreateGroupComponent implements OnDestroy {
         this.destroy.complete();
     }
 
-    public nameChanged(value:string):void {
+    public nameChanged(value: string): void {
         this.form.setValue({
             name: this.form.value.name,
             groupSlug: (this.form.value.name as string).toLowerCase().replace(/\s+/g, "-"),
             description: this.form.value.description
-        })
+        });
     }
 
     public submit(): void {
@@ -61,12 +62,12 @@ export class CreateGroupComponent implements OnDestroy {
         this.state = "LOADING";
         this.createGroup
             .mutate({
-                    ...this.form.value
+                ...this.form.value
             })
             .subscribe(
                 (response) => {
                     if (!response.errors) {
-                        this.dialogRef.close(this.form.value);
+                        this.dialogRef.close(this.form.value as CreateGroupResult);
                         return;
                     }
 
@@ -75,15 +76,16 @@ export class CreateGroupComponent implements OnDestroy {
                             this.error = `Group slug '${this.form.value.groupSlug}' already exists. Please chose a different slug`;
                         }
 
-                        if(error.message.includes("GROUP_SLUG_REQUIRED")) {
+                        if (error.message.includes("GROUP_SLUG_REQUIRED")) {
                             this.error = "Please enter a slug (short name) for this group";
                         }
 
-                        if(error.message.includes("GROUP_SLUG_INVALID")) {
-                            this.error = "The slug (shortname) must contain only lower case characters, numbers, and dashes (hyphens)";
+                        if (error.message.includes("GROUP_SLUG_INVALID")) {
+                            this.error =
+                                "The slug (shortname) must contain only lower case characters, numbers, and dashes (hyphens)";
                         }
 
-                        if(error.message.startsWith("NOT_UNIQUE")) {
+                        if (error.message.startsWith("NOT_UNIQUE")) {
                             this.error = "The slug is not unique. Choose a different slug";
                         }
                     }
@@ -100,6 +102,4 @@ export class CreateGroupComponent implements OnDestroy {
                 }
             );
     }
-
-
 }

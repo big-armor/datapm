@@ -9,15 +9,15 @@ import { CoverComponent } from "../cover/cover.component";
 import { InputComponent } from "../input/input.component";
 import { InputErrorPipe } from "../pipes/input-error.pipe";
 
-import { EditCatalogComponent } from "./edit-group.component";
+import { EditGroupComponent } from "./edit-group.component";
 
-describe("EditCatalogComponent", () => {
-    let component: EditCatalogComponent;
-    let fixture: ComponentFixture<EditCatalogComponent>;
+describe("EditGroupComponent", () => {
+    let component: EditGroupComponent;
+    let fixture: ComponentFixture<EditGroupComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [EditCatalogComponent, CoverComponent, InputComponent, InputErrorPipe],
+            declarations: [EditGroupComponent, CoverComponent, InputComponent, InputErrorPipe],
             imports: [
                 ReactiveFormsModule,
                 HttpClientModule,
@@ -48,7 +48,7 @@ describe("EditCatalogComponent", () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(EditCatalogComponent);
+        fixture = TestBed.createComponent(EditGroupComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
