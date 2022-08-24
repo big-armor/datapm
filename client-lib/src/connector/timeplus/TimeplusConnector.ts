@@ -26,7 +26,10 @@ export class TimeplusConnector implements Connector {
         if (typeof connectionConfiguration.host !== "string") {
             throw new Error("Timeplus host not set");
         }
-        return connectionConfiguration.host;
+        if (typeof connectionConfiguration.tenant !== "string") {
+            throw new Error("Timeplus tenant not set");
+        }
+        return connectionConfiguration.host + "#" + connectionConfiguration.tenant;
     }
 
     async getCredentialsIdentifierFromConfiguration(
@@ -51,7 +54,16 @@ export class TimeplusConnector implements Connector {
                 type: ParameterType.Text,
                 stringMinimumLength: 1,
                 configuration: connectionConfiguration,
-                message: "Host Name(e.g. a.beta.timeplus.com)?"
+                message: "Host Name(e.g. beta.timeplus.cloud)?"
+            });
+        }
+        if (connectionConfiguration.tenant == null) {
+            parameters.push({
+                name: "tenant",
+                type: ParameterType.Text,
+                stringMinimumLength: 1,
+                configuration: connectionConfiguration,
+                message: "Tenant ID(e.g. datapm)?"
             });
         }
 
@@ -89,7 +101,7 @@ export class TimeplusConnector implements Connector {
         credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
         const apiKey = getApiKey(credentialsConfiguration);
-        const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
+        const url = `https://${connectionConfiguration.host}/${connectionConfiguration.tenant}/api/v1beta1/streams`;
 
         const resp = await fetch(url, {
             headers: {
