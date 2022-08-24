@@ -1,3 +1,9 @@
+#### 0.32.5 (2022-08-24)
+
+##### Other Changes
+
+* //github.com/big-armor/datapm-registry ([af04a5d6](https://github.com/big-armor/datapm/commit/af04a5d60a00d6e68b12f839be41ecc59b27d22f))
+
 #### 0.32.4 (2022-07-21)
 
 #### 0.32.3 (2022-07-05)
