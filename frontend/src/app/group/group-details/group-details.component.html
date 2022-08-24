@@ -43,22 +43,22 @@
                         <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
                     </div>
                 </div>
-                <div class="container">
-                    <app-package-item
-                        [item]="package"
-                        [hasImage]="true"
-                        actionButtonText="Remove Group Access"
-                        [shouldShowActionButton]="canEdit"
-                        (action)="removePackage(package)"
-                        *ngFor="let package of group.packages"
-                    >
-                    </app-package-item>
-                </div>
-                <div class="dpm-no-data" *ngIf="!group.packages?.length">
-                    <p class="text-dark-gray ml-3">
+                <div class="container mt-4 pt-2">
+                    <div class="text-main-title">Packages Permissions for Group</div>
+                    <p *ngIf="group.packagePermissions.length > 0">This group has access to these packages.</p>
+                    <p *ngIf="group.packagePermissions.length == 0">
                         This group has no direct package permissions. Check the catalog tab for more permissions.
                     </p>
                     <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+                    <app-package-item
+                        [item]="packagePermission.package"
+                        [hasImage]="true"
+                        actionButtonText="Remove Group Access"
+                        [shouldShowActionButton]="canEdit"
+                        (action)="removePackage(packagePermission.package)"
+                        *ngFor="let packagePermission of group.packagePermissions"
+                    >
+                    </app-package-item>
                 </div>
             </div>
 

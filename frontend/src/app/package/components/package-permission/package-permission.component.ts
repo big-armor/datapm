@@ -8,9 +8,12 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeletePackageComponent } from "src/app/shared/delete-package/delete-package.component";
 import {
+    AddOrUpdateGroupToPackageGQL,
+    Group,
     GroupsByPackageGQL,
     Package,
     Permission,
+    RemoveGroupFromPackageGQL,
     RemovePackagePermissionsGQL,
     SetPackagePermissionsGQL,
     UpdatePackageGQL,
@@ -33,7 +36,7 @@ export class PackagePermissionComponent implements OnInit {
     public package: Package;
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
-    public groups: any[] = [];
+    public groupPermissions: any[] = [];
 
     private unsubscribe$ = new Subject();
 
@@ -45,6 +48,8 @@ export class PackagePermissionComponent implements OnInit {
         private packageService: PackageService,
         private removeUserPackagePermission: RemovePackagePermissionsGQL,
         private setPackagePermissions: SetPackagePermissionsGQL,
+        private addOrUpdateGroupPackagePermission: AddOrUpdateGroupToPackageGQL,
+        private removeGroupPackagePermission: RemoveGroupFromPackageGQL,
         private router: Router,
         private snackBarService: SnackBarService,
         private route: ActivatedRoute,
@@ -64,6 +69,20 @@ export class PackagePermissionComponent implements OnInit {
         });
     }
 
+    public removeGroup(groupSlug: string): void {
+        this.removeGroupPackagePermission
+            .mutate({
+                packageIdentifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                },
+                groupSlug
+            })
+            .subscribe(({ errors }) => {
+                this.getGroupList();
+            });
+    }
+
     public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
             width: "550px",
@@ -80,7 +99,9 @@ export class PackagePermissionComponent implements OnInit {
     public addGroup(): void {
         const dialogRef = this.dialog.open(AddGroupPackagePermissionsComponent, {
             width: "550px",
-            data: this.package
+            data: {
+                package: this.package
+            }
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -92,6 +113,27 @@ export class PackagePermissionComponent implements OnInit {
 
     public updatePermission(username: string, permission: Permission): void {
         this.setUserPermission(username, getEffectivePermissions(permission));
+    }
+
+    public updateGroupPermissions(group: Group, permission: Permission): void {
+        this.addOrUpdateGroupPackagePermission
+            .mutate({
+                groupSlug: group.slug,
+                packageIdentifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                },
+                permissions: getEffectivePermissions(permission)
+            })
+            .subscribe(({ errors }) => {
+                this.snackBarService.openSnackBar(
+                    errors
+                        ? "There was a problem. Try again later."
+                        : "Group '" + group.name + "' permissions updated to " + permission,
+                    "Ok"
+                );
+                this.getGroupList();
+            });
     }
 
     public removeUser(usernameOrEmailAddress: string): void {
@@ -195,10 +237,12 @@ export class PackagePermissionComponent implements OnInit {
                 }
             })
             .subscribe(({ data }) => {
-                this.groups = data.groupsByPackage.map((item) => ({
-                    name: item.group.name,
-                    permission: getHighestPermission(item.permissions)
-                }));
+                this.groupPermissions = data.groupsByPackage
+                    .map((item) => ({
+                        ...item,
+                        permission: getHighestPermission(item.permissions)
+                    }))
+                    .sort((a, b) => a.group.name.localeCompare(b.group.name));
             });
     }
 

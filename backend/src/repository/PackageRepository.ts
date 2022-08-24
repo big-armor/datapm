@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions, Repository, Connection, Brackets } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository, Brackets } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";

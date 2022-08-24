@@ -65,6 +65,14 @@ export class AddGroupPackagePermissionsComponent implements OnInit {
             packageSlug: this.packageNameControl
         });
 
+        if (this.data.group) {
+            this.selectedGroupSlug = this.data.group.slug;
+        }
+
+        if (this.data.package)
+            this.form.controls.packageSlug.setValue(
+                this.data.package.identifier.catalogSlug + "/" + this.data.package.identifier.packageSlug
+            );
         this.updateGroups();
     }
 
@@ -99,6 +107,7 @@ export class AddGroupPackagePermissionsComponent implements OnInit {
                 }
                 this.loading = false;
                 this.groups = data.myGroups;
+                this.form.controls.group.setValue(this.selectedGroupSlug);
             },
             () => {
                 this.state = "ERROR";
