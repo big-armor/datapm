@@ -54,7 +54,8 @@ export class TimeplusConnector implements Connector {
                 type: ParameterType.Text,
                 stringMinimumLength: 1,
                 configuration: connectionConfiguration,
-                message: "Host Name(e.g. beta.timeplus.cloud)?"
+                defaultValue: "beta.timeplus.cloud",
+                message: "Host Name?"
             });
         }
         if (connectionConfiguration.tenant == null) {
