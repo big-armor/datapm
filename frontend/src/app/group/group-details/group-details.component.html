@@ -33,35 +33,10 @@
                 [group]="group"
                 *ngIf="currentTab === 0"
             ></app-group-permissions>
-            <div *ngIf="currentTab === 1">
-                <div class="mt-4" *ngIf="group.packages?.length > 0">
-                    <p class="text-dark-gray ml-3">
-                        This group permissions set on these packages. The group may have additional access to other
-                        packages through catalog level permissions. Check the catalog tab above.
-                    </p>
-                    <div class="mt-2 mb-4 pl-3">
-                        <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
-                    </div>
-                </div>
-                <div class="container mt-4 pt-2">
-                    <div class="text-main-title">Packages Permissions for Group</div>
-                    <p *ngIf="group.packagePermissions.length > 0">This group has access to these packages.</p>
-                    <p *ngIf="group.packagePermissions.length == 0">
-                        This group has no direct package permissions. Check the catalog tab for more permissions.
-                    </p>
-                    <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
-                    <app-package-item
-                        [item]="packagePermission.package"
-                        [hasImage]="true"
-                        actionButtonText="Remove Group Access"
-                        [shouldShowActionButton]="canEdit"
-                        (action)="removePackage(packagePermission.package)"
-                        *ngFor="let packagePermission of group.packagePermissions"
-                    >
-                    </app-package-item>
-                </div>
-            </div>
-
+            <app-group-packages (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 1">
+            </app-group-packages>
+            <app-group-catalog (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 2">
+            </app-group-catalog>
             <app-group-manage
                 (groupEdited)="getGroupDetails($event)"
                 [group]="group"

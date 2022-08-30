@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
-import { Router } from "@angular/router";
-import { takeUntil } from "rxjs/operators";
+import { Router, Scroll } from "@angular/router";
+import { delay, filter, takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { AuthenticationService } from "./services/authentication.service";
 import { User } from "../generated/graphql";
+import { ViewportScroller } from "@angular/common";
 
 @Component({
     selector: "app-root",
@@ -20,7 +21,32 @@ export class AppComponent implements OnInit, OnDestroy {
 
     private subscription = new Subject();
 
-    constructor(private authenticationService: AuthenticationService, public router: Router) {}
+    constructor(
+        private authenticationService: AuthenticationService,
+        private router: Router,
+        private viewPortScoller: ViewportScroller
+    ) {
+        this.router.events
+            .pipe(filter((e): e is Scroll => e instanceof Scroll))
+            .pipe(delay(1)) // <--------------------------- This line
+            .subscribe((e) => {
+                if (e.position) {
+                    // backward navigation
+                    // TODO This viewPortScroller seems to have no effect
+                    this.viewPortScoller.scrollToPosition(e.position);
+                } else if (e.anchor) {
+                    // anchor navigation
+                    // TODO This viewPortScroller seems to have no effect
+                    this.viewPortScoller.scrollToAnchor(e.anchor);
+                } else {
+                    // forward navigation
+                    // this.viewPortScoller.scrollToPosition([0, 0]);
+
+                    // TODO This viewPortScroller seems to have no effect
+                    document.body.scrollTop = 0;
+                }
+            });
+    }
 
     ngOnInit() {
         this.searchFormGroup = new FormGroup({

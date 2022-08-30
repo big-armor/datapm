@@ -1,15 +1,23 @@
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupCatalogPermissionEntity } from "../entity/GroupCatalogPermissionEntity";
-import { GroupCatalogPermission, CatalogIdentifierInput, Permission, ActivityLogEventType } from "../generated/graphql";
+import { UserEntity } from "../entity/UserEntity";
+import {
+    GroupCatalogPermission,
+    CatalogIdentifierInput,
+    Permission,
+    ActivityLogEventType,
+    Group
+} from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupCatalogPermissionRepository } from "../repository/GroupCatalogPermissionRepository";
+import { getGraphQlRelationName } from "../util/relationNames";
 import {
     getCatalogFromCacheOrDbByIdOrFail,
     getCatalogFromCacheOrDbOrFail,
     catalogEntityToGraphQL
 } from "./CatalogResolver";
-import { findGroup, getGroupFromCacheOrDbByIdOrFail } from "./GroupResolver";
+import { findGroup, getGroupFromCacheOrDbByIdOrFail, getGroupFromCacheOrDbBySlugOrFail } from "./GroupResolver";
 
 export const groupCatalogPermissionEntityToGraphqlObject = async (
     context: Context,
@@ -128,4 +136,25 @@ export const removeGroupFromCatalog = async (
             targetCatalogId: catalogEntity.id
         });
     });
+};
+
+export const catalogPermissionsByGroupForUser = async (
+    parent: Group,
+    _0: any,
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
+
+    const user: UserEntity | undefined = (context as AuthenticatedContext).me;
+
+    const permissions = await context.connection
+        .getCustomRepository(GroupCatalogPermissionRepository)
+        .catalogPermissionsByGroupForUser({
+            groupId: group.id,
+            userId: user?.id,
+            relations: getGraphQlRelationName(info)
+        });
+
+    return permissions.map((p) => groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, p));
 };

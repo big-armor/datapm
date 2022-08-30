@@ -20,6 +20,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ImportedModule } from "../imported/imported.module";
 import { CatalogFollowersComponent } from "./catalog-details/catalog-followers/catalog-followers.component";
+import { AddGroupCatalogPermissionsComponent } from "../group/add-group-catalog-permissions/add-group-catalog-permissions.component";
 
 @NgModule({
     declarations: [
@@ -29,6 +30,7 @@ import { CatalogFollowersComponent } from "./catalog-details/catalog-followers/c
         AddUserComponent,
         CatalogPermissionsComponent,
         CatalogFollowersComponent,
+        AddGroupCatalogPermissionsComponent
     ],
     imports: [
         CommonModule,

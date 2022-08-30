@@ -1,0 +1,106 @@
+<div class="container mt-4 pt-2">
+    <div class="text-main-title">Packages Permissions for Group</div>
+    <p *ngIf="group.packagePermissions.length > 0">
+        This group has the following permissions to these packages. Note the group may also have catalog level access to
+        packages. Check the catalog tab for more permissions.
+    </p>
+    <p *ngIf="group.packagePermissions.length == 0">
+        This group has no direct package permissions. Check the catalog tab for more permissions.
+    </p>
+</div>
+<div class="container mt-4 pt-2">
+    <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="group.myPermissions.includes(Permission.MANAGE)"
+        >Add Package Permission</a
+    >
+</div>
+<div class="container mt-4 pt-2">
+    <table
+        mat-table
+        [dataSource]="group.packagePermissions"
+        *ngIf="group.packagePermissions.length > 0"
+        class="gray-table"
+        aria-labelledby="permissions"
+    >
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef scope="col">Package</th>
+            <td class="table-content" mat-cell *matCellDef="let packagePermission">
+                <div style="display: flex; justify-content: start; align-content: center">
+                    <a
+                        class="ml-2"
+                        [routerLink]="
+                            '/' +
+                            packagePermission.package.identifier.catalogSlug +
+                            '/' +
+                            packagePermission.package.identifier.packageSlug
+                        "
+                    >
+                        <app-avatar
+                            class="align-top user-img"
+                            [user]="packagePermission.package.creator"
+                            [size]="40"
+                            *ngIf="!packagePermission.package.catalog.unclaimed"
+                        >
+                        </app-avatar>
+                        <app-avatar
+                            class="align-top user-img"
+                            [catalog]="packagePermission.package.catalog"
+                            [circled]="false"
+                            [size]="40"
+                            *ngIf="packagePermission.package.catalog.unclaimed"
+                        >
+                        </app-avatar>
+                    </a>
+
+                    <a
+                        class="pt-2 color-info ml-2"
+                        [routerLink]="
+                            '/' +
+                            packagePermission.package.identifier.catalogSlug +
+                            '/' +
+                            packagePermission.package.identifier.packageSlug
+                        "
+                        >{{
+                            packagePermission.package.identifier.catalogSlug +
+                                "/" +
+                                packagePermission.package.identifier.packageSlug
+                        }}</a
+                    >
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
+            <td class="table-content" mat-cell *matCellDef="let packagePermission">
+                <mat-form-field
+                    appearance="fill"
+                    class="permission-div"
+                    *ngIf="packagePermission.package.myPermissions.includes(Permission.MANAGE)"
+                >
+                    <mat-select
+                        [value]="highestPermission(packagePermission.permissions)"
+                        (selectionChange)="updatePermission(packagePermission.package, $event.value)"
+                    >
+                        <mat-option value="VIEW">View</mat-option>
+                        <mat-option value="EDIT">Edit</mat-option>
+                        <mat-option value="MANAGE">Manage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <span *ngIf="!packagePermission.package.myPermissions.includes(Permission.MANAGE)">{{
+                    permissionString(packagePermission.permissions)
+                }}</span>
+            </td>
+        </ng-container>
+
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions" *ngIf="group.myPermissions.includes(Permission.MANAGE)">
+            <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+            <td mat-cell *matCellDef="let packagePermission">
+                <a class="app-outlined-button mr-3" (click)="removePackage(packagePermission.package)">Remove</a>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+</div>

@@ -298,4 +298,8 @@ export class PackagePermissionComponent implements OnInit {
                     .subscribe(({ errors, data }) => (this.package.isPublic = changeEvent.checked));
             });
     }
+
+    public groupClick(group: Group): void {
+        this.router.navigate(["group", group.slug]);
+    }
 }

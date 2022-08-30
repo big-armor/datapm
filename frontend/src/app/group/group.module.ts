@@ -18,8 +18,18 @@ import { GroupRoutingModule } from "./group-routing.module";
 import { GroupPermissionsComponent } from "./group-permissions/group-permissions.component";
 import { GroupManageComponent } from "./group-manage/group-manage.component";
 import { AddUserComponent } from "./add-user/add-user.component";
+import { GroupPackagesComponent } from "./group-packages/group-packages.component";
+import { GroupCatalogsComponent } from "./group-catalog/group-catalog.component";
+import { AddGroupCatalogPermissionsComponent } from "./add-group-catalog-permissions/add-group-catalog-permissions.component";
 @NgModule({
-    declarations: [GroupDetailsComponent, GroupPermissionsComponent, GroupManageComponent, AddUserComponent],
+    declarations: [
+        GroupDetailsComponent,
+        GroupPermissionsComponent,
+        GroupManageComponent,
+        AddUserComponent,
+        GroupPackagesComponent,
+        GroupCatalogsComponent
+    ],
     imports: [
         CommonModule,
         ReactiveFormsModule,

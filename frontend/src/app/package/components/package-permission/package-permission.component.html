@@ -104,7 +104,7 @@
         <th mat-header-cell *matHeaderCellDef scope="col">Group</th>
         <td class="table-content" mat-cell *matCellDef="let groupPermission">
             <div style="display: flex; justify-content: start; align-content: center">
-                <a class="color-info ml-2" [routerLink]="'/' + groupPermission.group.name">{{
+                <a class="color-info ml-2" (click)="groupClick(groupPermission.group)">{{
                     groupPermission.group.name
                 }}</a>
             </div>

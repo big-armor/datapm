@@ -17,6 +17,8 @@ type GroupDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
     styleUrls: ["./group-details.component.scss"]
 })
 export class GroupDetailsComponent implements OnDestroy {
+    public Permission: typeof Permission = Permission;
+
     public groupSlug: string = "";
     public group: Group;
     public state: GroupDetailsPageState = "INIT";
@@ -111,35 +113,6 @@ export class GroupDetailsComponent implements OnDestroy {
 
     public groupEdited(group: Group) {
         this.getGroupDetails();
-    }
-
-    public addPackage() {
-        const dialogRef = this.dialog.open(AddGroupPackagePermissionsComponent, {
-            data: {
-                group: this.group
-            },
-            width: "600px"
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.getGroupDetails();
-            }
-        });
-    }
-
-    public removePackage(p: Package) {
-        this.removeGroupPackage
-            .mutate({
-                groupSlug: this.groupSlug,
-                packageIdentifier: {
-                    catalogSlug: p.identifier.catalogSlug,
-                    packageSlug: p.identifier.packageSlug
-                }
-            })
-            .subscribe(() => {
-                this.getGroupDetails();
-            });
     }
 
     editGroup(): void {

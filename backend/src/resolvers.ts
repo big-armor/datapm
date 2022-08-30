@@ -249,7 +249,8 @@ import { runJob } from "./resolvers/JobResolver";
 import {
     addOrUpdateGroupToCatalog,
     removeGroupFromCatalog,
-    groupsByCatalog
+    groupsByCatalog,
+    catalogPermissionsByGroupForUser
 } from "./resolvers/GroupCatalogPermissionResolver";
 import {
     addOrUpdateGroupToCollection,
@@ -598,8 +599,8 @@ export const resolvers: {
     Group: {
         myPermissions: myGroupPermissions,
         packagePermissions: packagePermissionsByGroupForUser,
-        users: groupUsers
-        // catalogs: groupCatalogs,
+        users: groupUsers,
+        catalogPermissions: catalogPermissionsByGroupForUser
         // collections: groupCollections
     },
 

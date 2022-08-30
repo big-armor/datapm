@@ -1,6 +1,7 @@
 import { EntityManager, EntityRepository, In } from "typeorm";
 import { GroupCatalogPermissionEntity } from "../entity/GroupCatalogPermissionEntity";
 import { Permission } from "../generated/graphql";
+import { AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY } from "./CatalogRepository";
 
 @EntityRepository()
 export class GroupCatalogPermissionRepository {
@@ -21,7 +22,7 @@ export class GroupCatalogPermissionRepository {
             .createQueryBuilder(ALIAS)
             .where({ catalogId })
             .andWhere(
-                '"groupCatalogPermission"."group_id" IN (SELECT "groupUser"."group_id" FROM "group_user" "groupUser" WHERE "groupUser"."user_id" = :userId)',
+                '"groupCatalogPermission"."group_id" IN (SELECT "groupUser"."group_id" FROM "group_user" "groupUser" WHERE "groupUser"."user_id" = :userId)'
             )
             .setParameter("userId", userId)
             .addRelations(ALIAS, relations)
@@ -39,11 +40,10 @@ export class GroupCatalogPermissionRepository {
         creatorId: number;
         catalogId: number;
         groupId: number;
-        permissions: Permission[],
-        packagePermissions: Permission[],
+        permissions: Permission[];
+        packagePermissions: Permission[];
         relations?: string[];
     }): Promise<GroupCatalogPermissionEntity> {
-
         const entity = await this.manager.getRepository(GroupCatalogPermissionEntity).findOne({
             where: {
                 catalogId,
@@ -52,13 +52,13 @@ export class GroupCatalogPermissionRepository {
             relations
         });
 
-        if(entity) {
+        if (entity) {
             entity.permissions = permissions;
             entity.packagePermissions = packagePermissions;
             return this.manager.save(entity);
         }
 
-        const groupPermission =  this.manager.getRepository(GroupCatalogPermissionEntity).create({
+        const groupPermission = this.manager.getRepository(GroupCatalogPermissionEntity).create({
             groupId,
             catalogId,
             permissions,
@@ -75,6 +75,32 @@ export class GroupCatalogPermissionRepository {
             },
             relations
         });
+    }
 
+    async catalogPermissionsByGroupForUser({
+        groupId,
+        userId,
+        relations = []
+    }: {
+        groupId: number;
+        userId: number;
+        relations?: string[];
+    }): Promise<GroupCatalogPermissionEntity[]> {
+        const ALIAS = "groupCatalogPermission";
+        return this.manager
+            .getRepository(GroupCatalogPermissionEntity)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .where({ groupId })
+            .andWhere(
+                '("groupCatalogPermission"."catalog_id" IN (SELECT "CatalogEntity"."id" FROM "catalog" "CatalogEntity" WHERE ' +
+                    AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY +
+                    "))",
+                {
+                    userId,
+                    permission: Permission.VIEW
+                }
+            )
+            .getMany();
     }
 }

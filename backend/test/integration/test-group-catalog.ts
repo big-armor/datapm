@@ -5,7 +5,6 @@ import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 import { describe } from "mocha";
 import {
     AddOrUpdateGroupToCatalogDocument,
-    AddOrUpdateGroupToPackageDocument,
     AddOrUpdateUserToGroupDocument,
     AutoCompleteCatalogDocument,
     AutoCompletePackageDocument,
@@ -16,7 +15,6 @@ import {
     PackageDocument,
     Permission,
     RemoveGroupFromCatalogDocument,
-    RemoveGroupFromPackageDocument,
     UpdateCatalogDocument,
     UpdatePackageDocument
 } from "./registry-client";

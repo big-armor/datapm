@@ -19,12 +19,7 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
     public packages: Package[] = [];
     public catalogs: Catalog[] = [];
 
-
-    constructor(
-        private router: Router,
-
-    ) {
-    }
+    constructor(private router: Router) {}
 
     @Input()
     public catalogsQuery: Observable<CatalogsResponse>;
@@ -55,7 +50,6 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
 
     @Output()
     public onLoadPackagesClick = new EventEmitter<LimitAndOffset>();
-
 
     @Output()
     public onLoadCatalogsClick = new EventEmitter<LimitAndOffset>();
@@ -185,7 +179,7 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
         });
     }
 
-    public requestMoreCatalogs(): void {        
+    public requestMoreCatalogs(): void {
         if (this.loadingCatalogs) {
             return;
         }
@@ -194,11 +188,9 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
             limit: this.catalogsLimit,
             offset: this.catalogs.length
         });
-
     }
 
     public catalogClick(catalog: Catalog): void {
         this.router.navigate([catalog.identifier.catalogSlug]);
-        setTimeout(() => (document.body.scrollTop = 0), 100);
     }
 }

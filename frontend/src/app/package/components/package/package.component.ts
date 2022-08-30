@@ -3,7 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { OrderBy, PackageFollowersCountGQL, PackageIssuesGQL } from "src/generated/graphql";
+import { Group, OrderBy, PackageFollowersCountGQL, PackageIssuesGQL } from "src/generated/graphql";
 import { Follow, Package, Permission, User, UserGQL, GetFollowGQL, FollowIdentifierInput } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
