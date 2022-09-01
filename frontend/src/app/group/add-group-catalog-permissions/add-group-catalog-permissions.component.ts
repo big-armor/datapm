@@ -65,10 +65,7 @@ export class AddGroupCatalogPermissionsComponent implements OnInit {
             this.selectedGroupSlug = this.data.group.slug;
         }
 
-        if (this.data.catalog)
-            this.form.controls.catalogSlug.setValue(
-                this.data.catalog.identifier.catalogSlug + "/" + this.data.catalog.identifier.catalogSlug
-            );
+        if (this.data.catalog) this.form.controls.catalogSlug.setValue(this.data.catalog.identifier.catalogSlug);
         this.updateGroups();
     }
 

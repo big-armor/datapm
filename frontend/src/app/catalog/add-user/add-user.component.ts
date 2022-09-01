@@ -130,7 +130,7 @@ export class AddUserComponent implements OnInit {
             return {
                 usernameOrEmailAddress: c.usernameOrEmailAddress,
                 permission: this.effectivePermissions,
-                packagePermission: this.packagesEffectivePermissions
+                packagePermissions: this.packagesEffectivePermissions
             };
         });
     }

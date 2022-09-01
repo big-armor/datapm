@@ -105,7 +105,7 @@ export class GroupCatalogsComponent implements OnChanges {
 
         if (permissions.includes(Permission.VIEW)) return Permission.VIEW;
 
-        return Permission.VIEW;
+        return Permission.NONE;
     }
 
     public permissionString(permissions: Permission[]): string {

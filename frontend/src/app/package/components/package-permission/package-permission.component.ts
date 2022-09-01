@@ -10,6 +10,7 @@ import { DeletePackageComponent } from "src/app/shared/delete-package/delete-pac
 import {
     AddOrUpdateGroupToPackageGQL,
     Group,
+    GroupPackagePermission,
     GroupsByPackageGQL,
     Package,
     Permission,
@@ -36,7 +37,7 @@ export class PackagePermissionComponent implements OnInit {
     public package: Package;
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
-    public groupPermissions: any[] = [];
+    public groupPermissions: GroupPackagePermission & { permission: Permission }[] = [];
 
     private unsubscribe$ = new Subject();
 
@@ -46,10 +47,10 @@ export class PackagePermissionComponent implements OnInit {
         private groupsByPackage: GroupsByPackageGQL,
         private updatePackage: UpdatePackageGQL,
         private packageService: PackageService,
-        private removeUserPackagePermission: RemovePackagePermissionsGQL,
+        private removeUserPackagePermissions: RemovePackagePermissionsGQL,
         private setPackagePermissions: SetPackagePermissionsGQL,
-        private addOrUpdateGroupPackagePermission: AddOrUpdateGroupToPackageGQL,
-        private removeGroupPackagePermission: RemoveGroupFromPackageGQL,
+        private addOrUpdateGroupPackagePermissions: AddOrUpdateGroupToPackageGQL,
+        private removeGroupPackagePermissions: RemoveGroupFromPackageGQL,
         private router: Router,
         private snackBarService: SnackBarService,
         private route: ActivatedRoute,
@@ -70,7 +71,7 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public removeGroup(groupSlug: string): void {
-        this.removeGroupPackagePermission
+        this.removeGroupPackagePermissions
             .mutate({
                 packageIdentifier: {
                     catalogSlug: this.package.identifier.catalogSlug,
@@ -116,7 +117,7 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public updateGroupPermissions(group: Group, permission: Permission): void {
-        this.addOrUpdateGroupPackagePermission
+        this.addOrUpdateGroupPackagePermissions
             .mutate({
                 groupSlug: group.slug,
                 packageIdentifier: {
@@ -137,7 +138,7 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public removeUser(usernameOrEmailAddress: string): void {
-        this.removeUserPackagePermission
+        this.removeUserPackagePermissions
             .mutate({
                 identifier: {
                     catalogSlug: this.package.identifier.catalogSlug,

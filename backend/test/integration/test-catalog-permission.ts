@@ -75,7 +75,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user200",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -98,7 +98,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user202",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -121,7 +121,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user201",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test"
@@ -144,7 +144,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user201",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -201,7 +201,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user201",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -249,7 +249,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user201",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Testing messages"
@@ -297,7 +297,7 @@ describe("Catalog Permissions", async () => {
                     {
                         usernameOrEmailAddress: "my-test-user201",
                         permission: newPermissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Testing messages"

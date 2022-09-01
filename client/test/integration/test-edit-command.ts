@@ -276,7 +276,7 @@ describe("Edit Package Command Tests", async () => {
                     {
                         usernameOrEmailAddress: "testb-edit-command",
                         permission: [Permission.VIEW],
-                        packagePermission: [Permission.VIEW]
+                        packagePermissions: [Permission.VIEW]
                     }
                 ],
                 message: "test message"

@@ -214,7 +214,7 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (
         const permissions: Permission[] = [];
 
         if (userPermissions) {
-            userPermissions.packagePermission.forEach((permission) => {
+            userPermissions.packagePermissions.forEach((permission) => {
                 if (!permissions.includes(permission)) permissions.push(permission);
             });
         }

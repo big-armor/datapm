@@ -527,6 +527,7 @@ Represents users, and their permissions on a catalog
 type UserCatalogPermissions {
     user: User!
     permissions: [Permission!]!
+    packagePermissions: [Permission!]!
 }
 
 """
@@ -964,7 +965,7 @@ input SetUserCatalogPermissionInput {
     """
     The users permissions for all packages in the catalog
     """
-    packagePermission: [Permission!]!
+    packagePermissions: [Permission!]!
 }
 
 """

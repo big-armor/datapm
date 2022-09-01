@@ -7,12 +7,17 @@ import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCatalogComponent } from "src/app/shared/delete-catalog/delete-catalog.component";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import {
+    AddOrUpdateGroupToCatalogGQL,
     Catalog,
     DeleteUserCatalogPermissionsGQL,
+    Group,
+    GroupCatalogPermission,
+    GroupsByCatalogGQL,
     Permission,
     SetUserCatalogPermissionGQL,
     UpdateCatalogGQL,
     User,
+    UserCatalogPermissions,
     UsersByCatalogGQL
 } from "src/generated/graphql";
 
@@ -20,7 +25,8 @@ import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../services/dialog/dialog.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { getHighestPermission } from "src/app/services/permissions.service";
+import { getEffectivePermissions, getHighestPermission } from "src/app/services/permissions.service";
+import { AddGroupCatalogPermissionsComponent } from "src/app/group/add-group-catalog-permissions/add-group-catalog-permissions.component";
 
 @Component({
     selector: "app-catalog-permissions",
@@ -32,13 +38,18 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
 
     public isCatalogPublic: boolean;
     public isCatalogUnclaimed: boolean;
-    public columnsToDisplay = ["name", "permission", "actions"];
-    public users: any[] = [];
+    public columnsToDisplay = ["name", "permission", "packagePermission", "actions"];
+    public users: (UserCatalogPermissions & { permission: Permission; packagePermission: Permission })[] = [];
 
     Permission = Permission;
     public user: User;
     public hasCatalogPublicErrors: boolean;
     public hasCatalogUnclaimedErrors: boolean;
+
+    public groupPermissions: (GroupCatalogPermission & {
+        permission: Permission;
+        packagePermission: Permission;
+    })[] = [];
 
     @Output()
     public onCatalogUpdate = new EventEmitter<Catalog>();
@@ -55,7 +66,9 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
         private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
         private snackBarService: SnackBarService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private addOrUpdateGroupToCatalogGQL: AddOrUpdateGroupToCatalogGQL,
+        private groupsByCatalogGQL: GroupsByCatalogGQL
     ) {}
 
     public ngOnInit(): void {
@@ -72,6 +85,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
 
             this.setCatalogVariables(changes.catalog.currentValue);
             this.getUserList();
+            this.updateGroupsList();
         }
     }
 
@@ -162,10 +176,9 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
             })
             .subscribe(({ data }) => {
                 this.users = data.usersByCatalog.map((item) => ({
-                    username: item.user.username,
-                    name: this.getUserName(item.user as User),
-                    pendingInvitationAcceptance: item.user.username.includes("@"),
-                    permission: getHighestPermission(item.permissions)
+                    ...item,
+                    permission: getHighestPermission(item.permissions),
+                    packagePermission: getHighestPermission(item.packagePermissions)
                 }));
             });
     }
@@ -180,7 +193,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                     {
                         usernameOrEmailAddress: username,
                         permission: permissions,
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: ""
@@ -291,5 +304,63 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         if (permissions.includes(Permission.VIEW)) return "View";
 
         return "";
+    }
+
+    public addGroup(): void {
+        const dialogRef = this.dialog.open(AddGroupCatalogPermissionsComponent, {
+            width: "550px",
+            data: {
+                catalog: this.catalog
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.updateGroupsList();
+            }
+        });
+    }
+
+    public updateGroupPermissions(group: Group, permission: Permission, packagePermission: Permission): void {
+        this.addOrUpdateGroupToCatalogGQL
+            .mutate({
+                groupSlug: group.slug,
+                catalogIdentifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                },
+                permissions: getEffectivePermissions(permission),
+                packagePermissions: getEffectivePermissions(packagePermission)
+            })
+            .subscribe(({ errors }) => {
+                this.snackBarService.openSnackBar(
+                    errors
+                        ? "There was a problem. Try again later."
+                        : "Group '" + group.name + "' permissions updated to " + permission,
+                    "Ok"
+                );
+                this.updateGroupsList();
+            });
+    }
+
+    private updateGroupsList(): void {
+        if (!this.catalog) {
+            return;
+        }
+
+        this.groupsByCatalogGQL
+            .fetch({
+                catalogIdentifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                }
+            })
+            .subscribe(({ data }) => {
+                this.groupPermissions = data.groupsByCatalog
+                    .map((item) => ({
+                        ...item,
+                        permission: getHighestPermission(item.permissions),
+                        packagePermission: getHighestPermission(item.packagePermissions)
+                    }))
+                    .sort((a, b) => a.group.name.localeCompare(b.group.name));
+            });
     }
 }
