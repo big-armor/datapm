@@ -174,7 +174,7 @@ export const addOrUpdateUserToGroup = async (
         }
     });
 
-    await asyncForEach(inviteUsers, async (user) => {
+    await asyncForEach(existingUsers, async (user) => {
         await sendShareNotification(
             user,
             context.me.displayName,
@@ -190,7 +190,7 @@ export const addOrUpdateUserToGroup = async (
             user,
             context.me.displayName,
             group.name,
-            "You have been added to the group named " + group.name + "."
+            "You have been added to the group named " + groupEntity.name + "."
         );
     });
 };

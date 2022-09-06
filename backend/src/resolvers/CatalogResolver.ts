@@ -25,7 +25,11 @@ import { isAuthenticatedContext } from "../util/contextHelpers";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
-import { deletePackageFollowsForUsersWithNoPermissions, getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
+import {
+    deletePackageFollowsForUsersWithNoPermissions,
+    getPackageFromCacheOrDb,
+    packageEntityToGraphqlObject
+} from "./PackageResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
@@ -45,12 +49,12 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
 };
 
 export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+    /* if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
         return {
             catalogSlug: "private",
             registryURL: getEnvVariable("REGISTRY_URL")
         };
-    }
+    } */
 
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
@@ -61,10 +65,10 @@ export const catalogIdentifier = async (parent: Catalog, _1: any, context: Conte
 };
 
 export const catalogWebsite = async (parent: Catalog, _1: any, context: Context) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+    if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
-    
+
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.website;
 };
@@ -80,13 +84,9 @@ export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
-        return null;
-    }
-    
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
-    if (catalog.description != null) {
+    if (catalog.displayName != null) {
         return catalog.displayName;
     }
 
@@ -95,10 +95,10 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+    if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
-    
+
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     if (catalog.description != null) {
@@ -110,7 +110,7 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+    if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
 
@@ -124,7 +124,7 @@ export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Co
 
     let user: UserEntity | undefined;
 
-    if(isAuthenticatedContext(context)) {
+    if (isAuthenticatedContext(context)) {
         user = (context as AuthenticatedContext).me;
     }
 
@@ -150,12 +150,12 @@ export const userCatalogs = async (
 };
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
+    if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
-    
+
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    
+
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;
 
     const packages = await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
@@ -368,7 +368,7 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
         const unclaimedCatalogs = await context.connection.manager
             .getCustomRepository(CatalogRepository)
             .findAllUnclaimed();
-            
+
         const filteredUnclaimedCatalogs = unclaimedCatalogs.filter((c) => !catalogs.some((c2) => c2.id === c.id));
 
         catalogs.push(...filteredUnclaimedCatalogs);
@@ -421,9 +421,9 @@ export const getCatalogByIdentifier = async (
 
 export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
     const catalogPromiseFunction = () =>
-        context.connection.manager.getCustomRepository(CatalogRepository).findOne(catalogId, { relations }) as Promise<
-            CatalogEntity
-        >;
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
@@ -461,10 +461,9 @@ export const getCatalogFromCacheOrDbBySlug = async (
     relations?: string[]
 ) => {
     const catalogPromiseFunction = () =>
-        connection.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug, relations }) as Promise<
-            CatalogEntity
-        >;
+        connection
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };
-

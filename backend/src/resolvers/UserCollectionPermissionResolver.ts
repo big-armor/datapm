@@ -143,7 +143,7 @@ export const setUserCollectionPermissions = async (
         });
     });
 
-    await asyncForEach(inviteUsers, async (user) => {
+    await asyncForEach(existingUsers, async (user) => {
         await sendShareNotification(
             user,
             context.me.displayName,

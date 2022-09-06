@@ -252,9 +252,13 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }
 
     async deleteCatalog({ slug }: { slug: string }): Promise<void> {
-        const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({
+        const catalog = await this.manager.getRepository(CatalogEntity).findOne({
             where: { slug: slug }
         });
+
+        if (catalog == null) {
+            return;
+        }
 
         // find all packages that are part of this catalog
         const ALIAS = "package";

@@ -182,7 +182,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         user?: UserEntity;
         relations?: string[];
     }): Promise<PackageEntity[]> {
-        const ALIAS = "packagesForUser";
+        const ALIAS = "PackageEntity";
 
         const packages = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(`"PackageEntity"."catalog_id" = :catalogId `, { catalogId: catalogId })

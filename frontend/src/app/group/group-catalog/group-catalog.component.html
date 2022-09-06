@@ -69,7 +69,7 @@
                     </mat-select>
                 </mat-form-field>
                 <span *ngIf="!catalogPermission.catalog.myPermissions.includes(Permission.MANAGE)">{{
-                    permissionString(catalogPermission.pacakgePermissions)
+                    permissionString(catalogPermission.packagePermissions)
                 }}</span>
             </td>
         </ng-container>

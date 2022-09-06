@@ -10,7 +10,7 @@
         "build": "tsc",
         "postbuild": "npx gulp",
         "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
-        "start": "TYPEORM_IS_DIST=false TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --watch '../client-lib/src' --watch '../lib/src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
+        "start": "TYPEORM_IS_DIST=false TS_NODE_FILES=true . ./env.sh && . ./env-local.sh && nodemon --watch 'src' --watch '../client-lib/src' --watch '../lib/src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "prestart-nowatch": "npm run prestart",
         "start-nowatch": "TYPEORM_IS_DIST=false . ./env.sh && node --max-old-space-size=8192 -- node_modules/.bin/ts-node src/index.ts",
         "prestart:server": "npm run build",

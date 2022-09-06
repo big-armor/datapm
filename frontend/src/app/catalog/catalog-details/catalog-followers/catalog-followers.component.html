@@ -1,5 +1,6 @@
 <div class="mt-4 pt-2">
     <app-followers
+        *ngIf="catalog?.myPermissions.includes(Permission.VIEW)"
         [followers]="followers"
         [hasLoadingErrors]="hasLoadingErrors"
         [hasMoreFollowers]="hasMoreFollowers"
@@ -7,4 +8,7 @@
         [objectType]="'catalog'"
         (onMoreFollowersRequested)="loadFollowers($event)"
     ></app-followers>
+    <p *ngIf="!catalog?.myPermissions.includes(Permission.VIEW)">
+        You do not have permission to view this catalog, and therefore you can not view the followers.
+    </p>
 </div>

@@ -5,7 +5,7 @@ import { takeUntil } from "rxjs/operators";
 import { PlatformSettingsComponent } from "src/app/home/admin-dashboard/platform-settings/platform-settings.component";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Catalog, GetPageContentGQL, PageContent, User } from "src/generated/graphql";
+import { Catalog, GetPageContentGQL, PageContent, Permission, User } from "src/generated/graphql";
 
 enum PageType {
     USER,
@@ -38,16 +38,19 @@ export class CatalogComponent implements OnInit {
 
     private subscription = new Subject();
 
-    constructor(private route: ActivatedRoute, private pageContentGQL: GetPageContentGQL, private authService: AuthenticationService) {
+    constructor(
+        private route: ActivatedRoute,
+        private pageContentGQL: GetPageContentGQL,
+        private authService: AuthenticationService
+    ) {
         this.currentUserSubscription = this.authService.currentUser.subscribe((user) => {
             this.currentUser = user;
 
-            if(this.currentUser?.username == this.user?.username) {
+            if (this.currentUser?.username == this.user?.username) {
                 this.user = this.currentUser;
             }
         });
     }
-
 
     public ngOnInit(): void {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {
@@ -61,7 +64,6 @@ export class CatalogComponent implements OnInit {
         this.state = "LOADING";
 
         this.loadData(catalogSlug);
-
     }
 
     public ngOnDestroy(): void {
@@ -111,7 +113,12 @@ export class CatalogComponent implements OnInit {
 
     private updateCatalogSettings(content: any): void {
         this.catalog = content.catalog;
-        this.pageType = PageType.CATALOG;
+
+        if (!this.catalog.myPermissions.includes(Permission.VIEW)) {
+            this.pageType = PageType.CATALOG;
+        } else {
+            this.pageType = PageType.CATALOG;
+        }
     }
 
     private updateTemplateSettings(route: string, content: PageContent): void {

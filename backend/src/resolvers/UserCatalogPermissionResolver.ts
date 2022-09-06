@@ -102,7 +102,7 @@ export const setUserCatalogPermission = async (
         });
     });
 
-    await asyncForEach(inviteUsers, async (user) => {
+    await asyncForEach(existingUsers, async (user) => {
         await sendShareNotification(user, context.me.displayName, catalog.displayName, "/" + catalog.slug, message);
     });
 
