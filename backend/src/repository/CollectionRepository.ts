@@ -8,6 +8,15 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
+const PUBLIC_COLLECTIONS_QUERY = '("CollectionEntity"."is_public" is true)';
+const AUTHENTICATED_USER_COLLECTIONS_QUERY = `
+    (
+        ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND :permission = any(permissions)))
+        OR
+        ("CollectionEntity"."id" IN (select gc.collection_id FROM group_collection_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+    )`;
+export const AUTHENTICATED_USER_OR_PUBLIC_COLLECTIONS_QUERY = `(${PUBLIC_COLLECTIONS_QUERY} or ${AUTHENTICATED_USER_COLLECTIONS_QUERY})`;
+
 @EntityRepository(CollectionEntity)
 export class CollectionRepository extends Repository<CollectionEntity> {
     private static readonly COLLECTION_RELATION_ALIAS = "CollectionEntity";
@@ -96,8 +105,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
 
         const queryString = query.getQuery();
 
-        const response = await query
-            .getManyAndCount();
+        const response = await query.getManyAndCount();
 
         return response;
     }
@@ -219,7 +227,10 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             .getManyAndCount();
     }
 
-    private createQueryBuilderWithUserConditions(userId: number | undefined, permission: Permission): SelectQueryBuilder<CollectionEntity> {
+    private createQueryBuilderWithUserConditions(
+        userId: number | undefined,
+        permission: Permission
+    ): SelectQueryBuilder<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 
         if (!userId) {
@@ -227,49 +238,26 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         }
 
         return queryBuilder
-            .where(
-                `(
-                    ("CollectionEntity"."is_public" is true)
-                    OR 
-                    ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND :permission = any(permissions)))
-                    OR
-                    ("CollectionEntity"."id" IN (select gc.collection_id FROM group_collection_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
-                 )
-                `
-            )
+            .where(AUTHENTICATED_USER_OR_PUBLIC_COLLECTIONS_QUERY)
             .setParameter("userId", userId)
             .setParameter("permission", permission);
     }
 
-
-
-
-    async getPublicCollections(
-        limit: number,
-        offSet: number,
-        relations?: string[]
-    ): Promise<CollectionEntity[]> {
-        const ALIAS = "PublicCollections";
-        return this.createQueryBuilder(ALIAS)
-            // .orderBy('"PublishCollections"."created_at"', "DESC") // TODO Sort by views (or popularity)
-            .where(
-                `("PublicCollections"."is_public" = true)`,
-            )
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .getMany();
+    async getPublicCollections(limit: number, offSet: number, relations?: string[]): Promise<CollectionEntity[]> {
+        const ALIAS = "CollectionEntity";
+        return (
+            this.createQueryBuilder(ALIAS)
+                // .orderBy('"PublishCollections"."created_at"', "DESC") // TODO Sort by views (or popularity)
+                .where(PUBLIC_COLLECTIONS_QUERY)
+                .limit(limit)
+                .offset(offSet)
+                .addRelations(ALIAS, relations)
+                .getMany()
+        );
     }
 
-    async countPublicCollections(
-    ): Promise<number> {
+    async countPublicCollections(): Promise<number> {
         const ALIAS = "CountCollections";
-        return this.createQueryBuilder(ALIAS)
-            .where(
-                `("CountCollections"."is_public" = true)`,
-            )
-            .getCount();
+        return this.createQueryBuilder(ALIAS).where(`("CountCollections"."is_public" = true)`).getCount();
     }
-
-
 }

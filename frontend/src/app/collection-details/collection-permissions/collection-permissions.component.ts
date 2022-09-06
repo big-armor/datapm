@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
@@ -8,13 +8,19 @@ import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCollectionComponent } from "src/app/shared/delete-collection/delete-collection.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
+    AddOrUpdateGroupToCollectionGQL,
     Collection,
+    Group,
+    GroupCollectionPermission,
+    GroupsByCollectionGQL,
     Permission,
+    RemoveGroupFromCollectionGQL,
     SetUserCollectionPermissionsGQL,
     UpdateCollectionGQL,
-    User,
+    UserCollectionPermissions,
     UsersByCollectionGQL
 } from "src/generated/graphql";
+import { AddGroupCollectionPermissionsComponent } from "../add-group-collection-permissions/add-group-collection-permissions.component";
 import { AddUserComponent } from "../add-user/add-user.component";
 
 @Component({
@@ -29,7 +35,8 @@ export class CollectionPermissionsComponent implements OnChanges {
     Permission = Permission;
 
     public columnsToDisplay = ["name", "permission", "actions"];
-    public users: any[] = [];
+    public userPermissions: (UserCollectionPermissions & { permission: Permission })[] = [];
+    public groupPermissions: (GroupCollectionPermission & { permission: Permission })[] = [];
 
     constructor(
         private dialog: MatDialog,
@@ -39,6 +46,9 @@ export class CollectionPermissionsComponent implements OnChanges {
         private authenticationService: AuthenticationService,
         private router: Router,
         private snackBarService: SnackBarService,
+        private groupsByCollectionGQL: GroupsByCollectionGQL,
+        private addOrUpdateGroupCollectionPermissionsGQL: AddOrUpdateGroupToCollectionGQL,
+        private removeGroupPermissionsGQL: RemoveGroupFromCollectionGQL,
         private authSvc: AuthenticationService
     ) {}
 
@@ -50,6 +60,7 @@ export class CollectionPermissionsComponent implements OnChanges {
                 this.columnsToDisplay = ["name", "permission"];
             }
             this.getUserList();
+            this.getGroupsList();
         }
     }
 
@@ -65,10 +76,8 @@ export class CollectionPermissionsComponent implements OnChanges {
                 }
             })
             .subscribe(({ data }) => {
-                this.users = data.usersByCollection.map((item) => ({
-                    username: item.user.username,
-                    name: this.getUserName(item.user as User),
-                    pendingInvitationAcceptance: item.user.username.includes("@"),
+                this.userPermissions = data.usersByCollection.map((item) => ({
+                    ...item,
                     permission: getHighestPermission(item.permissions)
                 }));
             });
@@ -154,11 +163,6 @@ export class CollectionPermissionsComponent implements OnChanges {
         return permissions.slice(0, index + 1);
     }
 
-    private getUserName(user: User) {
-        const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        return fullname ? `${fullname} (${user.username})` : user.username;
-    }
-
     public deleteCollection() {
         const dlgRef = this.dialog.open(DeleteCollectionComponent, {
             data: {
@@ -172,6 +176,73 @@ export class CollectionPermissionsComponent implements OnChanges {
                     fragment: "collections"
                 });
         });
+    }
+
+    private getGroupsList() {
+        if (!this.collection) {
+            return;
+        }
+
+        this.groupsByCollectionGQL
+            .fetch({
+                collectionIdentifier: {
+                    collectionSlug: this.collection.identifier.collectionSlug
+                }
+            })
+            .subscribe(({ data }) => {
+                this.groupPermissions = data.groupsByCollection.map((item) => ({
+                    ...item,
+                    permission: getHighestPermission(item.permissions)
+                }));
+            });
+    }
+
+    public addGroup() {
+        const dialogRef = this.dialog.open(AddGroupCollectionPermissionsComponent, {
+            width: "550px",
+            data: {
+                collection: this.collection
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.getGroupsList();
+            }
+        });
+    }
+
+    private setGroupPermissions(group: Group, permissions: Permission[]) {
+        this.addOrUpdateGroupCollectionPermissionsGQL
+            .mutate({
+                collectionIdentifier: {
+                    collectionSlug: this.collection?.identifier.collectionSlug
+                },
+                groupSlug: group.slug,
+                permissions
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+                this.getGroupsList();
+            });
+    }
+
+    private removeGroupPermissions(group: Group) {
+        this.removeGroupPermissionsGQL
+            .mutate({
+                collectionIdentifier: {
+                    collectionSlug: this.collection?.identifier.collectionSlug
+                },
+                groupSlug: group.slug
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+                this.getGroupsList();
+            });
     }
 
     public permissionString(permissions: Permission[]): string {

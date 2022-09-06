@@ -20,7 +20,8 @@ import { GroupManageComponent } from "./group-manage/group-manage.component";
 import { AddUserComponent } from "./add-user/add-user.component";
 import { GroupPackagesComponent } from "./group-packages/group-packages.component";
 import { GroupCatalogsComponent } from "./group-catalog/group-catalog.component";
-import { AddGroupCatalogPermissionsComponent } from "./add-group-catalog-permissions/add-group-catalog-permissions.component";
+import { GroupCollectionsComponent } from "./group-collection/group-collection.component";
+
 @NgModule({
     declarations: [
         GroupDetailsComponent,
@@ -28,7 +29,8 @@ import { AddGroupCatalogPermissionsComponent } from "./add-group-catalog-permiss
         GroupManageComponent,
         AddUserComponent,
         GroupPackagesComponent,
-        GroupCatalogsComponent
+        GroupCatalogsComponent,
+        GroupCollectionsComponent
     ],
     imports: [
         CommonModule,

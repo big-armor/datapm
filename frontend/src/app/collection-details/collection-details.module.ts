@@ -20,14 +20,15 @@ import { MatStepperModule } from "@angular/material/stepper";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { CollectionFollowersComponent } from "./collection-details/collection-followers/collection-followers.component";
-
+import { AddGroupCollectionPermissionsComponent } from "./add-group-collection-permissions/add-group-collection-permissions.component";
 @NgModule({
     declarations: [
         CollectionDetailsComponent,
         AddPackageComponent,
         AddUserComponent,
         CollectionPermissionsComponent,
-        CollectionFollowersComponent
+        CollectionFollowersComponent,
+        AddGroupCollectionPermissionsComponent
     ],
     imports: [
         CommonModule,

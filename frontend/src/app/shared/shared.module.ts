@@ -83,6 +83,7 @@ import { EditGroupComponent } from "../shared/edit-group/edit-group.component";
 import { UserItemComponent } from "../shared/user-item/user-item.component";
 import { PackageAutocompleteComponent } from "./package-autocomplete/package-autocomplete.component";
 import { CatalogAutocompleteComponent } from "./catalog-autocomplete/catalog-autocomplete.component";
+import { CollectionAutocompleteComponent } from "./collection-autocomplete/collection-autocomplete.component";
 
 @NgModule({
     declarations: [
@@ -144,7 +145,8 @@ import { CatalogAutocompleteComponent } from "./catalog-autocomplete/catalog-aut
         UserGroupsComponent,
         UpdateMethodPipe,
         PackageAutocompleteComponent,
-        CatalogAutocompleteComponent
+        CatalogAutocompleteComponent,
+        CollectionAutocompleteComponent
     ],
     imports: [
         CommonModule,
@@ -222,7 +224,8 @@ import { CatalogAutocompleteComponent } from "./catalog-autocomplete/catalog-aut
         HeroComponent,
         FollowersComponent,
         PackageAutocompleteComponent,
-        CatalogAutocompleteComponent
+        CatalogAutocompleteComponent,
+        CollectionAutocompleteComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

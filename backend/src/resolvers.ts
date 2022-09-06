@@ -255,7 +255,8 @@ import {
 import {
     addOrUpdateGroupToCollection,
     removeGroupFromCollection,
-    groupsByCollection
+    groupsByCollection,
+    collectionPermissionsByGroupForUser
 } from "./resolvers/GroupCollectionPermissionResolver";
 
 export const getPageContentByRoute = async (
@@ -600,8 +601,8 @@ export const resolvers: {
         myPermissions: myGroupPermissions,
         packagePermissions: packagePermissionsByGroupForUser,
         users: groupUsers,
-        catalogPermissions: catalogPermissionsByGroupForUser
-        // collections: groupCollections
+        catalogPermissions: catalogPermissionsByGroupForUser,
+        collectionPermissions: collectionPermissionsByGroupForUser
     },
 
     Query: {

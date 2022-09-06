@@ -14,6 +14,7 @@ import {
     GroupCatalogPermission,
     GroupsByCatalogGQL,
     Permission,
+    RemoveGroupFromCatalogGQL,
     SetUserCatalogPermissionGQL,
     UpdateCatalogGQL,
     User,
@@ -68,6 +69,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         private snackBarService: SnackBarService,
         private route: ActivatedRoute,
         private addOrUpdateGroupToCatalogGQL: AddOrUpdateGroupToCatalogGQL,
+        private remoteGroupCatalogPermissionsGQL: RemoveGroupFromCatalogGQL,
         private groupsByCatalogGQL: GroupsByCatalogGQL
     ) {}
 
@@ -121,13 +123,13 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         this.setUserPermission(username, this.getPermissionArrayFrom(permission));
     }
 
-    public removeUser(username: string): void {
+    public removeUser(userPermissions: UserCatalogPermissions): void {
         this.deleteUserCatalogPermissionGQL
             .mutate({
                 identifier: {
                     catalogSlug: this.catalog?.identifier.catalogSlug
                 },
-                usernameOrEmailAddress: username
+                usernameOrEmailAddress: userPermissions.user.username
             })
             .subscribe(({ errors }) => {
                 if (errors) {
@@ -319,6 +321,22 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                 this.updateGroupsList();
             }
         });
+    }
+
+    public removeGroup(group: Group): void {
+        this.remoteGroupCatalogPermissionsGQL
+            .mutate({
+                catalogIdentifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                },
+                groupSlug: group.slug
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+                this.updateGroupsList();
+            });
     }
 
     public updateGroupPermissions(group: Group, permission: Permission, packagePermission: Permission): void {

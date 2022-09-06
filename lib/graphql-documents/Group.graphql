@@ -43,6 +43,7 @@ query Group($groupSlug: String!) {
                 description
                 isPublic
                 isRecommended
+                myPermissions
             }
         }
         catalogPermissions {

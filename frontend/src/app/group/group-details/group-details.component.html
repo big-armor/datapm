@@ -37,6 +37,8 @@
             </app-group-packages>
             <app-group-catalog (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 2">
             </app-group-catalog>
+            <app-group-collection (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 3">
+            </app-group-collection>
             <app-group-manage
                 (groupEdited)="getGroupDetails($event)"
                 [group]="group"

@@ -58,7 +58,9 @@ export class InputErrorPipe implements PipeTransform {
             statusChanges = merge(statusChanges, control.statusChanges);
         }
 
-        return statusChanges.pipe(map(() => this.checkError()));
+        if (statusChanges) return statusChanges.pipe(map(() => this.checkError()));
+
+        return this.checkError();
     }
 
     private checkError() {

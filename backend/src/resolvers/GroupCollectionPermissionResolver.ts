@@ -1,20 +1,23 @@
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupCollectionPermissionEntity } from "../entity/GroupCollectionPermissionEntity";
+import { UserEntity } from "../entity/UserEntity";
 import {
     GroupCollectionPermission,
     CollectionIdentifierInput,
     Permission,
-    ActivityLogEventType
+    ActivityLogEventType,
+    Group
 } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { GroupCollectionPermissionRepository } from "../repository/GroupCollectionPermissionRepository";
+import { getGraphQlRelationName } from "../util/relationNames";
 import {
     getCollectionFromCacheOrDbOrFail,
     collectionEntityToGraphQL,
     getCollectionFromCacheOrDbById
 } from "./CollectionResolver";
-import { findGroup, getGroupFromCacheOrDbByIdOrFail } from "./GroupResolver";
+import { findGroup, getGroupFromCacheOrDbByIdOrFail, getGroupFromCacheOrDbBySlugOrFail } from "./GroupResolver";
 
 export const groupCollectionPermissionEntityToGraphqlObject = async (
     context: Context,
@@ -142,4 +145,27 @@ export const removeGroupFromCollection = async (
 
         return groupCollectionPermissionEntityToGraphqlObject(context, manager, groupPermission);
     });
+};
+
+export const collectionPermissionsByGroupForUser = async (
+    parent: Group,
+    _0: any,
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
+
+    const user: UserEntity | undefined = (context as AuthenticatedContext).me;
+
+    const permissions = await context.connection
+        .getCustomRepository(GroupCollectionPermissionRepository)
+        .collectionPermissionsByGroupForUser({
+            groupId: group.id,
+            userId: user?.id,
+            relations: getGraphQlRelationName(info)
+        });
+
+    return permissions.map((p) =>
+        groupCollectionPermissionEntityToGraphqlObject(context, context.connection.manager, p)
+    );
 };

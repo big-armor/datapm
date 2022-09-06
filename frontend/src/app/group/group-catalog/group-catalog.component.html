@@ -1,9 +1,6 @@
 <div class="container mt-4 pt-2">
     <div class="text-main-title">Catalogs Permissions for Group</div>
-    <p *ngIf="group.catalogPermissions?.length > 0">
-        This group has the following permissions to these catalogs. Note the group may also have catalog level access to
-        catalogs. Check the catalog tab for more permissions.
-    </p>
+    <p *ngIf="group.catalogPermissions?.length > 0">This group has the following permissions to these catalogs.</p>
     <p *ngIf="!(group.catalogPermissions?.length > 0)">
         This group has no direct catalog permissions. Check the catalog tab for more permissions.
     </p>
@@ -48,7 +45,7 @@
         </ng-container>
 
         <ng-container matColumnDef="packagePermission">
-            <th mat-header-cell *matHeaderCellDef scope="col">Package Permission</th>
+            <th mat-header-cell *matHeaderCellDef scope="col">Packages Permission</th>
             <td class="table-content" mat-cell *matCellDef="let catalogPermission">
                 <mat-form-field
                     appearance="fill"
