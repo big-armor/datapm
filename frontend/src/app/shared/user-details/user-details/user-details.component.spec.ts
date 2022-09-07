@@ -18,7 +18,6 @@ describe("UserDetailsComponent", () => {
         TestBed.configureTestingModule({
             declarations: [UserDetailsComponent],
             imports: [
-                RouterModule.forRoot([]),
                 MatDialogModule,
                 MatTableModule,
                 ApolloTestingModule,

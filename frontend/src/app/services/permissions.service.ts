@@ -7,6 +7,19 @@ export function getEffectivePermissions(permission: Permission): Permission[] {
     return permissions.slice(0, index + 1);
 }
 
+export function getHighestPermission(permissions: Permission[]): Permission {
+    const orderedPermissions = [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
+
+    for (const permission of orderedPermissions) {
+        if (permissions.includes(permission)) {
+            return permission;
+        }
+    }
+
+    return Permission.NONE;
+
+}
+
 @Injectable({
     providedIn: "root"
 })

@@ -1,0 +1,12 @@
+mutation AddOrUpdateGroupToPackage(
+    $groupSlug: String!
+    $packageIdentifier: PackageIdentifierInput!
+    $permissions: [Permission!]!
+) {
+    addOrUpdateGroupToPackage(groupSlug: $groupSlug, packageIdentifier: $packageIdentifier, permissions: $permissions) {
+        group {
+            slug
+            name
+        }
+    }
+}

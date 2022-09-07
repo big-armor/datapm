@@ -1,0 +1,10 @@
+    .mat-option {
+        height: 75px;
+        padding: 5px 10px;
+        line-height: 75px;
+
+        ::ng-deep.avatar {
+            line-height: 20px;
+            margin-right: 10px;
+        }
+    }

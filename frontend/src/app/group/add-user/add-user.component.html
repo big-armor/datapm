@@ -1,0 +1,59 @@
+<form [formGroup]="form" (submit)="submit($event)" id="addUser">
+    <div mat-dialog-title id="contentTitle" class="pb-3">Add/Update {{ group.name }} Members</div>
+    <div mat-dialog-content id="contentBorder">
+        <div class="d-flex flex-row bd-highlight pt-2 shadow-div">
+            <div class="bd-highlight w-100">
+                <app-user-invite-input
+                    #userInviteInput
+                    [usernameControl]="usernameControl"
+                    (userInputChange)="onUserInputChange($event)"
+                    (loadingStateChange)="onLoadingStatusChange($event)"
+                >
+                </app-user-invite-input>
+                <div class="permission-div modal-select w-50">
+                    <label class="div-question pl-1 mb-0">Group permissions</label>
+                    <mat-form-field appearance="fill" class="w-100">
+                        <mat-select (selectionChange)="updateSelectedPermission($event.value)" [value]="permission">
+                            <mat-option value="VIEW">View </mat-option>
+                            <mat-option value="EDIT">Edit </mat-option>
+                            <mat-option value="MANAGE">Manage </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
+                    <ng-container [ngSwitch]="error">
+                        <ng-container *ngSwitchCase="'CANNOT_SET_GROUP_CREATOR_PERMISSIONS'">
+                            You can not reduce the permissions of the last group manager.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
+                            There is no user with that username on this registry.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'INVALID_EMAIL_ADDRESS'">
+                            Invalid email address used as an input.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'MESSAGE_TOO_LONG'">
+                            Message is too long. Please use fewer than 250 characters.</ng-container
+                        >
+                        <ng-container *ngSwitchCase="'MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS'">
+                            Message cannot contain email addresses.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'MESSAGE_CANNOT_CONTAIN_URL'">
+                            Message cannot contain URLs.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'MESSAGE_CANNOT_CONTAIN_HTML_TAGS'">
+                            Message cannot contain HTML tags.
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            Error occured while adding a user permission to the group
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions class="mat-dialog-actions">
+        <button type="submit" class="ml-auto modal-submit-btn" [disabled]="loading || hasErrors">
+            <span>add</span>
+        </button>
+    </div>
+</form>

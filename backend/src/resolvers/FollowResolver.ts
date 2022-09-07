@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
+import { hasCatalogPermission, hasCatalogPermissionOrFail, resolveCatalogPermissions, resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
@@ -32,6 +32,8 @@ import { collectionEntityToGraphQLOrNull, getCollectionFromCacheOrDbOrFail } fro
 import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
 import { getPackageIssueByIdentifiers } from "./PackageIssueResolver";
 import { getUserFromCacheOrDbByUsername } from "./UserResolver";
+import { hasPackagePermissionOrFail } from "../directive/hasPackagePermissionDirective";
+import { hasCollectionPermissionOrFail } from "../directive/hasCollectionPermissionDirective";
 
 export const entityToGraphqlObject = async (context: Context, entity: FollowEntity | undefined) => {
     if (!entity) {
@@ -71,65 +73,47 @@ export const saveFollow = async (
     followEntity.changeType = (follow.changeType || []) as ActivityLogChangeType[];
 
     if (follow.catalog) {
+
+        await hasCatalogPermissionOrFail(Permission.VIEW, context, {catalogSlug: follow.catalog.catalogSlug});
+
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
-
-        const hasViewPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
-            Permission.VIEW
-        );
-
-        if (!hasViewPermission) {
-            throw new Error("NOT_AUTHORIZED");
-        }
 
         followEntity.catalogId = catalog.id;
         followEntity.eventTypes = getCatalogEventTypes(follow);
     } else if (follow.collection) {
+
+        await hasCollectionPermissionOrFail(Permission.VIEW, context, follow.collection);
+
         const collection = await manager
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
-
-        const hasPermission = await manager
-            .getCustomRepository(UserCollectionPermissionRepository)
-            .hasPermission(userId, collection, Permission.VIEW);
-
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
-        }
 
         existingFollowEntity = await followRepository.getFollowByCollectionId(userId, collection.id);
 
         followEntity.collectionId = collection.id;
         followEntity.eventTypes = getCollectionEventTypes(follow);
+
     } else if (follow.package) {
+
+        await hasPackagePermissionOrFail(Permission.VIEW, context, {catalogSlug: follow.package.catalogSlug, packageSlug: follow.package.packageSlug});
+
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
-
-        const hasPermission = await manager
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity, Permission.VIEW);
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
-        }
 
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
 
         followEntity.packageId = packageEntity.id;
         followEntity.eventTypes = getDefaultPackageEventTypes();
+        
     } else if (follow.packageIssue) {
+
+        await hasPackagePermissionOrFail(Permission.VIEW, context, follow.packageIssue.packageIdentifier);
+
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.packageIssue.packageIdentifier });
-
-        if (!packageEntity.isPublic) {
-            const hasPermission = await manager
-                .getCustomRepository(PackagePermissionRepository)
-                .hasPermission(userId, packageEntity, Permission.VIEW);
-            if (!hasPermission) {
-                throw new Error("NOT_AUTHORIZED");
-            }
-        }
 
         const issueEntity = await manager
             .getCustomRepository(PackageIssueRepository)

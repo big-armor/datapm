@@ -775,7 +775,7 @@ describe("Catalog Tests", async () => {
                 value: [
                     {
                         permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
-                        packagePermission: [],
+                        packagePermissions: [],
                         usernameOrEmailAddress: "testB-catalog"
                     }
                 ],
@@ -827,7 +827,7 @@ describe("Catalog Tests", async () => {
                 value: [
                     {
                         permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
-                        packagePermission: [Permission.VIEW],
+                        packagePermissions: [Permission.VIEW],
                         usernameOrEmailAddress: "testB-catalog"
                     }
                 ],
@@ -850,7 +850,7 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
-                let packagesResponse = await userBClient.query({
+        let packagesResponse = await userBClient.query({
             query: CatalogPackagesDocument,
             variables: {
                 limit: 100,
@@ -862,7 +862,6 @@ describe("Catalog Tests", async () => {
         });
 
         expect(packagesResponse.data!.catalogPackages!.length).to.equal(1);
-
     });
 
     it("User B can't delete permissions of creator User A", async function () {
@@ -890,7 +889,7 @@ describe("Catalog Tests", async () => {
                 value: [
                     {
                         permission: [Permission.VIEW],
-                        packagePermission: [],
+                        packagePermissions: [],
                         usernameOrEmailAddress: "testB-catalog"
                     }
                 ],

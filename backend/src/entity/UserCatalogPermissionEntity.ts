@@ -29,6 +29,6 @@ export class UserCatalogPermissionEntity extends EntityBaseModel {
     @Column("enum", { array: true, name: "permission", enum: Permission })
     permissions: Permission[];
 
-    @Column("enum", { array: true, name: "package_permission", enum: Permission })
-    packagePermission: Permission[];
+    @Column("enum", { array: true, name: "package_permissions", enum: Permission })
+    packagePermissions: Permission[];
 }

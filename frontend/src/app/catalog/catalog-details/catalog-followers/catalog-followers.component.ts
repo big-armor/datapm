@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { Catalog, CatalogFollowersGQL, User } from "src/generated/graphql";
+import { Catalog, CatalogFollowersGQL, Permission, User } from "src/generated/graphql";
 import { FollowersRequest } from "../../../shared/followers/followers.component";
 
 @Component({
@@ -14,6 +14,7 @@ export class CatalogFollowersComponent {
     public hasMoreFollowers: boolean;
     public loadingFollowers: boolean;
 
+    Permission = Permission;
     constructor(private catalogFollowersGQL: CatalogFollowersGQL) {}
 
     public loadFollowers(request: FollowersRequest): void {

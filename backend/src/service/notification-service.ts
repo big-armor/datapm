@@ -16,8 +16,10 @@ import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
 import { PackageEntity } from "../entity/PackageEntity";
-import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
+import { hasPackagePermissionForEntity } from "../directive/hasPackagePermissionDirective";
+import { Context } from "../context";
+import { SessionCache } from "../session-cache";
 
 let databaseConnection: Connection | null;
 
@@ -144,9 +146,14 @@ async function sendNotifications(
             }
         });
 
-        const catalogChanges = await getCatalogChanges(user, notification, connection);
-        const packageChanges = await getPackageChanges(user, notification, connection);
-        const collectionChanges = await getCollectionChanges(user, notification, connection);
+        const context: Context = {
+            cache: new SessionCache(),
+            connection: connection,
+        }
+
+        const catalogChanges = await getCatalogChanges(user, notification, context);
+        const packageChanges = await getPackageChanges(user, notification, context);
+        const collectionChanges = await getCollectionChanges(user, notification, context);
         const userChanges = await getUserChanges(user, notification, connection);
 
         const notificationEmail: NotificationEmailTemplate = {
@@ -235,17 +242,15 @@ async function getUserChanges(
 async function getPackageChanges(
     user: UserEntity,
     notification: Notification,
-    connection: Connection
+    context: Context
 ): Promise<NotificationResourceTypeTemplate[]> {
     const values = await Promise.all(
         (await notification.packageNotifications?.asyncMap(async (pn) => {
-            const packageEntity = await connection
+            const packageEntity = await context.connection
                 .getRepository(PackageEntity)
                 .findOneOrFail(pn.packageId, { relations: ["catalog"] });
 
-            const hasPermission = await connection
-                .getCustomRepository(PackagePermissionRepository)
-                .hasPermission(user.id, packageEntity, Permission.VIEW);
+            const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity)
 
             if (!hasPermission) {
                 return null;
@@ -257,7 +262,7 @@ async function getPackageChanges(
                 actions: await pn.pending_notifications.asyncFlatMap(async (n) => {
                     let actionsTaken: NotificationActionTemplate[] = [];
 
-                    const user = await connection.getRepository(UserEntity).findOne({
+                    const user = await context.connection.getRepository(UserEntity).findOne({
                         where: {
                             id: n.actions[0].user_id
                         }
@@ -315,7 +320,7 @@ async function getPackageChanges(
                     } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
-                                const version = await connection
+                                const version = await context.connection
                                     .getRepository(VersionEntity)
                                     .findOneOrFail({ where: { id: a.package_version_id } });
 
@@ -335,7 +340,7 @@ async function getPackageChanges(
                     } else if (n.event_type == ActivityLogEventType.VERSION_DELETED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
-                                const version = await connection
+                                const version = await context.connection
                                     .getRepository(VersionEntity)
                                     .findOneOrFail({ where: { id: a.package_version_id } });
 
@@ -366,11 +371,11 @@ async function getPackageChanges(
 async function getCatalogChanges(
     user: UserEntity,
     notification: Notification,
-    connection: Connection
+    context: Context
 ): Promise<NotificationResourceTypeTemplate[]> {
     return await Promise.all(
         (await notification.catalogNotifications?.asyncMap(async (cn) => {
-            const catalogEntity = await connection.getCustomRepository(CatalogRepository).findOneOrFail(cn.catalogId);
+            const catalogEntity = await context.connection.getCustomRepository(CatalogRepository).findOneOrFail(cn.catalogId);
 
             return {
                 displayName: catalogEntity.displayName,
@@ -378,7 +383,7 @@ async function getCatalogChanges(
                 actions: await cn.pending_notifications.asyncFlatMap(async (n) => {
                     let actionsTaken: NotificationActionTemplate[] = [];
 
-                    const user = await connection.getRepository(UserEntity).findOne({
+                    const user = await context.connection.getRepository(UserEntity).findOne({
                         where: {
                             id: n.actions[0].user_id
                         }
@@ -439,13 +444,11 @@ async function getCatalogChanges(
                     } else if (n.event_type == ActivityLogEventType.CATALOG_PACKAGE_ADDED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncFlatMap(async (a) => {
-                                const packageEntity = await connection
+                                const packageEntity = await context.connection
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id } });
 
-                                const hasPermission = await connection
-                                    .getCustomRepository(PackagePermissionRepository)
-                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
+                                const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity);
 
                                 if (!hasPermission) {
                                     return [];
@@ -475,11 +478,11 @@ async function getCatalogChanges(
 async function getCollectionChanges(
     user: UserEntity,
     notification: Notification,
-    connection: Connection
+    context: Context
 ): Promise<NotificationResourceTypeTemplate[]> {
     return await Promise.all(
         (await notification.collectionNotifications?.asyncMap(async (cn) => {
-            const collectionEntity = await connection
+            const collectionEntity = await context.connection
                 .getCustomRepository(CollectionRepository)
                 .findOneOrFail(cn.collectionId);
 
@@ -489,7 +492,7 @@ async function getCollectionChanges(
                 actions: await cn.pending_notifications.asyncFlatMap(async (n) => {
                     let actionsTaken: NotificationActionTemplate[] = [];
 
-                    const user = await connection.getRepository(UserEntity).findOne({
+                    const user = await context.connection.getRepository(UserEntity).findOne({
                         where: {
                             id: n.actions[0].user_id
                         }
@@ -550,13 +553,11 @@ async function getCollectionChanges(
                     } else if (n.event_type == ActivityLogEventType.COLLECTION_PACKAGE_ADDED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncFlatMap(async (a) => {
-                                const packageEntity = await connection
+                                const packageEntity = await context.connection
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
 
-                                const hasPermission = await connection
-                                    .getCustomRepository(PackagePermissionRepository)
-                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
+                                const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity);
 
                                 if (!hasPermission) {
                                     return [];

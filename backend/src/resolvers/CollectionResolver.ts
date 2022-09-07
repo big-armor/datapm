@@ -134,7 +134,7 @@ export const updateCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return context.connection.transaction(async (transaction) => {
+    const collection =  context.connection.transaction(async (transaction) => {
         const repository = transaction.getCustomRepository(CollectionRepository);
         const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
 
@@ -181,6 +181,10 @@ export const updateCollection = async (
 
         return collectionEntityToGraphQL(collectionEntity);
     });
+
+    context.cache.clear();
+
+    return collection;
 };
 
 export const deleteCollectionFollowsForUsersWithNoPermissions = async (

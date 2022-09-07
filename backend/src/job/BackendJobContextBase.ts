@@ -2,13 +2,12 @@ import { CantSaveReasons, JobContext, MessageType, PackageFileWithContext, Packa
 import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile, } from "datapm-lib";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { AuthenticatedContext } from "../context";
-import { hasPermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
+import { hasPackagePermissionOrFail, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
 import { CredentialRepository } from "../repository/CredentialRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { RepositoryRepository } from "../repository/RepositoryRepository";
 import { VersionRepository } from "../repository/VersionRepository";
-import { hasPackagePermissions } from "../resolvers/UserPackagePermissionResolver";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { decryptValue, encryptValue } from "../util/EncryptionUtil";
 
@@ -22,9 +21,7 @@ export abstract class BackendJobContextBase extends JobContext {
 
     async getRepositoryConfigsByType(relatedPackage: PackageIdentifierInput, connectorType: string): Promise<RepositoryConfig[]> {
         
-        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: relatedPackage});
-
-        await hasPackagePermissions(this.context, packageEntity.id, Permission.VIEW);
+        await hasPackagePermissionOrFail(Permission.VIEW, this.context, relatedPackage);
 
         const repositoryEntities =  await this.context.connection.getCustomRepository(RepositoryRepository).findRepositoriesByConnectorType(relatedPackage, connectorType);
 
@@ -78,7 +75,7 @@ export abstract class BackendJobContextBase extends JobContext {
         if(packageEntity == null)
             throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(packageIdentifier));
 
-        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+        await hasPackagePermissionOrFail(Permission.VIEW, this.context, packageIdentifier);
 
         const repositoryEntity = await this.context.connection.getCustomRepository(RepositoryRepository).findRepository(packageIdentifier, connectorType, repositoryIdentifier);
 
@@ -108,7 +105,7 @@ export abstract class BackendJobContextBase extends JobContext {
         if(packageEntity == null)
             throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(relatedPackage));
 
-        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+        await hasPackagePermissionOrFail(Permission.VIEW, this.context, relatedPackage);
 
         await this.context.connection.getCustomRepository(RepositoryRepository).createOrUpdateRepository(packageEntity, connectorType, repositoryConfig.identifier,repositoryConfig.connectionConfiguration, this.context.me);
     }
@@ -123,7 +120,7 @@ export abstract class BackendJobContextBase extends JobContext {
         if(packageEntity == null)
             throw new Error("PACKAGE_NOT_FOUND - " + JSON.stringify(relatedPackage));
 
-        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+        await hasPackagePermissionOrFail(Permission.VIEW, this.context, relatedPackage);
 
         await this.context.connection.getCustomRepository(RepositoryRepository).deleteRepository(relatedPackage, connectorType, repositoryIdentifer);
 
@@ -187,10 +184,7 @@ export abstract class BackendJobContextBase extends JobContext {
             packageSlug: packageFile.packageSlug
         };
 
-        const packageEntity = await this.context.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier});
-
-
-        await hasPackagePermissions(this.context, packageEntity.id, Permission.EDIT);
+        await hasPackagePermissionOrFail(Permission.VIEW, this.context, identifier);
 
         const version = await createOrUpdateVersion(this.context, identifier, {
             packageFile
@@ -258,7 +252,7 @@ export abstract class BackendJobContextBase extends JobContext {
             permitsSaving: true,
             save: async (packageFile: PackageFile): Promise<void> => {
 
-                await hasPermission(Permission.EDIT,this.context,identifier);        
+                await hasPackagePermissionOrFail(Permission.EDIT,this.context,identifier);        
 
                 await createOrUpdateVersion(this.context as AuthenticatedContext, identifier, {
                     packageFile

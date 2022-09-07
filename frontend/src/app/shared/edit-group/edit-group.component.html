@@ -1,0 +1,46 @@
+<form [formGroup]="form" id="editGroup">
+    <div mat-dialog-title id="contentTitle">Edit group</div>
+
+    <div mat-dialog-content id="contentBorder">
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Name</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="name"
+                    placeholder="Name"
+                    [autoFocus]="true"
+                    [error]="form | inputError: 'displayName':errorMsg['displayName'] | async"
+                ></app-input>
+            </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Group slug</div>
+            <div class="pr-3 py-2 bd-highlight div-answer">
+                {{ data.slug }}
+            </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-1">
+            <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="description"
+                    placeholder="Description"
+                    [autoFocus]="true"
+                    [multiline]="true"
+                ></app-input>
+            </div>
+        </div>
+        <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating group.</div>
+    </div>
+    <div mat-dialog-actions class="d-flex justify-content-between pb-2">
+        <button mat-dialog-close class="modal-close-btn">Close</button>
+        <button class="ml-auto modal-submit-btn" [disabled]="form.invalid" (click)="save()">
+            <span *ngIf="state !== 'LOADING'">save</span>
+            <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'">Save</mat-spinner>
+        </button>
+    </div>
+</form>

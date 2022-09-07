@@ -1,0 +1,57 @@
+<div class="container" id="user-following">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-div pl-2">
+                <div class="text-main-title col-md-12">My Groups</div>
+                <div class="text-left ml-3" *ngIf="groups?.length == 0">
+                    <p class="text-dark-gray">
+                        You are not currently a member of any groups.
+                    </p>
+                </div>
+
+                <div class="mb-3 col-lg-8 no-pd-mobiletext-left" *ngIf="groups?.length > 0">
+                    <p class="text-dark-gray">
+                        This is a list of the groups that you have created or to which other's have added you. 
+                    </p>
+                </div>
+
+                <div class="mb-4 mt-4 col-md-12 no-pd-mobile">
+                    <a class="app-outlined-button" (click)="createGroup()">Create A Group</a>
+                </div>
+
+                <div class="user-div mt-4 ml-3" [hidden]="groups?.length == 0">
+                    <table mat-table [dataSource]="groups" class="w-100 gray-table" aria-labelledby="user-groups">
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef scope="col">Group</th>
+                            <td mat-cell *matCellDef="let group">
+                                <a [routerLink]="'/group/' + group.slug">{{ group.name }}</a>
+                            </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="permission">
+                            <th mat-header-cell *matHeaderCellDef scope="col">My Permission</th>
+                            <td mat-cell *matCellDef="let group">
+                                {{ getHigestPermission(group.myPermissions) }}
+                            </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
+                            <td mat-cell *matCellDef="let group">
+                                <button *ngIf="hasManagerPermission(group)" (click)="editGroup(group)" class="mr-1 app-outlined-button">
+                                    <span class="">Edit</span>
+                                </button>
+                                <button *ngIf="hasManagerPermission(group)" (click)="deleteGroup(group)" class="app-outlined-button">
+                                    <span class="delete-txt">Delete</span>
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="COLUMNS"></tr>
+                        <tr mat-row *matRowDef="let row; columns: COLUMNS"></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

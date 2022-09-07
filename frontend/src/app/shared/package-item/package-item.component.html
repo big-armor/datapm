@@ -1,37 +1,51 @@
 <mat-card class="package-item my-3" (click)="goToComponent()">
     <mat-card-content>
-                <div class="d-flex bd-highlight d-flex align-items-top">
-                    <div class="d-flex align-self-center img-cover">
-                        <app-avatar class="align-top user-img" [user]="item.creator" [size]="40" *ngIf="!item.catalog.unclaimed"> </app-avatar>
-                        <app-avatar class="align-top user-img" [catalog]="item.catalog" [circled]="false"  [size]="40" *ngIf="item.catalog.unclaimed"> </app-avatar>
-                    </div>
-                    <div class="pl-2 pr-2 flex-grow-1 bd-highlight align-self-center text-overflow-elipses">
+        <div class="d-flex bd-highlight d-flex align-items-top">
+            <div class="d-flex align-self-center img-cover">
+                <app-avatar
+                    class="align-top user-img"
+                    [user]="item.creator"
+                    [size]="40"
+                    *ngIf="!item.catalog.unclaimed"
+                >
+                </app-avatar>
+                <app-avatar
+                    class="align-top user-img"
+                    [catalog]="item.catalog"
+                    [circled]="false"
+                    [size]="40"
+                    *ngIf="item.catalog.unclaimed"
+                >
+                </app-avatar>
+            </div>
+            <div class="pl-2 pr-2 flex-grow-1 bd-highlight align-self-center text-overflow-elipses">
+                <a class="box-name">{{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}</a>
 
-                       
-
-                        <a class="box-name">{{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}</a>
-
-                        <div class="text-light-gray text-overflow-elipses">
-                            {{ truncatedDescription }}
-                        </div>
-
-                        <span style="display: block">
-                            <mat-chip class="mat-chip-small" [class.public-chip]="item?.isPublic" [class.not-public-chip]="!item?.isPublic"
-                                *ngIf="this.item?.myPermissions?.includes('MANAGE')">
-                                {{ item?.isPublic ? "public" : "not public" }}
-                            </mat-chip>
-                        
-                            <span *ngIf="item?.updateMethods?.length > 0">
-                                <mat-chip class="mat-chip-small" *ngFor="let updateMethod of item?.updateMethods">
-                                    {{updateMethod | updateMethod}}
-                                </mat-chip>
-                            </span>
-                        </span>
-
-                    </div>
-                    <div class="p-1 d-flex flex-grow-2 bd-highlight action-div text-center">
-                        <button class="app-outlined-button" *ngIf="shouldShowActionButton" (click)="handleAction($event)">{{actionButtonText }}</button>
-                    </div>
+                <div class="text-light-gray text-overflow-elipses">
+                    {{ truncatedDescription }}
                 </div>
+
+                <span style="display: block">
+                    <mat-chip
+                        class="mat-chip-small"
+                        [class.public-chip]="item?.isPublic"
+                        [class.not-public-chip]="!item?.isPublic"
+                    >
+                        {{ item?.isPublic ? "public" : "not public" }}
+                    </mat-chip>
+
+                    <span *ngIf="item?.updateMethods?.length > 0">
+                        <mat-chip class="mat-chip-small" *ngFor="let updateMethod of item?.updateMethods">
+                            {{ updateMethod | updateMethod }}
+                        </mat-chip>
+                    </span>
+                </span>
+            </div>
+            <div class="p-1 d-flex flex-grow-2 bd-highlight action-div text-center">
+                <button class="app-outlined-button" *ngIf="shouldShowActionButton" (click)="handleAction($event)">
+                    {{ actionButtonText }}
+                </button>
+            </div>
+        </div>
     </mat-card-content>
 </mat-card>

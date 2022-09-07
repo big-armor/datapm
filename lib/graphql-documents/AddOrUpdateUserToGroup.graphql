@@ -1,0 +1,3 @@
+mutation AddOrUpdateUserToGroup($groupSlug: String!, $userPermissions: [SetUserGroupPermissionsInput!]!) {
+    addOrUpdateUserToGroup(groupSlug: $groupSlug, userPermissions: $userPermissions)
+}

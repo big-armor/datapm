@@ -1,0 +1,50 @@
+type Group {
+    slug: String!
+    name: String
+    description: String
+    users: [GroupUser!]
+    myPermissions: [Permission!]
+    createdAt: Date
+    updatedAt: Date
+    creator: User
+    packagePermissions: [GroupPackagePermission!]
+    catalogPermissions: [GroupCatalogPermission!]
+    collectionPermissions: [GroupCollectionPermission!]
+}
+
+type GroupUser {
+    user: User
+    group: Group
+    permissions: [Permission!]
+    createdAt: Date
+    updatedAt: Date
+    creator: User
+}
+
+type GroupPackagePermission {
+    group: Group
+    package: Package
+    permissions: [Permission!]
+    createdAt: Date
+    updatedAt: Date
+    creator: User
+}
+
+type GroupCatalogPermission {
+    group: Group
+    catalog: Catalog
+    permissions: [Permission!]
+    packagePermissions: [Permission!]
+    createdAt: Date
+    updatedAt: Date
+    creator: User
+}
+
+type GroupCollectionPermission {
+    group: Group
+    collection: Collection
+    permissions: [Permission!]
+    createdAt: Date
+    updatedAt: Date
+    creator: User
+}

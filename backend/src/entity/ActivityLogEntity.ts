@@ -8,6 +8,7 @@ import { CollectionEntity } from "./CollectionEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 import { PackageIssueEntity } from "./PackageIssueEntity";
 import { DataBatchEntity } from "./DataBatchEntity";
+import { GroupEntity } from "./GroupEntity";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
@@ -68,9 +69,20 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "target_collection_id", nullable: true })
     public targetCollectionId?: number;
 
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_user_id" })
+    public targetUser: UserEntity | null;
+
+    @Column({ name: "target_group_id", nullable: true })
+    public targetGroupId?: number;
+
+    @ManyToOne(() => GroupEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_group_id" })
+    public targetGroup: GroupEntity | null;
+
     @Column({ name: "target_data_batch_id", nullable: true })
     public targetDataBatchId?: number;
-    
+
     @ManyToOne(() => PackageEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_data_batch_id" })
     public targetDataBatch?: DataBatchEntity | null;
@@ -82,20 +94,24 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "properties_edited", array: true, type: "text" })
     public propertiesEdited?: string[];
 
+    @Column({ name: "permissions", array: true, type: "text" })
+    public permissions?: string[];
+
     @Column({
         name: "additional_properties",
-        type: 'jsonb',
+        type: "jsonb",
         array: false,
         default: () => "'{}'::jsonb",
-        nullable: false,
+        nullable: false
     })
-    public additionalProperties?: {[key: string]: any};
+    public additionalProperties?: { [key: string]: any };
 
     // The following are not persisted to the database
     // but are used during logging to the console.
     public targetPackageIdentifier?: string;
     public targetVersionNumber?: string;
     public targetCatalogSlug?: string;
+    public targetGroupSlug?: string;
     public targetCollectionSlug?: string;
     public username?: string;
     public targetUsername?: string;

@@ -1,0 +1,77 @@
+<div class="container mt-4 pt-2">
+    <div class="text-main-title">Collections Permissions for Group</div>
+    <p *ngIf="group.collectionPermissions?.length > 0">
+        This group has the following permissions to these collections. Note that the group members must also be given
+        access to the packages in this collection. You can give this group individual package access or across all
+        packages in a catalog.
+    </p>
+    <p *ngIf="!(group.collectionPermissions?.length > 0)">
+        This group has no direct collection permissions. Check the collection tab for more permissions.
+    </p>
+</div>
+<div class="container mt-4 pt-2">
+    <a
+        class="app-outlined-button mt-2"
+        (click)="addCollection()"
+        *ngIf="group.myPermissions.includes(Permission.MANAGE)"
+        >Add Collection Permission</a
+    >
+</div>
+<div class="container mt-4 pt-2">
+    <table
+        mat-table
+        [dataSource]="group.collectionPermissions"
+        *ngIf="group.collectionPermissions.length > 0"
+        class="gray-table"
+        aria-labelledby="permissions"
+    >
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef scope="col">Collection</th>
+            <td class="table-content" mat-cell *matCellDef="let collectionPermission">
+                <div style="display: flex; justify-content: start; align-content: center">
+                    <a
+                        class="pt-2 color-info ml-2"
+                        [routerLink]="'/collection/' + collectionPermission.collection.identifier.collectionSlug"
+                        >{{ collectionPermission.collection.identifier.collectionSlug }}</a
+                    >
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef scope="col">Collection Permission</th>
+            <td class="table-content" mat-cell *matCellDef="let collectionPermission">
+                <mat-form-field
+                    appearance="fill"
+                    class="permission-div"
+                    *ngIf="collectionPermission.collection.myPermissions.includes(Permission.MANAGE)"
+                >
+                    <mat-select
+                        [value]="highestPermission(collectionPermission.permissions)"
+                        (selectionChange)="updatePermission(collectionPermission.collection, $event.value)"
+                    >
+                        <mat-option value="VIEW">View</mat-option>
+                        <mat-option value="EDIT">Edit</mat-option>
+                        <mat-option value="MANAGE">Manage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <span *ngIf="!collectionPermission.collection.myPermissions.includes(Permission.MANAGE)">{{
+                    permissionString(collectionPermission.permissions)
+                }}</span>
+            </td>
+        </ng-container>
+
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions" *ngIf="group.myPermissions.includes(Permission.MANAGE)">
+            <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+            <td mat-cell *matCellDef="let collectionPermission">
+                <a class="app-outlined-button mr-3" (click)="removeCollection(collectionPermission.collection)"
+                    >Remove</a
+                >
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+</div>

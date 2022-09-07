@@ -12,7 +12,7 @@ import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
 import { TEMP_STORAGE_PATH } from "./constants";
 import path from "path";
-// NOTE: including "datapm-client-lib" here causes a build error where suddently the response objects 
+// NOTE: including "datapm-client-lib" here causes a build error where suddently the response objects
 // in the generated graphql schema are seen as "any" type.
 
 const maildev = require("maildev");
@@ -42,16 +42,16 @@ export interface ActivityLogLine {
     targetPackageIdentifier?: string;
     targetVersionNumber?: string;
     targetCatalogSlug?: string;
+    targetGroupSlug?: string;
     targetCollectionSlug?: string;
     targetUsername?: string;
     propertiesEdited?: string[];
 }
 
-
 export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
     const lines = line.split("\n");
 
-    for(const splitLine of lines) { 
+    for (const splitLine of lines) {
         const trimmedLine = splitLine.trim();
         if (trimmedLine.length === 0 || !trimmedLine.startsWith("{")) continue;
         try {
@@ -62,8 +62,6 @@ export function findActivityLogLine(line: string, callback: (activityLogLine: Ac
             console.log(e.message);
         }
     }
-
-
 
     return false;
 }
@@ -101,6 +99,7 @@ before(async function () {
     });
 
     mailServer.on("new", function (email: any) {
+        // console.log("Email recieved: " + email.subject);
         mailObserver.next(email);
     });
 
@@ -152,7 +151,6 @@ before(async function () {
         console.log("Registry server exited with code " + code + " and signal " + signal);
     });
 
-    
     const serverStartResponse = await startServerProcess(
         "Test data",
         "npm",
@@ -166,8 +164,6 @@ before(async function () {
     );
 
     testDataServerProcess = serverStartResponse.serverProcess;
-    
-        
 
     // Wait for the server to start
     await new Promise<void>(async (r) => {
@@ -216,7 +212,7 @@ describe("Server should start", async function () {
         expect(response.data.registryStatus.registryUrl).equal("http://localhost:4200");
         expect(response.data.registryStatus.status).equal(RegistryStatus.SERVING_REQUESTS);
 
-        const packageFileJson = fs.readFileSync(path.join(__dirname,"..","..","package.json"));
+        const packageFileJson = fs.readFileSync(path.join(__dirname, "..", "..", "package.json"));
         const packageFile = JSON.parse(packageFileJson.toString());
 
         expect(response.data.registryStatus.version).equal(packageFile.version);
@@ -228,12 +224,12 @@ after(async function () {
 
     const storageFolderPath = TEMP_STORAGE_URL.replace("file://", "");
 
-    if(fs.existsSync(storageFolderPath)) {
-            fs.rmSync(storageFolderPath, { recursive: true });
+    if (fs.existsSync(storageFolderPath)) {
+        fs.rmSync(storageFolderPath, { recursive: true });
     }
 
-    if(testDataServerProcess) {
-            testDataServerProcess.stdout?.destroy();
+    if (testDataServerProcess) {
+        testDataServerProcess.stdout?.destroy();
         testDataServerProcess.stderr?.destroy();
 
         if (testDataServerProcess.pid !== undefined) {
@@ -260,25 +256,24 @@ after(async function () {
     serverProcess.stdout!.destroy();
     serverProcess.stderr!.destroy();
 
-    if(serverProcess.pid !== undefined) {
+    if (serverProcess.pid !== undefined) {
         try {
-                let pids = pidtree(serverProcess.pid, { root: true });
+            let pids = pidtree(serverProcess.pid, { root: true });
 
-                // recursively kill all child processes
-                (await pids).forEach((p) => {
-                    console.log("Killing process " + p);
-                    try {
-                        process.kill(p);
-                    } catch (error) {
-                        console.error("Error killing process " + p);
-                        console.error(error);
-                    }
-                });
-            } catch (error) {
-                console.log("error stopping processes " + error.message);
-            }
+            // recursively kill all child processes
+            (await pids).forEach((p) => {
+                console.log("Killing process " + p);
+                try {
+                    process.kill(p);
+                } catch (error) {
+                    console.error("Error killing process " + p);
+                    console.error(error);
+                }
+            });
+        } catch (error) {
+            console.log("error stopping processes " + error.message);
+        }
     }
-    
 
     if (container) {
         await container.stop();
@@ -287,8 +282,6 @@ after(async function () {
 
     mailServer.close();
 });
-
-
 
 async function startServerProcess(
     name: string,

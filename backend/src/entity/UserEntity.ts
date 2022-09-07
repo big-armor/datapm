@@ -2,6 +2,7 @@ import { Entity, Column, OneToMany, PrimaryGeneratedColumn, Unique } from "typeo
 import { EntityBaseModel } from "./EntityBaseModel";
 import { UserCatalogPermissionEntity } from "./UserCatalogPermissionEntity";
 import { UserStatus } from "../generated/graphql";
+import { GroupUserEntity } from "./GroupUserEntity";
 @Entity({
     name: "user"
 })
@@ -45,6 +46,11 @@ export class UserEntity extends EntityBaseModel {
         cascade: true
     })
     catalogPermissions: UserCatalogPermissionEntity[];
+
+    @OneToMany(() => GroupUserEntity, (groupUser) => groupUser.user, {
+        cascade: true
+    })
+    groups: GroupUserEntity[];
 
     @Column({ nullable: true })
     twitterHandle?: string;
@@ -111,4 +117,6 @@ export class UserEntity extends EntityBaseModel {
     /** Whether the user has enabled the dark mode ui theme. */
     @Column({ nullable: false, default: false, name: "ui_dark_mode_enabled" })
     uiDarkModeEnabled: boolean;
+
+
 }

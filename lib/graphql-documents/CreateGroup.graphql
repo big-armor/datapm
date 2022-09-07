@@ -1,0 +1,11 @@
+mutation CreateGroup($groupSlug: String!, $name: String!, $description: String!) {
+    createGroup(groupSlug: $groupSlug, name: $name, description: $description) {
+        slug
+        name
+        description
+        createdAt
+        creator {
+            username
+        }
+    }
+}

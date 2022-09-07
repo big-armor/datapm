@@ -1,0 +1,65 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+#addUser {
+    .textarea-input {
+        ::ng-deep .mat-form-field-flex {
+            background-color: var(--custom-secondary-color);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        ::ng-deep .mat-form-field-outline {
+            color: transparent !important;
+            height: 0px !important;
+            border: 0;
+        }
+
+        ::ng-deep .mat-form-field-infix {
+            padding: 0px;
+            border-top: 0px;
+        }
+
+        textarea {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $text-font;
+            letter-spacing: 0.5px;
+            line-height: 18px;
+            padding: 0.5em 0;
+
+            &::placeholder {
+                font-size: ($text-font - 1);
+                font-family: $family-roboto;
+                letter-spacing: 0.5px;
+                font-weight: $weight-300;
+                color: var(--gray-4-color);
+            }
+        }
+    }
+}
+
+::ng-deep .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
+    color: var(--info-color);
+}
+
+@media (max-width: 576px) {
+    .w-50 {
+        width: 100% !important;
+    }
+}
+
+#addUser {
+    .text-danger {
+        width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    #addUser {
+        .text-danger {
+            width: 100%;
+        }
+    }
+}

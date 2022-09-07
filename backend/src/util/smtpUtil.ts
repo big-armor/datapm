@@ -8,7 +8,8 @@ export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
     VERIFY_EMAIL = "✓ Verify Your New Account",
     FORGOT_PASSWORD = "⚠ Recover Your Account",
-    INVITE_USER = "🚀 Data Invite",
+    INVITE_USER = "🚀 Invite to Collaborate",
+    DATA_SHARED = "📦 Data Shared",
     USER_SUSPENDED = "Your account has been suspended"
 }
 
@@ -178,7 +179,7 @@ export async function sendShareNotification(
 
     emailHTML = emailHTML.replace(/{{message}}/g, message);
 
-    sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
+    sendEmail(user, EMAIL_SUBJECTS.DATA_SHARED, emailText, emailHTML);
 }
 
 export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string, message: string) {

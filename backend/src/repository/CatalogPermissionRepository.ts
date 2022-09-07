@@ -154,7 +154,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         userId: number;
         relations?: string[];
     }) {
-        const ALIAS = "userPackagePermission";
+        const ALIAS = "userCatalogPermissions";
         return this.manager
             .getRepository(UserCatalogPermissionEntity)
             .createQueryBuilder(ALIAS)
@@ -236,7 +236,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         catalogPermissionEntry.userId = user.id;
                         catalogPermissionEntry.catalogId = catalogEntity.id;
                         catalogPermissionEntry.permissions = value.permission;
-                        catalogPermissionEntry.packagePermission = value.packagePermission;
+                        catalogPermissionEntry.packagePermissions = value.packagePermissions;
                         return await transaction.save(catalogPermissionEntry);
                     } catch (e) {
                         console.log(e);
@@ -249,7 +249,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         return await transaction
                             .createQueryBuilder()
                             .update(UserCatalogPermissionEntity)
-                            .set({ permissions: value.permission, packagePermission: value.packagePermission })
+                            .set({ permissions: value.permission, packagePermissions: value.packagePermissions })
                             .where({ catalogId: catalogEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {

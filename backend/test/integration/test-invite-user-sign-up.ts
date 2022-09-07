@@ -56,7 +56,7 @@ describe("Invite User That Then Signs Up", function () {
         let userBEmail: any = null;
         let verifyEmailPromise = new Promise<void>((r) => {
             let subscription = mailObservable.subscribe((email) => {
-                if (email.to[0].address === "testB-invite-sign-up@test.datapm.io") userBEmail = email;
+                if (email.to[0].address === "testb-invite-sign-up@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
@@ -75,7 +75,7 @@ describe("Invite User That Then Signs Up", function () {
                 value: [
                     {
                         permissions: [Permission.VIEW],
-                        usernameOrEmailAddress: "testB-invite-sign-up@test.datapm.io"
+                        usernameOrEmailAddress: "testb-invite-sign-up@test.datapm.io"
                     }
                 ],
                 message: "Here is my message!@#$%^&*()-=+"

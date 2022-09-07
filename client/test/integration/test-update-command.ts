@@ -357,7 +357,7 @@ describe("Update Package Command Tests", async () => {
                     {
                         usernameOrEmailAddress: "testB-update-command",
                         permission: [Permission.VIEW],
-                        packagePermission: [Permission.VIEW]
+                        packagePermissions: [Permission.VIEW]
                     }
                 ],
                 message: "test message"

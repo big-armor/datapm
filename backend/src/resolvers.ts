@@ -20,13 +20,15 @@ import {
     FollowResolvers,
     ActivityLogResolvers,
     BuilderIOSettings,
-    BuilderIOPage
+    BuilderIOPage,
+    GroupResolvers,
+    UserStatus
 } from "./generated/graphql";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isRequestingUserOrAdmin } from "./util/contextHelpers";
-import { DATAPM_VERSION, parsePackageFileJSON, validatePackageFile } from "datapm-lib";
+import { isAuthenticatedAsAdmin, isRequestingUserOrAdmin } from "./util/contextHelpers";
+import { DATAPM_VERSION, parsePackageFileJSON } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
     addPackageToCollection,
@@ -168,10 +170,12 @@ import {
     logAuthor,
     logCatalog,
     logCollection,
+    logGroup,
     logId,
     logPackage,
     logPackageIssue,
     logPropertiesEdited,
+    logUser,
     myActivity,
     myFollowingActivity,
     packageActivities
@@ -217,6 +221,24 @@ import {
 } from "./resolvers/FollowResolver";
 
 import {
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    addOrUpdateUserToGroup,
+    removeUserFromGroup,
+    myGroupPermissions,
+    myGroups,
+    group,
+    groupUsers
+} from "./resolvers/GroupResolver";
+import {
+    addOrUpdateGroupToPackage,
+    removeGroupFromPackage,
+    groupsByPackage,
+    packagePermissionsByGroupForUser
+} from "./resolvers/GroupPackagePermissionResolver";
+
+import {
     getPlatformSettingsByKey,
     getDeserializedPublicPlatformSettingsByKey,
     getPublicPlatformSettingsByKeyOrFail,
@@ -224,6 +246,18 @@ import {
 } from "./resolvers/PlatformSettingsResolver";
 
 import { runJob } from "./resolvers/JobResolver";
+import {
+    addOrUpdateGroupToCatalog,
+    removeGroupFromCatalog,
+    groupsByCatalog,
+    catalogPermissionsByGroupForUser
+} from "./resolvers/GroupCatalogPermissionResolver";
+import {
+    addOrUpdateGroupToCollection,
+    removeGroupFromCollection,
+    groupsByCollection,
+    collectionPermissionsByGroupForUser
+} from "./resolvers/GroupCollectionPermissionResolver";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -241,25 +275,23 @@ export const getPageContentByRoute = async (
         return { catalog };
     }
 
-    const builderIOSettings = await getDeserializedPublicPlatformSettingsByKey(
+    const builderIOSettings = (await getDeserializedPublicPlatformSettingsByKey(
         _0,
         { key: "builder-io-settings" },
         context,
         info
-    ) as BuilderIOSettings;
+    )) as BuilderIOSettings;
 
+    let template = builderIOSettings.templates?.find((t) => t.key === route);
 
-    let template = builderIOSettings.templates?.find(t => t.key === route);
-
-    if(!template) {
-        template = builderIOSettings.templates?.find(t => t.key === "404");
-
+    if (!template) {
+        template = builderIOSettings.templates?.find((t) => t.key === "404");
     }
 
     const builderIOPage: BuilderIOPage = {
         apiKey: builderIOSettings.apiKey,
         template
-    }
+    };
 
     return { builderIOPage };
 };
@@ -286,6 +318,7 @@ export const resolvers: {
     AutoCompleteResult: AutoCompleteResultResolvers;
     Follow: FollowResolvers;
     ActivityLog: ActivityLogResolvers;
+    Group: GroupResolvers;
 } = {
     AutoCompleteResult: {
         packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
@@ -403,11 +436,23 @@ export const resolvers: {
     }),
     User: {
         username: async (parent: User, _1: any, context: Context) => {
-            if (!parent.username) {
-                return parent.emailAddress as string;
+            return parent.username;
+        },
+        displayName: async (parent: User, _1: any, context: Context) => {
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+
+            if (user.status === UserStatus.PENDING_SIGN_UP) {
+                if (isAuthenticatedAsAdmin(context)) {
+                    return user.emailAddress + " (pending sign up)";
+                }
+
+                const emailParts = user.emailAddress.split("@");
+                return emailParts[0] + " (pending sign up)";
             }
 
-            return parent.username;
+            const returnValue = user.displayName || user.username;
+
+            return returnValue;
         },
         firstName: async (parent: User, _1: any, context: Context) => {
             const user = await getUserFromCacheOrDbByUsername(context, parent.username);
@@ -519,7 +564,7 @@ export const resolvers: {
         updatedAt: packageUpdatedAt,
         viewedCount: packageViewedCount,
         isPublic: packageIsPublic,
-        updateMethods: packageUpdateMethods,
+        updateMethods: packageUpdateMethods
     },
     PackageIssue: {
         author: getPackageIssueAuthor,
@@ -548,7 +593,16 @@ export const resolvers: {
         targetPackage: logPackage,
         targetPackageIssue: logPackageIssue,
         targetCatalog: logCatalog,
-        targetCollection: logCollection
+        targetCollection: logCollection,
+        targetUser: logUser,
+        targetGroup: logGroup
+    },
+    Group: {
+        myPermissions: myGroupPermissions,
+        packagePermissions: packagePermissionsByGroupForUser,
+        users: groupUsers,
+        catalogPermissions: catalogPermissionsByGroupForUser,
+        collectionPermissions: collectionPermissionsByGroupForUser
     },
 
     Query: {
@@ -557,7 +611,7 @@ export const resolvers: {
                 status: RegistryStatus.SERVING_REQUESTS,
                 version: DATAPM_VERSION,
                 registryUrl: process.env["REGISTRY_URL"] as string
-            }
+            };
         },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             return await getUserFromCacheOrDbByUsername(context, context.me.username, getGraphQlRelationName(info));
@@ -648,7 +702,12 @@ export const resolvers: {
         catalogFollowersCount: catalogFollowersCount,
         collectionFollowersCount: collectionFollowersCount,
         userFollowersCount: userFollowersCount,
-        listRepositories
+        listRepositories,
+        groupsByPackage,
+        groupsByCatalog,
+        groupsByCollection,
+        myGroups: myGroups,
+        group: group
     },
 
     Mutation: {
@@ -682,6 +741,8 @@ export const resolvers: {
         deleteCatalog: deleteCatalog,
         setCatalogAvatarImage: setCatalogAvatarImage,
         deleteCatalogAvatarImage: deleteCatalogAvatarImage,
+        addOrUpdateGroupToCatalog: addOrUpdateGroupToCatalog,
+        removeGroupFromCatalog: removeGroupFromCatalog,
 
         // Catalog Permissions
         setUserCatalogPermission: setUserCatalogPermission,
@@ -699,6 +760,14 @@ export const resolvers: {
         createCredential,
         deleteCredential,
 
+        // Groups
+        createGroup,
+        updateGroup,
+        deleteGroup,
+        addOrUpdateUserToGroup,
+        removeUserFromGroup,
+        addOrUpdateGroupToPackage,
+        removeGroupFromPackage,
 
         // Package issues
         createPackageIssue: createPackageIssue,
@@ -722,12 +791,14 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+        addOrUpdateGroupToCollection: addOrUpdateGroupToCollection,
+        removeGroupFromCollection: removeGroupFromCollection,
 
         // Collection Permissions
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
-        // Version 
+        // Version
         createVersion: createVersion,
         deleteVersion: deleteVersion,
 
@@ -738,9 +809,6 @@ export const resolvers: {
 
         savePlatformSettings: savePlatformSettings,
 
-        runJob,
-
-        
-
+        runJob
     }
 };

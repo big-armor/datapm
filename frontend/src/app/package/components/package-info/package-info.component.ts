@@ -1,3 +1,4 @@
+import { I } from "@angular/cdk/keycodes";
 import { formatNumber } from "@angular/common";
 import { Component, Input, OnChanges, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
@@ -49,11 +50,13 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     public ngOnChanges(): void {
         this.packageUnit = this.parsePackageUnit();
 
-        this.packageSizeBytes =
-            this.packageFile.sources.reduce(
-                (sum, item) => sum + item.streamSets.reduce((sum, item) => sum + item.streamStats.byteCount, 0),
-                0
-            ) || 0;
+        if (this.packageFile) {
+            this.packageSizeBytes =
+                this.packageFile.sources?.reduce(
+                    (sum, item) => sum + item.streamSets.reduce((sum, item) => sum + item.streamStats.byteCount, 0),
+                    0
+                ) || 0;
+        }
     }
 
     public getRecordCount(packageFile: PackageFile): string {
@@ -61,9 +64,8 @@ export class PackageInfoComponent implements OnInit, OnChanges {
             return "";
         }
 
-        const streamSets = packageFile
-            .sources.reduce((a,b) => [...a,...b.streamSets],new Array<StreamSet>());
-            
+        const streamSets = packageFile.sources.reduce((a, b) => [...a, ...b.streamSets], new Array<StreamSet>());
+
         const count = streamSets.reduce((a, b) => a + (b.streamStats.recordCount || 0), 0);
 
         let prefix = "";
@@ -81,7 +83,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
             prefix = "~";
         }
 
-        return prefix + formatNumber(count, "en-US" );
+        return prefix + formatNumber(count, "en-US");
     }
 
     public get generatedFetchCommand() {

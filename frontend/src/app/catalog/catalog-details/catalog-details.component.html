@@ -14,10 +14,12 @@
                         </div>
                         <div class="text-main-title mb-0">{{ catalog?.displayName }}</div>
                         <div class="text-light-gray mb-1">@{{ catalog?.identifier.catalogSlug }}</div>
-
                     </div>
                 </div>
-                <div class="d-flex flex-row bd-highlight ml-auto align-self-end">
+                <div
+                    class="d-flex flex-row bd-highlight ml-auto align-self-end"
+                    *ngIf="catalog?.myPermissions.includes(Permission.VIEW)"
+                >
                     <button class="app-raised-button follow-btn" (click)="follow()">
                         <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Following</span>
                         <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
@@ -25,6 +27,9 @@
                 </div>
             </div>
             <p class="text-dark-gray mt-3" style="margin-left: 90px">
+                <span *ngIf="!catalog?.myPermissions.includes(Permission.VIEW) && catalog.packages.length === 0"
+                    >You do not have permission to view this catalog.</span
+                >
                 {{ catalog?.description }}
             </p>
 
@@ -33,7 +38,7 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container" *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0">
             <mat-tab-group
                 [(selectedIndex)]="currentTab"
                 (selectedTabChange)="updateTabParam()"
@@ -53,9 +58,12 @@
                 <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
             </mat-tab-group>
         </div>
-        <hr class="header-border" />
+        <hr
+            class="header-border"
+            *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0"
+        />
 
-        <div class="container">
+        <div class="container" *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0">
             <div *ngIf="currentTab === 0">
                 <div class="container">
                     <app-package-item

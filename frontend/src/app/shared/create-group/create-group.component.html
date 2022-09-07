@@ -1,0 +1,34 @@
+<form id="createGroup" [formGroup]="form">
+    <div mat-dialog-title id="contentTitle">Create Group</div>
+    <div mat-dialog-content id="contentBorder">
+        <div class="d-flex bd-highlight shadow-div my-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Group Name*</div>
+            <div class="bd-highlight div-answer">
+                <input formControlName="name" class="flat-input" (keyup)="nameChanged($event.value)" placeholder="Group Name" cdkFocusInitial />
+            </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Slug</div>
+            <div class="bd-highlight div-answer">
+                <input formControlName="groupSlug" class="flat-input" [value]="slugValue" placeholder="Slug" />
+            </div>
+        </div>
+
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <textarea formControlName="description" class="flat-input"></textarea>
+            </div>
+        </div>
+
+        <div class="text-danger pl-3" *ngIf="state === 'ERROR'">
+            {{ error }}
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button (click)="submit()" class="ml-auto modal-submit-btn" [class.disabled]="form.invalid">
+            <span *ngIf="state !== 'LOADING'">create</span>
+            <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>
+        </button>
+    </div>
+</form>

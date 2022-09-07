@@ -1,0 +1,35 @@
+<app-input
+    placeholder="catalog/package"
+    [group]="form"
+    class="flat-input px-0"
+    controlName="packageSlug"
+    inputStyle="flat"
+    [matAutocomplete]="auto"
+    (keydown)="packageInputKeyDown()"
+    [error]="form | inputError: 'packageSlug' | async"
+></app-input>
+<mat-autocomplete #auto="matAutocomplete" class="search-autocomplete">
+    <mat-option *ngIf="packageKeyDownHasHappened && !autoCompleteResult && form.value.length > 1">
+        <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
+    </mat-option>
+    <ng-container *ngIf="autoCompleteResult">
+        <mat-option
+            *ngFor="let option of autoCompleteResult.packages"
+            [value]="option.identifier.catalogSlug + '/' + option.identifier.packageSlug"
+        >
+            <div class="d-flex">
+                <div>
+                    <app-avatar class="align-top user-img" [user]="option.creator" [size]="40"> </app-avatar>
+                </div>
+
+                <div class="autocomplete-contents">
+                    <div class="autocomplete-title">
+                        {{ option.identifier.catalogSlug + " / " + option.identifier.packageSlug }}
+                    </div>
+
+                    <div class="autocomplete-description">{{ option.description }}</div>
+                </div>
+            </div>
+        </mat-option>
+    </ng-container>
+</mat-autocomplete>

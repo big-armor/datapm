@@ -38,8 +38,9 @@
                 <app-user-following
                     [isCurrentUser]="isCurrentUser"
                     [username]="username"
-                    *ngSwitchCase="'user-following'"
+                    *ngSwitchCase="'following'"
                 ></app-user-following>
+                <app-user-groups *ngSwitchCase="'groups'"></app-user-groups>
                 <app-user-details *ngSwitchDefault></app-user-details>
             </div>
 

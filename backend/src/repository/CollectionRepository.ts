@@ -2,11 +2,20 @@ import { UserInputError } from "apollo-server";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { Collection, CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { Collection, CreateCollectionInput, Permission, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+
+const PUBLIC_COLLECTIONS_QUERY = '("CollectionEntity"."is_public" is true)';
+const AUTHENTICATED_USER_COLLECTIONS_QUERY = `
+    (
+        ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND :permission = any(permissions)))
+        OR
+        ("CollectionEntity"."id" IN (select gc.collection_id FROM group_collection_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+    )`;
+export const AUTHENTICATED_USER_OR_PUBLIC_COLLECTIONS_QUERY = `(${PUBLIC_COLLECTIONS_QUERY} or ${AUTHENTICATED_USER_COLLECTIONS_QUERY})`;
 
 @EntityRepository(CollectionEntity)
 export class CollectionRepository extends Repository<CollectionEntity> {
@@ -87,15 +96,16 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<[CollectionEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
-        const response = await this.createQueryBuilderWithUserConditions(user?.id)
-            .andWhere(
-                `("CollectionEntity".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'EDIT' = ANY( permissions) ))`
-            )
+        const query = this.createQueryBuilderWithUserConditions(user?.id, Permission.VIEW)
+            .andWhere(`("CollectionEntity"."creator_id" = :targetUserId)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
-            .addRelations("CollectionEntity", relations)
-            .getManyAndCount();
+            .addRelations("CollectionEntity", relations);
+
+        const queryString = query.getQuery();
+
+        const response = await query.getManyAndCount();
 
         return response;
     }
@@ -150,7 +160,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         userId: number,
         relations?: string[]
     ): Promise<CollectionEntity[]> {
-        return this.createQueryBuilderWithUserConditions(userId)
+        return this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
             .setParameter("userId", userId)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getMany();
@@ -167,7 +177,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<CollectionEntity[]> {
         const ALIAS = "autoCompleteCollection";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user?.id)
+        const entities = await this.createQueryBuilderWithUserConditions(user?.id, Permission.VIEW)
             .andWhere(
                 `(LOWER("CollectionEntity"."slug") LIKE :queryLike OR LOWER("CollectionEntity"."name") LIKE :queryLike)`,
                 {
@@ -189,7 +199,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         relations?: string[]
     ): Promise<[CollectionEntity[], number]> {
         return (
-            this.createQueryBuilderWithUserConditions(userId)
+            this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
                 .andWhere(
                     "(name_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query))"
                 )
@@ -208,7 +218,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         relations?: string[]
     ): Promise<[CollectionEntity[], number]> {
         const ALIAS = "latestCollections";
-        return this.createQueryBuilderWithUserConditions(userId)
+        return this.createQueryBuilderWithUserConditions(userId, Permission.VIEW)
             .andWhere('EXISTS (SELECT 1 FROM collection_package WHERE collection_id = "CollectionEntity"."id")')
             .orderBy('"CollectionEntity"."updated_at"', "DESC")
             .limit(limit)
@@ -217,47 +227,37 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             .getManyAndCount();
     }
 
-    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<CollectionEntity> {
+    private createQueryBuilderWithUserConditions(
+        userId: number | undefined,
+        permission: Permission
+    ): SelectQueryBuilder<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 
         if (!userId) {
-            return queryBuilder.where('("CollectionEntity"."is_public")');
+            return queryBuilder.where('("CollectionEntity"."is_public" is true)');
         }
 
         return queryBuilder
-            .where(
-                `(("CollectionEntity"."is_public") OR ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
-            )
-            .setParameter("userId", userId);
+            .where(AUTHENTICATED_USER_OR_PUBLIC_COLLECTIONS_QUERY)
+            .setParameter("userId", userId)
+            .setParameter("permission", permission);
     }
 
-
-
-
-    async getPublicCollections(
-        limit: number,
-        offSet: number,
-        relations?: string[]
-    ): Promise<CollectionEntity[]> {
-        const ALIAS = "PublicCollections";
-        return this.createQueryBuilder(ALIAS)
-            // .orderBy('"PublishCollections"."created_at"', "DESC") // TODO Sort by views (or popularity)
-            .where(
-                `("PublicCollections"."is_public" = true)`,
-            )
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .getMany();
+    async getPublicCollections(limit: number, offSet: number, relations?: string[]): Promise<CollectionEntity[]> {
+        const ALIAS = "CollectionEntity";
+        return (
+            this.createQueryBuilder(ALIAS)
+                // .orderBy('"PublishCollections"."created_at"', "DESC") // TODO Sort by views (or popularity)
+                .where(PUBLIC_COLLECTIONS_QUERY)
+                .limit(limit)
+                .offset(offSet)
+                .addRelations(ALIAS, relations)
+                .getMany()
+        );
     }
 
-    async countPublicCollections(
-    ): Promise<number> {
+    async countPublicCollections(): Promise<number> {
         const ALIAS = "CountCollections";
-        return this.createQueryBuilder(ALIAS)
-            .where(
-                `("CountCollections"."is_public" = true)`,
-            )
-            .getCount();
+        return this.createQueryBuilder(ALIAS).where(`("CountCollections"."is_public" = true)`).getCount();
     }
 }

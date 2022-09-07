@@ -1,0 +1,16 @@
+mutation RemoveUserFromGroup($username: String!, $groupSlug: String!) {
+    removeUserFromGroup(username: $username, groupSlug: $groupSlug) {
+        slug
+        name
+        users {
+            user { 
+                username
+                firstName
+                lastName
+                nameIsPublic
+                displayName
+            }
+            permissions
+        }
+    }
+}

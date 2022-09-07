@@ -1,0 +1,79 @@
+<div class="container mt-4 pt-2">
+    <div class="text-main-title">Group Members</div>
+    <div>Users that are included in this group, and their permissions to edit or manage this group.</div>
+    <div>
+        <a
+            class="app-outlined-button btn mt-3 mb-3"
+            (click)="addUser()"
+            *ngIf="group.myPermissions.includes(Permission.MANAGE)"
+            >Add a user</a
+        >
+    </div>
+
+    <!-- Package without thupmbnail -->
+    <table
+        mat-table
+        [dataSource]="group.users"
+        *ngIf="group.users.length > 0"
+        class="gray-table"
+        aria-labelledby="permissions"
+    >
+        <!-- Label column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef scope="col">User</th>
+            <td class="table-content" mat-cell *matCellDef="let groupUser">
+                <div style="display: flex; justify-content: start; align-content: center">
+                    <a class="ml-2" [routerLink]="'/' + groupUser.user.username"
+                        ><app-avatar [user]="groupUser.user" [size]="24"></app-avatar>
+                    </a>
+
+                    <a class="color-info ml-2" [routerLink]="'/' + groupUser.user.username">{{
+                        groupUser.user.displayName
+                    }}</a>
+                    <span *ngIf="groupUser.user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
+            <td class="table-content" mat-cell *matCellDef="let groupUser">
+                <mat-form-field
+                    appearance="fill"
+                    class="permission-div"
+                    *ngIf="group.myPermissions.includes(Permission.MANAGE)"
+                >
+                    <mat-select
+                        [value]="groupUser.permission"
+                        (selectionChange)="updatePermission(groupUser.user.username, $event.value)"
+                    >
+                        <mat-option value="VIEW">View</mat-option>
+                        <mat-option value="EDIT">Edit</mat-option>
+                        <mat-option value="MANAGE">Manage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <span *ngIf="!group.myPermissions.includes(Permission.MANAGE)">{{
+                    permissionString(groupUser.permissions)
+                }}</span>
+            </td>
+        </ng-container>
+
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions" *ngIf="group.myPermissions.includes(Permission.MANAGE)">
+            <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+            <td mat-cell *matCellDef="let groupUser">
+                <a class="app-outlined-button mr-3" (click)="removeUser(groupUser.user.username)">Remove</a>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+
+    <div class="dpm-no-data" *ngIf="!group.users.length">
+        <p>There are no members in this group.</p>
+        <a class="app-outlined-button mt-3" (click)="addUser()" *ngIf="group.myPermissions.includes(Permission.MANAGE)"
+            >Add a user</a
+        >
+    </div>
+</div>

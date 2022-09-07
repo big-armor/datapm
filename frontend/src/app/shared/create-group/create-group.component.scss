@@ -1,0 +1,46 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+#createCatalog {
+    position: relative;
+    min-width: 500px;
+
+    #contentBorder {
+        border-top: 0px !important;
+    }
+
+    .catalog-avatar {
+        display: block;
+        margin-left: 30px;
+        width: 100px;
+        height: 55px;
+        border-radius: 50%;
+        transform: translateY(-45px);
+    }
+}
+
+@media (max-width: 768px) {
+    #createCatalog {
+        min-width: 400px;
+        .catalog-avatar {
+            margin-left: 15px;
+            margin-bottom: -80px;
+            width: 80px;
+            height: unset;
+            transform: translateY(-88px);
+        }
+        .slide-right {
+            padding-right: 0px !important;
+            padding-bottom: 0px !important;
+            position: absolute;
+            float: right;
+            right: 0px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #createCatalog {
+        min-width: 260px;
+    }
+}

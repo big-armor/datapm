@@ -34,46 +34,58 @@
         Delete This Collection
     </button>
 
-    <div class="mt-4 py-3" *ngIf="users?.length">
+    <div class="mt-4 py-3">
         <div class="text-main-title">Users With Access</div>
-        <p class="text-dark-gray">The following users have individual permission this collection.</p>
+        <p class="text-dark-gray" *ngIf="userPermissions?.length">
+            The following users have individual permission this collection.
+        </p>
+        <p class="text-dark-gray" *ngIf="userPermissions?.length == 0">
+            There are no other users who have permissions to this collection.
+        </p>
+
         <button
             class="app-outlined-button"
             (click)="addUser()"
-            *ngIf="users.length > 0 && collection.myPermissions.includes(Permission.MANAGE)"
+            *ngIf="collection.myPermissions.includes(Permission.MANAGE)"
         >
             Add User
         </button>
     </div>
 
     <!-- Package without thupmbnail -->
-    <table mat-table [dataSource]="users" *ngIf="users.length > 0" class="gray-table" aria-labelledby="permissions">
+    <table
+        mat-table
+        [dataSource]="userPermissions"
+        *ngIf="userPermissions.length > 0"
+        class="gray-table"
+        aria-labelledby="permissions"
+    >
         <!-- Label column -->
         <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef scope="col">User</th>
-            <td class="table-content" mat-cell *matCellDef="let user">
+            <td class="table-content" mat-cell *matCellDef="let userPermission">
                 <div style="display: flex; justify-content: start; align-content: center">
-                    <a class="ml-2" [routerLink]="'/' + user.username"
-                        ><app-avatar [user]="user" [size]="24"></app-avatar
+                    <a class="ml-2" [routerLink]="'/' + userPermission.user.username"
+                        ><app-avatar [user]="userPermission.user" [size]="24"></app-avatar
                     ></a>
-
-                    <a class="color-info ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
-                    <span *ngIf="user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
+                    <a class="color-info ml-2" [routerLink]="'/' + userPermission.user.username">{{
+                        userPermission.user.displayName
+                    }}</a>
                 </div>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="permission">
             <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
-            <td class="table-content" mat-cell *matCellDef="let user">
+            <td class="table-content" mat-cell *matCellDef="let userPermission">
                 <mat-form-field
                     appearance="fill"
                     class="permission-div"
                     *ngIf="collection.myPermissions.includes(Permission.MANAGE)"
                 >
                     <mat-select
-                        [value]="user.permission"
-                        (selectionChange)="updatePermission(user.username, $event.target.value)"
+                        [value]="userPermission.permission"
+                        (selectionChange)="updatePermission(userPermission.user.username, $event.target.value)"
                     >
                         <mat-option value="VIEW">View </mat-option>
                         <mat-option value="EDIT">Edit </mat-option>
@@ -81,7 +93,7 @@
                     </mat-select>
                 </mat-form-field>
                 <span *ngIf="!collection.myPermissions.includes(Permission.MANAGE)">{{
-                    permissionString(user.permission)
+                    permissionString(userPermission.permission)
                 }}</span>
             </td>
         </ng-container>
@@ -89,8 +101,8 @@
         <!-- Actions column -->
         <ng-container matColumnDef="actions" *ngIf="collection.myPermissions.includes(Permission.MANAGE)">
             <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
-            <td mat-cell *matCellDef="let user">
-                <a class="app-outlined-button mr-3" (click)="removeUser(user.username)">Remove</a>
+            <td mat-cell *matCellDef="let userPermission">
+                <a class="app-outlined-button mr-3" (click)="removeUser(userPermission.user.username)">Remove</a>
             </td>
         </ng-container>
 
@@ -98,13 +110,61 @@
         <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
     </table>
 
-    <div class="dpm-no-data" *ngIf="!users.length">
-        <p>There are no other users who have permissions to this collection.</p>
-        <a
-            class="app-outlined-button mt-3"
-            (click)="addUser()"
-            *ngIf="collection.myPermissions.includes(Permission.MANAGE)"
-            >Add a user</a
-        >
+    <div class="container p-0 mb-3" id="packagePermission">
+        <div class="text-main-title mt-4 pt-3">Groups With Access</div>
+        <p class="text-dark-gray" *ngIf="groupPermissions.length > 0">
+            The following groups have permission to access this package.
+        </p>
+        <p class="text-dark-gray" *ngIf="groupPermissions.length == 0">
+            There are no groups with access to this package.
+        </p>
+        <button class="app-outlined-button mt-2" (click)="addGroup()">Add Group</button>
     </div>
+
+    <table
+        mat-table
+        [dataSource]="groupPermissions"
+        *ngIf="groupPermissions?.length > 0"
+        class="gray-table"
+        aria-describedby="groupsTable"
+    >
+        <!-- Label column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef scope="col">Group</th>
+            <td class="table-content" mat-cell *matCellDef="let groupPermission">
+                <div style="display: flex; justify-content: start; align-content: center">
+                    <a class="color-info ml-2" [routerLink]="'/group/' + groupPermission.group.slug">{{
+                        groupPermission.group.name
+                    }}</a>
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
+            <td class="table-content" mat-cell *matCellDef="let groupPermission">
+                <mat-form-field appearance="fill" class="permission-div">
+                    <mat-select
+                        [value]="groupPermission.permission"
+                        (selectionChange)="setGroupPermissions(groupPermission.group, $event.value)"
+                    >
+                        <mat-option value="VIEW">View </mat-option>
+                        <mat-option value="EDIT">Edit </mat-option>
+                        <mat-option value="MANAGE">Manage </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </td>
+        </ng-container>
+
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+            <td mat-cell *matCellDef="let groupPermission">
+                <a class="app-outlined-button" (click)="removeGroupPermissions(groupPermission.group)">Remove</a>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
 </div>

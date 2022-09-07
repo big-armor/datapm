@@ -81,3 +81,61 @@
     <p>There are no other users who have permissions to this package.</p>
     <a class="app-outlined-button mt-3" (click)="addUser()">Add a user</a>
 </div>
+
+<div class="container p-0 mb-3" id="packagePermission">
+    <div class="text-main-title mt-4 pt-3">Groups With Access</div>
+    <p class="text-dark-gray" *ngIf="groupPermissions.length > 0">
+        The following groups have permission to access this package.
+    </p>
+    <p class="text-dark-gray" *ngIf="groupPermissions.length == 0">
+        There are no other groups with permissions to this package.
+    </p>
+    <button class="app-outlined-button mt-2" (click)="addGroup()">Add Group</button>
+</div>
+
+<table
+    mat-table
+    [dataSource]="groupPermissions"
+    class="gray-table"
+    *ngIf="groupPermissions.length > 0"
+    aria-describedby="groupsTable"
+>
+    <!-- Label column -->
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef scope="col">Group</th>
+        <td class="table-content" mat-cell *matCellDef="let groupPermission">
+            <div style="display: flex; justify-content: start; align-content: center">
+                <a class="color-info ml-2" (click)="groupClick(groupPermission.group)">{{
+                    groupPermission.group.name
+                }}</a>
+            </div>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="permission">
+        <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
+        <td class="table-content" mat-cell *matCellDef="let groupPermission">
+            <mat-form-field appearance="fill" class="permission-div">
+                <mat-select
+                    [value]="groupPermission.permission"
+                    (selectionChange)="updateGroupPermissions(groupPermission.group, $event.value)"
+                >
+                    <mat-option value="VIEW">View </mat-option>
+                    <mat-option value="EDIT">Edit </mat-option>
+                    <mat-option value="MANAGE">Manage </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <!-- Actions column -->
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+        <td mat-cell *matCellDef="let groupPermission">
+            <a class="app-outlined-button" (click)="removeGroup(groupPermission.group.slug)">Remove</a>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>

@@ -37,6 +37,8 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
     public currentTab = 0;
 
+    Permission = Permission;
+
     public currentUser: User;
 
     public catalogFollow: Follow;

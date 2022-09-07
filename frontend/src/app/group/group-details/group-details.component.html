@@ -1,0 +1,66 @@
+<div class="group-details container-fluid px-0 pt-2">
+    <div *ngIf="state === 'SUCCESS'">
+        <div class="container">
+            <div class="d-flex bd-highlight">
+                <div class="bd-highlight">
+                    <div class="text-main-title mb-1">Group: {{ group?.name }}</div>
+                </div>
+            </div>
+            <div class="text-light-gray">{{ groupSlug }}</div>
+            <div class="text-dark-gray">
+                {{ group?.description }}
+            </div>
+        </div>
+
+        <div class="container">
+            <mat-tab-group
+                [(selectedIndex)]="currentTab"
+                (selectedTabChange)="updateTabParam()"
+                class="group-tabs mt-3"
+            >
+                <mat-tab label="Users"></mat-tab>
+                <mat-tab label="Packages"></mat-tab>
+                <mat-tab label="Catalogs"></mat-tab>
+                <mat-tab label="Collections"></mat-tab>
+                <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
+            </mat-tab-group>
+        </div>
+        <hr class="header-border" />
+
+        <div class="container">
+            <app-group-permissions
+                (groupEdited)="getGroupDetails($event)"
+                [group]="group"
+                *ngIf="currentTab === 0"
+            ></app-group-permissions>
+            <app-group-packages (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 1">
+            </app-group-packages>
+            <app-group-catalog (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 2">
+            </app-group-catalog>
+            <app-group-collection (groupEdited)="getGroupDetails($event)" [group]="group" *ngIf="currentTab === 3">
+            </app-group-collection>
+            <app-group-manage
+                (groupEdited)="getGroupDetails($event)"
+                [group]="group"
+                *ngIf="currentTab === 4"
+            ></app-group-manage>
+        </div>
+    </div>
+
+    <div class="container">
+        <div *ngIf="state === 'NOT_AUTHORIZED'">
+            <div class="dpm-no-data">
+                <p class="text-dark-gray ml-3">You do not have permission to view this group.</p>
+            </div>
+        </div>
+
+        <div *ngIf="state === 'NOT_FOUND'">
+            <div class="dpm-no-data">
+                <p class="text-dark-gray ml-3">The requested group was not found.</p>
+            </div>
+        </div>
+        <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+    </div>
+</div>

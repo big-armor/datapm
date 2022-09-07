@@ -13,12 +13,10 @@
         <div class="container">Failed to load page</div>
     </app-builder-io>
     <div class="d-flex justify-content-center text-dark-gray" *ngIf="pageType == PageType.UNKNOWN">
-        This page could not be found.
+        This catalog could not be found, or you do not have access to it.
     </div>
 </div>
-<div class="dpm-no-data text-dark-gray" *ngIf="state === 'ERROR'">
-    There was a problem loading the page.
-</div>
+<div class="dpm-no-data text-dark-gray" *ngIf="state === 'ERROR'">There was a problem loading the page.</div>
 <div *ngIf="state === 'LOADING'">
     <mat-spinner [diameter]="60"></mat-spinner>
 </div>

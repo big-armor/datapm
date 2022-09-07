@@ -4,12 +4,10 @@ import { CreateCatalogDocument, GetCatalogDocument } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
 
-describe("Catalog Tests", async () => {
+describe("Catalog Slug Case Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
-    it("Create usersA", async function () {
+    before(async () => {
         userAClient = await createUser(
             "FirstA",
             "LastA",

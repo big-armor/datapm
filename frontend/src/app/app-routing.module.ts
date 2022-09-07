@@ -12,12 +12,16 @@ const staticRoutes: Route[] = [
     },
     {
         path: "downloads",
-        loadChildren: () => import("./downloads/downloads.module").then((m) => m.DownloadsModule)   
+        loadChildren: () => import("./downloads/downloads.module").then((m) => m.DownloadsModule)
     },
     {
         path: "collection/:collectionSlug",
         loadChildren: () =>
             import("./collection-details/collection-details.module").then((m) => m.CollectionDetailsModule)
+    },
+    {
+        path: "group/:groupSlug",
+        loadChildren: () => import("./group/group.module").then((m) => m.GroupModule)
     },
     {
         path: "",
@@ -31,10 +35,11 @@ const staticRoutes: Route[] = [
         path: "login",
         loadChildren: () => import("./login-container/login-container.module").then((m) => m.LoginContainerModule)
     },
-    { // IMPORTANT - this one must be last
+    {
+        // IMPORTANT - this one must be last
         path: "",
         loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
-    },
+    }
 ];
 
 @NgModule({

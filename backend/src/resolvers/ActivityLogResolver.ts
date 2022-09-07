@@ -12,6 +12,7 @@ import {
     Catalog,
     Collection,
     CollectionIdentifierInput,
+    Group,
     Package,
     PackageIdentifierInput,
     PackageIssue,
@@ -40,7 +41,8 @@ export const activtyLogEntityToGraphQL = async function (
         changeType: activityLogEntity.changeType,
         createdAt: activityLogEntity.createdAt,
         updatedAt: activityLogEntity.updatedAt,
-        propertiesEdited: activityLogEntity.propertiesEdited
+        propertiesEdited: activityLogEntity.propertiesEdited,
+        permissions: activityLogEntity.permissions
     };
 
     if (activityLogEntity.userId) {
@@ -365,6 +367,54 @@ export const logCollection = async (
         "targetCollection"
     ]);
     return collectionEntityToGraphQL(loadedLog.targetCollection as CollectionEntity);
+};
+
+export const logUser = async (
+    parent: ActivityLog,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<User | null> => {
+    const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
+        "targetUser"
+    ]);
+    if (!cachedLog.targetUserId) {
+        return null;
+    }
+
+    let targetUserEntity = cachedLog.targetUser;
+    if (targetUserEntity) {
+        return targetUserEntity;
+    }
+
+    const loadedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, true, [
+        "targetUser"
+    ]);
+    return loadedLog.targetUser;
+};
+
+export const logGroup = async (
+    parent: ActivityLog,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Group | null> => {
+    const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
+        "targetGroup"
+    ]);
+    if (!cachedLog.targetGroupId) {
+        return null;
+    }
+
+    let targetGroupEntity = cachedLog.targetGroup;
+    if (targetGroupEntity) {
+        return targetGroupEntity;
+    }
+
+    const loadedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, true, [
+        "targetGroup"
+    ]);
+    return loadedLog.targetGroup;
 };
 
 export const getActivityLogFromCacheOrDbByIdOrFail = async (

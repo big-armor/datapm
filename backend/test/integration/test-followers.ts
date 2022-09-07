@@ -11,20 +11,18 @@ import {
     NotificationFrequency,
     PackageFollowersCountDocument,
     PackageFollowersDocument,
-    Permission,
-    SaveFollowDocument,
-    SetPackagePermissionsDocument
+    SaveFollowDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
 
-describe("Follow Tests", async () => {
+describe("Followers Tests", async () => {
     const userAUsername = "followers-user-a";
     const userBUsername = "followers-user-b";
 
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
-    it("Create users A & B", async function () {
+    before(async () => {
         userAClient = await createUser(
             "FirstA",
             "LastA",
@@ -32,6 +30,10 @@ describe("Follow Tests", async () => {
             userAUsername + "@test.datapm.io",
             "passwordA!"
         );
+        expect(userAClient).to.exist;
+
+        console.log("User A created");
+
         userBClient = await createUser(
             "FirstB",
             "LastB",
@@ -39,8 +41,8 @@ describe("Follow Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+        console.log("User B created");
     });
 
     it("Catalog followers returns followers list and count", async function () {

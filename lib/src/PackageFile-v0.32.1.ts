@@ -94,10 +94,6 @@ export interface Source {
      */
     credentialsIdentifier?: string;
 
-    /** Used only during the update command, and not used in fetch command. This allows the package file to be updated
-     * without requiring a standard fetch to use specific credentials. */
-    updateCredentialsIdentifier?: string;
-
     /** An object containing valid JSON properties for the purposes of accessing the source. The schema
      * of this object is loose because it is up to the source implementation to define it's own schema
      * configuration. This is used in combination with the StreamSet.configuration to access an individual stream

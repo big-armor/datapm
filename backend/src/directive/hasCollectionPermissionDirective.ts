@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ForbiddenError, ApolloError } from "apollo-server";
+import { SchemaDirectiveVisitor, ForbiddenError, ApolloError, AuthenticationError } from "apollo-server";
 import {
     GraphQLObjectType,
     GraphQLField,
@@ -7,11 +7,80 @@ import {
     GraphQLInterfaceType,
     EnumValueNode
 } from "graphql";
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
+import { CollectionEntity } from "../entity/CollectionEntity";
+import { UserEntity } from "../entity/UserEntity";
 import { CollectionIdentifierInput, Permission } from "../generated/graphql";
-import { CollectionRepository } from "../repository/CollectionRepository";
-import { hasCollectionPermissions } from "../resolvers/UserCollectionPermissionResolver";
+import { getCollectionFromCacheOrDbOrFail } from "../resolvers/CollectionResolver";
+import { getCollectionPermissionsFromCacheOrDb } from "../resolvers/UserCollectionPermissionResolver";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
+
+export async function resolveCollectionPermissions(
+    context: Context,
+    identifier: CollectionIdentifierInput,
+    user?: UserEntity
+) {
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection, identifier.collectionSlug);
+    return resolveCollectionPermissionsForEntity(context, collectionEntity, user);
+}
+
+export async function resolveCollectionPermissionsForEntity(context: Context, collectionEntity: CollectionEntity, user?: UserEntity) {
+    const permissions: Permission[] = [];
+
+    if (collectionEntity.isPublic) {
+        permissions.push(Permission.VIEW);
+    }
+
+    if (user == null) {
+        return permissions;
+    }
+
+    const userPermission = await getCollectionPermissionsFromCacheOrDb(context, collectionEntity);
+
+    const allPermissions =  permissions.concat(userPermission);
+
+    return allPermissions.filter((v, i, a) => a.indexOf(v) === i);
+}
+
+
+
+export async function hasCollectionPermission(
+    permission: Permission,
+    context: Context,
+    identifier: CollectionIdentifierInput
+): Promise<Boolean> {
+
+    const isAuthenicatedContext = isAuthenticatedContext(context);
+
+    // Check that the package exists
+    const permissions = await resolveCollectionPermissions(context, identifier,  isAuthenicatedContext ? (context as AuthenticatedContext).me : undefined);
+
+    return permissions.includes(permission);
+   
+}
+
+export async function hasCollectionPermissionOrFail(    
+    permission: Permission,
+    context: Context,
+    identifier: CollectionIdentifierInput
+): Promise<true> {
+
+    const hasPermissionBoolean = await hasCollectionPermission(permission, context, identifier);
+
+     if (hasPermissionBoolean) {
+        return true;
+    }
+
+    const isAuthenicatedContext = isAuthenticatedContext(context);
+
+    if (!isAuthenicatedContext) {
+        throw new AuthenticationError("NOT_AUTHENTICATED");
+    }
+
+    throw new ForbiddenError("NOT_AUTHORIZED");
+
+}
 export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
     public visitObject(object: GraphQLObjectType) {
         const fields = object.getFields();
@@ -34,7 +103,7 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
             .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;
         details.field.resolve = async function (source, args, context: AuthenticatedContext, info) {
             const identifier: CollectionIdentifierInput = args[argument.name];
-            await self.validatePermission(context, identifier, permission);
+            await hasCollectionPermissionOrFail(permission, context, identifier );
             return resolve.apply(this, [source, args, context, info]);
         };
     }
@@ -55,24 +124,11 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
                 throw new ApolloError("COLLECTION_SLUG_REQUIRED");
             }
 
-            await self.validatePermission(context, { collectionSlug }, permission);
+            await hasCollectionPermissionOrFail(permission, context, {collectionSlug} );
 
             return resolve.apply(this, [source, args, context, info]);
         };
     }
 
-    async validatePermission(
-        context: AuthenticatedContext,
-        identifier: CollectionIdentifierInput,
-        permission: Permission
-    ) {
-        const collection = await context.connection
-            .getCustomRepository(CollectionRepository)
-            .findCollectionBySlugOrFail(identifier.collectionSlug);
-
-        const hasRequiredPermission = await hasCollectionPermissions(context, collection, permission);
-        if (!hasRequiredPermission) {
-            throw new ForbiddenError(`NOT_AUTHORIZED`);
-        }
-    }
+   
 }

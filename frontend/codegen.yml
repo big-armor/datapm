@@ -5,6 +5,7 @@ schema:
     - node_modules/datapm-lib/user-schema.gql
     - node_modules/datapm-lib/api-key-schema.gql
     - node_modules/datapm-lib/images-schema.gql
+    - node_modules/datapm-lib/group-schema.gql
 documents:
     - src/graphql/*.graphql
     - node_modules/datapm-lib/graphql-documents/*.graphql

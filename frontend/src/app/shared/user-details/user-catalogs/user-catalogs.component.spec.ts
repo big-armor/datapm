@@ -19,7 +19,6 @@ describe("UserCatalogsComponent", () => {
         TestBed.configureTestingModule({
             declarations: [UserCatalogsComponent],
             imports: [
-                RouterModule.forRoot([]),
                 MatCardModule,
                 MatDialogModule,
                 MatTableModule,

@@ -1,4 +1,4 @@
-import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
 import {
     CreatePackageDocument,
@@ -10,8 +10,6 @@ import {
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
-import fs from "fs";
-import * as crypto from "crypto";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 
 describe("Package Search Tests", async () => {
@@ -127,12 +125,14 @@ describe("Package Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
+
+        const targetPackage = response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search");
         expect(
-            response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") !=
+            targetPackage !=
                 null,
             "package returned"
         ).true;
-        expect(response.data!.searchPackages.packages![0].displayName).to.equal("Congressional Legislators");
+        expect(targetPackage!.displayName).to.equal("Congressional Legislators");
     });
 
     it("Should not allow anonymous access to package", async function () {

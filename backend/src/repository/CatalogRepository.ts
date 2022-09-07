@@ -50,25 +50,26 @@ export async function getCatalogOrFail({
     return catalog;
 }
 
+const PUBLIC_CATALOGS_QUERY = '("CatalogEntity"."isPublic" is true)';
+const AUTHENTICATED_USER_CATALOGS_QUERY = `
+    (
+        ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
+            or
+        ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select gc.catalog_id from group_catalog_permissions gc WHERE :permission = ANY(gc.permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+    )`;
+export const AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY = `(${PUBLIC_CATALOGS_QUERY} or ${AUTHENTICATED_USER_CATALOGS_QUERY})`;
+
 @EntityRepository(CatalogEntity)
 export class CatalogRepository extends Repository<CatalogEntity> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: UserEntity | null, permission: Permission) {
+    createQueryBuilderWithUserConditions(user: UserEntity | undefined, permission: Permission) {
         if (user == null) {
+            return this.manager.getRepository(CatalogEntity).createQueryBuilder().where(PUBLIC_CATALOGS_QUERY);
+        } else {
             return this.manager
                 .getRepository(CatalogEntity)
                 .createQueryBuilder()
-                .where(`("CatalogEntity"."isPublic" is true)`);
-        } else {
-            return this.manager.getRepository(CatalogEntity).createQueryBuilder().where(
-                `
-                (
-                    "CatalogEntity"."isPublic" is true 
-                    or 
-                    ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
-                )`,
-                { userId: user.id, permission }
-            );
+                .where(AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY, { userId: user.id, permission });
         }
     }
 
@@ -251,9 +252,13 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }
 
     async deleteCatalog({ slug }: { slug: string }): Promise<void> {
-        const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({
+        const catalog = await this.manager.getRepository(CatalogEntity).findOne({
             where: { slug: slug }
         });
+
+        if (catalog == null) {
+            return;
+        }
 
         // find all packages that are part of this catalog
         const ALIAS = "package";
@@ -285,7 +290,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }): Promise<CatalogEntity[]> {
         const ALIAS = "autoCompleteCatalog";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user || null, Permission.VIEW)
+        const entities = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `(LOWER("CatalogEntity"."slug") LIKE :valueLike OR LOWER("CatalogEntity"."displayName") LIKE :valueLike)`,
                 {
@@ -381,32 +386,21 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         }
     }
 
-
-
-    async getPublicCatalogs(
-        limit: number,
-        offSet: number,
-        relations?: string[]
-    ): Promise<CatalogEntity[]> {
+    async getPublicCatalogs(limit: number, offSet: number, relations?: string[]): Promise<CatalogEntity[]> {
         const ALIAS = "PublicCatalogs";
-        return this.createQueryBuilder(ALIAS)
-            // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
-            .where(
-                `("PublicCatalogs"."isPublic" = true)`,
-            )
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .getMany();
+        return (
+            this.createQueryBuilder(ALIAS)
+                // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
+                .where(`("PublicCatalogs"."isPublic" = true)`)
+                .limit(limit)
+                .offset(offSet)
+                .addRelations(ALIAS, relations)
+                .getMany()
+        );
     }
 
-    async countPublicCatalogs(
-    ): Promise<number> {
+    async countPublicCatalogs(): Promise<number> {
         const ALIAS = "CountPublicCatalogs";
-        return this.createQueryBuilder(ALIAS)
-            .where(
-                `("CountPublicCatalogs"."isPublic" = true)`,
-            )
-            .getCount();
+        return this.createQueryBuilder(ALIAS).where(`("CountPublicCatalogs"."isPublic" = true)`).getCount();
     }
 }

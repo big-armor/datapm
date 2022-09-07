@@ -113,6 +113,10 @@ enum ActivityLogEventType {
     PACKAGE_FETCHED
     PACKAGE_PUBLIC_CHANGED
     PACKAGE_EDIT
+    PACKAGE_USER_PERMISSION_ADDED_UPDATED
+    PACKAGE_USER_PERMISSION_REMOVED
+    PACKAGE_GROUP_PERMISSION_ADDED_UPDATED
+    PACKAGE_GROUP_PERMISSION_REMOVED
 
     DATA_BATCH_UPLOAD_STARTED
     DATA_BATCH_UPLOAD_STOPPED
@@ -145,6 +149,10 @@ enum ActivityLogEventType {
     COLLECTION_PACKAGE_ADDED
     COLLECTION_PACKAGE_REMOVED
     COLLECTION_PUBLIC_CHANGED
+    COLLECTION_USER_PERMISSION_ADDED_UPDATED
+    COLLECTION_USER_PERMISSION_REMOVED
+    COLLECTION_GROUP_PERMISSION_ADDED_UPDATED
+    COLLECTION_GROUP_PERMISSION_REMOVED
 
     CATALOG_CREATED
     CATALOG_DELETED
@@ -153,11 +161,21 @@ enum ActivityLogEventType {
     CATALOG_EDIT
     CATALOG_PACKAGE_ADDED
     CATALOG_PACKAGE_REMOVED
+    CATALOG_USER_PERMISSION_ADDED_UPDATED
+    CATALOG_USER_PERMISSION_REMOVED
+    CATALOG_GROUP_PERMISSION_ADDED_UPDATED
+    CATALOG_GROUP_PERMISSION_REMOVED
 
     USER_CREATED
     USER_DELETED
     USER_EDIT
     USER_STATUS_CHANGED
+
+    GROUP_CREATED
+    GROUP_DELETED
+    GROUP_EDIT
+    GROUP_MEMBER_REMOVED
+    GROUP_MEMBER_PERMISSION_ADDED_UPDATED
 }
 
 enum ActivityLogChangeType {
@@ -308,9 +326,19 @@ Whether the requesting user has the specified permission on the collection
 directive @hasCollectionPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
 
 """
+Whether the requesting user has the specified permission on the group (not the associated resources)
+"""
+directive @hasGroupPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
 Whether the catalog slug provided is valid
 """
 directive @validCatalogSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the catalog slug provided is valid
+"""
+directive @validGroupSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
 Whether the catalog slug provided is valid
@@ -499,6 +527,7 @@ Represents users, and their permissions on a catalog
 type UserCatalogPermissions {
     user: User!
     permissions: [Permission!]!
+    packagePermissions: [Permission!]!
 }
 
 """
@@ -594,7 +623,10 @@ type ActivityLog {
     targetPackageIssue: PackageIssue
     targetPackageVersion: Version
     targetCollection: Collection
+    targetUser: User
+    targetGroup: Group
     targetCatalog: Catalog
+    permissions: [String!]
     eventType: ActivityLogEventType!
     changeType: ActivityLogChangeType
     createdAt: Date!
@@ -933,7 +965,7 @@ input SetUserCatalogPermissionInput {
     """
     The users permissions for all packages in the catalog
     """
-    packagePermission: [Permission!]!
+    packagePermissions: [Permission!]!
 }
 
 """
@@ -969,6 +1001,14 @@ input SetPackagePermissionInput {
 The properties for setting a specific user's permissions on a collection
 """
 input SetUserCollectionPermissionsInput {
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
+    permissions: [Permission!]!
+}
+
+"""
+The properties for setting a specific user's permissions in a group
+"""
+input SetUserGroupPermissionsInput {
     usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
@@ -1076,22 +1116,43 @@ type Query {
     Returns all of the users for a given catalog
     """
     usersByPackage(
-        identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
     ): [UserPackagePermissions!]!
 
     """
     Returns all of the users for a given catalog
     """
     usersByCatalog(
-        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
     ): [UserCatalogPermissions!]!
 
     """
     Returns all of the users for a given collection
     """
     usersByCollection(
-        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
     ): [UserCollectionPermissions!]!
+
+    """
+    Returns all of the users for a given catalog
+    """
+    groupsByPackage(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): [GroupPackagePermission!]!
+
+    """
+    Returns all of the users for a given catalog
+    """
+    groupsByCatalog(
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): [GroupCatalogPermission!]!
+
+    """
+    Returns all of the users for a given collection
+    """
+    groupsByCollection(
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+    ): [GroupCollectionPermission!]!
 
     """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
@@ -1112,6 +1173,16 @@ type Query {
     Returns the catalogs the requesting user either owns or has edit or manage permission to
     """
     myCatalogs: [Catalog]! @isAuthenticated
+
+    """
+    Returns all groups the user can view
+    """
+    myGroups: [Group!]! @isAuthenticated
+
+    """
+    Returns a single group
+    """
+    group(groupSlug: String! @hasGroupPermission(permission: VIEW)): Group!
 
     """
     Returns catalogs matching the query string (which can include boolean logic combinations) with pagination
@@ -1826,4 +1897,51 @@ type Mutation {
         connectorType: String!
         credentialIdentifier: String!
     ): Void @hasPackagePermission(permission: EDIT)
+
+    createGroup(groupSlug: String! @validGroupSlug, name: String!, description: String!): Group! @isAuthenticated
+
+    updateGroup(groupSlug: String! @hasGroupPermission(permission: EDIT), name: String!, description: String!): Group!
+
+    deleteGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE)): Void
+
+    addOrUpdateUserToGroup(
+        groupSlug: String! @hasGroupPermission(permission: MANAGE)
+        userPermissions: [SetUserGroupPermissionsInput!]!
+    ): Void
+
+    removeUserFromGroup(groupSlug: String! @hasGroupPermission(permission: MANAGE), username: String!): Group!
+
+    addOrUpdateGroupToCollection(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        permissions: [Permission!]!
+    ): GroupCollectionPermission!
+
+    removeGroupFromCollection(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+    ): Void
+
+    addOrUpdateGroupToPackage(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        permissions: [Permission!]!
+    ): GroupPackagePermission!
+
+    removeGroupFromPackage(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): Void
+
+    addOrUpdateGroupToCatalog(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+        permissions: [Permission!]!
+        packagePermissions: [Permission!]!
+    ): GroupCatalogPermission!
+
+    removeGroupFromCatalog(
+        groupSlug: String! @hasGroupPermission(permission: VIEW)
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): Void
 }

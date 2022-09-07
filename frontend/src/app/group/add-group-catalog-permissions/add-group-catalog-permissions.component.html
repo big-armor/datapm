@@ -1,0 +1,60 @@
+<form [formGroup]="form" (submit)="submit($event)" id="addGroup">
+    <div mat-dialog-title id="contentTitle">Add Catalog Permissions For Group</div>
+    <div mat-dialog-content id="contentBorder">
+        <div class="bd-highlight shadow-div">
+            <label class="div-question pl-1 mb-0">Group</label>
+            <mat-select [formControl]="groupControl" [value]="selectedGroupSlug">
+                <mat-option *ngFor="let groupOption of groups" [value]="groupOption.slug">
+                    {{ groupOption.name }}
+                </mat-option>
+            </mat-select>
+            <label class="mt-3 mb-3 pl-1">Catalog</label>
+            <app-catalog-autocomplete [form]="form"></app-catalog-autocomplete>
+
+            <div class="permission-div modal-select mt-3 w-50">
+                <label class="div-question pl-1">Catalog Permissions</label>
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-select [value]="permission" (selectionChange)="updateSelectedPermission($event.value)">
+                        <mat-option value="VIEW">View</mat-option>
+                        <mat-option value="EDIT">Edit</mat-option>
+                        <mat-option value="MANAGE">Manage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="permission-div modal-select mt-3 w-50">
+                <label class="div-question pl-1">Package Permissions</label>
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-select
+                        [value]="packagePermission"
+                        (selectionChange)="updateSelectedPackagePermission($event.value)"
+                    >
+                        <mat-option value="NONE">None</mat-option>
+                        <mat-option value="VIEW">View</mat-option>
+                        <mat-option value="EDIT">Edit</mat-option>
+                        <mat-option value="MANAGE">Manage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="bd-highlight w-100">
+                <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
+                    <ng-container [ngSwitch]="error">
+                        <ng-container *ngSwitchCase="'CANNOT_SET_CATALOG_CREATOR_PERMISSIONS'">
+                            You can not change the permissions of the catalog owner.
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'GROUP_NOT_FOUND'">
+                            There is no group with that name on this registry.
+                        </ng-container>
+                        <ng-container *ngSwitchDefault> Error occured while adding a group permission </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions class="mat-dialog-actions">
+        <button type="submit" class="ml-auto modal-submit-btn" [disabled]="loading || hasErrors">
+            <span>Add</span>
+        </button>
+    </div>
+</form>

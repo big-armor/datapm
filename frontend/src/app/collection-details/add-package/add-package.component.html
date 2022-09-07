@@ -7,52 +7,7 @@
                 <div class="d-flex bd-highlight shadow-div my-3">
                     <div class="bd-highlight div-question py-2">Package</div>
                     <div class="bd-highlight div-answer">
-                        <app-input
-                            placeholder="catalog/package"
-                            [group]="form"
-                            class="flat-input px-0"
-                            controlName="packageSlug"
-                            inputStyle="flat"
-                            [matAutocomplete]="auto"
-                            (keydown)="packageInputKeyDown()"
-                            [error]="form | inputError: 'packageSlug' | async"
-                        ></app-input>
-                        <mat-autocomplete #auto="matAutocomplete" class="search-autocomplete">
-                            <mat-option
-                                *ngIf="
-                                    packageKeyDownHasHappened &&
-                                    !autoCompleteResult &&
-                                    packageNameControl.value.length > 1
-                                "
-                            >
-                                <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
-                            </mat-option>
-                            <ng-container *ngIf="autoCompleteResult">
-                                <mat-option
-                                    *ngFor="let option of autoCompleteResult.packages"
-                                    [value]="option.identifier.catalogSlug + '/' + option.identifier.packageSlug"
-                                >
-                                    <div class="d-flex">
-                                        <div>
-                                            <app-avatar class="align-top user-img" [user]="option.creator" [size]="40">
-                                            </app-avatar>
-                                        </div>
-
-                                        <div class="autocomplete-contents">
-                                            <div class="autocomplete-title">
-                                                {{
-                                                    option.identifier.catalogSlug +
-                                                        " / " +
-                                                        option.identifier.packageSlug
-                                                }}
-                                            </div>
-
-                                            <div class="autocomplete-description">{{ option.description }}</div>
-                                        </div>
-                                    </div>
-                                </mat-option>
-                            </ng-container>
-                        </mat-autocomplete>
+                        <app-package-autocomplete [form]="form"></app-package-autocomplete>
                     </div>
                 </div>
                 <div class="d-flex bd-highlight shadow-div mb-3">
@@ -117,11 +72,7 @@
                 </ng-container>
             </div>
             <div mat-dialog-actions class="mat-dialog-actions">
-                <button
-                    type="submit"
-                    class="ml-auto modal-submit-btn"
-                    [disabled]="state == 'LOADING'"
-                >
+                <button type="submit" class="ml-auto modal-submit-btn" [disabled]="state == 'LOADING'">
                     <span>Add Package To Collection</span>
                 </button>
             </div>

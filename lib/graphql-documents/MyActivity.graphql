@@ -31,6 +31,10 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                     emailAddress
                 }
             }
+            targetGroup {
+                name
+                slug
+            }
             targetPackageVersion {
                 identifier {
                     versionMajor
@@ -50,11 +54,19 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                 }
                 displayName
             }
+            targetUser {
+                emailAddress
+                username
+                firstName
+                lastName
+                displayName
+            }
             propertiesEdited
             eventType
             changeType
             createdAt
             updatedAt
+            permissions
         }
         count
         hasMore

@@ -9,19 +9,14 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import {
     AddPackageToCollectionGQL,
-    AutoCompletePackageGQL,
-    AutoCompleteResult,
     Collection,
-    CollectionIdentifierInput,
     CollectionSlugAvailableGQL,
     CreateCollectionGQL,
     PackageIdentifierInput,
     UserCollectionsGQL
 } from "src/generated/graphql";
 
-import {
-    nameToSlug
-} from "datapm-lib";
+import { nameToSlug } from "datapm-lib";
 
 enum ErrorType {
     PACKAGE_NOT_FOUND = "PACKAGE_NOT_FOUND",
@@ -51,9 +46,6 @@ export class AddPackageComponent implements OnInit, OnDestroy {
     public selectedCollection: Collection;
     public selectedCollectionName: string;
 
-    public packageKeyDownHasHappened = false;
-    public autoCompleteResult: AutoCompleteResult;
-
     public form: FormGroup;
     public packageNameControl: FormControl = new FormControl("", [
         Validators.required,
@@ -69,7 +61,6 @@ export class AddPackageComponent implements OnInit, OnDestroy {
     constructor(
         private addPackageToCollectionGQL: AddPackageToCollectionGQL,
         private dialogRef: MatDialogRef<AddPackageComponent>,
-        private autoCompletePackages: AutoCompletePackageGQL,
         private userCollectionsGQL: UserCollectionsGQL,
         private collectionSlugAvailableGQL: CollectionSlugAvailableGQL,
         private createCollectionGQL: CreateCollectionGQL,
@@ -113,27 +104,6 @@ export class AddPackageComponent implements OnInit, OnDestroy {
                 this.state = "SUCCESS";
             });
 
-        this.packageNameControl.valueChanges.subscribe((value) => {
-            value = value.replace(/ /g, "-");
-            this.packageNameControl.setValue(value, { emitEvent: false });
-        });
-
-        this.packageNameControl.valueChanges
-            .pipe(
-                debounceTime(500),
-                switchMap((value) => {
-                    if (value.length < 2) {
-                        this.autoCompleteResult = null;
-                        return [];
-                    }
-                    return this.autoCompletePackages.fetch({ startsWith: value });
-                })
-            )
-            .subscribe((result) => {
-                if (result.errors != null) this.autoCompleteResult = null;
-                else this.autoCompleteResult = result.data.autoComplete;
-            });
-
         this.listenToCollectionInput();
     }
 
@@ -142,14 +112,10 @@ export class AddPackageComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    public packageInputKeyDown(): void {
-        this.packageKeyDownHasHappened = true;
-    }
-
     public submit(ev): void {
         ev.preventDefault();
 
-        this.form.updateValueAndValidity()
+        this.form.updateValueAndValidity();
 
         if (!this.form.valid) {
             return;
@@ -210,12 +176,10 @@ export class AddPackageComponent implements OnInit, OnDestroy {
                 (c) => c.name.includes(searchValue) || c.name.includes(searchValue)
             );
             if (!this.collections.length) {
-                this.collectionSlugAvailableGQL
-                    .fetch({ collectionSlug })
-                    .subscribe((result) => {
-                        this.selectedValidCollectionSlug = result.data?.collectionSlugAvailable;
-                        this.selectedCollectionName = searchValue;
-                    });
+                this.collectionSlugAvailableGQL.fetch({ collectionSlug }).subscribe((result) => {
+                    this.selectedValidCollectionSlug = result.data?.collectionSlugAvailable;
+                    this.selectedCollectionName = searchValue;
+                });
             } else {
                 this.selectedCollection = this.userCollections.find((c) => c.name === searchValue);
                 this.selectedValidCollectionSlug = true;

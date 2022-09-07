@@ -1,0 +1,17 @@
+<mat-card class="user-item my-3" (click)="goToComponent()">
+    <mat-card-content>
+        <div class="d-flex bd-highlight d-flex align-items-top">
+            <div class="d-flex align-self-center img-cover">
+                <app-avatar class="align-top user-img" [user]="item" [size]="40"> </app-avatar>
+            </div>
+            <div class="pl-2 pr-2 flex-grow-1 bd-highlight align-self-center text-overflow-elipses">
+                <a class="box-name">{{ item.displayName }}</a>
+            </div>
+            <div class="p-1 d-flex flex-grow-2 bd-highlight action-div text-center">
+                <button class="app-outlined-button" *ngIf="shouldShowActionButton" (click)="handleAction($event)">
+                    {{ actionButtonText }}
+                </button>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

@@ -21,7 +21,8 @@ function copyFiles() {
         path.join(SCHEMA_DIR, "auth-schema.gql"),
         path.join(SCHEMA_DIR, "user-schema.gql"),
         path.join(SCHEMA_DIR, "api-key-schema.gql"),
-        path.join(SCHEMA_DIR, "images-schema.gql")
+        path.join(SCHEMA_DIR, "images-schema.gql"),
+        path.join(SCHEMA_DIR, "group-schema.gql"),
     ]).pipe(dest(DESTINATION_DIR));
 }
 

@@ -28,8 +28,7 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { VersionRepository } from "../repository/VersionRepository";
 import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
-import { hasPackageEntityPermissions } from "./UserPackagePermissionResolver";
+import { hasPackagePermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import {
     catalogEntityToGraphQL,
@@ -50,6 +49,8 @@ import {
 } from "./FollowResolver";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { isAuthenticatedContext } from "../util/contextHelpers";
+import { GroupEntity } from "../entity/GroupEntity";
+import { connection } from "mongoose";
 
 
 export const packageEntityToGraphqlObjectOrNull = async (
@@ -190,7 +191,7 @@ export const packageCatalog = async (
         throw new Error("CATALOG_NOT_FOUND: " + packageEntity.catalogId);
     }
 
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return {
             identifier: {
                 catalogSlug: catalog.slug,
@@ -208,10 +209,12 @@ export const packageLatestVersion = async (
     context: Context,
     info: any
 ): Promise<Version | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+    
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId);
     if (catalog === undefined) {
@@ -404,10 +407,9 @@ export const updatePackage = async (
         }
     }
 
-    return await context.connection.transaction(async (transaction) => {
-        const packageEntity = await transaction
-            .getCustomRepository(PackageRepository)
-            .findPackageOrFail({ identifier });
+    let packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, getGraphQlRelationName(info));
+
+    await context.connection.transaction(async (transaction) => {
 
         const [packageEntityUpdated, propertiesChanged] = await transaction
             .getCustomRepository(PackageRepository)
@@ -421,7 +423,7 @@ export const updatePackage = async (
         await createActivityLog(transaction, {
             userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_EDIT,
-            targetPackageId: packageEntity.id,
+            targetPackageId: packageEntityUpdated.id,
             propertiesEdited: propertiesChanged
         });
 
@@ -429,7 +431,7 @@ export const updatePackage = async (
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.PACKAGE_PUBLIC_CHANGED,
-                targetPackageId: packageEntity.id,
+                targetPackageId: packageEntityUpdated.id,
                 changeType: value.isPublic
                     ? ActivityLogChangeType.PUBLIC_ENABLED
                     : ActivityLogChangeType.PUBLIC_DISABLED
@@ -440,8 +442,23 @@ export const updatePackage = async (
             }
         }
 
-        return packageEntityToGraphqlObject(context, transaction, packageEntityUpdated);
     });
+
+    context.cache.clear();
+
+
+    if(value.newCatalogSlug || value.newPackageSlug) {
+        identifier = {
+            catalogSlug: value.newCatalogSlug || identifier.catalogSlug,
+            packageSlug: value.newPackageSlug || identifier.packageSlug
+        }
+    }
+    
+    packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, getGraphQlRelationName(info));
+
+    return packageEntityToGraphqlObject(context, context.connection, packageEntity);
+
+
 };
 
 export const movePackage = async (
@@ -486,9 +503,10 @@ export const movePackage = async (
         await transaction.getCustomRepository(PackageRepository).save(packageEntity);
 
         const userPermission = await getCatalogPermissionsFromCacheOrDb(context, targetCatalogEntity.id, context.me.id);
+        
         await transaction
             .getCustomRepository(PackagePermissionRepository)
-            .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission.permissions);
+            .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission);
 
         // TODO Move the data from the old catalog to the new one
         /* await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
@@ -599,55 +617,61 @@ export const catalogPackages = async (
 };
 
 export const packageDescription = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.description || null;
 };
 
 export const packageDisplayName = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.displayName || null;
 };
 
 export const packageCreatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.createdAt || null;
 };
 
 export const packageUpdatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.updatedAt || null;
 };
 
 export const packageFetchCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.fetchCount || null;
 };
 
 export const packageViewedCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
-    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
-    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
+    
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.fetchCount || null;
 };
@@ -737,4 +761,6 @@ export const getPackageVersionsFromCacheOrDbById = async (
         context.connection.getCustomRepository(VersionRepository).findVersions({ packageId, relations });
     return await context.cache.loadPackageVersions(packageId, versionsPromiseFunction);
 };
+
+
 

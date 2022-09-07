@@ -8,5 +8,6 @@ query UsersByCatalog($identifier: CatalogIdentifierInput!) {
             displayName
         }
         permissions
+        packagePermissions
     }
 }

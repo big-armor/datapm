@@ -18,6 +18,7 @@ import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { FirstUserStatusHolder } from "../resolvers/FirstUserStatusHolder";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -311,11 +312,12 @@ export class UserRepository extends Repository<UserEntity> {
     createInviteUser(emailAddress: string): Promise<UserEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
             let user = transaction.create(UserEntity);
-            user.emailAddress = emailAddress.trim();
+            user.emailAddress = emailAddress.trim().toLowerCase();
             user.verifyEmailToken = uuid();
             user.verifyEmailTokenDate = new Date();
             user.passwordSalt = uuid();
             user.emailVerified = false;
+            user.username = "invited-" + uuid().substring(0, 8);
 
             const now = new Date();
             user.createdAt = now;
@@ -344,65 +346,67 @@ export class UserRepository extends Repository<UserEntity> {
 
         ReservedKeywordsService.validateReservedKeyword(value.username);
         const emailVerificationToken = uuid();
-        return this.manager
-            .nestedTransaction(async (transaction) => {
-                if (value.firstName != null) user.firstName = value.firstName.trim();
+        return (
+            this.manager
+                .nestedTransaction(async (transaction) => {
+                    if (value.firstName != null) user.firstName = value.firstName.trim();
 
-                if (value.lastName != null) user.lastName = value.lastName.trim();
+                    if (value.lastName != null) user.lastName = value.lastName.trim();
 
-                user.emailAddress = value.emailAddress.trim();
-                user.username = value.username.trim();
-                user.passwordSalt = uuid();
-                user.passwordHash = hashPassword(value.password, user.passwordSalt);
+                    user.emailAddress = value.emailAddress.trim();
+                    user.username = value.username.trim();
+                    user.passwordSalt = uuid();
+                    user.passwordHash = hashPassword(value.password, user.passwordSalt);
 
-                user.verifyEmailToken = emailVerificationToken;
-                user.verifyEmailTokenDate = new Date();
+                    user.verifyEmailToken = emailVerificationToken;
+                    user.verifyEmailTokenDate = new Date();
 
-                if (user.emailVerified == null) user.emailVerified = false;
+                    if (user.emailVerified == null) user.emailVerified = false;
 
-                const now = new Date();
-                user.createdAt = now;
-                user.updatedAt = now;
+                    const now = new Date();
+                    user.createdAt = now;
+                    user.updatedAt = now;
 
-                user.uiDarkModeEnabled = value.uiDarkModeEnabled || false;
+                    user.uiDarkModeEnabled = value.uiDarkModeEnabled || false;
 
-                user.status = UserStatus.ACTIVE;
+                    user.status = UserStatus.ACTIVE;
 
-                if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = await this.isAtLeastOneUserRegistered();
-                }
-
-                if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED || (isAdmin(value) && value.isAdmin)) {
-                    user.isAdmin = true;
-                } else {
-                    user.isAdmin = false;
-                }
-
-                user = await transaction.save(user);
-                await transaction.getCustomRepository(CatalogRepository).createCatalog({
-                    userId: user.id,
-                    value: {
-                        description: "",
-                        isPublic: false,
-                        displayName: user.username,
-                        slug: user.username,
-                        website: user.website
+                    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
+                        FirstUserStatusHolder.IS_FIRST_USER_CREATED = await this.isAtLeastOneUserRegistered();
                     }
-                });
 
-                return user;
-            })
+                    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED || (isAdmin(value) && value.isAdmin)) {
+                        user.isAdmin = true;
+                    } else {
+                        user.isAdmin = false;
+                    }
 
-            // FIX ME this should just use an await above, and handled errors in sendVerifyEmail
-            .then(async (user: UserEntity) => {
-                if (!user.emailVerified) await sendVerifyEmail(user, emailVerificationToken);
+                    user = await transaction.save(user);
+                    await transaction.getCustomRepository(CatalogRepository).createCatalog({
+                        userId: user.id,
+                        value: {
+                            description: "",
+                            isPublic: false,
+                            displayName: user.username,
+                            slug: user.username,
+                            website: user.website
+                        }
+                    });
 
-                return getUserOrFail({
-                    username: value.username,
-                    manager: self.manager,
-                    relations
-                });
-            });
+                    return user;
+                })
+
+                // FIX ME this should just use an await above, and handled errors in sendVerifyEmail
+                .then(async (user: UserEntity) => {
+                    if (!user.emailVerified) await sendVerifyEmail(user, emailVerificationToken);
+
+                    return getUserOrFail({
+                        username: value.username,
+                        manager: self.manager,
+                        relations
+                    });
+                })
+        );
     }
 
     updateUserPassword({ username, passwordHash }: { username: string; passwordHash: string }): Promise<void> {

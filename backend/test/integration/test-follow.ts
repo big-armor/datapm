@@ -1106,7 +1106,7 @@ describe("Follow Tests", async () => {
                     {
                         usernameOrEmailAddress: userBUsername,
                         permission: [Permission.VIEW],
-                        packagePermission: [Permission.VIEW]
+                        packagePermissions: [Permission.VIEW]
                     }
                 ],
                 message: "Testing test"

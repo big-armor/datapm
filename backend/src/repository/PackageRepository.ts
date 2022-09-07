@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions, Repository, Connection, Brackets } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository, Brackets } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";
@@ -17,11 +17,15 @@ import { UserRepository } from "./UserRepository";
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `
     (
-        ("PackageEntity"."isPublic" is false and "PackageEntity"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.package_permission))) 
+        ("PackageEntity"."isPublic" is false and "PackageEntity"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.package_permissions))) 
         or 
         ("PackageEntity"."isPublic" is false and "PackageEntity".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission)))
+        or
+        ("PackageEntity"."isPublic" is false and "PackageEntity".id in (select gp.package_id from group_package_permissions gp WHERE :permission = ANY(gp.permissions) AND gp.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
+        or
+        ("PackageEntity"."isPublic" is false and "PackageEntity".catalog_id in (select gc.catalog_id from group_catalog_permissions gc WHERE :permission = ANY(gc.package_permissions) AND gc.group_id IN (select gu.group_id FROM group_user gu WHERE gu.user_id = :userId)))
     )`;
-const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
+export const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
 
 async function findPackageById(
     manager: EntityManager,
@@ -75,8 +79,10 @@ function validation(packageEntity: PackageEntity) {
 }
 
 function validateIdentifier(packageIdentifier: PackageIdentifierInput) {
-    if(getNameLength(packageIdentifier.catalogSlug) === 0) throw new Error("PACKAGE_CATALOG_NOT_VALID: must be provided");
-    if(getNameLength(packageIdentifier.packageSlug) === 0) throw new Error("PACKAGE_SLUG__NOT_VALID: must be provided");
+    if (getNameLength(packageIdentifier.catalogSlug) === 0)
+        throw new Error("PACKAGE_CATALOG_NOT_VALID: must be provided");
+    if (getNameLength(packageIdentifier.packageSlug) === 0)
+        throw new Error("PACKAGE_SLUG__NOT_VALID: must be provided");
 }
 
 @EntityRepository(PackageEntity)
@@ -96,17 +102,14 @@ export class PackageRepository extends Repository<PackageEntity> {
     }): Promise<[PackageEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
+        const modifiedRelations = [...(relations || [])];
 
-        const modifiedRelations = [...relations || []];
-
-        if(!relations?.includes("catalog")) {
+        if (!relations?.includes("catalog")) {
             modifiedRelations.push("catalog");
         }
 
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(
-                `("PackageEntity"."creator_id" = :targetUserId AND "PackageEntitycatalog"."unclaimed" = false)`
-            )
+            .andWhere(`("PackageEntity"."creator_id" = :targetUserId AND "PackageEntitycatalog"."unclaimed" = false)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
@@ -159,7 +162,6 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity> {
-
         validateIdentifier(identifier);
 
         const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({ slug: identifier.catalogSlug });
@@ -180,7 +182,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         user?: UserEntity;
         relations?: string[];
     }): Promise<PackageEntity[]> {
-        const ALIAS = "packagesForUser";
+        const ALIAS = "PackageEntity";
 
         const packages = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(`"PackageEntity"."catalog_id" = :catalogId `, { catalogId: catalogId })
@@ -211,9 +213,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity | null> {
-
         validateIdentifier(identifier);
-
 
         const packageEntity = await findPackage(
             this.manager,
@@ -232,7 +232,6 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity> {
-
         validateIdentifier(identifier);
 
         const packageEntity = await this.findPackage({ identifier, relations });
@@ -398,7 +397,6 @@ export class PackageRepository extends Repository<PackageEntity> {
     }
 
     async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeMarkdown: string | null | undefined) {
-
         validateIdentifier(identifier);
 
         await this.manager.nestedTransaction(async (transaction) => {
@@ -427,7 +425,6 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         context?: AuthenticatedContext;
     }): Promise<void> {
-
         validateIdentifier(identifier);
 
         const catalogSlug = identifier.catalogSlug;
@@ -473,7 +470,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "PackageEntity";
 
         const queryArray = startsWith
-            .replace(process.env["REGISTRY_URL"] as string,"")
+            .replace(process.env["REGISTRY_URL"] as string, "")
             .trim()
             .toLowerCase()
             .split(/\s+/)
@@ -483,17 +480,21 @@ export class PackageRepository extends Repository<PackageEntity> {
 
         const entities = await queryBuilder
 
-            .andWhere(new Brackets((qb) => {
-                  qb.where(`(LOWER("PackageEntity"."slug") LIKE :startsWith OR LOWER("PackageEntity"."displayName") like all (array[:...queryArray]))`,
-                {
-                    startsWith: startsWith.trim().toLowerCase() + "%",
-                    queryArray: queryArray
+            .andWhere(
+                new Brackets((qb) => {
+                    qb.where(
+                        `(LOWER("PackageEntity"."slug") LIKE :startsWith OR LOWER("PackageEntity"."displayName") like all (array[:...queryArray]))`,
+                        {
+                            startsWith: startsWith.trim().toLowerCase() + "%",
+                            queryArray: queryArray
+                        }
+                    ).orWhere(
+                        `"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :startsWith)`,
+                        {
+                            startsWith: startsWith.trim().toLowerCase() + "%"
+                        }
+                    );
                 })
-                .orWhere(`"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :startsWith)`, {
-                    startsWith: startsWith.trim().toLowerCase() + "%"
-            
-                })
-            }) 
             )
             .addRelations(ALIAS, relations)
             .getMany();
@@ -518,14 +519,18 @@ export class PackageRepository extends Repository<PackageEntity> {
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
                 new Brackets((qb) => {
-                    qb.where(`(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
+                    qb.where(
+                        `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "PackageEntity"."slug" LIKE :queryLike OR "PackageEntity"."displayName" LIKE :queryLike)`,
                         {
                             query,
                             queryLike: "%" + query + "%"
-                        })
-                        .orWhere(`"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :queryLike)`, {
+                        }
+                    ).orWhere(
+                        `"PackageEntity"."id" IN (SELECT p.id FROM package p JOIN catalog c ON p.catalog_id = c.id WHERE LOWER(CONCAT(c.slug,'/',p.slug)) LIKE :queryLike)`,
+                        {
                             queryLike: "%" + query + "%"
-                        })
+                        }
+                    );
                 })
             )
             .limit(limit)
@@ -542,16 +547,12 @@ export class PackageRepository extends Repository<PackageEntity> {
     ): Promise<[PackageEntity[], number]> {
         const ALIAS = "myPackages";
 
-        const modifiedRelations = [...relations || []];
-
-
+        const modifiedRelations = [...(relations || [])];
 
         return this.manager
             .getRepository(PackageEntity)
             .createQueryBuilder("Package")
-            .where(
-                `("Package"."creator_id" = :userId)`,
-            )
+            .where(`("Package"."creator_id" = :userId)`)
             .orderBy('"Package"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
@@ -575,41 +576,30 @@ export class PackageRepository extends Repository<PackageEntity> {
             .getManyAndCount();
     }
 
-    async getPublicPackages(
-        limit: number,
-        offSet: number,
-        relations?: string[]
-    ): Promise<PackageEntity[]> {
+    async getPublicPackages(limit: number, offSet: number, relations?: string[]): Promise<PackageEntity[]> {
         const ALIAS = "PublicPackages";
-        return this.createQueryBuilder(ALIAS)
-            // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
-            .where(
-                `("PublicPackages"."isPublic" = true)`,
-            )
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .getMany();
+        return (
+            this.createQueryBuilder(ALIAS)
+                // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
+                .where(`("PublicPackages"."isPublic" = true)`)
+                .limit(limit)
+                .offset(offSet)
+                .addRelations(ALIAS, relations)
+                .getMany()
+        );
     }
 
-    async countPublicPackages(
-    ): Promise<number> {
+    async countPublicPackages(): Promise<number> {
         const ALIAS = "CountPublicPackages";
-        return this.createQueryBuilder(ALIAS)
-            .where(
-                `("CountPublicPackages"."isPublic" = true)`,
-            )
-            .getCount();
+        return this.createQueryBuilder(ALIAS).where(`("CountPublicPackages"."isPublic" = true)`).getCount();
     }
 
     async getPackageOldestUpdated(
-        beforeDate:Date,
+        beforeDate: Date,
         offset: number,
         limit: number,
         relations?: string[]
-
     ): Promise<PackageEntity[]> {
-
         const ALIAS = "LeastUpdatedPackages";
         return this.createQueryBuilder(ALIAS)
             .offset(offset)
@@ -618,8 +608,5 @@ export class PackageRepository extends Repository<PackageEntity> {
             .where('"LeastUpdatedPackages"."last_update_job_date" < :beforeDate', { beforeDate })
             .orderBy('"LeastUpdatedPackages"."last_update_job_date"', "ASC")
             .getMany();
-
     }
-
-
 }

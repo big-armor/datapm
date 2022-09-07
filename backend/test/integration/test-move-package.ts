@@ -138,7 +138,7 @@ describe("Package Issues and Comments Tests", async () => {
                     {
                         usernameOrEmailAddress: userBUsername,
                         permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -210,7 +210,7 @@ describe("Package Issues and Comments Tests", async () => {
                     {
                         usernameOrEmailAddress: userBUsername,
                         permission: [Permission.VIEW],
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -282,7 +282,7 @@ describe("Package Issues and Comments Tests", async () => {
                     {
                         usernameOrEmailAddress: userBUsername,
                         permission: [Permission.VIEW, Permission.EDIT],
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -349,7 +349,7 @@ describe("Package Issues and Comments Tests", async () => {
                     {
                         usernameOrEmailAddress: userBUsername,
                         permission: [Permission.VIEW, Permission.EDIT],
-                        packagePermission: []
+                        packagePermissions: []
                     }
                 ],
                 message: "Test message"
@@ -581,5 +581,4 @@ describe("Package Issues and Comments Tests", async () => {
 
         expect(packageData.versions.length).equal(1);
     });
-
 });

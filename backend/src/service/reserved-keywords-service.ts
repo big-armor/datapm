@@ -17,7 +17,8 @@ export class ReservedKeywordsService {
         "GRAPHQL",
         "ACCEPT-INVITE",
         "CLIENT-INSTALLERS",
-        "SITEMAP"
+        "SITEMAP",
+        "GROUP"
     ];
 
     public static validateReservedKeyword(keyword: string): void {

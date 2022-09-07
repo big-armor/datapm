@@ -1,0 +1,3 @@
+mutation RemoveGroupFromCatalog($groupSlug: String!, $catalogIdentifier: CatalogIdentifierInput!) {
+    removeGroupFromCatalog(groupSlug: $groupSlug, catalogIdentifier: $catalogIdentifier)
+}
