@@ -1,9 +1,8 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
-import { CurrentUser, Group, Permission, UpdateGroupGQL, User } from "src/generated/graphql";
+import { CurrentUser, Group, Permission, UpdateGroupGQL } from "src/generated/graphql";
 import { ImageService } from "../../services/image.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { takeUntil } from "rxjs/operators";

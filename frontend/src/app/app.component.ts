@@ -5,7 +5,7 @@ import { delay, filter, takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { AuthenticationService } from "./services/authentication.service";
-import { CurrentUser, User } from "../generated/graphql";
+import { CurrentUser } from "../generated/graphql";
 import { ViewportScroller } from "@angular/common";
 
 @Component({

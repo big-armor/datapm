@@ -229,10 +229,10 @@ import {
     myGroupPermissions,
     myGroups,
     group,
-    groupUsers,
     setGroupAsAdmin,
     adminSearchGroups,
-    adminDeleteGroup
+    adminDeleteGroup,
+    groupUsers
 } from "./resolvers/GroupResolver";
 import {
     addOrUpdateGroupToPackage,

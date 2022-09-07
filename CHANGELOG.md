@@ -1,3 +1,9 @@
+#### 0.32.8 (2022-09-07)
+
+##### New Features
+
+*  Added Group Permissions ([b0dde7b9](https://github.com/big-armor/datapm/commit/b0dde7b9828c54143bf6e3f370ad3d0505e69eba))
+
 #### 0.32.7 (2022-08-31)
 
 ##### Build System / Dependencies

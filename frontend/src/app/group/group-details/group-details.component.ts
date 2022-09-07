@@ -6,17 +6,7 @@ import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EditGroupComponent } from "src/app/shared/edit-group/edit-group.component";
-import {
-    Group,
-    GroupGQL,
-    Follow,
-    Package,
-    Permission,
-    User,
-    RemoveGroupFromPackageGQL,
-    CurrentUser
-} from "src/generated/graphql";
-import { AddGroupPackagePermissionsComponent } from "../add-group-package-permissions/add-group-package-permissions.component";
+import { Group, GroupGQL, Follow, Permission, RemoveGroupFromPackageGQL, CurrentUser } from "src/generated/graphql";
 
 type GroupDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
 
