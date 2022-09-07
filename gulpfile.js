@@ -307,6 +307,20 @@ function cleanDocs() {
     return spawnAndLog("clean-lib", "npm", ["run", "clean"], { cwd: "docs/website" });
 }
 
+async function checkNodeVersion() {
+    const packageFileString = fs.readFileSync("package.json", "utf8");
+    const packageFile = JSON.parse(packageFileString);
+    const nodeVersion = packageFile.engines.node;
+    const currentNodeVersion = process.version;
+
+    const semVer = require("semver");
+    if (!semVer.satisfies(currentNodeVersion, nodeVersion)) {
+        throw new Error(
+            "The current node version is " + currentNodeVersion + " but the package.json requires " + nodeVersion + "."
+        );
+    }
+}
+
 exports.default = series(
     installLibDependencies,
     buildLib,
@@ -377,6 +391,7 @@ exports.buildRegistryDockerImage = series(
 );
 
 exports.prepareDevEnvironment = series(
+    checkNodeVersion,
     installLibDependencies,
     installClientLibDependencies,
     installBackendDependencies,
@@ -387,3 +402,5 @@ exports.prepareDevEnvironment = series(
 );
 
 exports.clean = series(cleanLib, cleanClientLib, cleanClient, cleanBackend, cleanFrontend, cleanDocs, cleanRoot);
+
+exports.checkNodeVersion = checkNodeVersion;

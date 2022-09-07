@@ -1,3 +1,17 @@
+#### 0.32.7 (2022-08-31)
+
+##### Build System / Dependencies
+
+* **deps:**  bump moment-timezone from 0.5.33 to 0.5.37 in /backend ([#518](https://github.com/big-armor/datapm/pull/518)) ([57c5d803](https://github.com/big-armor/datapm/commit/57c5d803673ea501d1474fa791c747773fb7a585))
+
+#### 0.32.6 (2022-08-26)
+
+#### 0.32.5 (2022-08-24)
+
+##### Other Changes
+
+* //github.com/big-armor/datapm-registry ([af04a5d6](https://github.com/big-armor/datapm/commit/af04a5d60a00d6e68b12f839be41ecc59b27d22f))
+
 #### 0.32.4 (2022-07-21)
 
 #### 0.32.3 (2022-07-05)

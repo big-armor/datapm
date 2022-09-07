@@ -143,7 +143,7 @@ export class TimeplusSink implements Sink {
             getCommitKeys: () => {
                 return [] as CommitKey[];
             },
-            outputLocation: `https://${connectionConfiguration.host}/api/v1beta1/streams`,
+            outputLocation: `https://${connectionConfiguration.host}/${connectionConfiguration.tenant}/api/v1beta1/streams`,
             lastOffset: undefined,
             transforms: [new BatchingTransform(100, 100)],
             writable: new Transform({
@@ -188,9 +188,9 @@ export class TimeplusSink implements Sink {
                         data: rows
                     };
                     const bodyStr = JSON.stringify(data);
-                    const ingestURL = `https://${connectionConfiguration.host}/api/v1beta1/streams/${
-                        configuration["stream-name-" + schema.title]
-                    }/ingest`;
+                    const ingestURL = `https://${connectionConfiguration.host}/${
+                        connectionConfiguration.tenant
+                    }/api/v1beta1/streams/${configuration["stream-name-" + schema.title]}/ingest`;
                     const response = await fetch(ingestURL, {
                         method: "POST",
                         headers: {
@@ -254,7 +254,7 @@ export class TimeplusSink implements Sink {
 
         let stream: TimeplusStream | undefined;
 
-        const url = `https://${connectionConfiguration.host}/api/v1beta1/streams`;
+        const url = `https://${connectionConfiguration.host}/${connectionConfiguration.tenant}/api/v1beta1/streams`;
 
         const apiKey = getApiKey(credentialsConfiguration);
 
@@ -285,15 +285,18 @@ export class TimeplusSink implements Sink {
                 columns: timeplusColumns
             });
 
-            const response = await fetch(`https://${connectionConfiguration.host}/api/v1beta1/streams`, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                    "X-Api-Key": apiKey
-                },
-                body: requestBody
-            });
+            const response = await fetch(
+                `https://${connectionConfiguration.host}/${connectionConfiguration.tenant}/api/v1beta1/streams`,
+                {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        "X-Api-Key": apiKey
+                    },
+                    body: requestBody
+                }
+            );
 
             if (response.status !== 201) {
                 // jobContext.print("INFO", "Timeplus Request Body Below");
