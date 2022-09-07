@@ -54,7 +54,7 @@ export class GroupManageComponent implements OnChanges {
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
             if (confirmed)
-                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().user.username], {
                     fragment: "groups"
                 });
         });

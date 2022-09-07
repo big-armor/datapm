@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { User } from "src/generated/graphql";
+import { CurrentUser, User } from "src/generated/graphql";
 
 @Component({
     selector: "app-user-item",
@@ -26,7 +26,7 @@ export class UserItemComponent implements OnInit {
     @Output()
     public action = new EventEmitter();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     constructor(private router: Router, private authenticationService: AuthenticationService) {}
 

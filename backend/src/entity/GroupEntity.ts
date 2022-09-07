@@ -25,4 +25,7 @@ export class GroupEntity extends EntityBaseModel {
 
     @Column({ name: "creator_id" })
     creatorId: number;
+
+    @Column({ name: "is_admin" })
+    isAdmin: boolean;
 }

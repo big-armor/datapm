@@ -91,7 +91,7 @@ export class AddPackageComponent implements OnInit, OnDestroy {
             .fetch({
                 limit: 9999,
                 offSet: 0,
-                username: this.authenticationService.currentUser.getValue().username
+                username: this.authenticationService.currentUser.getValue().user.username
             })
             .subscribe(({ errors, data }) => {
                 if (errors) {

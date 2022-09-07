@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Follow, FollowIdentifierInput, GetFollowGQL, User } from "src/generated/graphql";
+import { CurrentUser, Follow, FollowIdentifierInput, GetFollowGQL, User } from "src/generated/graphql";
 import { FollowDialogComponent, FollowDialogResult } from "../../dialogs/follow-dialog/follow-dialog.component";
 import { LoginDialogComponent } from "../../header/login-dialog/login-dialog.component";
 
@@ -15,7 +15,7 @@ import { LoginDialogComponent } from "../../header/login-dialog/login-dialog.com
 export class UserDetailsHeaderComponent implements OnChanges {
     @Input()
     public user: User;
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     private subscription: Subscription;
 
@@ -29,7 +29,7 @@ export class UserDetailsHeaderComponent implements OnChanges {
         private router: Router,
         private route: ActivatedRoute
     ) {
-        this.subscription = this.authService.currentUser.subscribe((user: User) => {
+        this.subscription = this.authService.currentUser.subscribe((user: CurrentUser) => {
             this.currentUser = user;
         });
     }
@@ -45,7 +45,7 @@ export class UserDetailsHeaderComponent implements OnChanges {
     }
 
     public get isCurrentUser() {
-        return this.user && this.currentUser?.username === this.user.username;
+        return this.user && this.currentUser?.user.username === this.user.username;
     }
 
     public follow(): void {

@@ -1,5 +1,5 @@
 <form id="editAccount" [formGroup]="form">
-    <app-cover [username]="currentUser.username" [editable]="true" (upload)="uploadCover($event)"></app-cover>
+    <app-cover [username]="currentUser.user.username" [editable]="true" (upload)="uploadCover($event)"></app-cover>
 
     <app-avatar class="user-img" [user]="currentUser" [size]="100" [editable]="true" (upload)="uploadAvatar($event)">
     </app-avatar>

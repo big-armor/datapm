@@ -3,12 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
-import {
-    Group,
-    Permission,
-    UpdateGroupGQL,
-    User
-} from "src/generated/graphql";
+import { CurrentUser, Group, Permission, UpdateGroupGQL, User } from "src/generated/graphql";
 import { ImageService } from "../../services/image.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { takeUntil } from "rxjs/operators";
@@ -39,7 +34,7 @@ export class EditGroupComponent {
     confirmDialogOpened: boolean = false;
     Permission = Permission;
 
-    public user: User;
+    public user: CurrentUser;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: Group,
@@ -55,13 +50,12 @@ export class EditGroupComponent {
             }),
             description: new FormControl(data.description, {
                 validators: [Validators.required]
-            }),
+            })
         });
 
         this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.user = u));
     }
 
-    
     public save(): void {
         if (!this.form.valid) {
             return;
@@ -90,5 +84,4 @@ export class EditGroupComponent {
                 }
             );
     }
-
 }

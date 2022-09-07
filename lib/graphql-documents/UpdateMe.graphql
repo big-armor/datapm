@@ -1,21 +1,24 @@
 mutation UpdateMe($value: UpdateUserInput!) {
     updateMe(value: $value) {
-        emailAddress
-        displayName
-        firstName
-        lastName
-        username
-        description
-        location
-        twitterHandle
-        gitHubHandle
-        website
-        nameIsPublic
-        locationIsPublic
-        twitterHandleIsPublic
-        gitHubHandleIsPublic
-        emailAddressIsPublic
-        websiteIsPublic
-        uiDarkModeEnabled
+        isAdmin
+        user {
+            emailAddress
+            displayName
+            firstName
+            lastName
+            username
+            description
+            location
+            twitterHandle
+            gitHubHandle
+            website
+            nameIsPublic
+            locationIsPublic
+            twitterHandleIsPublic
+            gitHubHandleIsPublic
+            emailAddressIsPublic
+            websiteIsPublic
+            uiDarkModeEnabled
+        }
     }
 }

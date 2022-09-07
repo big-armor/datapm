@@ -21,20 +21,25 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import {  LeaderElectionService } from "./service/leader-election-service";
-import  { DistributedLockingService } from "./service/distributed-locking-service";
+import { LeaderElectionService } from "./service/leader-election-service";
+import { DistributedLockingService } from "./service/distributed-locking-service";
 import { SessionCache } from "./session-cache";
 import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
 import { parse } from "url";
 import { libPackageVersion } from "datapm-lib";
-import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex, generateStaticSiteMap } from "./util/SiteMapUtil";
+import {
+    generateCatalogSiteMap,
+    generateCollectionsSiteMap,
+    generatePackageSiteMap,
+    generateSiteMapIndex,
+    generateStaticSiteMap
+} from "./util/SiteMapUtil";
 import * as SegfaultHandler from "segfault-raub";
-
+import { GroupRepository } from "./repository/GroupRepository";
 
 console.log("DataPM Registry Server Starting...");
-
 
 const REGISTRY_API_VERSION = libPackageVersion();
 
@@ -43,7 +48,6 @@ const REFERER_REGEX = /\/graphql\/?$/;
 const app = express();
 
 async function main() {
-
     process.title = "DataPM Registry Server";
 
     // get secrets from environment variable or from secret manager
@@ -66,7 +70,7 @@ async function main() {
     const distributedLockingService = new DistributedLockingService();
 
     const leaderElectionService = new LeaderElectionService(distributedLockingService, connection);
-    
+
     // Do not await the next line, as it is a long running operation
     leaderElectionService.start();
 
@@ -76,26 +80,30 @@ async function main() {
         await distributedLockingService.stop();
     });
 
-
-
     const context = async ({ req }: { req: express.Request }): Promise<HTTPContext | AuthenticatedHTTPContext> => {
         const me = await getMeRequest(req, connection.manager);
 
-        if(!me) {
+        if (!me) {
             return {
                 request: req,
                 connection: connection,
                 cache: new SessionCache()
-            }
+            };
+        }
+
+        let isAdmin = me.isAdmin;
+
+        if (!isAdmin) {
+            isAdmin = await connection.getCustomRepository(GroupRepository).userIsMemberOfAdminGroup(me);
         }
 
         return {
             request: req,
             me,
+            isAdmin,
             connection: connection,
             cache: new SessionCache()
-        }
-        
+        };
     };
 
     const schema = await makeSchema();
@@ -224,13 +232,11 @@ async function main() {
             case "true":
             case "1":
             case "yes":
-                const localRobotsTxt = path.join(__dirname, "robots-production.txt")
-                const staticRobotsTxt = path.join(__dirname, "..", "static","robots-production.txt");
+                const localRobotsTxt = path.join(__dirname, "robots-production.txt");
+                const staticRobotsTxt = path.join(__dirname, "..", "static", "robots-production.txt");
                 let content = "";
-                if(fs.existsSync(localRobotsTxt))
-                    content = fs.readFileSync(localRobotsTxt,'utf-8').toString();
-                else if(fs.existsSync(staticRobotsTxt))
-                    content = fs.readFileSync(staticRobotsTxt, 'utf-8').toString();
+                if (fs.existsSync(localRobotsTxt)) content = fs.readFileSync(localRobotsTxt, "utf-8").toString();
+                else if (fs.existsSync(staticRobotsTxt)) content = fs.readFileSync(staticRobotsTxt, "utf-8").toString();
                 else {
                     res.sendStatus(404);
                     return;
@@ -238,29 +244,24 @@ async function main() {
 
                 content = content.replace("${REGISTRY_URL}", process.env["REGISTRY_URL"] as string);
 
-                res.header("Content-Type","text/plain").send(content);
+                res.header("Content-Type", "text/plain").send(content);
 
                 break;
             default:
+                const localRobotsTxt2 = path.join(__dirname, "robots.txt");
+                const staticRobotsTxt2 = path.join(__dirname, "..", "static", "robots.txt");
 
-                const localRobotsTxt2 = path.join(__dirname, "robots.txt")
-                const staticRobotsTxt2 = path.join(__dirname, "..", "static","robots.txt");
-
-                if(fs.existsSync(localRobotsTxt2))
-                    res.header("Content-Type","text/plain").sendFile(localRobotsTxt2);
-                else if(fs.existsSync(staticRobotsTxt2))
-                    res.header("Content-Type","text/plain").sendFile(staticRobotsTxt2);
+                if (fs.existsSync(localRobotsTxt2)) res.header("Content-Type", "text/plain").sendFile(localRobotsTxt2);
+                else if (fs.existsSync(staticRobotsTxt2))
+                    res.header("Content-Type", "text/plain").sendFile(staticRobotsTxt2);
         }
     });
 
-
     /** Terraform script Downloads */
     app.use("/static/terraform-scripts/:type", async (req, res, next) => {
+        const terraFormScriptsDirectory = path.join(__dirname, "static", "terraform-scripts");
 
-        const terraFormScriptsDirectory = path.join(__dirname, "static","terraform-scripts");
-
-
-        if(!fs.existsSync(terraFormScriptsDirectory)) {
+        if (!fs.existsSync(terraFormScriptsDirectory)) {
             res.sendStatus(404);
             return;
         }
@@ -269,38 +270,37 @@ async function main() {
 
         let startsWith: string | undefined = undefined;
 
-        if(req.params.type === "gcp") {
+        if (req.params.type === "gcp") {
             startsWith = "datapm-gcp-terraform-";
         }
 
-        if(startsWith === undefined) {
+        if (startsWith === undefined) {
             res.sendStatus(403);
             return;
         }
 
         const file = files.find((f) => f.startsWith(startsWith as string) && f.endsWith(".zip"));
 
-        if(file == null) {
+        if (file == null) {
             res.sendStatus(404);
             return;
         }
 
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Transfer-Encoding', 'chunked');
-        res.setHeader('Content-Disposition', `attachment; filename="${file}"`);
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader("Transfer-Encoding", "chunked");
+        res.setHeader("Content-Disposition", `attachment; filename="${file}"`);
 
         const filePath = path.join(terraFormScriptsDirectory, file);
 
         const reader = fs.createReadStream(filePath);
 
-        reader.once("close",()=> {
+        reader.once("close", () => {
             res.end();
-        })
+        });
 
-        reader.once("open",()=> {
+        reader.once("open", () => {
             reader.pipe(res);
-        })
-
+        });
     });
 
     // These three routes serve angular static content
@@ -431,12 +431,11 @@ async function main() {
         }
     });
 
-
     /** Client Installer Downloads */
     app.use("/client-installers/:type", async (req, res, next) => {
         let installerFileNameEndsWith = "not-found.something";
 
-        switch(req.params.type) {
+        switch (req.params.type) {
             case "windows": {
                 installerFileNameEndsWith = ".msixbundle";
                 break;
@@ -453,16 +452,15 @@ async function main() {
                 installerFileNameEndsWith = ".rpm";
                 break;
             }
-            default:  {
+            default: {
                 res.sendStatus(404);
                 return;
             }
-                
         }
 
         const clientInstallersPath = path.join(__dirname, "client-installers");
 
-        if(!fs.existsSync(clientInstallersPath)) {
+        if (!fs.existsSync(clientInstallersPath)) {
             res.sendStatus(404);
             return;
         }
@@ -471,93 +469,80 @@ async function main() {
 
         const installerFile = installerFiles.find((file) => file.endsWith(installerFileNameEndsWith));
 
-        if(!installerFile) {
+        if (!installerFile) {
             res.sendStatus(404);
             return;
         }
 
-        res.setHeader('Content-Type', 'application/octet-stream');
-        res.setHeader('Transfer-Encoding', 'chunked');
-        res.setHeader('Content-Disposition', `attachment; filename="${installerFile}"`);
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader("Transfer-Encoding", "chunked");
+        res.setHeader("Content-Disposition", `attachment; filename="${installerFile}"`);
 
         const filePath = path.join(__dirname, "client-installers", installerFile);
 
         const reader = fs.createReadStream(filePath);
 
-
-        reader.once("close",()=> {
+        reader.once("close", () => {
             res.end();
-        })
+        });
 
-        reader.once("open",()=> {
+        reader.once("open", () => {
             reader.pipe(res);
-        })
-
-
+        });
     });
 
     app.use("/sitemap.xml", async (req, res, next) => {
-
         const contextObject = await context({ req });
 
         const siteMapContents = await generateSiteMapIndex(contextObject);
-        res.setHeader('Content-Type', 'application/xml');
-        res.setHeader('Content-Length', siteMapContents.length);
+        res.setHeader("Content-Type", "application/xml");
+        res.setHeader("Content-Length", siteMapContents.length);
 
         res.send(siteMapContents);
-
     });
 
     app.use("/sitemap_static.xml", async (req, res, next) => {
-
         const siteMapContents = await generateStaticSiteMap();
-        res.setHeader('Content-Type', 'application/xml');
-        res.setHeader('Content-Length', siteMapContents.length);
+        res.setHeader("Content-Type", "application/xml");
+        res.setHeader("Content-Length", siteMapContents.length);
 
         res.send(siteMapContents);
-
     });
 
     app.use("/sitemap_collections_:mapNumber.xml", async (req, res, next) => {
-
         const contextObject = await context({ req });
 
         const mapNumber = parseInt(req.params.mapNumber);
 
-        const siteMapContents = await generateCollectionsSiteMap(mapNumber,contextObject);
-        res.setHeader('Content-Type', 'application/xml');
-        res.setHeader('Content-Length', siteMapContents.length);
+        const siteMapContents = await generateCollectionsSiteMap(mapNumber, contextObject);
+        res.setHeader("Content-Type", "application/xml");
+        res.setHeader("Content-Length", siteMapContents.length);
 
         res.send(siteMapContents);
-
     });
 
     app.use("/sitemap_catalogs_:mapNumber.xml", async (req, res, next) => {
-
         const contextObject = await context({ req });
 
         const mapNumber = parseInt(req.params.mapNumber);
 
-        const siteMapContents = await generateCatalogSiteMap(mapNumber,contextObject);
-        res.setHeader('Content-Type', 'application/xml');
-        res.setHeader('Content-Length', siteMapContents.length);
+        const siteMapContents = await generateCatalogSiteMap(mapNumber, contextObject);
+        res.setHeader("Content-Type", "application/xml");
+        res.setHeader("Content-Length", siteMapContents.length);
 
         res.send(siteMapContents);
-
     });
 
     app.use("/sitemap_packages_:mapNumber.xml", async (req, res, next) => {
-
         const contextObject = await context({ req });
 
         const mapNumber = parseInt(req.params.mapNumber);
 
-        const siteMapContents = await generatePackageSiteMap(mapNumber,contextObject);
-        res.setHeader('Content-Type', 'application/xml');
-        res.setHeader('Content-Length', siteMapContents.length);
+        const siteMapContents = await generatePackageSiteMap(mapNumber, contextObject);
+        res.setHeader("Content-Type", "application/xml");
+        res.setHeader("Content-Length", siteMapContents.length);
 
         res.send(siteMapContents);
-
     });
 
     /** Data Web Socket Server */
@@ -570,55 +555,47 @@ async function main() {
         parser: require("socket.io-msgpack-parser")
     });
 
-    io.on('connection', async (socket) => {
-
-
-        const contextObject:SocketContext | AuthenticatedSocketContext = {
+    io.on("connection", async (socket) => {
+        const contextObject: SocketContext | AuthenticatedSocketContext = {
             connection,
-            cache: new SessionCache(),
-        }
+            cache: new SessionCache()
+        };
 
-        if(socket.handshake.auth.token != null) {
-            if(Array.isArray(socket.handshake.auth.token)) {
+        if (socket.handshake.auth.token != null) {
+            if (Array.isArray(socket.handshake.auth.token)) {
                 throw new Error("TOKEN_MUST_BE_SINGLE_VALUE");
             }
-    
-            const token = socket.handshake.auth.token;;
-            
-            const user = await getMeFromAPIKey(token,connection.manager);
-            
-            (contextObject as AuthenticatedSocketContext).me = user;
 
+            const token = socket.handshake.auth.token;
+
+            const user = await getMeFromAPIKey(token, connection.manager);
+
+            (contextObject as AuthenticatedSocketContext).me = user;
         }
 
         new SocketConnectionHandler(socket, contextObject, distributedLockingService);
-
-
     });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
-
         const registryHostName = parse(process.env["REGISTRY_URL"] as string).hostname;
 
-        // If the request was to a hostname other than the  
+        // If the request was to a hostname other than the
         // hostname in hte registry_url environment variable,
         // redirect to the equivalent url on the correct name
-        if(req.hostname != registryHostName) {
+        if (req.hostname != registryHostName) {
             const redirectDestination = `${process.env["REGISTRY_URL"]}${req.originalUrl}`;
-            res.redirect(301,redirectDestination);
+            res.redirect(301, redirectDestination);
             return;
         }
 
-        
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);
         res.setHeader("x-datapm-registry-url", process.env["REGISTRY_URL"] as string); // TODO support other paths
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
 
-    httpServer.listen(port,() => {
+    httpServer.listen(port, () => {
         console.log(`🚀 Server ready at http://localhost:${port}`);
     });
-
 }
 main().catch((error) => console.log(error));

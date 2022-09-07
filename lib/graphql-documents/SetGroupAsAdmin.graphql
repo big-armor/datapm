@@ -1,0 +1,3 @@
+mutation SetGroupAsAdmin($groupSlug: String!, $isAdmin: Boolean!) {
+    setGroupAsAdmin(groupSlug: $groupSlug, isAdmin: $isAdmin)
+}

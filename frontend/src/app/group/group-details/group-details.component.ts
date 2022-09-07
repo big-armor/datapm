@@ -6,7 +6,16 @@ import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EditGroupComponent } from "src/app/shared/edit-group/edit-group.component";
-import { Group, GroupGQL, Follow, Package, Permission, User, RemoveGroupFromPackageGQL } from "src/generated/graphql";
+import {
+    Group,
+    GroupGQL,
+    Follow,
+    Package,
+    Permission,
+    User,
+    RemoveGroupFromPackageGQL,
+    CurrentUser
+} from "src/generated/graphql";
 import { AddGroupPackagePermissionsComponent } from "../add-group-package-permissions/add-group-package-permissions.component";
 
 type GroupDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
@@ -25,7 +34,7 @@ export class GroupDetailsComponent implements OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     private tabs = ["", "packages", "catalogs", "collections"];
 
@@ -46,7 +55,7 @@ export class GroupDetailsComponent implements OnDestroy {
             this.getGroupDetails();
         });
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: CurrentUser) => {
             this.currentUser = user;
         });
     }

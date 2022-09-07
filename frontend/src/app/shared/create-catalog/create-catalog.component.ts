@@ -1,7 +1,13 @@
 import { Component, Inject, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { CreateCatalogGQL, SetCatalogAvatarImageGQL, SetCatalogCoverImageGQL, User } from "src/generated/graphql";
+import {
+    CreateCatalogGQL,
+    CurrentUser,
+    SetCatalogAvatarImageGQL,
+    SetCatalogCoverImageGQL,
+    User
+} from "src/generated/graphql";
 import { combineLatest, Observable, of, Subject } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { takeUntil } from "rxjs/operators";
@@ -23,7 +29,7 @@ export class CreateCatalogComponent implements OnDestroy {
     public avatarImgData: string;
     public coverImgData: string;
 
-    public user: User;
+    public currentUser: CurrentUser;
 
     constructor(
         private dialogRef: MatDialogRef<CreateCatalogComponent>,
@@ -43,7 +49,7 @@ export class CreateCatalogComponent implements OnDestroy {
             unclaimed: new FormControl(undefined)
         });
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.user = u));
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.currentUser = u));
     }
 
     public ngOnDestroy(): void {

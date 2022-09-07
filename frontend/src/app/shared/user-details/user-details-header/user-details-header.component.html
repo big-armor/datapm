@@ -39,9 +39,7 @@
                         <em class="far fa-envelope"></em>
                     </a>
                     <span *ngIf="user.emailAddressIsPublic && isCurrentUser" class="public-text">public</span>
-                    <span *ngIf="!user.emailAddressIsPublic && isCurrentUser" class="not-public-text"
-                        >not public</span
-                    >
+                    <span *ngIf="!user.emailAddressIsPublic && isCurrentUser" class="not-public-text">not public</span>
                 </span>
 
                 <span class="social-link" *ngIf="user.twitterHandle && (user.twitterHandleIsPublic || isCurrentUser)">
@@ -49,9 +47,7 @@
                         <em class="fab fa-twitter"></em>
                     </a>
                     <span *ngIf="user.twitterHandleIsPublic && isCurrentUser" class="public-text">public</span>
-                    <span *ngIf="!user.twitterHandleIsPublic && isCurrentUser" class="not-public-text"
-                        >not public</span
-                    >
+                    <span *ngIf="!user.twitterHandleIsPublic && isCurrentUser" class="not-public-text">not public</span>
                 </span>
 
                 <span class="social-link" *ngIf="user.gitHubHandle && (user.gitHubHandleIsPublic || isCurrentUser)">
@@ -59,9 +55,7 @@
                         <em class="fab fa-github"></em>
                     </a>
                     <span *ngIf="user.gitHubHandleIsPublic && isCurrentUser" class="public-text">public</span>
-                    <span *ngIf="!user.gitHubHandleIsPublic && isCurrentUser" class="not-public-text"
-                        >not public</span
-                    >
+                    <span *ngIf="!user.gitHubHandleIsPublic && isCurrentUser" class="not-public-text">not public</span>
                 </span>
             </div>
 

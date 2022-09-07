@@ -9,6 +9,7 @@ import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.c
 import {
     AddOrUpdateGroupToCatalogGQL,
     Catalog,
+    CurrentUser,
     DeleteUserCatalogPermissionsGQL,
     Group,
     GroupCatalogPermission,
@@ -43,7 +44,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
     public users: (UserCatalogPermissions & { permission: Permission; packagePermission: Permission })[] = [];
 
     Permission = Permission;
-    public user: User;
+    public currentUser: CurrentUser;
     public hasCatalogPublicErrors: boolean;
     public hasCatalogUnclaimedErrors: boolean;
 
@@ -74,8 +75,8 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
     ) {}
 
     public ngOnInit(): void {
-        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((user) => {
-            this.user = user;
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((currentUser) => {
+            this.currentUser = currentUser;
         });
     }
 
@@ -161,7 +162,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         });
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed) this.router.navigate([this.user.username], { fragment: "catalogs" });
+            if (confirmed) this.router.navigate([this.currentUser.user.username], { fragment: "catalogs" });
         });
     }
 

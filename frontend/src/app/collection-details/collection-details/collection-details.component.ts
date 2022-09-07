@@ -16,6 +16,7 @@ import {
     Collection,
     CollectionFollowersCountGQL,
     CollectionGQL,
+    CurrentUser,
     Follow,
     FollowIdentifierInput,
     GetFollowGQL,
@@ -40,7 +41,7 @@ export class CollectionDetailsComponent implements OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     private tabs = ["", "followers"];
 
@@ -63,7 +64,7 @@ export class CollectionDetailsComponent implements OnDestroy {
             this.getCollectionDetails();
         });
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: CurrentUser) => {
             this.currentUser = user;
         });
     }

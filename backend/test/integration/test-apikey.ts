@@ -121,7 +121,7 @@ describe("API Key Tests", async () => {
         });
 
         expect(response.errors == null).true;
-        expect(response.data!.me.username).equal("testA-apiKey");
+        expect(response.data!.me.user.username).equal("testA-apiKey");
     });
 
     it("Delete API key", async function () {

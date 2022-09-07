@@ -5,6 +5,7 @@ import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import {
     Catalog,
+    CurrentUser,
     Permission,
     SetCatalogAvatarImageGQL,
     SetCatalogCoverImageGQL,
@@ -42,7 +43,7 @@ export class EditCatalogComponent {
     confirmDialogOpened: boolean = false;
     Permission = Permission;
 
-    public user: User;
+    public currentUser: CurrentUser;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: Catalog,
@@ -66,7 +67,7 @@ export class EditCatalogComponent {
             description: new FormControl(data.description)
         });
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.user = u));
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.currentUser = u));
     }
 
     public uploadAvatar(data: any): void {

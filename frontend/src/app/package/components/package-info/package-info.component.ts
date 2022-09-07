@@ -10,7 +10,7 @@ import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
-import { Package, User } from "src/generated/graphql";
+import { CurrentUser, Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
@@ -28,7 +28,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     @Input()
     public packageFile: PackageFile;
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
     public packageUnit: string;
 
     public packageSizeBytes: number = 0;
@@ -44,7 +44,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     public ngOnInit(): void {
         this.authenticationService.currentUser
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((user: User) => (this.currentUser = user));
+            .subscribe((user: CurrentUser) => (this.currentUser = user));
     }
 
     public ngOnChanges(): void {

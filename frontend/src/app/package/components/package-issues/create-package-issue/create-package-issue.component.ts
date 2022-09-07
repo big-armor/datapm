@@ -5,7 +5,7 @@ import { skip, takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { DialogService } from "src/app/services/dialog/dialog.service";
-import { CreatePackageIssueGQL, Package, User } from "src/generated/graphql";
+import { CreatePackageIssueGQL, CurrentUser, Package, User } from "src/generated/graphql";
 
 @Component({
     selector: "app-create-package-issue",
@@ -19,7 +19,7 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
     public loading = false;
     public submitting = false;
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     public subject: string = "";
     public content: string = "";
@@ -38,7 +38,7 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.loadPackage();
         this.fillInputsFromQueryParams();
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: CurrentUser) => {
             this.currentUser = user;
         });
     }

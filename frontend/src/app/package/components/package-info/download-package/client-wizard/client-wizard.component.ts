@@ -7,7 +7,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { ApiKeyService } from "src/app/services/api-key.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Clipboard } from "@angular/cdk/clipboard";
-import { Package, User } from "src/generated/graphql";
+import { CurrentUser, Package, User } from "src/generated/graphql";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 
 @Component({
@@ -17,7 +17,7 @@ import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 })
 export class ClientWizardComponent implements OnInit {
     public currentIndex: number = 0;
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     username: string;
     package: Package;
@@ -43,14 +43,13 @@ export class ClientWizardComponent implements OnInit {
         combineLatest([this.apiKeysService.getMyApiKeys(), this.pacakgeService.package]).subscribe(([apiKeys, pkg]) => {
             this.package = pkg.package;
 
-            let user = this.authenticationService.currentUser.value;
-            if (user) {
-                this.username = user.username;
-                this.currentUser = user;
+            let currentUser = this.authenticationService.currentUser.value;
+            if (currentUser) {
+                this.username = currentUser.user.username;
+                this.currentUser = currentUser;
             } else {
                 this.username = "username";
             }
-
         });
     }
 

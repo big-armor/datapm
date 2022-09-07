@@ -5,7 +5,7 @@ import { delay, filter, takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { AuthenticationService } from "./services/authentication.service";
-import { User } from "../generated/graphql";
+import { CurrentUser, User } from "../generated/graphql";
 import { ViewportScroller } from "@angular/common";
 
 @Component({
@@ -16,7 +16,7 @@ import { ViewportScroller } from "@angular/common";
 export class AppComponent implements OnInit, OnDestroy {
     public title = "datapm-registry-frontend";
 
-    currentUser: User;
+    currentUser: CurrentUser;
     searchFormGroup: FormGroup;
 
     private subscription = new Subject();
@@ -53,9 +53,11 @@ export class AppComponent implements OnInit, OnDestroy {
             search: new FormControl("")
         });
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
-            this.currentUser = user;
-        });
+        this.authenticationService.currentUser
+            .pipe(takeUntil(this.subscription))
+            .subscribe((currentUser: CurrentUser) => {
+                this.currentUser = currentUser;
+            });
     }
 
     ngOnDestroy() {
@@ -63,9 +65,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     getWelcomeString() {
-        if (this.currentUser.firstName != null) return this.currentUser.firstName;
+        if (this.currentUser.user.firstName != null) return this.currentUser.user.firstName;
 
-        return this.currentUser.username;
+        return this.currentUser.user.username;
     }
 
     search() {

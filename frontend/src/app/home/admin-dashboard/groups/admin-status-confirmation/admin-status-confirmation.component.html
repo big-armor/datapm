@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="confirmAdmin">
+            <div mat-dialog-title id="contentTitle" class="mat-dialog-title">Confirm admin</div>
+            <div mat-dialog-content id="contentBorder" class="py-3">
+                <div *ngIf="modalData.isAdmin" class="test-dark-gray">
+                    <p>Are you sure that you want to make all users in this group admins?</p>
+                </div>
+                <div *ngIf="!modalData.isAdmin" class="test-dark-gray">
+                    <p>
+                        Are you sure that you want disable admin permissions for this group? (Note users in other groups
+                        with admin permissions, will still have admin permissions)
+                    </p>
+                </div>
+                <div *ngIf="hasErrors">Error occurred when saving an Admin. Please refresh the page and try again.</div>
+            </div>
+
+            <div mat-dialog-actions class="mat-dialog-actions d-flex justify-content-between">
+                <button mat-dialog-close class="modal-close-btn" (click)="cancel()">Cancel</button>
+                <button class="modal-submit-btn" (click)="confirmSave()">
+                    <span>Confirm</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

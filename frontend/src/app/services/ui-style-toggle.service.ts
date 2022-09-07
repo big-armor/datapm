@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { UpdateMeGQL, User } from "src/generated/graphql";
+import { CurrentUser, UpdateMeGQL, User } from "src/generated/graphql";
 import { AuthenticationService } from "./authentication.service";
 
 export enum ThemeMode {
@@ -19,15 +19,15 @@ export class UiStyleToggleService {
     private readonly DARK_THEME_CLASS_NAME = "theme-dark";
     private readonly DARK_MODE_OS_SETTINGS_CSS = "(prefers-color-scheme: dark)";
 
-    private user: User;
+    private currentUser: CurrentUser;
     private darkThemeSelected = false;
 
     constructor(private updateMeGQL: UpdateMeGQL, private authenticationService: AuthenticationService) {
         this.loadThemeFromLocalStorage();
-        this.authenticationService.currentUser.subscribe((user) => {
-            if (user) {
-                this.user = user;
-                this.darkThemeSelected = user.uiDarkModeEnabled;
+        this.authenticationService.currentUser.subscribe((currentUser) => {
+            if (currentUser) {
+                this.currentUser = currentUser;
+                this.darkThemeSelected = currentUser.user.uiDarkModeEnabled;
                 this.setThemeOnStart();
                 this.storeThemeInLocalStorage();
             }
@@ -86,7 +86,7 @@ export class UiStyleToggleService {
 
     private updateSelectedStylePreferences(): void {
         this.storeThemeInLocalStorage();
-        if (!this.user) {
+        if (!this.currentUser) {
             return;
         }
 

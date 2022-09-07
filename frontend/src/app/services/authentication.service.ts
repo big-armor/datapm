@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, of, throwError } from "rxjs";
 
-import { User, LoginGQL, MeGQL } from "../../generated/graphql";
+import { User, LoginGQL, MeGQL, CurrentUser } from "../../generated/graphql";
 import { catchError, switchMap, tap } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
-    public currentUser: BehaviorSubject<User>;
+    public currentUser: BehaviorSubject<CurrentUser>;
     public isLoggedIn: BehaviorSubject<boolean>;
 
     constructor(private loginGQL: LoginGQL, private meGQL: MeGQL) {

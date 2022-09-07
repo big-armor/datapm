@@ -48,8 +48,8 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
             this.state = State.LOGGED_IN;
         }
 
-        this.subscription = this.authenticationService.currentUser.subscribe((user: User) => {
-            if (!user) {
+        this.subscription = this.authenticationService.currentUser.subscribe((currentUser) => {
+            if (!currentUser) {
                 this.state = State.LOGGED_OUT;
             } else {
                 this.state = State.LOGGED_IN;

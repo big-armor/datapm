@@ -356,6 +356,11 @@ Whether the markdown provided is valid
 directive @validMarkdown(maxLength: Int) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
+Whether the input is a valid email or username
+"""
+directive @validEmailOrUsername on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
 A collection of packages offered by a person or an organization.
 """
 type Catalog {
@@ -736,6 +741,15 @@ type SearchUsersResult {
 }
 
 """
+The response for searching users
+"""
+type SearchGroupsResult {
+    groups: [Group]!
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
 The response for a search term auto-complete request
 """
 type AutoCompleteResult {
@@ -836,6 +850,14 @@ type PageContent {
     builderIOPage: BuilderIOPage
     catalog: Catalog
     user: User
+}
+
+"""
+Information about the current user
+"""
+type CurrentUser {
+    user: User!
+    isAdmin: Boolean!
 }
 
 """
@@ -1105,7 +1127,7 @@ type Query {
     """
     Who am i
     """
-    me: User! @isAuthenticated
+    me: CurrentUser! @isAuthenticated
 
     """
     A list of the requesting user's exisiting API key information
@@ -1289,6 +1311,11 @@ type Query {
     Returns users that match the given search query with no restrictions
     """
     adminSearchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
+
+    """
+    Returns users that match the given search query with no restrictions
+    """
+    adminSearchGroups(value: String!, limit: Int!, offSet: Int!): SearchGroupsResult! @isAdmin
 
     """
     Returns the latest packages
@@ -1495,12 +1522,17 @@ type Mutation {
     """
     Updates the requesting user's information. All fields optional.
     """
-    updateMe(value: UpdateUserInput!): User! @isAuthenticated
+    updateMe(value: UpdateUserInput!): CurrentUser! @isAuthenticated
 
     """
     Updates the user's admin status.
     """
     setAsAdmin(username: String! @validUsernameOrEmailAddress, isAdmin: Boolean!): Void @isAdmin
+
+    """
+    Updates the group's admin status.
+    """
+    setGroupAsAdmin(groupSlug: String! @validGroupSlug, isAdmin: Boolean!): Void @isAdmin
 
     """
     Updates the user's status and sends a notification email to them
@@ -1541,6 +1573,11 @@ type Mutation {
     Deletes a user's account
     """
     adminDeleteUser(usernameOrEmailAddress: String! @validUsernameOrEmailAddress): Void @isAdmin
+
+    """
+    Deletes a group
+    """
+    adminDeleteGroup(groupSlug: String! @validGroupSlug): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user

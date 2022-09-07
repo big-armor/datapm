@@ -17,6 +17,7 @@ import {
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
     CreatePackageIssueCommentGQL,
+    CurrentUser,
     DeletePackageIssueCommentGQL,
     DeletePackageIssueGQL,
     Follow,
@@ -94,7 +95,7 @@ export class PackageIssuesDetailComponent implements OnInit, OnDestroy {
     public user: User;
     private commentsOffset = 0;
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
     private unsubscribe$ = new Subject();
 
     constructor(
@@ -126,7 +127,7 @@ export class PackageIssuesDetailComponent implements OnInit, OnDestroy {
             this.errorMessage = "Invalid issue number";
         }
 
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: CurrentUser) => {
             this.currentUser = user;
         });
     }
@@ -449,14 +450,14 @@ export class PackageIssuesDetailComponent implements OnInit, OnDestroy {
     private loadPackage(): void {
         this.state = State.LOADING;
         combineLatest([this.authenticationService.currentUser, this.packageService.package]).subscribe(
-            ([user, packageResponse]) => {
+            ([currentUser, packageResponse]) => {
                 const fetchedPackage = packageResponse.package;
                 this.packageIdentifier = {
                     catalogSlug: fetchedPackage.identifier.catalogSlug,
                     packageSlug: fetchedPackage.identifier.packageSlug
                 };
 
-                this.user = user;
+                this.user = currentUser.user;
                 this.isUserPackageManager = fetchedPackage.myPermissions.includes(Permission.MANAGE);
                 this.loadPackageIssue();
             }

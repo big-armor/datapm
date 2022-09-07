@@ -1,7 +1,7 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/colors";
 
-#adminUsers {
+#adminGroups {
     table.mat-table {
         tbody {
             height: 560px !important;
@@ -68,17 +68,15 @@
         justify-content: center;
     }
 
-    .mat-cell {
-        padding: 5px;
-    }
-
-    td.mat-cell:first-child {
-        padding-left: 10px;
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        width: 250px;
     }
 }
 
 @media (max-width: 992px) {
-    #adminUsers {
+    #adminGroups {
         th.mat-header-cell:first-of-type,
         td.mat-cell:first-of-type,
         td.mat-footer-cell:first-of-type {

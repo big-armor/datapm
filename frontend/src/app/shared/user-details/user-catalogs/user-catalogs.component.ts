@@ -48,12 +48,10 @@ export class UserCatalogsComponent implements OnInit {
     constructor(
         private userCatalogs: UserCatalogsGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
-        private deleteCatalogGQL: DeleteCatalogGQL,
         private authenticationService: AuthenticationService,
         private dialog: MatDialog,
         private dialogService: DialogService,
         private router: Router
-
     ) {}
 
     public ngOnInit(): void {
@@ -97,7 +95,7 @@ export class UserCatalogsComponent implements OnInit {
             return;
         }
 
-        if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.value?.username) {
+        if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.value?.user.username) {
             this.dialog.open(this.deleteMyUsercatalog);
             return;
         }

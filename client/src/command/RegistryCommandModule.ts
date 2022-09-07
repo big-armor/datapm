@@ -8,7 +8,6 @@ import {
     CreateAPIKeyDocument,
     DeleteAPIKeyDocument,
     LoginDocument,
-    MeDocument,
     MyAPIKeysDocument,
     RegistryStatusDocument,
     Scope,
@@ -121,10 +120,6 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
     oraRef.start("Deleting API Key from Registry");
 
     try {
-        await userRegistryClient.getClient().query({
-            query: MeDocument
-        });
-
         const apiKeysResponse = await userRegistryClient.getClient().query<{ myAPIKeys: APIKey[] }>({
             query: MyAPIKeysDocument
         });

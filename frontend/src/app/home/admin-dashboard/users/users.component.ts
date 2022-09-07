@@ -23,14 +23,7 @@ import { AdminStatusConfirmationComponent } from "./admin-status-confirmation/ad
     styleUrls: ["./users.component.scss"]
 })
 export class UsersComponent implements AfterViewInit, OnDestroy {
-    public readonly DISPLAYED_COLUMNS: string[] = [
-        "username",
-        "firstName",
-        "lastName",
-        "emailAddress",
-        "isAdmin",
-        "actions"
-    ];
+    public readonly DISPLAYED_COLUMNS: string[] = ["username", "name", "emailAddress", "isAdmin", "actions"];
     public readonly USERS_PER_PAGE = 10;
 
     private readonly destroyed = new Subject();

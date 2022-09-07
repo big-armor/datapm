@@ -10,6 +10,7 @@ import { UsersComponent } from "./admin-dashboard/users/users.component";
 import { AuthGuard } from "../helpers/auth-guard";
 import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
 import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
+import { GroupsComponent } from "./admin-dashboard/groups/groups.component";
 
 const routes: Routes = [
     {
@@ -47,6 +48,10 @@ const routes: Routes = [
             {
                 path: "users",
                 component: UsersComponent
+            },
+            {
+                path: "groups",
+                component: GroupsComponent
             },
             {
                 path: "platform-settings",

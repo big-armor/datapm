@@ -149,7 +149,7 @@ describe("Invite User That Then Signs Up", function () {
         });
 
         expect(whoAmIResponse.errors == null).equal(true);
-        expect(whoAmIResponse.data.me.username).equal("test-user-after-signup");
+        expect(whoAmIResponse.data.me.user.username).equal("test-user-after-signup");
     });
 
     it("Should return VIEW permission on package", async function () {

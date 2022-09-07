@@ -1,0 +1,23 @@
+query AdminSearchGroups($value: String!, $limit: Int!, $offset: Int!) {
+    adminSearchGroups(value: $value, limit: $limit, offSet: $offset) {
+        groups {
+            slug
+            name
+            description
+            isAdmin
+            createdAt
+            updatedAt
+            creator {
+                username
+                firstName
+                lastName
+                emailAddress
+                displayName
+                status
+                isAdmin
+            }
+        }
+        hasMore
+        count
+    }
+}

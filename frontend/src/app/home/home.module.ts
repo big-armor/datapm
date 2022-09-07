@@ -15,6 +15,7 @@ import { TrendingComponent } from "./trending/trending.component";
 import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
 import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
 import { UsersComponent } from "./admin-dashboard/users/users.component";
+import { GroupsComponent } from "./admin-dashboard/groups/groups.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -26,6 +27,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
 import { AdminStatusConfirmationComponent } from "./admin-dashboard/users/admin-status-confirmation/admin-status-confirmation.component";
+import { GroupAdminConfirmationComponent } from "./admin-dashboard/groups/admin-status-confirmation/admin-status-confirmation.component";
 
 @NgModule({
     declarations: [
@@ -35,9 +37,11 @@ import { AdminStatusConfirmationComponent } from "./admin-dashboard/users/admin-
         TrendingComponent,
         AdminDashboardComponent,
         UsersComponent,
+        GroupsComponent,
         RecentlyViewedComponent,
         PlatformSettingsComponent,
-        AdminStatusConfirmationComponent
+        AdminStatusConfirmationComponent,
+        GroupAdminConfirmationComponent
     ],
     imports: [
         CommonModule,

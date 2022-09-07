@@ -5,7 +5,7 @@ import { takeUntil } from "rxjs/operators";
 import { PlatformSettingsComponent } from "src/app/home/admin-dashboard/platform-settings/platform-settings.component";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Catalog, GetPageContentGQL, PageContent, Permission, User } from "src/generated/graphql";
+import { Catalog, CurrentUser, GetPageContentGQL, PageContent, Permission, User } from "src/generated/graphql";
 
 enum PageType {
     USER,
@@ -28,7 +28,7 @@ export class CatalogComponent implements OnInit {
     public state: PageState = "INIT";
 
     public user: User;
-    public currentUser: User;
+    public currentUser: CurrentUser;
     public currentUserSubscription: Subscription;
 
     public catalog: Catalog;
@@ -46,8 +46,8 @@ export class CatalogComponent implements OnInit {
         this.currentUserSubscription = this.authService.currentUser.subscribe((user) => {
             this.currentUser = user;
 
-            if (this.currentUser?.username == this.user?.username) {
-                this.user = this.currentUser;
+            if (this.currentUser && this.currentUser?.user.username == this.user?.username) {
+                this.user = this.currentUser.user;
             }
         });
     }

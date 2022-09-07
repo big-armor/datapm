@@ -6,7 +6,7 @@ import { Subject, Observable, BehaviorSubject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
 import { DialogService } from "../../services/dialog/dialog.service";
-import { AutoCompleteGQL, AutoCompleteResult, User } from "src/generated/graphql";
+import { AutoCompleteGQL, AutoCompleteResult, CurrentUser, User } from "src/generated/graphql";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
@@ -32,7 +32,7 @@ interface Option {
 export class HeaderComponent implements OnInit, OnDestroy {
     state = State.INIT;
 
-    currentUser: User;
+    currentUser: CurrentUser;
     searchControl: FormControl;
     private subscription = new Subject();
 
@@ -72,7 +72,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
             this.searchControl.setValue(queryParams.get("q") || "");
         });
-        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
+        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: CurrentUser) => {
             this.currentUser = user;
             if (user) {
                 this.state = State.SUCCESS;
@@ -141,7 +141,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     public goToMyDetails(): void {
-        this.router.navigate([this.currentUser?.username]);
+        this.router.navigate([this.currentUser?.user.username]);
     }
 
     public logout(): void {
