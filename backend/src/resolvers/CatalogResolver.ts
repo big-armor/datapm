@@ -150,10 +150,6 @@ export const userCatalogs = async (
 };
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
-        return null;
-    }
-
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;

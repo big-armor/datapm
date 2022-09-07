@@ -23,9 +23,7 @@ describe("Autocomplete tests", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let userCClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
-    it("Create users A & B", async function () {
+    before(async () => {
         userAClient = await createUser(
             "AAuto",
             "ACompletely",

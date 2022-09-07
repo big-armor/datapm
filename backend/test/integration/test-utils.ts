@@ -53,11 +53,9 @@ export async function createUserDoNotVerifyEmail(
     return new Promise(async (resolve, reject) => {
         let anonymousClient = createAnonymousClient();
 
-        let verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
-                subscription.unsubscribe();
-                r(email);
-            });
+        const emails: any[] = [];
+        let subscription = mailObservable.subscribe((email) => {
+            emails.push(email);
         });
 
         await anonymousClient
@@ -89,25 +87,33 @@ export async function createUserDoNotVerifyEmail(
                     reject(response);
                     return;
                 }
-                verifyEmailPromise
-                    .catch((error) => reject(error))
-                    .then((email) => {
-                        expect(email.html).to.not.contain("{{registry_name}}");
-                        expect(email.html).to.not.contain("{{registry_url}}");
-                        expect(email.html).to.not.contain("{{token}}");
-                        expect(email.html).to.not.contain("{{");
 
-                        expect(email.text).to.not.contain("{{registry_name}}");
-                        expect(email.text).to.not.contain("{{registry_url}}");
-                        expect(email.text).to.not.contain("{{token}}");
-                        expect(email.text).to.not.contain("{{");
+                do {
+                    const email = emails.find((email) => email.to[0].address === emailAddress);
 
-                        const emailValidationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+                    if (email == null) {
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                        continue;
+                    }
 
-                        resolve({
-                            emailVerificationToken: emailValidationToken!.pop()!
-                        });
+                    expect(email.html).to.not.contain("{{registry_name}}");
+                    expect(email.html).to.not.contain("{{registry_url}}");
+                    expect(email.html).to.not.contain("{{token}}");
+                    expect(email.html).to.not.contain("{{");
+
+                    expect(email.text).to.not.contain("{{registry_name}}");
+                    expect(email.text).to.not.contain("{{registry_url}}");
+                    expect(email.text).to.not.contain("{{token}}");
+                    expect(email.text).to.not.contain("{{");
+
+                    const emailValidationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+                    resolve({
+                        emailVerificationToken: emailValidationToken!.pop()!
                     });
+                    break;
+                } while (true);
+
+                subscription.unsubscribe();
             });
     });
 }
@@ -150,23 +156,27 @@ export async function createUser(
                         if (response == undefined) return;
 
                         expect(
-                            (response as FetchResult<
-                                VerifyEmailAddressMutation,
-                                Record<string, any>,
-                                Record<string, any>
-                            >).errors == null
+                            (
+                                response as FetchResult<
+                                    VerifyEmailAddressMutation,
+                                    Record<string, any>,
+                                    Record<string, any>
+                                >
+                            ).errors == null
                         ).true;
 
-                        const authenticatedClient = createAuthenticatedClient(username,password);
+                        const authenticatedClient = createAuthenticatedClient(username, password);
                         resolve(authenticatedClient);
                     });
             });
     });
 }
 
-export async function createAuthenticatedClient(username:String, password:String):Promise<ApolloClient<NormalizedCacheObject>> {
-    const responseRaw = await createAnonymousClient()
-    .mutate({
+export async function createAuthenticatedClient(
+    username: String,
+    password: String
+): Promise<ApolloClient<NormalizedCacheObject>> {
+    const responseRaw = await createAnonymousClient().mutate({
         mutation: LoginDocument,
         variables: {
             username,
@@ -174,11 +184,7 @@ export async function createAuthenticatedClient(username:String, password:String
         }
     });
 
-    const response = responseRaw as FetchResult<
-            LoginMutation,
-            Record<string, any>,
-            Record<string, any>
-        >;
+    const response = responseRaw as FetchResult<LoginMutation, Record<string, any>, Record<string, any>>;
 
     if (response.errors != null) {
         throw new Error(JSON.stringify(response.errors));
@@ -219,27 +225,24 @@ export function createTestClient(headers: any) {
     });
 }
 
-
-export async function createAnonymousStreamingClient():Promise<Socket>  {
+export async function createAnonymousStreamingClient(): Promise<Socket> {
     const socket = io("http://localhost:4000", {
-            path: "/ws/",
-            parser: require("socket.io-msgpack-parser"),
-            transports: ["polling", "websocket"]
-        });
+        path: "/ws/",
+        parser: require("socket.io-msgpack-parser"),
+        transports: ["polling", "websocket"]
+    });
 
     return new TimeoutPromise<Socket>(5000, (resolve) => {
         socket.once("connect", async () => {
             socket.once(SocketEvent.READY.toString(), () => {
-                resolve(socket)
+                resolve(socket);
             });
         });
     });
 }
 
-export async function createAuthenicatedStreamingClient(username:String, password:String):Promise<Socket>  {
-
+export async function createAuthenicatedStreamingClient(username: String, password: String): Promise<Socket> {
     const authenticatedClient = await createAuthenticatedClient(username, password);
-
 
     const response = await authenticatedClient.mutate({
         mutation: CreateAPIKeyDocument,
@@ -249,23 +252,23 @@ export async function createAuthenicatedStreamingClient(username:String, passwor
                 scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
             }
         }
-    })
+    });
 
     const apiKey = createAPIKeyFromParts(response.data!.createAPIKey.id, response.data!.createAPIKey.secret);
-                       
-    const socket = io("http://localhost:4000", {
-            path: "/ws/",
-            parser: require("socket.io-msgpack-parser"),
-            transports: ["polling", "websocket"],
-            auth: {
-                token:  apiKey
-            }
-        });
 
-    return new TimeoutPromise<Socket>(5000, (resolve,reject) => {
+    const socket = io("http://localhost:4000", {
+        path: "/ws/",
+        parser: require("socket.io-msgpack-parser"),
+        transports: ["polling", "websocket"],
+        auth: {
+            token: apiKey
+        }
+    });
+
+    return new TimeoutPromise<Socket>(5000, (resolve, reject) => {
         socket.once("connect", async () => {
             socket.once(SocketEvent.READY.toString(), () => {
-                resolve(socket)
+                resolve(socket);
             });
         });
 

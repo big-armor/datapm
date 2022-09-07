@@ -22,9 +22,7 @@ describe("Collection Search Tests", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousUser = createAnonymousClient();
 
-    before(async () => {});
-
-    it("Create users A & B", async function () {
+    before(async () => {
         userAClient = await createUser(
             "FirstA",
             "LastA",

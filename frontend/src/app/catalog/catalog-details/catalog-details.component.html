@@ -27,9 +27,8 @@
                 </div>
             </div>
             <p class="text-dark-gray mt-3" style="margin-left: 90px">
-                <span *ngIf="!catalog?.myPermissions.includes(Permission.VIEW)"
-                    >You do not have permission to view this catalog, but you may have permission to view some packages
-                    in it.</span
+                <span *ngIf="!catalog?.myPermissions.includes(Permission.VIEW) && catalog.packages.length === 0"
+                    >You do not have permission to view this catalog.</span
                 >
                 {{ catalog?.description }}
             </p>
@@ -39,7 +38,7 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container" *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0">
             <mat-tab-group
                 [(selectedIndex)]="currentTab"
                 (selectedTabChange)="updateTabParam()"
@@ -59,9 +58,12 @@
                 <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
             </mat-tab-group>
         </div>
-        <hr class="header-border" />
+        <hr
+            class="header-border"
+            *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0"
+        />
 
-        <div class="container">
+        <div class="container" *ngIf="catalog?.myPermissions.includes(Permission.VIEW) || catalog.packages.length > 0">
             <div *ngIf="currentTab === 0">
                 <div class="container">
                     <app-package-item
