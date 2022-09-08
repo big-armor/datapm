@@ -310,8 +310,13 @@ export const getGroupFromCacheOrDbBySlugOrFail = async (
     forceReload?: boolean,
     relations: string[] = []
 ) => {
-    const groupPromiseFunction = () =>
-        connection.getRepository(GroupEntity).findOneOrFail({ slug: groupSlug }, { relations });
+    const groupPromiseFunction = async () => {
+        const group = await connection.getRepository(GroupEntity).findOne({ slug: groupSlug }, { relations });
+
+        if (group == undefined) throw new Error("GROUP_NOT_FOUND - " + groupSlug);
+
+        return group;
+    };
     return await context.cache.loadGroupBySlug(groupSlug, groupPromiseFunction, forceReload);
 };
 
