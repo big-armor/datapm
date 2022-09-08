@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { AdminStatusConfirmationComponent } from "./admin-status-confirmation.component";
+import { GroupAdminConfirmationComponent } from "./admin-status-confirmation.component";
 
 describe("AdminStatusConfirmationComponent", () => {
-    let component: AdminStatusConfirmationComponent;
-    let fixture: ComponentFixture<AdminStatusConfirmationComponent>;
+    let component: GroupAdminConfirmationComponent;
+    let fixture: ComponentFixture<GroupAdminConfirmationComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [AdminStatusConfirmationComponent]
+            declarations: [GroupAdminConfirmationComponent]
         }).compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(AdminStatusConfirmationComponent);
+        fixture = TestBed.createComponent(GroupAdminConfirmationComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
