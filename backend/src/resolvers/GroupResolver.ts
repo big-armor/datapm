@@ -9,6 +9,7 @@ import { GroupUserEntity } from "../entity/GroupUserEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { Group, GroupUser, Permission, SetUserGroupPermissionsInput } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
+import { GroupRepository } from "../repository/GroupRepository";
 import { GroupUserRepository } from "../repository/GroupUserRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
@@ -16,6 +17,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { sendInviteUser, sendShareNotification } from "../util/smtpUtil";
 
 import { getUserFromCacheOrDbByUsername } from "./UserResolver";
+const GROUP_SEARCH_RESULT_LIMIT = 100;
 
 export const createGroup = async (
     _0: any,
@@ -308,8 +310,13 @@ export const getGroupFromCacheOrDbBySlugOrFail = async (
     forceReload?: boolean,
     relations: string[] = []
 ) => {
-    const groupPromiseFunction = () =>
-        connection.getRepository(GroupEntity).findOneOrFail({ slug: groupSlug }, { relations });
+    const groupPromiseFunction = async () => {
+        const group = await connection.getRepository(GroupEntity).findOne({ slug: groupSlug }, { relations });
+
+        if (group == undefined) throw new Error("GROUP_NOT_FOUND - " + groupSlug);
+
+        return group;
+    };
     return await context.cache.loadGroupBySlug(groupSlug, groupPromiseFunction, forceReload);
 };
 
@@ -347,4 +354,48 @@ export const groupUsers = async (
     });
 
     return groupUsers;
+};
+
+export const setGroupAsAdmin = async (
+    _0: any,
+    { groupSlug, isAdmin }: { groupSlug: string; isAdmin: boolean },
+    context: AuthenticatedContext,
+    info: any
+): Promise<void> => {
+    await context.connection.transaction(async (manager) => {
+        const group = await getGroupFromCacheOrDbBySlugOrFail(context, manager, groupSlug);
+
+        group.isAdmin = isAdmin;
+
+        await manager.save(group);
+    });
+};
+
+export const adminSearchGroups = async (
+    _0: any,
+    { value, limit, offSet }: { value: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const clampedLimit = Math.min(limit, GROUP_SEARCH_RESULT_LIMIT);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(GroupRepository)
+        .searchWithNoRestrictions({ value, limit: clampedLimit, offSet });
+
+    return {
+        hasMore: count - (offSet + clampedLimit) > 0,
+        groups: searchResponse,
+        count
+    };
+};
+
+export const adminDeleteGroup = async (
+    _0: any,
+    { groupSlug }: { groupSlug: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    await context.connection.getRepository(GroupEntity).delete({
+        slug: groupSlug
+    });
 };

@@ -3,9 +3,7 @@ import { CatalogEntity } from "./entity/CatalogEntity";
 import { CollectionEntity } from "./entity/CollectionEntity";
 import { GroupEntity } from "./entity/GroupEntity";
 import { PackageEntity } from "./entity/PackageEntity";
-import { UserCatalogPermissionEntity } from "./entity/UserCatalogPermissionEntity";
 import { UserEntity } from "./entity/UserEntity";
-import { UserPackagePermissionEntity } from "./entity/UserPackagePermissionEntity";
 import { VersionEntity } from "./entity/VersionEntity";
 import { PackageIdentifier, PackageIdentifierInput, Permission, VersionIdentifierInput } from "./generated/graphql";
 

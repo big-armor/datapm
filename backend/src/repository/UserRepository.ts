@@ -18,6 +18,7 @@ import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { FirstUserStatusHolder } from "../resolvers/FirstUserStatusHolder";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+import { GroupRepository } from "./GroupRepository";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -633,5 +634,11 @@ export class UserRepository extends Repository<UserEntity> {
         const value = response[0].max as Date;
 
         return value || new Date();
+    }
+
+    async userIsAdmin(user: UserEntity): Promise<boolean> {
+        if (user.isAdmin) return true;
+
+        return this.manager.getCustomRepository(GroupRepository).userIsMemberOfAdminGroup(user);
     }
 }

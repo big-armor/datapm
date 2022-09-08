@@ -39,8 +39,8 @@ describe("Recently Viewed", async () => {
             query: MeDocument
         });
 
-        userOne = userOneResponse.data!.me;
-        userTwo = userTwoResponse.data!.me;
+        userOne = userOneResponse.data!.me.user;
+        userTwo = userTwoResponse.data!.me.user;
     });
 
     it("Create test package", async function () {

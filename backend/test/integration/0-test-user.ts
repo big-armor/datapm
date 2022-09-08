@@ -69,16 +69,16 @@ describe("User Tests", async () => {
             query: MeDocument
         });
 
-        let userA = response.data;
-        expect(userA.me.firstName).equal("FirstA");
-        expect(userA.me.lastName).equal("LastA");
-        expect(userA.me.username).to.equal("testA-user");
-        expect(userA.me.emailAddress).to.equal("testA-user@test.datapm.io");
-        expect(userA.me.nameIsPublic, "nameIsPUblic should be false").to.equal(false);
-        expect(userA.me.location, "location should be null").equal(null);
-        expect(userA.me.twitterHandle, "twitterHandle should be null").equal(null);
-        expect(userA.me.gitHubHandle, "gitHubHandle should be null").equal(null);
-        expect(userA.me.website, "website should be null").equal(null);
+        let userA = response.data.me.user;
+        expect(userA.firstName).equal("FirstA");
+        expect(userA.lastName).equal("LastA");
+        expect(userA.username).to.equal("testA-user");
+        expect(userA.emailAddress).to.equal("testA-user@test.datapm.io");
+        expect(userA.nameIsPublic, "nameIsPUblic should be false").to.equal(false);
+        expect(userA.location, "location should be null").equal(null);
+        expect(userA.twitterHandle, "twitterHandle should be null").equal(null);
+        expect(userA.gitHubHandle, "gitHubHandle should be null").equal(null);
+        expect(userA.website, "website should be null").equal(null);
     });
 
     it("First created user in registry is an admin", async function () {
@@ -94,16 +94,16 @@ describe("User Tests", async () => {
             query: MeDocument
         });
 
-        let userB = response.data;
-        expect(userB.me.firstName).equal("FirstB");
-        expect(userB.me.lastName).equal("LastB");
-        expect(userB.me.username).to.equal("testB-user");
-        expect(userB.me.emailAddress).to.equal("testB-user@test.datapm.io");
-        expect(userB.me.nameIsPublic).to.equal(false);
-        expect(userB.me.location).equal(null);
-        expect(userB.me.twitterHandle).equal(null);
-        expect(userB.me.gitHubHandle).equal(null);
-        expect(userB.me.website).equal(null);
+        let userB = response.data.me.user;
+        expect(userB.firstName).equal("FirstB");
+        expect(userB.lastName).equal("LastB");
+        expect(userB.username).to.equal("testB-user");
+        expect(userB.emailAddress).to.equal("testB-user@test.datapm.io");
+        expect(userB.nameIsPublic).to.equal(false);
+        expect(userB.location).equal(null);
+        expect(userB.twitterHandle).equal(null);
+        expect(userB.gitHubHandle).equal(null);
+        expect(userB.website).equal(null);
     });
 
     it("Second created user in registry is not an admin", async function () {
@@ -144,7 +144,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.nameIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.nameIsPublic).to.equal(true);
     });
 
     it("User B Get User A Public Name", async function () {
@@ -279,7 +279,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.twitterHandle).to.equal("testTwitterA");
+        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
     });
 
     it("User B Access User A Twitter Handle - Not Public", async function () {
@@ -305,8 +305,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.twitterHandle).to.equal("testTwitterA");
-        expect(response.data!.updateMe.twitterHandleIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
+        expect(response.data!.updateMe.user.twitterHandleIsPublic).to.equal(true);
     });
 
     it("User B Access User A Twitter Handle - Public", async function () {
@@ -332,8 +332,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.twitterHandle).to.equal("testTwitterA");
-        expect(response.data!.updateMe.twitterHandleIsPublic).to.equal(false);
+        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
+        expect(response.data!.updateMe.user.twitterHandleIsPublic).to.equal(false);
     });
 
     it("User B Access User A Twitter Handle - Not Public again", async function () {
@@ -359,7 +359,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.gitHubHandle).to.equal("testGithubA");
+        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
     });
 
     it("User B Access User A Github Handle - Not Public", async function () {
@@ -385,8 +385,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.gitHubHandle).to.equal("testGithubA");
-        expect(response.data!.updateMe.gitHubHandleIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
+        expect(response.data!.updateMe.user.gitHubHandleIsPublic).to.equal(true);
     });
 
     it("User B Access User A Github Handle - Public", async function () {
@@ -412,8 +412,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.gitHubHandle).to.equal("testGithubA");
-        expect(response.data!.updateMe.gitHubHandleIsPublic).to.equal(false);
+        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
+        expect(response.data!.updateMe.user.gitHubHandleIsPublic).to.equal(false);
     });
 
     it("User B Access User A Github Handle - Not Public again", async function () {
@@ -439,7 +439,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.location).to.equal("testLocationA");
+        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
     });
 
     it("Set User A description", async function () {
@@ -452,7 +452,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.description).to.equal("This is my new description");
+        expect(response.data!.updateMe.user.description).to.equal("This is my new description");
     });
 
     it("User B Access User A Location - Not Public", async function () {
@@ -478,8 +478,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.location).to.equal("testLocationA");
-        expect(response.data!.updateMe.locationIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
+        expect(response.data!.updateMe.user.locationIsPublic).to.equal(true);
     });
 
     it("User B Access User A Location - Public", async function () {
@@ -505,8 +505,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.location).to.equal("testLocationA");
-        expect(response.data!.updateMe.locationIsPublic).to.equal(false);
+        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
+        expect(response.data!.updateMe.user.locationIsPublic).to.equal(false);
     });
 
     it("User B Access User A Location - Not Public again", async function () {
@@ -532,7 +532,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.website).to.equal("testWebsiteA");
+        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
     });
 
     it("User B Access User A Website - Not Public", async function () {
@@ -558,8 +558,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.website).to.equal("testWebsiteA");
-        expect(response.data!.updateMe.websiteIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
+        expect(response.data!.updateMe.user.websiteIsPublic).to.equal(true);
     });
 
     it("User B Access User A Website - Public", async function () {
@@ -585,8 +585,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.website).to.equal("testWebsiteA");
-        expect(response.data!.updateMe.websiteIsPublic).to.equal(false);
+        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
+        expect(response.data!.updateMe.user.websiteIsPublic).to.equal(false);
     });
 
     it("User B Access User A Website - Not Public again", async function () {
@@ -612,7 +612,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
     });
 
     it("User B Access User A emailAddress - Not Public", async function () {
@@ -638,8 +638,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.emailAddress).to.equal("testEmailAddressA@a.com");
-        expect(response.data!.updateMe.emailAddressIsPublic).to.equal(true);
+        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data!.updateMe.user.emailAddressIsPublic).to.equal(true);
     });
 
     it("User B Access User A emailAddress - Public", async function () {
@@ -665,8 +665,8 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.emailAddress).to.equal("testEmailAddressA@a.com");
-        expect(response.data!.updateMe.emailAddressIsPublic).to.equal(false);
+        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data!.updateMe.user.emailAddressIsPublic).to.equal(false);
     });
 
     it("User B Access User A emailAddress - Not Public again", async function () {
@@ -688,7 +688,7 @@ describe("User Tests", async () => {
         });
 
         let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(false);
+        expect(userA.me.user.uiDarkModeEnabled).to.equal(false);
     });
 
     it("Set User A toggles dark mode on", async function () {
@@ -701,7 +701,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(true);
+        expect(response.data!.updateMe.user.uiDarkModeEnabled).to.equal(true);
     });
 
     it("User A fetches dark mode toggle value", async function () {
@@ -710,7 +710,7 @@ describe("User Tests", async () => {
         });
 
         let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(true);
+        expect(userA.me.user.uiDarkModeEnabled).to.equal(true);
     });
 
     it("Set User A toggles dark mode off", async function () {
@@ -723,7 +723,7 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(false);
+        expect(response.data!.updateMe.user.uiDarkModeEnabled).to.equal(false);
     });
 
     it("User A fetches dark mode toggle", async function () {
@@ -732,7 +732,7 @@ describe("User Tests", async () => {
         });
 
         let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(false);
+        expect(userA.me.user.uiDarkModeEnabled).to.equal(false);
     });
 
     it("New user registered with dark mode on", async function () {
@@ -750,7 +750,7 @@ describe("User Tests", async () => {
         });
 
         let darkModeUser = response.data;
-        expect(darkModeUser.me.uiDarkModeEnabled).to.equal(true);
+        expect(darkModeUser.me.user.uiDarkModeEnabled).to.equal(true);
     });
 
     // TODO test login

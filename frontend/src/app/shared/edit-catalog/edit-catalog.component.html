@@ -59,7 +59,7 @@
                 ></app-input>
             </div>
         </div>
-        <div class="d-flex bd-highlight shadow-div mb-3" *ngIf="user.isAdmin">
+        <div class="d-flex bd-highlight shadow-div mb-3" *ngIf="currentUser.isAdmin">
             <div class="pr-3 py-2 bd-highlight div-question">Unclaimed</div>
             <div class="bd-highlight d-flex align-items-center div-answer">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="unclaimed"></mat-slide-toggle>

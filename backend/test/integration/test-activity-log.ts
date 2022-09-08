@@ -67,8 +67,8 @@ describe("Activity Log Tests", async () => {
             query: MeDocument
         });
 
-        userOne = userOneResponse.data!.me;
-        userTwo = userTwoResponse.data!.me;
+        userOne = userOneResponse.data!.me.user;
+        userTwo = userTwoResponse.data!.me.user;
     });
 
     it("Should show USER_CREATED", async function () {

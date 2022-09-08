@@ -10,7 +10,13 @@ import { SessionCache } from "../session-cache";
 
 let databaseConnection: Connection | null;
 
-const packageUpdateCron = new CronJob("1/1 * * * *", packageUpdateSchedulingCronHandler, null, false, "America/New_York");
+const packageUpdateCron = new CronJob(
+    "1/1 * * * *",
+    packageUpdateSchedulingCronHandler,
+    null,
+    false,
+    "America/New_York"
+);
 
 export function startPackageUpdateService(connection: Connection) {
     databaseConnection = connection;
@@ -26,15 +32,15 @@ async function packageUpdateSchedulingCronHandler() {
 }
 
 export async function packageUpdateScheduling(connection: Connection) {
-    
-    const beforeDate = new Date(new Date().getTime() - (1000 * 60 * 60 * 24));
+    const beforeDate = new Date(new Date().getTime() - 1000 * 60 * 60 * 24);
 
     // Find the package that was updated the longest in the past
-    const packageEntities: PackageEntity[] = await connection.getCustomRepository(PackageRepository).getPackageOldestUpdated(beforeDate, 0,2, ["catalog", "creator"]);
+    const packageEntities: PackageEntity[] = await connection
+        .getCustomRepository(PackageRepository)
+        .getPackageOldestUpdated(beforeDate, 0, 2, ["catalog", "creator"]);
 
-    for(const packageEntity of packageEntities) {
-        
-        const jobId = "package-update-" + randomUUID().substring(0,7);
+    for (const packageEntity of packageEntities) {
+        const jobId = "package-update-" + randomUUID().substring(0, 7);
 
         packageEntity.lastUpdateJobDate = new Date();
         await connection.getRepository(PackageEntity).save(packageEntity);
@@ -42,11 +48,11 @@ export async function packageUpdateScheduling(connection: Connection) {
         const userContext: AuthenticatedContext = {
             cache: new SessionCache(),
             connection,
+            isAdmin: false,
             me: packageEntity.creator
-        }
+        };
 
-
-        const jobContext = new HeadlessJobContext(jobId, userContext );
+        const jobContext = new HeadlessJobContext(jobId, userContext);
 
         const packageUpdateJob = new UpdatePackageJob(jobContext, {
             defaults: true,
@@ -54,17 +60,15 @@ export async function packageUpdateScheduling(connection: Connection) {
             reference: {
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug,
-                registryURL: process.env["REGISTRY_URL"] as string,
+                registryURL: process.env["REGISTRY_URL"] as string
             }
         });
 
         try {
             await packageUpdateJob.execute();
         } catch (error) {
-            console.error("Error running package update job " + jobId )
+            console.error("Error running package update job " + jobId);
             console.error(error);
         }
-
     }
-
 }

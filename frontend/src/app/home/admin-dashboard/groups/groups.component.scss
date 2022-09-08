@@ -1,0 +1,110 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/colors";
+
+#adminGroups {
+    table.mat-table {
+        tbody {
+            height: 560px !important;
+        }
+    }
+
+    ::ng-deep {
+        .mat-form-field-infix {
+            border-top: none;
+            padding: 10px 10px;
+
+            input {
+                font-family: $family-roboto;
+                font-size: $text-font;
+                letter-spacing: 0.4px;
+                font-weight: $weight-400;
+
+                &::placeholder {
+                    font-family: $family-roboto;
+                    font-size: $text-font - 1;
+                    letter-spacing: 0.4px;
+                    font-weight: $weight-300;
+                    opacity: 0.8;
+                    color: var(--gray-3-color);
+                }
+            }
+        }
+
+        .mat-form-field-suffix {
+            .mat-icon-button {
+                position: relative;
+                top: 5px;
+                height: 1.5em;
+            }
+        }
+
+        .mat-form-field-flex {
+            padding: 0px;
+            background-color: var(--gray-7-color) !important;
+            width: 218px;
+            border-radius: 4px;
+            border: 1px solid var(--gray-5-color);
+
+            &:hover {
+                background-color: var(--custom-secondary-color) !important;
+            }
+        }
+
+        .mat-form-field-underline {
+            display: none;
+        }
+    }
+
+    .loading-shade {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 56px;
+        right: 0;
+        background: rgba(0, 0, 0, 0.08);
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        width: 250px;
+    }
+}
+
+@media (max-width: 992px) {
+    #adminGroups {
+        th.mat-header-cell:first-of-type,
+        td.mat-cell:first-of-type,
+        td.mat-footer-cell:first-of-type {
+            width: unset;
+        }
+
+        .btn-wrapper {
+            display: table-cell;
+        }
+
+        table.gray-table td {
+            min-width: 90px;
+        }
+
+        .app-outlined-button {
+            padding: 6px 3px;
+            margin: 3px 0px;
+            width: 101px;
+        }
+        ::ng-deep {
+            .mat-form-field-infix {
+                input {
+                    &::placeholder {
+                        font-weight: $weight-400;
+                        font-size: $small-font;
+                    }
+                }
+            }
+        }
+    }
+}

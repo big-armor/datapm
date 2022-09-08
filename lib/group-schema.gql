@@ -10,6 +10,7 @@ type Group {
     packagePermissions: [GroupPackagePermission!]
     catalogPermissions: [GroupCatalogPermission!]
     collectionPermissions: [GroupCollectionPermission!]
+    isAdmin: Boolean
 }
 
 type GroupUser {

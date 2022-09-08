@@ -3,6 +3,7 @@ import {
     Catalog,
     CatalogFollowersCountGQL,
     CatalogFollowersGQL,
+    CurrentUser,
     Follow,
     FollowIdentifierInput,
     GetFollowGQL,
@@ -39,7 +40,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
 
     Permission = Permission;
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     public catalogFollow: Follow;
     public isFollowing: boolean;
@@ -78,9 +79,11 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-            this.currentUser = user;
-        });
+        this.authenticationService.currentUser
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((currentUser: CurrentUser) => {
+                this.currentUser = currentUser;
+            });
         if (this.canEdit) {
             this.tabs.push("manage");
         }

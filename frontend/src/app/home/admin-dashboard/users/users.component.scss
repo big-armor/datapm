@@ -68,10 +68,12 @@
         justify-content: center;
     }
 
-    th.mat-header-cell:first-of-type,
-    td.mat-cell:first-of-type,
-    td.mat-footer-cell:first-of-type {
-        width: 250px;
+    .mat-cell {
+        padding: 5px;
+    }
+
+    td.mat-cell:first-child {
+        padding-left: 10px;
     }
 }
 

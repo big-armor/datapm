@@ -27,7 +27,7 @@ export class UserDetailsPageComponent implements OnChanges, OnInit {
 
     constructor(private route: ActivatedRoute, private router: Router, private authSvc: AuthenticationService) {
         this.username = this.route.snapshot.paramMap.get("catalogSlug");
-        if (this.username === this.authSvc.currentUser.value?.username) {
+        if (this.username === this.authSvc.currentUser.value?.user.username) {
             this.isCurrentUser = true;
             this.tabs = [
                 { name: "my account", value: "" },

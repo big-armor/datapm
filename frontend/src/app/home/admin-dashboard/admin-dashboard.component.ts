@@ -10,6 +10,7 @@ export class AdminDashboardComponent {
 
     public routes = [
         { linkName: "users", url: this.URL_PREFIX + "/users" },
+        { linkName: "groups", url: this.URL_PREFIX + "/groups" },
         { linkName: "platform settings", url: this.URL_PREFIX + "/platform-settings" }
     ];
 }

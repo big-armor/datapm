@@ -1,22 +1,24 @@
 query Me {
     me {
-        emailAddress
-        displayName
-        firstName
-        lastName
-        username
-        description
-        location
-        twitterHandle
-        gitHubHandle
-        website
-        nameIsPublic
-        locationIsPublic
-        twitterHandleIsPublic
-        gitHubHandleIsPublic
-        emailAddressIsPublic
-        websiteIsPublic
         isAdmin
-        uiDarkModeEnabled
+        user {
+            emailAddress
+            displayName
+            firstName
+            lastName
+            username
+            description
+            location
+            twitterHandle
+            gitHubHandle
+            website
+            nameIsPublic
+            locationIsPublic
+            twitterHandleIsPublic
+            gitHubHandleIsPublic
+            emailAddressIsPublic
+            websiteIsPublic
+            uiDarkModeEnabled
+        }
     }
 }

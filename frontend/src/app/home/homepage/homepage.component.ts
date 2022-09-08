@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { User } from "src/generated/graphql";
+import { CurrentUser, User } from "src/generated/graphql";
 
 @Component({
     selector: "home",
@@ -17,13 +17,13 @@ export class HomepageComponent implements OnInit {
     ];
     private readonly unsubscribe$ = new Subject();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     constructor(private authenticationService: AuthenticationService) {}
 
     public ngOnInit(): void {
         this.authenticationService.currentUser
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((user: User) => (this.currentUser = user));
+            .subscribe((user: CurrentUser) => (this.currentUser = user));
     }
 }

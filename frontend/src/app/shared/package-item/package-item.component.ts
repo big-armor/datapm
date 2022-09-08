@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Package, User } from "src/generated/graphql";
+import { CurrentUser, Package, User } from "src/generated/graphql";
 import * as timeago from "timeago.js";
 
 @Component({
@@ -27,7 +27,7 @@ export class PackageItemComponent implements OnInit {
     @Output()
     public action = new EventEmitter();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
 
     constructor(private router: Router, private authenticationService: AuthenticationService) {}
 

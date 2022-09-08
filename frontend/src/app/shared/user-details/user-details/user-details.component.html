@@ -18,7 +18,7 @@
                         <div class="mb-3 text-dark-gray">
                             <mat-slide-toggle
                                 class="app-slide-toggle"
-                                [checked]="currentUser.uiDarkModeEnabled"
+                                [checked]="currentUser.user.uiDarkModeEnabled"
                                 (change)="toggleDarkMode()"
                                 >Dark mode</mat-slide-toggle
                             >
@@ -29,13 +29,18 @@
                 <div class="mt-4 mb-4 pb-2" *ngIf="catalog">
                     <div class="text-main-title">Public Package Access</div>
                     <p class="text-dark-gray col-md-12 p-0">
-                        Enabling public access here allows you to enable public access for packages in your personal catalog.
+                        Enabling public access here allows you to enable public access for packages in your personal
+                        catalog.
                     </p>
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center public-toggle">
                             <div class="ml-auto pr-2 pb-1 slide-right">
-                                <mat-slide-toggle class="app-slide-toggle" [checked]="isCatalogPublic" (change)="updatePublic($event)"
-                                    [disabled]="!catalog.myPermissions.includes(Permission.MANAGE)"></mat-slide-toggle>
+                                <mat-slide-toggle
+                                    class="app-slide-toggle"
+                                    [checked]="isCatalogPublic"
+                                    (change)="updatePublic($event)"
+                                    [disabled]="!catalog.myPermissions.includes(Permission.MANAGE)"
+                                ></mat-slide-toggle>
                             </div>
                             <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
                                 <span class="public-text" *ngIf="isCatalogPublic">Public</span>

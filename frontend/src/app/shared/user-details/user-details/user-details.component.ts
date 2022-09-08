@@ -4,7 +4,18 @@ import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-passwo
 import { AuthenticationService } from "../../../services/authentication.service";
 import { getRegistryURL } from "../../../helpers/RegistryAccessHelper";
 
-import { APIKey, User, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, Scope, UpdateCatalogGQL, Permission, GetCatalogGQL } from "src/generated/graphql";
+import {
+    APIKey,
+    User,
+    Catalog,
+    CreateAPIKeyGQL,
+    DeleteAPIKeyGQL,
+    Scope,
+    UpdateCatalogGQL,
+    Permission,
+    GetCatalogGQL,
+    CurrentUser
+} from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -40,7 +51,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
     public deletionStatusByApiKeyId = new Map<string, boolean>();
 
-    public currentUser: User;
+    public currentUser: CurrentUser;
     public apiKeysState = State.INIT;
     public createAPIKeyState = State.INIT;
 
@@ -53,9 +64,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     public createAPIKeyForm: FormGroup;
 
     public catalogState = State.INIT;
-    public catalog:Catalog;
-    public isCatalogPublic:boolean = false;
-    public publicAccessSavingError:boolean = false;
+    public catalog: Catalog;
+    public isCatalogPublic: boolean = false;
+    public publicAccessSavingError: boolean = false;
 
     private subscription = new Subject();
 
@@ -74,25 +85,29 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
-            this.currentUser = user;
-            if (user) {
-                this.state = State.SUCCESS;
-            }
-
-            this.getCatalogGQL.fetch({
-                identifier: {
-                    catalogSlug: user.username
-                }
-            }).subscribe(({ data, errors }) => {
-                if(errors && errors.length > 0) {
-                    this.catalogState = State.ERROR;
-                    return;
+        this.authenticationService.currentUser
+            .pipe(takeUntil(this.subscription))
+            .subscribe((currentUser: CurrentUser) => {
+                this.currentUser = currentUser;
+                if (currentUser) {
+                    this.state = State.SUCCESS;
                 }
 
-                this.setCatalogVariables(data.catalog);
+                this.getCatalogGQL
+                    .fetch({
+                        identifier: {
+                            catalogSlug: currentUser.user.username
+                        }
+                    })
+                    .subscribe(({ data, errors }) => {
+                        if (errors && errors.length > 0) {
+                            this.catalogState = State.ERROR;
+                            return;
+                        }
+
+                        this.setCatalogVariables(data.catalog);
+                    });
             });
-        });
 
         this.refreshAPIKeys(false, true);
 
@@ -136,13 +151,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         });
     }
 
-
     private updateCatalogVisibility(isPublic: boolean): void {
         this.publicAccessSavingError = false;
         this.updateCatalogGQL
             .mutate({
                 identifier: {
-                    catalogSlug: this.currentUser.username
+                    catalogSlug: this.currentUser.user.username
                 },
                 value: {
                     isPublic
@@ -161,7 +175,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 }
             );
     }
-
 
     openEditDialog() {
         const dialogConfig = new MatDialogConfig();

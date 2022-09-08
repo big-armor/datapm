@@ -229,6 +229,9 @@ import {
     myGroupPermissions,
     myGroups,
     group,
+    setGroupAsAdmin,
+    adminSearchGroups,
+    adminDeleteGroup,
     groupUsers
 } from "./resolvers/GroupResolver";
 import {
@@ -258,6 +261,7 @@ import {
     groupsByCollection,
     collectionPermissionsByGroupForUser
 } from "./resolvers/GroupCollectionPermissionResolver";
+import { me } from "./resolvers/MeResolver";
 
 export const getPageContentByRoute = async (
     _0: any,
@@ -613,9 +617,7 @@ export const resolvers: {
                 registryUrl: process.env["REGISTRY_URL"] as string
             };
         },
-        me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
-            return await getUserFromCacheOrDbByUsername(context, context.me.username, getGraphQlRelationName(info));
-        },
+        me: me,
         user: async (_0: any, args: { username: string }, context: AuthenticatedContext, info: any) => {
             return await getUserFromCacheOrDbByUsername(context, args.username, getGraphQlRelationName(info));
         },
@@ -684,6 +686,7 @@ export const resolvers: {
         emailAddressAvailable: emailAddressAvailable,
         searchUsers: searchUsers,
         adminSearchUsers: adminSearchUsers,
+        adminSearchGroups,
         myActivity: myActivity,
         packageActivities: packageActivities,
         getFollow: getFollow,
@@ -768,6 +771,8 @@ export const resolvers: {
         removeUserFromGroup,
         addOrUpdateGroupToPackage,
         removeGroupFromPackage,
+        setGroupAsAdmin,
+        adminDeleteGroup,
 
         // Package issues
         createPackageIssue: createPackageIssue,

@@ -294,7 +294,7 @@ describe("Inviting Users", function () {
         });
 
         expect(whoAmIResponse.errors == null).equal(true);
-        expect(whoAmIResponse.data.me.username).equal("new-invited-user-1");
+        expect(whoAmIResponse.data.me.user.username).equal("new-invited-user-1");
     });
 
     it("Should return VIEW permission on package", async function () {

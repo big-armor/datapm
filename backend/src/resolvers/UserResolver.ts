@@ -8,7 +8,8 @@ import {
     UpdateMyPasswordInput,
     UpdateUserInput,
     ActivityLogEventType,
-    UserStatus
+    UserStatus,
+    CurrentUser
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { getUserByUsernameOrFail, UserRepository } from "../repository/UserRepository";
@@ -167,8 +168,8 @@ export const updateMe = async (
     { value }: { value: UpdateUserInput },
     context: AuthenticatedContext,
     info: any
-) => {
-    return context.connection.transaction(async (transaction) => {
+): Promise<CurrentUser> => {
+    const user = await context.connection.transaction(async (transaction) => {
         await createActivityLog(transaction, {
             userId: context.me.id,
             targetUserId: context.me.id,
@@ -178,10 +179,16 @@ export const updateMe = async (
 
         return await transaction.getCustomRepository(UserRepository).updateUser({
             username: context.me.username,
-            value,
-            relations: getGraphQlRelationName(info)
+            value
         });
     });
+
+    const userIsAdmin = await context.connection.manager.getCustomRepository(UserRepository).userIsAdmin(user);
+
+    return {
+        user,
+        isAdmin: userIsAdmin
+    };
 };
 
 export const forgotMyPassword = async (

@@ -1,23 +1,19 @@
 import { AuthenticatedContext, Context } from "../context";
 
 export function isRequestingUserOrAdmin(context: Context, username: string): boolean {
-
-    if(!isAuthenticatedContext(context))
-        return false;
+    if (!isAuthenticatedContext(context)) return false;
 
     const authenticatedContext = context as AuthenticatedContext;
 
-    return authenticatedContext.me.isAdmin || authenticatedContext.me.username === username;
+    return authenticatedContext.isAdmin || authenticatedContext.me.username === username;
 }
 
 export function isAuthenticatedAsAdmin(context: Context): boolean {
+    if (!isAuthenticatedContext(context)) return false;
 
-    if(!isAuthenticatedContext(context))
-        return false;
-    
     const authenicatedContext = context as AuthenticatedContext;
 
-    return authenicatedContext.me.isAdmin === true;
+    return authenicatedContext.isAdmin === true;
 }
 
 export function isUserWithUsername(context: AuthenticatedContext, username: string): boolean {

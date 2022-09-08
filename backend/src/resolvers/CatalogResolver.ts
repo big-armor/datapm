@@ -169,7 +169,7 @@ export const createCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    if (!context.me.isAdmin && value.unclaimed === true) {
+    if (!context.isAdmin && value.unclaimed === true) {
         throw new Error("NOT_AUTHORIZED");
     }
 
@@ -195,7 +195,7 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        if (!context.me.isAdmin && value.unclaimed != null) {
+        if (!context.isAdmin && value.unclaimed != null) {
             throw new Error("NOT_AUTHORIZED - must be admin to set unclaimed status");
         }
 
@@ -360,7 +360,7 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
 
     const catalogs = permissions.filter((p) => p.catalog != null).map((p) => p.catalog);
 
-    if (context.me.isAdmin) {
+    if (context.isAdmin) {
         const unclaimedCatalogs = await context.connection.manager
             .getCustomRepository(CatalogRepository)
             .findAllUnclaimed();
