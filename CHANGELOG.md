@@ -1,3 +1,9 @@
+#### 0.32.9 (2022-09-08)
+
+##### New Features
+
+*  Group designated admins ([477869c7](https://github.com/big-armor/datapm/commit/477869c7f2a7e6c55d5ee5c9f421ae3638b5193b))
+
 #### 0.32.8 (2022-09-07)
 
 ##### New Features
