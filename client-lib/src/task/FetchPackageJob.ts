@@ -266,11 +266,10 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 const sourceConector = await sourceConnectorDescription?.getConnector();
 
                 if (sourceConector.requiresCredentialsConfiguration()) {
-                    this.args.sourceCredentialsIdentifier =
-                        await sourceConector.getCredentialsIdentifierFromConfiguration(
-                            sourceConnectionConfiguration,
-                            sourceCredentialsConfiguration
-                        );
+                    this.args.sourceCredentialsIdentifier = await sourceConector.getCredentialsIdentifierFromConfiguration(
+                        sourceConnectionConfiguration,
+                        sourceCredentialsConfiguration
+                    );
 
                     if (this.args.sourceCredentialsIdentifier)
                         this.args.packageSourceCredentialsConfig = JSON.stringify({
@@ -867,8 +866,9 @@ export async function fetchMultiple(
                 },
                 finish: (line, recordCount, result) => {
                     fetchStatus = FetchStatus.COMPLETED;
-                    latestStatuses[fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug] =
-                        recordCount;
+                    latestStatuses[
+                        fetchPreparation.source.slug + "/" + fetchPreparation.streamSetPreview.slug
+                    ] = recordCount;
 
                     if (result === FetchOutcome.SUCCESS) task.end("SUCCESS", line);
                     else if (result === FetchOutcome.FAILURE) task.end("ERROR", line);
