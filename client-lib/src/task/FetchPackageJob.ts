@@ -446,7 +446,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     : undefined,
                 source,
                 this.args.defaults,
-                false
+                true
             );
 
             if (Object.keys(inspectionResult.additionalConnectionConfiguration).length > 0) {
