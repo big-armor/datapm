@@ -1,3 +1,9 @@
+#### 0.32.10 (2022-09-14)
+
+##### Bug Fixes
+
+*  Credential recall not working ([#521](https://github.com/big-armor/datapm/pull/521)) ([c3c4b410](https://github.com/big-armor/datapm/commit/c3c4b410edd5efe120c493b104fb30b068f3a83f))
+
 #### 0.32.9 (2022-09-08)
 
 ##### New Features
