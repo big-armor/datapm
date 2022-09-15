@@ -4,7 +4,7 @@ import { PlatformSettingsEntity } from "../entity/PlatformSettingsEntity";
 import { PlatformSettingsRepository } from "../repository/PlatformSettingsRepository";
 
 export const savePlatformSettings = async (
-    _0: any,
+    _0: unknown,
     { settings }: { settings: PlatformSettingsInput },
     context: AuthenticatedContext,
     info: any
@@ -24,13 +24,13 @@ export const savePlatformSettings = async (
     return await repository.save(settingsToSave);
 };
 
-export const getPlatformSettingsByKey = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+export const getPlatformSettingsByKey = async (_0: unknown, {}, context: AuthenticatedContext, info: any) => {
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     return await repository.createQueryBuilder().getMany();
 };
 
 export const getPublicPlatformSettingsByKeyOrFail = async (
-    _0: any,
+    _0: unknown,
     { key }: { key: string },
     context: AuthenticatedContext,
     info: any
@@ -45,7 +45,7 @@ export const getPublicPlatformSettingsByKeyOrFail = async (
 };
 
 export const getDeserializedPublicPlatformSettingsByKey = async (
-    _0: any,
+    _0: unknown,
     { key }: { key: string },
     context: AuthenticatedContext,
     info: any

@@ -6,24 +6,26 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType,
     GraphQLInputField,
-    GraphQLInputObjectType
+    GraphQLInputObjectType,
+    Kind
 } from "graphql";
 import { Context } from "../context";
 import { validateUsername } from "./ValidUsernameDirective";
 import { validateEmailAddress } from "./ValidEmailDirective";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
-import { Kind } from "graphql";
 
 export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined =
@@ -37,8 +39,9 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined =
@@ -64,8 +67,8 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
     }
 }
 
-export function validateUsernameOrEmail(value: string | undefined) {
-    if (value?.indexOf("@") != -1) {
+export function validateUsernameOrEmail(value: string | undefined): void {
+    if (value?.indexOf("@") !== -1) {
         validateEmailAddress(value);
     } else {
         validateUsername(value);

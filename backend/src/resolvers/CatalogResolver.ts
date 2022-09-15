@@ -1,6 +1,8 @@
 import { UserInputError, ValidationError } from "apollo-server";
+import { Package } from "datapm-client-lib";
+import { GraphQLResolveInfo } from "graphql";
 import graphqlFields from "graphql-fields";
-import { Connection, EntityManager } from "typeorm";
+import { Connection, DeleteResult, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { hasCatalogPermission, resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
 import { CatalogEntity } from "../entity/CatalogEntity";
@@ -25,11 +27,7 @@ import { isAuthenticatedContext } from "../util/contextHelpers";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
-import {
-    deletePackageFollowsForUsersWithNoPermissions,
-    getPackageFromCacheOrDb,
-    packageEntityToGraphqlObject
-} from "./PackageResolver";
+import { deletePackageFollowsForUsersWithNoPermissions, packageEntityToGraphqlObject } from "./PackageResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
@@ -48,14 +46,7 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
     };
 };
 
-export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
-    /* if (!(await hasCatalogPermission(Permission.VIEW,context, parent.identifier))) {
-        return {
-            catalogSlug: "private",
-            registryURL: getEnvVariable("REGISTRY_URL")
-        };
-    } */
-
+export const catalogIdentifier = async (parent: Catalog, _1: unknown, context: Context): Promise<CatalogIdentifier> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     return {
@@ -64,7 +55,7 @@ export const catalogIdentifier = async (parent: Catalog, _1: any, context: Conte
     };
 };
 
-export const catalogWebsite = async (parent: Catalog, _1: any, context: Context) => {
+export const catalogWebsite = async (parent: Catalog, _1: unknown, context: Context): Promise<string | null> => {
     if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -73,17 +64,17 @@ export const catalogWebsite = async (parent: Catalog, _1: any, context: Context)
     return catalog.website;
 };
 
-export const catalogIsPublic = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
+export const catalogIsPublic = async (parent: Catalog, _1: unknown, context: Context): Promise<boolean> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.isPublic;
 };
 
-export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
+export const catalogIsUnclaimed = async (parent: Catalog, _1: unknown, context: Context): Promise<boolean> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.unclaimed;
 };
 
-export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
+export const catalogDisplayName = async (parent: Catalog, _1: unknown, context: Context): Promise<string | null> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     if (catalog.displayName != null) {
@@ -94,7 +85,7 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
     return catalogEntity.displayName;
 };
 
-export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
+export const catalogDescription = async (parent: Catalog, _1: unknown, context: Context): Promise<string | null> => {
     if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -109,7 +100,12 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
     return catalogEntity.description;
 };
 
-export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
+export const catalogCreator = async (
+    parent: Catalog,
+    _1: unknown,
+    context: Context,
+    info: GraphQLResolveInfo
+): Promise<UserEntity | null> => {
     if (!(await hasCatalogPermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -119,7 +115,7 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
     return await getUserFromCacheOrDbById(context, context.connection, catalog.creatorId, getGraphQlRelationName(info));
 };
 
-export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
+export const myCatalogPermissions = async (parent: Catalog, _1: unknown, context: Context): Promise<Permission[]> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     let user: UserEntity | undefined;
@@ -132,11 +128,15 @@ export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Co
 };
 
 export const userCatalogs = async (
-    _0: any,
+    _0: unknown,
     { username, limit, offSet }: { username: string; limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    hasMore: boolean;
+    catalogs: Catalog[];
+    count: number;
+}> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(CatalogRepository)
@@ -149,7 +149,12 @@ export const userCatalogs = async (
     };
 };
 
-export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
+export const catalogPackagesForUser = async (
+    parent: Catalog,
+    _1: unknown,
+    context: Context,
+    info: GraphQLResolveInfo
+): Promise<Package[]> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;
@@ -160,15 +165,15 @@ export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: 
         relations: getGraphQlRelationName(info)
     });
 
-    return packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
+    return packages.asyncMap((p) => packageEntityToGraphqlObject(context, context.connection, p));
 };
 
 export const createCatalog = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: CreateCatalogInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Catalog> => {
     if (!context.isAdmin && value.unclaimed === true) {
         throw new Error("NOT_AUTHORIZED");
     }
@@ -189,11 +194,11 @@ export const createCatalog = async (
 };
 
 export const updateCatalog = async (
-    _0: any,
+    _0: unknown,
     { identifier, value }: { identifier: CatalogIdentifierInput; value: UpdateCatalogInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Catalog> => {
     return context.connection.transaction(async (transaction) => {
         if (!context.isAdmin && value.unclaimed != null) {
             throw new Error("NOT_AUTHORIZED - must be admin to set unclaimed status");
@@ -205,7 +210,7 @@ export const updateCatalog = async (
 
         if (
             value.isPublic != null &&
-            value.isPublic != catalog.isPublic &&
+            value.isPublic !== catalog.isPublic &&
             !(await hasCatalogPermission(Permission.MANAGE, context, identifier))
         ) {
             throw new ValidationError("NOT_AUTHORIZED - must be manager to set public status");
@@ -268,7 +273,10 @@ export const updateCatalog = async (
     });
 };
 
-export const deleteCatalogFollowsForUsersWithNoPermissions = async (catalogId: number, manager: EntityManager) => {
+export const deleteCatalogFollowsForUsersWithNoPermissions = async (
+    catalogId: number,
+    manager: EntityManager
+): Promise<DeleteResult> => {
     const catalogPermissions = await getAllCatalogPermissions(manager, catalogId);
     const follows = await getCatalogFollowsByCatalogId(catalogId, manager);
 
@@ -281,11 +289,11 @@ export const deleteCatalogFollowsForUsersWithNoPermissions = async (catalogId: n
 };
 
 export const setCatalogAvatarImage = async (
-    _0: any,
+    _0: unknown,
     { identifier, image }: { identifier: CatalogIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     if (identifier.catalogSlug === context.me.username) {
         throw new Error("AVATAR_NOT_ALLOWED_ON_USER_CATALOGS");
     }
@@ -295,31 +303,31 @@ export const setCatalogAvatarImage = async (
 };
 
 export const deleteCatalogAvatarImage = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await ImageStorageService.INSTANCE.deleteCatalogAvatarImage(catalog.id);
 };
 
 export const setCatalogCoverImage = async (
-    _0: any,
+    _0: unknown,
     { identifier, image }: { identifier: CatalogIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
 };
 
 export const deleteCatalog = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await createActivityLog(context.connection, {
         userId: context.me.id,
@@ -333,11 +341,11 @@ export const deleteCatalog = async (
 };
 
 export const searchCatalogs = async (
-    _0: any,
+    _0: unknown,
     { query, limit, offSet }: { query: string; limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{ hasMore: boolean; catalogs: Catalog[]; count: number }> => {
     const [searchResponse, count] = await context.connection.manager.getCustomRepository(CatalogRepository).search({
         user: context.me,
         query,
@@ -353,7 +361,7 @@ export const searchCatalogs = async (
     };
 };
 
-export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => {
+export const myCatalogs = async (_0: unknown, _1: unknown, context: AuthenticatedContext): Promise<Catalog[]> => {
     const permissions = await context.connection.manager
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
@@ -374,11 +382,11 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
 };
 
 export const getCatalogByIdentifierOrFail = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Catalog> => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
     const catalog = await getCatalogFromCacheOrDbBySlug(
         context,
@@ -395,11 +403,11 @@ export const getCatalogByIdentifierOrFail = async (
 };
 
 export const getCatalogByIdentifier = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Catalog | undefined> => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
     const catalog = await getCatalogFromCacheOrDbBySlug(
         context,
@@ -415,11 +423,17 @@ export const getCatalogByIdentifier = async (
     return catalogEntityToGraphQL(catalog);
 };
 
-export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
+export const getCatalogFromCacheOrDbById = async (
+    context: Context,
+    catalogId: number,
+    relations: string[] = []
+): Promise<CatalogEntity> => {
+    // TODO Make this return a Catalog and not CatalogEntity
+
     const catalogPromiseFunction = () =>
-        context.connection.manager
-            .getCustomRepository(CatalogRepository)
-            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+        context.connection.manager.getCustomRepository(CatalogRepository).findOne(catalogId, { relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
@@ -429,7 +443,8 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     connection: EntityManager | Connection,
     catalogId: number,
     relations: string[] = []
-) => {
+): Promise<CatalogEntity> => {
+    // TODO Make this return a Catalog and not CatalogEntity
     const catalogPromiseFunction = () =>
         connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
 
@@ -439,9 +454,13 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
 export const getCatalogFromCacheOrDbOrFail = async (
     context: Context,
     identifier: CatalogIdentifier | CatalogIdentifierInput,
+    // TODO fix this parameter ordering
+    // eslint-disable-next-line default-param-last
     relations: string[] = [],
     forceReload?: boolean
-) => {
+): Promise<CatalogEntity> => {
+    // TODO Make this return a Catalog and not CatalogEntity
+
     const catalogPromiseFunction = () =>
         context.connection.manager
             .getCustomRepository(CatalogRepository)
@@ -455,11 +474,13 @@ export const getCatalogFromCacheOrDbBySlug = async (
     connection: EntityManager | Connection,
     slug: string,
     relations?: string[]
-) => {
+): Promise<CatalogEntity> => {
+    // TODO Make this return a Catalog and not CatalogEntity
+
     const catalogPromiseFunction = () =>
-        connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+        connection.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug, relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };

@@ -16,9 +16,7 @@ import { describe, it } from "mocha";
 describe("Package Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -35,13 +33,12 @@ describe("Package Tests", async () => {
             "testB-registry-proxy@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
-
     it("Create a test package for proxying data with no authentication", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -54,26 +51,28 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-registry-proxy");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-registry-proxy");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-registry-proxy");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-registry-proxy");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
-        packageFileContents.registries = [{
-            catalogSlug: "testA-registry-proxy",
-            publishMethod: PublishMethod.SCHEMA_PROXY_DATA,
-            url: "http://localhost:4200"
-        }];
+        packageFileContents.registries = [
+            {
+                catalogSlug: "testA-registry-proxy",
+                publishMethod: PublishMethod.SCHEMA_PROXY_DATA,
+                url: "http://localhost:4200"
+            }
+        ];
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -86,27 +85,28 @@ describe("Package Tests", async () => {
             }
         });
 
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-registry-proxy");
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-registry-proxy");
-
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
         expect(responsePackageFile.readmeMarkdown).includes("This is where a readme might go");
         expect(responsePackageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
 
-        expect(responsePackageFile.registries![0].publishMethod).equal(PublishMethod.SCHEMA_PROXY_DATA);
-        expect(responsePackageFile.sources![0].type).equal("datapmRegistryProxy");
-        expect(responsePackageFile.sources![0].streamSets[0].slug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
-        
-        
+        if (responsePackageFile.registries == null) {
+            throw new Error("No registries");
+        }
+        expect(responsePackageFile.registries[0].publishMethod).equal(PublishMethod.SCHEMA_PROXY_DATA);
+        expect(responsePackageFile.sources[0].type).equal("datapmRegistryProxy");
+        expect(responsePackageFile.sources[0].streamSets[0].slug).equal(
+            "https://theunitedstates.io/congress-legislators/legislators-current.csv"
+        );
     });
 
-    it("User can set catalog public", async function(){
-    
-        let response = await userAClient.mutate({
+    it("User can set catalog public", async function () {
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
 
             variables: {
@@ -119,13 +119,11 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
-
-
     it("User A can update package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -133,24 +131,24 @@ describe("Package Tests", async () => {
                     packageSlug: "congressional-legislators"
                 },
                 value: {
-                    isPublic: true,
+                    isPublic: true
                 }
             }
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.updatePackage.catalog?.displayName).to.equal("testA-registry-proxy");
-        expect(response.data!.updatePackage.latestVersion).to.not.equal(null);
+        expect(response.data?.updatePackage.catalog?.displayName).to.equal("testA-registry-proxy");
+        expect(response.data?.updatePackage.latestVersion).to.not.equal(null);
 
-        const identifier = response.data!.updatePackage.latestVersion!.identifier;
+        const identifier = response.data?.updatePackage.latestVersion?.identifier;
 
-        expect(identifier.versionMajor).to.equal(1);
-        expect(identifier.versionMinor).to.equal(0);
-        expect(identifier.versionPatch).to.equal(0);
+        expect(identifier?.versionMajor).to.equal(1);
+        expect(identifier?.versionMinor).to.equal(0);
+        expect(identifier?.versionPatch).to.equal(0);
     });
 
     it("Anonymous user can access package with proxy info", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -162,18 +160,16 @@ describe("Package Tests", async () => {
 
         expect(response.errors == null, "no errors").equal(true);
 
-        const responsePackageFileContents = response.data!.package.latestVersion!.packageFile;
+        const responsePackageFileContents = response.data?.package.latestVersion?.packageFile;
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
-
         expect(responsePackageFile.sources.length).to.equal(1);
         expect(responsePackageFile.sources[0].type).equal("datapmRegistryProxy");
-        expect(responsePackageFile.sources[0].configuration!.catalogSlug).equal("testA-registry-proxy");
-        expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("congressional-legislators");
-        expect(responsePackageFile.sources[0].streamSets[0].slug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
-        
+        expect(responsePackageFile.sources[0].configuration?.catalogSlug).equal("testA-registry-proxy");
+        expect(responsePackageFile.sources[0].configuration?.packageSlug).equal("congressional-legislators");
+        expect(responsePackageFile.sources[0].streamSets[0].slug).equal(
+            "https://theunitedstates.io/congress-legislators/legislators-current.csv"
+        );
     });
-
-    
 });

@@ -5,7 +5,10 @@ import { AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY } from "./PackageRepository
 
 @EntityRepository()
 export class GroupPackagePermissionRepository {
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     /** This is only in the context of a user's package permission via being a member of a group. But not via direct
      * package assignment, or through catalog level package permissions.

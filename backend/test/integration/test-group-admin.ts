@@ -31,8 +31,8 @@ describe("Group Admin", () => {
             "testB-group-admin@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should create a group", async () => {
@@ -45,8 +45,8 @@ describe("Group Admin", () => {
             }
         });
 
-        expect(response).to.exist;
-        expect(response.errors).to.be.undefined;
+        expect(response).to.not.equal(undefined);
+        expect(response.errors).to.equal(undefined);
     });
 
     it("Should add userA to group", async () => {
@@ -75,7 +75,7 @@ describe("Group Admin", () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
     });
 
     it("UserA should be admin", async () => {
@@ -95,7 +95,7 @@ describe("Group Admin", () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
         expect(response.data.adminSearchUsers.count).greaterThan(0);
     });
 
@@ -108,7 +108,7 @@ describe("Group Admin", () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
     });
 
     it("UserA should not be admin", async () => {

@@ -6,7 +6,7 @@ import { createAnonymousClient, createUserDoNotVerifyEmail } from "./test-utils"
 import { describe, it } from "mocha";
 
 describe("Email Verification Tests", async () => {
-    let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
+    const anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
     let userAClient: {
         emailVerificationToken: string;
     };
@@ -15,19 +15,20 @@ describe("Email Verification Tests", async () => {
     };
 
     before(async () => {
-        expect(anonymousClient).to.exist;
+        expect(anonymousClient).to.not.equal(undefined);
     });
 
     it("Invalid email verification token", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: "made-up-not-valid"
             }
         });
 
-        expect(response.errors != null).true;
-        expect(response.errors![0].message).to.equal("TOKEN_NOT_VALID");
+        if (response.errors == null) throw new Error("Expected error response");
+
+        expect(response.errors[0].message).to.equal("TOKEN_NOT_VALID");
     });
 
     it("Create users A & B", async function () {
@@ -45,41 +46,44 @@ describe("Email Verification Tests", async () => {
             "testB-emailVerification@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Login without validating email", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-emailVerification@test.datapm.io",
                 password: "passwordA!"
             }
         });
-        expect(response.errors != null).true;
-        expect(response.errors![0].message).equal("EMAIL_ADDRESS_NOT_VERIFIED");
+
+        if (response.errors == null) throw new Error("Expected error response");
+
+        expect(response.errors != null).equal(true);
+        expect(response.errors[0].message).equal("EMAIL_ADDRESS_NOT_VERIFIED");
     });
 
     it("Validate correct token", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: userAClient.emailVerificationToken
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("Validate correct token again", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: userAClient.emailVerificationToken
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 });

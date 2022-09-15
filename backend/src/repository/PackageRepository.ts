@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions, Repository, Brackets } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository, Brackets, SelectQueryBuilder } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";
@@ -53,7 +53,7 @@ async function findPackage(
 
     const catalog = await manager.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug: catalogSlug });
 
-    if (catalog == undefined) {
+    if (catalog === undefined) {
         throw new Error("CATALOG_NOT_FOUND: " + catalogSlug);
     }
     const options: FindOneOptions<PackageEntity> = {
@@ -102,6 +102,10 @@ export class PackageRepository extends Repository<PackageEntity> {
     }): Promise<[PackageEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
+        if (targetUser == null) {
+            throw new UserInputError("USER_NOT_FOUND " + username);
+        }
+
         const modifiedRelations = [...(relations || [])];
 
         if (!relations?.includes("catalog")) {
@@ -140,7 +144,7 @@ export class PackageRepository extends Repository<PackageEntity> {
     public createQueryBuilderWithUserConditions(
         user: UserEntity | undefined,
         permission: Permission = Permission.VIEW
-    ) {
+    ): SelectQueryBuilder<PackageEntity> {
         if (user != null) {
             return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
         }
@@ -148,7 +152,10 @@ export class PackageRepository extends Repository<PackageEntity> {
         return this.manager.getRepository(PackageEntity).createQueryBuilder().where(PUBLIC_PACKAGES_QUERY);
     }
 
-    public createQueryBuilderWithUserConditionsByUserId(userId: number, permission: Permission) {
+    public createQueryBuilderWithUserConditionsByUserId(
+        userId: number,
+        permission: Permission
+    ): SelectQueryBuilder<PackageEntity> {
         return this.manager
             .getRepository(PackageEntity)
             .createQueryBuilder()
@@ -242,9 +249,9 @@ export class PackageRepository extends Repository<PackageEntity> {
         return packageEntity;
     }
 
-    findPackages({ catalogId }: { catalogId: number }) {
+    findPackages({ catalogId }: { catalogId: number }): Promise<PackageEntity[]> {
         const PRODUCTS_ALIAS = "packages";
-        let query = this.manager
+        const query = this.manager
             .getRepository(PackageEntity)
             .createQueryBuilder(PRODUCTS_ALIAS)
             .where({ catalogId: catalogId });
@@ -252,7 +259,13 @@ export class PackageRepository extends Repository<PackageEntity> {
         return query.getMany();
     }
 
-    findPackageById({ packageId, relations = [] }: { packageId: number; relations?: string[] }) {
+    findPackageById({
+        packageId,
+        relations = []
+    }: {
+        packageId: number;
+        relations?: string[];
+    }): Promise<PackageEntity | null> {
         return findPackageById(this.manager, packageId, relations);
     }
 
@@ -270,7 +283,7 @@ export class PackageRepository extends Repository<PackageEntity> {
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlug({ slug: packageInput.catalogSlug });
 
-            if (catalog == undefined) {
+            if (catalog === undefined) {
                 throw new Error("CATALOG_NOT_FOUND: " + packageInput.catalogSlug);
             }
 
@@ -346,7 +359,7 @@ export class PackageRepository extends Repository<PackageEntity> {
                 throw new Error("PACKAGE_NOT_FOUND");
             }
 
-            if (packageInput.newCatalogSlug && packageInput.newCatalogSlug != packageEntity.catalog.slug) {
+            if (packageInput.newCatalogSlug && packageInput.newCatalogSlug !== packageEntity.catalog.slug) {
                 packageEntity.catalogId = (
                     await transaction
                         .getCustomRepository(CatalogRepository)
@@ -355,26 +368,26 @@ export class PackageRepository extends Repository<PackageEntity> {
                 propertiesEdited.push("catalogSlug");
             }
 
-            if (packageInput.newPackageSlug && packageInput.newPackageSlug != packageEntity.slug) {
+            if (packageInput.newPackageSlug && packageInput.newPackageSlug !== packageEntity.slug) {
                 packageEntity.slug = packageInput.newPackageSlug;
                 propertiesEdited.push("slug");
             }
 
-            if (packageInput.displayName && packageInput.displayName != packageEntity.displayName) {
+            if (packageInput.displayName && packageInput.displayName !== packageEntity.displayName) {
                 packageEntity.displayName = packageInput.displayName;
                 propertiesEdited.push("displayName");
             }
 
-            if (packageInput.description && packageInput.description != packageEntity.description) {
+            if (packageInput.description && packageInput.description !== packageEntity.description) {
                 packageEntity.description = packageInput.description;
                 propertiesEdited.push("description");
             }
 
-            if (packageInput.isPublic != null && packageInput.isPublic != packageEntity.isPublic) {
-                if (packageInput.isPublic == true && packageEntity.catalog.isPublic == false) {
+            if (packageInput.isPublic != null && packageInput.isPublic !== packageEntity.isPublic) {
+                if (packageInput.isPublic === true && packageEntity.catalog.isPublic === false) {
                     throw new Error("CATALOG_NOT_PUBLIC");
                 }
-                if (packageEntity.versions == null || packageEntity.versions.length == 0) {
+                if (packageEntity.versions == null || packageEntity.versions.length === 0) {
                     throw new Error("PACKAGE_HAS_NO_VERSIONS");
                 }
                 packageEntity.isPublic = packageInput.isPublic;
@@ -396,7 +409,10 @@ export class PackageRepository extends Repository<PackageEntity> {
         });
     }
 
-    async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeMarkdown: string | null | undefined) {
+    async updatePackageReadmeVectors(
+        identifier: PackageIdentifierInput,
+        readmeMarkdown: string | null | undefined
+    ): Promise<void> {
         validateIdentifier(identifier);
 
         await this.manager.nestedTransaction(async (transaction) => {
@@ -470,7 +486,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "PackageEntity";
 
         const queryArray = startsWith
-            .replace(process.env["REGISTRY_URL"] as string, "")
+            .replace(process.env.REGISTRY_URL as string, "")
             .trim()
             .toLowerCase()
             .split(/\s+/)

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { EntityRepository, Repository } from "typeorm";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { OrderBy } from "./OrderBy";

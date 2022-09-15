@@ -27,12 +27,16 @@ export async function resolveCatalogPermissions(
     context: Context,
     identifier: CatalogIdentifierInput,
     user?: UserEntity
-) {
+): Promise<Permission[]> {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     return resolveCatalogPermissionsForEntity(context, catalog, user);
 }
 
-export async function resolveCatalogPermissionsForEntity(context: Context, catalog: CatalogEntity, user?: UserEntity) {
+export async function resolveCatalogPermissionsForEntity(
+    context: Context,
+    catalog: CatalogEntity,
+    user?: UserEntity
+): Promise<Permission[]> {
     const permissions: Permission[] = [];
 
     if (catalog.isPublic) {
@@ -43,40 +47,38 @@ export async function resolveCatalogPermissionsForEntity(context: Context, catal
         return permissions;
     }
 
-    const userPermission = await getCatalogPermissionsFromCacheOrDb(context, catalog.id, user!.id);
+    const userPermission = await getCatalogPermissionsFromCacheOrDb(context, catalog.id, user.id);
 
-    const allPermissions =  permissions.concat(userPermission);
+    const allPermissions = permissions.concat(userPermission);
 
     return allPermissions.filter((v, i, a) => a.indexOf(v) === i);
-
 }
-
-
 
 export async function hasCatalogPermission(
     permission: Permission,
     context: Context,
     identifier: CatalogIdentifierInput
-): Promise<Boolean> {
-
+): Promise<boolean> {
     const isAuthenicatedContext = isAuthenticatedContext(context);
 
     // Check that the package exists
-    const permissions = await resolveCatalogPermissions(context, identifier,  isAuthenicatedContext ? (context as AuthenticatedContext).me : undefined);
+    const permissions = await resolveCatalogPermissions(
+        context,
+        identifier,
+        isAuthenicatedContext ? (context as AuthenticatedContext).me : undefined
+    );
 
     return permissions.includes(permission);
-   
 }
 
-export async function hasCatalogPermissionOrFail(    
+export async function hasCatalogPermissionOrFail(
     permission: Permission,
     context: Context,
     identifier: CatalogIdentifierInput
 ): Promise<true> {
-
     const hasPermissionBoolean = await hasCatalogPermission(permission, context, identifier);
 
-     if (hasPermissionBoolean) {
+    if (hasPermissionBoolean) {
         return true;
     }
 
@@ -87,13 +89,12 @@ export async function hasCatalogPermissionOrFail(
     }
 
     throw new ForbiddenError("NOT_AUTHORIZED");
-
 }
 
 export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
-    visitObject(object: GraphQLObjectType) {
+    visitObject(object: GraphQLObjectType): void {
         const fields = object.getFields();
-        for (let field of Object.values(fields)) {
+        for (const field of Object.values(fields)) {
             this.visitFieldDefinition(field);
         }
     }
@@ -101,15 +102,17 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
-        const permission = (argument
-            .astNode!.directives!.find((d) => d.name.value == "hasCatalogPermission")!
-            .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;
+        const permission = (argument.astNode?.directives
+            ?.find((d) => d.name.value === "hasCatalogPermission")
+            ?.arguments?.find((a) => a.name.value === "permission")?.value as EnumValueNode).value as Permission;
         details.field.resolve = async function (source, args, context: Context, info) {
             const identifier: CatalogIdentifierInput = args[argument.name];
             await self.validatePermission(context, identifier.catalogSlug, permission);
@@ -117,9 +120,10 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         const permission: Permission = this.args.permission;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         field.resolve = async function (source, args, context: Context, info) {
             const catalogSlug: string | undefined =
@@ -156,8 +160,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
         if (catalog.unclaimed) {
             return buildUnclaimedCatalogPermissions(context);
         } else {
-
-            if(isAuthenticatedContext(context)) {
+            if (isAuthenticatedContext(context)) {
                 const authenticatedContext = context as AuthenticatedContext;
                 return await resolveCatalogPermissionsForEntity(context, catalog, authenticatedContext.me);
             } else {

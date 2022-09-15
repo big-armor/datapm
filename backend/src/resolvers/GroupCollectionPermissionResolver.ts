@@ -47,7 +47,7 @@ export const groupCollectionPermissionEntityToGraphqlObject = async (
 };
 
 export const groupsByCollection = async (
-    _0: any,
+    _0: unknown,
     { collectionIdentifier }: { collectionIdentifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -69,7 +69,7 @@ export const groupsByCollection = async (
 };
 
 export const addOrUpdateGroupToCollection = async (
-    _0: any,
+    _0: unknown,
     {
         groupSlug,
         collectionIdentifier,
@@ -110,7 +110,7 @@ export const addOrUpdateGroupToCollection = async (
 };
 
 export const removeGroupFromCollection = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, collectionIdentifier }: { groupSlug: string; collectionIdentifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -149,7 +149,7 @@ export const removeGroupFromCollection = async (
 
 export const collectionPermissionsByGroupForUser = async (
     parent: Group,
-    _0: any,
+    _0: unknown,
     context: AuthenticatedContext,
     info: any
 ) => {

@@ -36,5 +36,4 @@ export class GroupPackagePermissionEntity extends EntityBaseModel {
 
     @Column({ name: "creator_id" })
     creatorId: number;
-
 }

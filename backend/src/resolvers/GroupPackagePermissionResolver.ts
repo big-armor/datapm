@@ -50,7 +50,7 @@ export const groupPackagePermissionEntityToGraphqlObject = async (
 };
 
 export const groupsByPackage = async (
-    _0: any,
+    _0: unknown,
     { packageIdentifier }: { packageIdentifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -67,7 +67,7 @@ export const groupsByPackage = async (
 };
 
 export const addOrUpdateGroupToPackage = async (
-    _0: any,
+    _0: unknown,
     {
         groupSlug,
         packageIdentifier,
@@ -103,7 +103,7 @@ export const addOrUpdateGroupToPackage = async (
 };
 
 export const removeGroupFromPackage = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, packageIdentifier }: { groupSlug: string; packageIdentifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -137,7 +137,7 @@ export const removeGroupFromPackage = async (
 
 export const packagePermissionsByGroupForUser = async (
     parent: Group,
-    _0: any,
+    _0: unknown,
     context: AuthenticatedContext,
     info: any
 ) => {

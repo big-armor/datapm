@@ -6,18 +6,18 @@ import { startPackageUpdateService, stopPackageUpdateService } from "./package-u
 
 const LEADER_KEY = "datapm-leader";
 
-
-
 export class LeaderElectionService {
-
     leader = false;
 
     continueAttempting = true;
 
-    constructor(private distributedLockingService: DistributedLockingService, private connection: Connection) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private distributedLockingService: DistributedLockingService, private connection: Connection) {
+        // nothing to do
+    }
 
-    async start() {
-        if (process.env["LEADER_ELECTION_DISABLED"] === "true") {
+    async start(): Promise<void> {
+        if (process.env.LEADER_ELECTION_DISABLED === "true") {
             console.log(
                 "LEADER_ELECTION_DISABLED is true. Not starting leader election, no background services will run on this instance."
             );
@@ -38,11 +38,9 @@ export class LeaderElectionService {
                 });
             }
         }
-
     }
 
-    async stop() {
-
+    async stop(): Promise<void> {
         this.continueAttempting = false;
 
         if (this.leader) {
@@ -51,12 +49,12 @@ export class LeaderElectionService {
         }
     }
 
-    startLeaderServices():void {
+    startLeaderServices(): void {
         startNotificationService(this.connection);
         startPackageUpdateService(this.connection);
     }
 
-    async stopLeaderServices() {
-        return Promise.all([stopNotificationService(), stopPackageUpdateService()]);
+    async stopLeaderServices(): Promise<void> {
+        await Promise.all([stopNotificationService(), stopPackageUpdateService()]);
     }
 }

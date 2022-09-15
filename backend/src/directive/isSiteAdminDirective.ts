@@ -5,14 +5,14 @@ import { GroupRepository } from "../repository/GroupRepository";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export class IsAdminDirective extends SchemaDirectiveVisitor {
-    visitObject(object: GraphQLObjectType) {
+    visitObject(object: GraphQLObjectType): void {
         const fields = object.getFields();
-        for (let field of Object.values(fields)) {
+        for (const field of Object.values(fields)) {
             this.visitFieldDefinition(field);
         }
     }
 
-    public visitFieldDefinition(field: GraphQLField<any, any>): void {
+    public visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
             if (!isAuthenticatedContext(context)) throw new AuthenticationError("NOT_AUTHENTICATED");
@@ -28,6 +28,7 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
     public visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }

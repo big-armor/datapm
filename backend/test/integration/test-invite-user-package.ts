@@ -9,16 +9,16 @@ import {
     Permission,
     SetPackagePermissionsDocument
 } from "./registry-client";
-import { mailObservable } from "./setup";
+import { MailDevEmail, mailObservable } from "./setup";
 import { createAnonymousClient, createTestClient, createUser } from "./test-utils";
 
 describe("Inviting Users", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let invitedUserClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
-    let emailVerificationToken: string = "";
+    let emailVerificationToken: string | undefined;
 
     before(async function () {
         userAClient = await createUser(
@@ -104,7 +104,7 @@ describe("Inviting Users", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS"))).not.equal(
+        expect(response.errors?.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS"))).not.equal(
             null
         );
     });
@@ -127,7 +127,7 @@ describe("Inviting Users", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_URL"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_URL"))).not.equal(null);
     });
 
     it("Should not allow HTML tag in message", async function () {
@@ -148,7 +148,7 @@ describe("Inviting Users", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_HTML_TAGS"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_HTML_TAGS"))).not.equal(null);
     });
 
     it("Should not allow messages longer than 250 characters", async function () {
@@ -169,22 +169,22 @@ describe("Inviting Users", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("MESSAGE_TOO_LONG"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("MESSAGE_TOO_LONG"))).not.equal(null);
     });
 
     it("Should send invite email", async function () {
-        let userCEmail: any = null;
-        let userDEmail: any = null;
-        let userBEmail: any = null;
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        let userCEmail: MailDevEmail | null = null;
+        let userDEmail: MailDevEmail | null = null;
+        let userBEmail: MailDevEmail | null = null;
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === "testB-invite-users@test.datapm.io") userBEmail = email;
                 else if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
                 else if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
 
                 if (userBEmail && userCEmail && userDEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -217,19 +217,19 @@ describe("Inviting Users", function () {
         expect(response.errors == null).equal(true);
 
         await verifyEmailPromise.then(() => {
-            expect(userBEmail.html).to.not.contain("{{");
-            expect(userBEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
-            expect(userBEmail.html).to.contain("/testA-invite-users/legislators-test");
+            expect(userBEmail?.html).to.not.contain("{{");
+            expect(userBEmail?.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userBEmail?.html).to.contain("/testA-invite-users/legislators-test");
 
-            expect(userCEmail.html).to.not.contain("{{");
-            emailVerificationToken = (userCEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
+            expect(userCEmail?.html).to.not.contain("{{");
+            emailVerificationToken = (userCEmail?.text as string).match(/\?token=([a-zA-z0-9-]+)/)?.pop();
             expect(emailVerificationToken != null).equal(true);
-            expect(userCEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userCEmail?.html).to.contain("Here is my message!@#$%^&*()-=+");
 
-            expect(userDEmail.html).to.not.contain("{{");
-            let emailDVerificationToken = (userDEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
+            expect(userDEmail?.html).to.not.contain("{{");
+            const emailDVerificationToken = (userDEmail?.text as string).match(/\?token=([a-zA-z0-9-]+)/)?.pop();
             expect(emailDVerificationToken != null).equal(true);
-            expect(userDEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userDEmail?.html).to.contain("Here is my message!@#$%^&*()-=+");
         });
     });
 
@@ -244,7 +244,7 @@ describe("Inviting Users", function () {
         });
 
         expect(response.errors != null).equal(true);
-        expect(response.errors!.find((e) => e.message.includes("USERNAME_NOT_AVAILABLE"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("USERNAME_NOT_AVAILABLE"))).not.equal(null);
     });
 
     it("Should not allow invalid token", async function () {
@@ -258,7 +258,7 @@ describe("Inviting Users", function () {
         });
 
         expect(response.errors != null).equal(true);
-        expect(response.errors!.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
     });
 
     it("Should allow user to accept invite", async function () {
@@ -286,7 +286,7 @@ describe("Inviting Users", function () {
         expect(response.errors == null).equal(true);
 
         invitedUserClient = createTestClient({
-            Authorization: "Bearer " + response.data!.login
+            Authorization: "Bearer " + response.data?.login
         });
 
         const whoAmIResponse = await invitedUserClient.query({
@@ -337,6 +337,6 @@ describe("Inviting Users", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
     });
 });

@@ -131,8 +131,8 @@ export class SessionCache {
     public async loadPackagePermissionsStatusById(
         id: number,
         permission: Permission,
-        permissionPromise: () => Promise<Boolean>
-    ): Promise<Boolean> {
+        permissionPromise: () => Promise<boolean>
+    ): Promise<boolean> {
         const cacheId = this.buildDataKeyForPackagePermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
@@ -164,8 +164,8 @@ export class SessionCache {
     public async loadCollectionPermissionsStatusById(
         id: number,
         permission: Permission,
-        permissionPromise: () => Promise<Boolean>
-    ): Promise<Boolean> {
+        permissionPromise: () => Promise<boolean>
+    ): Promise<boolean> {
         const cacheId = this.buildDataKeyForCollectionPermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }

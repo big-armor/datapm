@@ -1,10 +1,10 @@
-import { Readable, Stream, Writable } from "stream";
+import { Readable, Stream, Transform, Writable } from "stream";
 
 export class DpmStorageStreamHolder {
     private readonly OPEN_READ_STREAMS: Readable[] = [];
     private readonly OPEN_WRITE_STREAMS: Writable[] = [];
 
-    public copyToStream(readable: Readable, writable: Writable, transformer?: any): Promise<void> {
+    public copyToStream(readable: Readable, writable: Writable, transformer?: Transform): Promise<void> {
         this.registerWriteStream(writable);
         this.addPipesToDataStream(readable, writable, transformer);
 
@@ -39,7 +39,7 @@ export class DpmStorageStreamHolder {
         }
     }
 
-    private addPipesToDataStream(readable: Stream, writable: Writable, transformer: any): void {
+    private addPipesToDataStream(readable: Stream, writable: Writable, transformer?: Transform): void {
         if (transformer) {
             readable.pipe(transformer).pipe(writable);
         } else {

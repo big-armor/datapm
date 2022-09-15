@@ -1,8 +1,4 @@
-import {
-    PackageFile,
-    PublishMethod,
-    Source
-} from "datapm-lib";
+import { PackageFile, PublishMethod, Source } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
 import { AuthenticatedContext, Context } from "./../context";
@@ -36,11 +32,10 @@ export const versionEntityToGraphqlObject = async (
     connection: EntityManager | Connection,
     versionEntity: VersionEntity
 ): Promise<Version> => {
-    let packageSlug: string;
     let catalogSlug: string;
 
     const packageEntity = await getPackageFromCacheOrDbById(context, connection, versionEntity.packageId);
-    packageSlug = packageEntity.slug;
+    const packageSlug = packageEntity.slug;
 
     if (versionEntity.package?.catalog != null) {
         catalogSlug = versionEntity.package.catalog.slug;
@@ -53,7 +48,7 @@ export const versionEntityToGraphqlObject = async (
 
     return {
         identifier: {
-            registryURL: process.env["REGISTRY_URL"]!,
+            registryURL: process.env.REGISTRY_URL,
             catalogSlug: catalogSlug,
             packageSlug: packageSlug,
             versionMajor: versionEntity.majorVersion,
@@ -64,17 +59,17 @@ export const versionEntityToGraphqlObject = async (
 };
 
 export const createVersion = async (
-    _0: any,
+    _0: unknown,
     { identifier, value }: { identifier: PackageIdentifierInput; value: CreateVersionInput },
     context: AuthenticatedContext,
     info: GraphQLResolveInfo
-) => {
+): Promise<Version> => {
     const relations = getGraphQlRelationName(info);
     return createOrUpdateVersion(context, identifier, value, relations);
 };
 
 export const deleteVersion = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: VersionIdentifierInput },
     context: AuthenticatedContext
 ): Promise<void> => {
@@ -93,25 +88,30 @@ export const deleteVersion = async (
 };
 
 /** Return the unmodified original package file, only when the requester has EDIT permission */
-export const canonicalPackageFile = async (parent: any, _1: any, context: AuthenticatedContext): Promise<Maybe<PackageFile>> => {
-
-    if(context.me == null) {
+export const canonicalPackageFile = async (
+    parent: Version,
+    _1: unknown,
+    context: AuthenticatedContext
+): Promise<Maybe<PackageFile>> => {
+    if (context.me == null) {
         return null;
     }
 
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
-    const permissions = await context.connection.getCustomRepository(PackagePermissionRepository).findPackagePermissions({
-        userId: context.me.id,
-        packageId: packageEntity.id,
-    });
+    const permissions = await context.connection
+        .getCustomRepository(PackagePermissionRepository)
+        .findPackagePermissions({
+            userId: context.me.id,
+            packageId: packageEntity.id
+        });
 
-    if(permissions == null || permissions.permissions.includes(Permission.EDIT) === false) {
+    if (permissions == null || permissions.permissions.includes(Permission.EDIT) === false) {
         return null;
     }
 
-    let packageFile:PackageFile;
+    let packageFile: PackageFile;
     try {
         packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
             catalogSlug: packageEntity.catalog.slug,
@@ -120,7 +120,6 @@ export const canonicalPackageFile = async (parent: any, _1: any, context: Authen
             versionMinor: version.minorVersion,
             versionPatch: version.patchVersion
         });
-
     } catch (error) {
         if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
             throw new Error("PACKAGE_FILE_NOT_FOUND");
@@ -130,13 +129,18 @@ export const canonicalPackageFile = async (parent: any, _1: any, context: Authen
     }
 
     return packageFile;
-}
+};
 
-export const modifiedPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const modifiedPackageFile = async (
+    parent: Version,
+    _1: unknown,
+    context: AuthenticatedContext,
+    info: GraphQLResolveInfo
+): Promise<PackageFile> => {
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
-    let packageFile:PackageFile;
+    let packageFile: PackageFile;
     try {
         packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
             catalogSlug: packageEntity.catalog.slug,
@@ -145,7 +149,6 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
             versionMinor: version.minorVersion,
             versionPatch: version.patchVersion
         });
-
     } catch (error) {
         if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
             throw new Error("PACKAGE_FILE_NOT_FOUND");
@@ -154,20 +157,16 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
         throw error;
     }
     // Find this registry in the package file
-    const registry = (packageFile.registries || []).find(reg => reg.url === process.env.REGISTRY_URL);
-
+    const registry = (packageFile.registries || []).find((reg) => reg.url === process.env.REGISTRY_URL);
 
     const publishMethod = registry?.publishMethod || PublishMethod.SCHEMA_ONLY;
 
-    // If the publish method was to store data or proxy, 
+    // If the publish method was to store data or proxy,
     // then we need to replace the sources with the registry based source
-    if(publishMethod === PublishMethod.SCHEMA_AND_DATA) {
+    if (publishMethod === PublishMethod.SCHEMA_AND_DATA) {
         // This means that this registry contains the data, and therefore we need to replace the source with this registry
-        const registrySources: Source[] = packageFile.schemas.map<Source>(schema => {
-
-
-            if(schema.title == null)
-                throw new Error("SCHEMA_HAS_NO_TITLE");
+        const registrySources: Source[] = packageFile.schemas.map<Source>((schema) => {
+            if (schema.title == null) throw new Error("SCHEMA_HAS_NO_TITLE");
 
             return {
                 connectionConfiguration: {
@@ -188,35 +187,33 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
                             schemaSlug: schema.title
                         },
                         streamStats: {
-                            inspectedCount: 0,
+                            inspectedCount: 0
                         },
-                        updateMethods: 
-                            Array.from(packageFile.sources
-                                .flatMap(s => s.streamSets)
-                                .filter(s => s.schemaTitles.includes(schema.title!))
+                        updateMethods: Array.from(
+                            packageFile.sources
+                                .flatMap((s) => s.streamSets)
+                                .filter((s) => s.schemaTitles.includes(schema.title))
                                 .reduce((acc, s) => {
-                                    for(const u of s.updateMethods) {
-                                        acc.add(u)
+                                    for (const u of s.updateMethods) {
+                                        acc.add(u);
                                     }
                                     return acc;
                                 }, new Set<UpdateMethod>())
-                            )
-                                
-                        // TODO implement lastUpdateHash and stream stats by 
+                        )
+
+                        // TODO implement lastUpdateHash and stream stats by
                         // keeping an index of the records at data storage time in index.ts
                     }
                 ]
-            }
-            
+            };
         });
 
         packageFile.sources = registrySources;
 
         packageFile.canonical = false;
         packageFile.modifiedProperties = ["sources"];
-
-    } else if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
-        const registrySources: Source[] = packageFile.sources.map<Source>(source => {
+    } else if (publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        const registrySources: Source[] = packageFile.sources.map<Source>((source) => {
             return {
                 connectionConfiguration: {
                     url: process.env.REGISTRY_URL as string
@@ -228,15 +225,15 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
                     packageSlug: packageEntity.slug,
                     sourceSlug: source.slug
                 },
-                streamSets: source.streamSets.map(streamSet => {
+                streamSets: source.streamSets.map((streamSet) => {
                     return {
                         ...streamSet,
                         configuration: {
                             streamSetSlug: streamSet.slug
                         }
-                    }
+                    };
                 })
-            }
+            };
         });
 
         packageFile.sources = registrySources;
@@ -245,17 +242,15 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
     }
 
     return packageFile;
-
-
 };
 
 export const versionAuthor = async (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<User | null> => {
-    if (!(await hasPackagePermission( Permission.VIEW, context, parent.identifier ))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
 
@@ -266,20 +261,20 @@ export const versionAuthor = async (
 
 export const versionIdentifier = (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): VersionIdentifier => {
     return parent.identifier;
 };
 
 export const versionCreatedAt = async (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<Date | null> => {
-    if (!(await hasPackagePermission( Permission.VIEW, context, parent.identifier))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
 
@@ -290,29 +285,26 @@ export const versionCreatedAt = async (
 
 export const versionUpdateMethods = async (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<UpdateMethod[] | null> => {
-
-    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier ))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
 
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
 
-
     return version.updateMethods;
-
-}
+};
 
 export const versionUpdatedAt = async (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<Date | null> => {
-    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier ))) {
+    if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
 
@@ -323,9 +315,9 @@ export const versionUpdatedAt = async (
 
 export const versionPackage = async (
     parent: Version,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<Package | null> => {
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     return packageEntityToGraphqlObject(context, context.connection, version.package);
@@ -336,7 +328,7 @@ export const getPackageVersionFromCacheOrDbByIdentifier = async (
     identifier: VersionIdentifierInput,
     relations?: string[],
     forceReload?: boolean
-) => {
+): Promise<VersionEntity> => {
     const versionPromiseFunction = () =>
         context.connection.getCustomRepository(VersionRepository).findOneOrFail({ identifier, relations });
 

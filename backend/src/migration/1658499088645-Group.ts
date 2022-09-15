@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
 
@@ -92,15 +92,12 @@ ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_EDIT';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_ADDED';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_REMOVED';
 ALTER TYPE activity_log_event_type_enum ADD VALUE 'GROUP_MEMBER_PERMISSION_ADDED_UPDATED';
-`
+`;
 
 export class Group1658499088645 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

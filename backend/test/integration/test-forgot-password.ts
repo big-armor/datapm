@@ -3,13 +3,11 @@ import { expect } from "chai";
 import { ForgotMyPasswordDocument, RecoverMyPasswordDocument, LoginDocument } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
-import { mailObservable } from "./setup";
+import { MailDevEmail, mailObservable } from "./setup";
 import { v4 as uuid } from "uuid";
 
 describe("Forgot Password Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
-
-    before(async () => {});
 
     it("Create forgot password user A", async function () {
         userAClient = await createUser(
@@ -19,26 +17,29 @@ describe("Forgot Password Tests", async () => {
             "forgotpasswordA-user@test.datapm.io",
             "passwordA2!"
         );
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
     });
 
     it("User account doesn't exist, but returns successfully", async function () {
-        let user = await userAClient.mutate({
+        const user = await userAClient.mutate({
             mutation: ForgotMyPasswordDocument,
             variables: {
                 emailAddress: "does-not-exist-user@test.datapm.io"
             }
         });
-        expect(user.data!.forgotMyPassword).equal(null);
+        if (user.data == null) throw new Error("User data is null");
+        expect(user.data.forgotMyPassword).equal(null);
     });
 
-    it("SMTP fails to send", async function () {});
+    it("SMTP fails to send", async function () {
+        // TODO implement this
+    });
 
     it("Email sent contains no {{ (left over tokens not replaced)", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -61,10 +62,10 @@ describe("Forgot Password Tests", async () => {
     });
 
     it("Email sent actually contains a token and recovery token is valid", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -77,9 +78,9 @@ describe("Forgot Password Tests", async () => {
         await verifyEmailPromise.then((email) => {
             let token;
             const regex = /[a-zA-z0-9-]/g;
-            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            const emailForgotToken = (email.text as string).match(/\?token=([a-zA-z0-9-]+)/);
             if (emailForgotToken) token = regex.test(emailForgotToken[1]);
-            expect(emailForgotToken != null).true;
+            expect(emailForgotToken != null).equal(true);
             expect(token).to.equal(true);
         });
         return await verifyEmailPromise;
@@ -95,15 +96,18 @@ describe("Forgot Password Tests", async () => {
                 }
             }
         });
-        expect(recoverMyPasswordUser.errors! != null).true;
-        expect(recoverMyPasswordUser.errors![0].message).to.equal("TOKEN_NOT_VALID");
+
+        if (recoverMyPasswordUser.errors == null) throw new Error("recoverMyPasswordUser.errors is null");
+
+        expect(recoverMyPasswordUser.errors != null).equal(true);
+        expect(recoverMyPasswordUser.errors[0].message).to.equal("TOKEN_NOT_VALID");
     });
 
     it("Should use the token captured in the fortPassword integration test to attempt a correct validation", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -115,7 +119,7 @@ describe("Forgot Password Tests", async () => {
 
         const token = await verifyEmailPromise.then((email) => {
             let token;
-            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            const emailForgotToken = (email.text as string).match(/\?token=([a-zA-z0-9-]+)/);
             if (emailForgotToken) token = emailForgotToken[1];
             return token;
         });
@@ -129,15 +133,15 @@ describe("Forgot Password Tests", async () => {
                 }
             }
         });
-        expect(correctRecoveryToken.errors! == null).true;
+        expect(correctRecoveryToken.errors == null).equal(true);
         return await verifyEmailPromise;
     });
 
     it("Should validate that the users password has actually changed by using the login(..) mutation", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -148,7 +152,7 @@ describe("Forgot Password Tests", async () => {
         });
         const token = await verifyEmailPromise.then((email) => {
             let token;
-            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            const emailForgotToken = (email.text as string).match(/\?token=([a-zA-z0-9-]+)/);
             if (emailForgotToken) token = emailForgotToken[1];
             return token;
         });
@@ -163,7 +167,7 @@ describe("Forgot Password Tests", async () => {
             }
         });
 
-        let loginWithNewPassword = await userAClient.mutate({
+        const loginWithNewPassword = await userAClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "forgotpassword-user",
@@ -171,16 +175,16 @@ describe("Forgot Password Tests", async () => {
             }
         });
         await verifyEmailPromise;
-        expect(loginWithNewPassword.errors == null).true;
-        expect(loginWithNewPassword.data?.login).to.exist;
+        expect(loginWithNewPassword.errors == null).equal(true);
+        expect(loginWithNewPassword.data?.login).to.not.equal(undefined);
         return await verifyEmailPromise;
     });
 
     it("Should validate that the old password does not work after change", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -191,7 +195,7 @@ describe("Forgot Password Tests", async () => {
         });
         const token = await verifyEmailPromise.then((email) => {
             let token;
-            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            const emailForgotToken = (email.text as string).match(/\?token=([a-zA-z0-9-]+)/);
             if (emailForgotToken) token = emailForgotToken[1];
             return token;
         });
@@ -214,16 +218,18 @@ describe("Forgot Password Tests", async () => {
             }
         });
         await verifyEmailPromise;
-        expect(loginWithNewPassword.errors != null).true;
-        expect(loginWithNewPassword.errors![0].message).equal("WRONG_CREDENTIALS");
+
+        if (loginWithNewPassword.errors == null) throw new Error("loginWithNewPassword.errors is null");
+        expect(loginWithNewPassword.errors != null).equal(true);
+        expect(loginWithNewPassword.errors[0].message).equal("WRONG_CREDENTIALS");
         return await verifyEmailPromise;
     });
 
     it("Should validate that the token is no longer useable after a successful reset", async function () {
-        const verifyEmailPromise = new Promise<any>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<MailDevEmail>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 subscription.unsubscribe();
-                r(email);
+                resolve(email);
             });
         });
         await userAClient.mutate({
@@ -234,7 +240,7 @@ describe("Forgot Password Tests", async () => {
         });
         const token = await verifyEmailPromise.then((email) => {
             let token;
-            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            const emailForgotToken = (email.text as string).match(/\?token=([a-zA-z0-9-]+)/);
             if (emailForgotToken) token = emailForgotToken[1];
             return token;
         });
@@ -261,10 +267,11 @@ describe("Forgot Password Tests", async () => {
             }
         });
 
+        if (secondPasswordResetResponse.errors == null) throw new Error("secondPasswordResetResponse.errors is null");
         expect(secondPasswordResetResponse.errors != null, "has errors").to.equal(true);
-        expect(secondPasswordResetResponse.errors![0].message).to.equal("TOKEN_NOT_VALID");
+        expect(secondPasswordResetResponse.errors[0].message).to.equal("TOKEN_NOT_VALID");
 
-        let loginWithNewPassword = await userAClient.mutate({
+        const loginWithNewPassword = await userAClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "forgotpassword-user",
@@ -272,8 +279,8 @@ describe("Forgot Password Tests", async () => {
             }
         });
         await verifyEmailPromise;
-        expect(loginWithNewPassword.errors == null).true;
-        expect(loginWithNewPassword.data?.login).to.exist;
+        expect(loginWithNewPassword.errors == null).equal(true);
+        expect(loginWithNewPassword.data?.login).to.not.equal(undefined);
         return await verifyEmailPromise;
     });
 });

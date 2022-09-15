@@ -5,7 +5,10 @@ import { AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY } from "./CatalogRepository"
 
 @EntityRepository()
 export class GroupCatalogPermissionRepository {
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     async getCatalogPermissionsByUser({
         catalogId,

@@ -1,6 +1,6 @@
 import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
-import { Kind } from "graphql";
 import {
+    Kind,
     GraphQLField,
     defaultFieldResolver,
     GraphQLInputField,
@@ -9,6 +9,7 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType
 } from "graphql";
+
 import { Context } from "../context";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
@@ -19,6 +20,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
@@ -33,7 +35,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
             const emailAddress: string | undefined = args.emailAddress || args.value?.emailAddress || undefined;
@@ -54,18 +56,18 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateEmailAddress(emailAddress: string | undefined) {
+export function validateEmailAddress(emailAddress: string | undefined): void {
     const validEmailAddress = emailAddressValid(emailAddress);
 
-    if (validEmailAddress == "REQUIRED") {
+    if (validEmailAddress === "REQUIRED") {
         throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.REQUIRED);
     }
 
-    if (validEmailAddress == "TOO_LONG") {
+    if (validEmailAddress === "TOO_LONG") {
         throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.TOO_LONG);
     }
 
-    if (validEmailAddress == "INVALID_EMAIL_ADDRESS_FORMAT") {
+    if (validEmailAddress === "INVALID_EMAIL_ADDRESS_FORMAT") {
         throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.INVALID_EMAIL_ADDRESS_FORMAT);
     }
 }

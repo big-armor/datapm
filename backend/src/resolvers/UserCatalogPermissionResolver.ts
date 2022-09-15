@@ -21,7 +21,7 @@ import { deletePackageFollowsForUsersWithNoPermissions } from "./PackageResolver
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const setUserCatalogPermission = async (
-    _0: any,
+    _0: unknown,
     {
         identifier,
         value,
@@ -80,7 +80,7 @@ export const setUserCatalogPermission = async (
                     throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
                 }
             } else {
-                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                if (user.status === UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
                     existingUsers.push(user);
@@ -112,7 +112,7 @@ export const setUserCatalogPermission = async (
 };
 
 export const deleteUserCatalogPermissions = async (
-    _0: any,
+    _0: unknown,
     { identifier, usernameOrEmailAddress }: { identifier: CatalogIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {

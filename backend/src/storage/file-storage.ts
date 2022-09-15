@@ -1,5 +1,5 @@
 import { DPMStorage } from "./dpm-storage";
-import { Readable } from "stream";
+import { Readable, Transform } from "stream";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
 import sanitize from "sanitize-filename";
@@ -57,10 +57,15 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve(readStream);
     }
 
-    public async writeStream(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async writeStream(
+        namespace: string[],
+        itemId: string,
+        byteStream: Readable,
+        transformer?: Transform
+    ): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
         const path = this.buildPath(namespace, itemId);
-        const writeStream = fs.createWriteStream(path,{
+        const writeStream = fs.createWriteStream(path, {
             encoding: "utf8"
         });
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
@@ -77,28 +82,36 @@ export class FileStorage implements DPMStorage {
         });
     }
 
-
     public async listItems(namespace: string[]): Promise<string[]> {
         const basePath = this.buildBasePath(namespace);
-        if(!this.itemExistsInAbsolutePath(basePath)) {
+        if (!this.itemExistsInAbsolutePath(basePath)) {
             return [];
         }
 
-        return fs.readdirSync(basePath).map(f => {
-            const parts =  f.split(path.sep);
+        return fs.readdirSync(basePath).map((f) => {
+            const parts = f.split(path.sep);
             return parts[parts.length - 1];
         });
-
     }
 
-    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback?: any): Promise<void> {
-        const oldFileFinalPath = this.buildPath(oldNamespace,oldItemId);
+    public async moveFile(
+        oldNamespace: string[],
+        oldItemId: string,
+        newNamespace: string[],
+        newItemId: string,
+        callback?: (error: Error | undefined) => void
+    ): Promise<void> {
+        const oldFileFinalPath = this.buildPath(oldNamespace, oldItemId);
         if (!this.itemExistsInAbsolutePath(oldFileFinalPath)) {
             throw new Error(StorageErrors.FILE_DOES_NOT_EXIST + ": " + oldFileFinalPath);
         }
 
-        const newFileFinalPath = this.buildPath(newNamespace,newItemId);
-        return fs.move(oldFileFinalPath, newFileFinalPath, { overwrite: true }, callback);
+        const newFileFinalPath = this.buildPath(newNamespace, newItemId);
+        return fs.move(oldFileFinalPath, newFileFinalPath, { overwrite: true }, (error) => {
+            if (callback) {
+                callback(error);
+            }
+        });
     }
 
     public stop(): boolean {
@@ -132,7 +145,7 @@ export class FileStorage implements DPMStorage {
     }
 
     private buildBasePath(namespace: string[]): string {
-        const sanitizedNamespace = namespace.map(n => sanitize(n));
-        return [this.SCHEMA_URL,...sanitizedNamespace].join(path.sep);
+        const sanitizedNamespace = namespace.map((n) => sanitize(n));
+        return [this.SCHEMA_URL, ...sanitizedNamespace].join(path.sep);
     }
 }

@@ -9,8 +9,6 @@ import { loadPackageFileFromDisk, PackageFile, parsePackageFileJSON } from "data
 describe("Publish trival package changes", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create user A", async function () {
         userAClient = await createUser(
             "FirstA",
@@ -19,11 +17,11 @@ describe("Publish trival package changes", function () {
             "testA-publish-trivial-changes@test.datapm.io",
             "passwordA!"
         );
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -36,18 +34,18 @@ describe("Publish trival package changes", function () {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-publish-trivial-changes");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-publish-trivial-changes");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-publish-trivial-changes");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-publish-trivial-changes");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     let packageFile: PackageFile;
 
     it("For trivial changes test, user A publish old package file v0.1.0", async function () {
-        let packageFileContents = loadPackageFileFromDisk(
+        const packageFileContents = loadPackageFileFromDisk(
             "test/packageFiles/v0.1.0/congressional-legislators-schema-v0.1.0.datapm.json"
         );
 
@@ -73,10 +71,10 @@ describe("Publish trival package changes", function () {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-publish-trivial-changes");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-publish-trivial-changes");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         packageFile = parsePackageFileJSON(responsePackageFileContents);
     });
@@ -107,9 +105,9 @@ describe("Publish trival package changes", function () {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         packageFile = parsePackageFileJSON(responsePackageFileContents);
 

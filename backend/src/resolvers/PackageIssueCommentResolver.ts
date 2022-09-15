@@ -21,7 +21,7 @@ import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const getCommentsByByPackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -59,7 +59,12 @@ export const getCommentsByByPackageIssue = async (
     };
 };
 
-export const getPackageIssueCommentAuthor = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const getPackageIssueCommentAuthor = async (
+    parent: any,
+    _1: unknown,
+    context: AuthenticatedContext,
+    info: any
+) => {
     return await context.connection.getCustomRepository(UserRepository).findOneOrFail({
         where: { id: parent.authorId },
         relations: getGraphQlRelationName(info)
@@ -67,7 +72,7 @@ export const getPackageIssueCommentAuthor = async (parent: any, _1: any, context
 };
 
 export const createPackageIssueComment = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -118,7 +123,7 @@ export const createPackageIssueComment = async (
 };
 
 export const updatePackageIssueComment = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -162,7 +167,7 @@ export const updatePackageIssueComment = async (
 };
 
 export const deletePackageIssueComment = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -227,7 +232,6 @@ async function hasPermissionsToEditComment(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
@@ -242,7 +246,6 @@ function hasEditPermissionsForComment(
     packagePermissions: Permission[],
     context: Context
 ): boolean {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
@@ -252,7 +255,6 @@ function hasEditPermissionsForComment(
     if (packagePermissions.includes(Permission.MANAGE)) {
         return true;
     }
-
 
     return commentEntity.authorId === authenicatedContext.me.id;
 }

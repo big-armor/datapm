@@ -22,14 +22,19 @@ import { UserEntity } from "../entity/UserEntity";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { sendUserSuspendedEmail } from "../util/smtpUtil";
 import { Connection, EntityManager } from "typeorm";
+import { GraphQLResolveInfo } from "graphql";
 
 const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
-    _0: any,
+    _0: unknown,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    hasMore: boolean;
+    users: UserEntity[];
+    count: number;
+}> => {
     const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
@@ -43,11 +48,15 @@ export const searchUsers = async (
 };
 
 export const adminSearchUsers = async (
-    _0: any,
+    _0: unknown,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    hasMore: boolean;
+    users: UserEntity[];
+    count: number;
+}> => {
     const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
@@ -61,18 +70,18 @@ export const adminSearchUsers = async (
 };
 
 export const adminSetUserStatus = async (
-    _0: any,
+    _0: unknown,
     { username, status, message }: { username: string; status: UserStatus; message?: string | undefined | null },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
         const targetUser = await getUserByUsernameOrFail({
             username,
             manager: transaction
         });
 
-        if (UserStatus.SUSPENDED == status) {
+        if (UserStatus.SUSPENDED === status) {
             sendUserSuspendedEmail(targetUser, message || "");
         }
 
@@ -88,19 +97,23 @@ export const adminSetUserStatus = async (
 };
 
 export const emailAddressAvailable = async (
-    _0: any,
+    _0: unknown,
     { emailAddress }: { emailAddress: string },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<boolean> => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByEmail(emailAddress);
 
-    if (user != null && user.status == UserStatus.PENDING_SIGN_UP) return true;
+    if (user != null && user.status === UserStatus.PENDING_SIGN_UP) return true;
 
     return user == null;
 };
 
-export const usernameAvailable = async (_0: any, { username }: { username: string }, context: Context) => {
+export const usernameAvailable = async (
+    _0: unknown,
+    { username }: { username: string },
+    context: Context
+): Promise<boolean> => {
     ReservedKeywordsService.validateReservedKeyword(username);
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
@@ -112,17 +125,17 @@ export const usernameAvailable = async (_0: any, { username }: { username: strin
 };
 
 export const createMe = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: CreateUserInput },
     context: AuthenticatedContext,
-    info: any
-) => {
-    if ((await emailAddressAvailable(_0, { emailAddress: value.emailAddress }, context, info)) == false) {
+    info: GraphQLResolveInfo
+): Promise<void> => {
+    if ((await emailAddressAvailable(_0, { emailAddress: value.emailAddress }, context, info)) === false) {
         FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
         throw new ValidationError("EMAIL_ADDRESS_NOT_AVAILABLE");
     }
 
-    if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
+    if ((await usernameAvailable(_0, { username: value.username }, context)) === false) {
         FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
@@ -152,11 +165,11 @@ export const createMe = async (
 };
 
 export const setAsAdmin = async (
-    _0: any,
+    _0: unknown,
     { username, isAdmin }: { username: string; isAdmin: boolean },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return await context.connection.manager.getCustomRepository(UserRepository).updateUserAdminStatus({
         username,
         isAdmin
@@ -164,10 +177,10 @@ export const setAsAdmin = async (
 };
 
 export const updateMe = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: UpdateUserInput },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<CurrentUser> => {
     const user = await context.connection.transaction(async (transaction) => {
         await createActivityLog(transaction, {
@@ -192,11 +205,11 @@ export const updateMe = async (
 };
 
 export const forgotMyPassword = async (
-    _0: any,
+    _0: unknown,
     { emailAddress }: { emailAddress: string },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByLogin(emailAddress);
 
     // return a "fake" successful resolve if user not found
@@ -208,22 +221,22 @@ export const forgotMyPassword = async (
 };
 
 export const recoverMyPassword = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: RecoverMyPasswordInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     await context.connection.manager.getCustomRepository(UserRepository).recoverMyPassword({
         value
     });
 };
 
 export const updateMyPassword = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: UpdateMyPasswordInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const user = await context.connection.manager
         .getCustomRepository(UserRepository)
         .getUserByLogin(context.me.username, getGraphQlRelationName(info));
@@ -233,7 +246,7 @@ export const updateMyPassword = async (
     }
 
     const oldPasswordHash = hashPassword(value.oldPassword, user.passwordSalt);
-    if (oldPasswordHash != user.passwordHash) {
+    if (oldPasswordHash !== user.passwordHash) {
         throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
@@ -246,33 +259,38 @@ export const updateMyPassword = async (
 };
 
 export const setMyCoverImage = async (
-    _0: any,
+    _0: unknown,
     { image }: { image: Base64ImageUpload },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.id, image.base64);
 };
 
 export const setMyAvatarImage = async (
-    _0: any,
+    _0: unknown,
     { image }: { image: Base64ImageUpload },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<void> => {
     return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.id, image.base64);
 };
 
-export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+export const deleteMe = async (
+    _0: unknown,
+    _1: unknown,
+    context: AuthenticatedContext,
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return await deleteUserAndLogAction(context.me.username, context);
 };
 
 export const adminDeleteUser = async (
-    _0: any,
+    _0: unknown,
     { usernameOrEmailAddress }: { usernameOrEmailAddress: string },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return await deleteUserAndLogAction(usernameOrEmailAddress, context);
 };
 
@@ -297,10 +315,10 @@ const deleteUserAndLogAction = async (usernameOrEmailAddress: string, context: A
 };
 
 export const acceptInvite = async (
-    _0: any,
+    _0: unknown,
     { username, token, password }: { username: string; token: string; password: string },
     context: Context,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
         const user = await transaction.getCustomRepository(UserRepository).findByEmailValidationToken(token);
@@ -309,7 +327,7 @@ export const acceptInvite = async (
             throw new UserInputError("TOKEN_NOT_VALID");
         }
 
-        if ((await usernameAvailable(_0, { username: username }, context)) == false) {
+        if ((await usernameAvailable(_0, { username: username }, context)) === false) {
             throw new ValidationError("USERNAME_NOT_AVAILABLE");
         }
 
@@ -333,7 +351,7 @@ export const getUserFromCacheOrDbById = async (
     connection: EntityManager | Connection,
     id: number,
     relations: string[] = []
-) => {
+): Promise<UserEntity> => {
     const userPromiseFunction = () =>
         connection.getCustomRepository(UserRepository).findOneOrFail({
             where: { id },
@@ -343,8 +361,12 @@ export const getUserFromCacheOrDbById = async (
     return context.cache.loadUser(id, userPromiseFunction);
 };
 
-export const getUserFromCacheOrDbByUsername = async (context: Context, username: string, relations: string[] = []) => {
+export const getUserFromCacheOrDbByUsername = async (
+    context: Context,
+    username: string,
+    relations: string[] = []
+): Promise<UserEntity> => {
     const userPromiseFunction = () =>
-        context.connection.getCustomRepository(UserRepository).findUserByUserName({ username, relations });
+        context.connection.getCustomRepository(UserRepository).findUserByUserNameOrFail({ username, relations });
     return context.cache.loadUserByUsername(username, userPromiseFunction);
 };

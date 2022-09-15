@@ -5,18 +5,18 @@ import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../gene
 import { getEnvVariable } from "./getEnvVariable";
 
 export interface Identifier {
-    catalogSlug: String;
-    packageSlug: String;
+    catalogSlug: string;
+    packageSlug: string;
     version: {
         majorVersion: number;
         minorVersion: number;
         patchVersion: number;
     };
-    attributeSlug: String;
-    enumerationSlug: String;
+    attributeSlug: string;
+    enumerationSlug: string;
 }
 
-export function parseIdentifierString(identifier: String) {
+export function parseIdentifierString(identifier: string): void {
     const parts = identifier.split("/");
     const returnValue = {} as Identifier;
 

@@ -17,12 +17,14 @@ export class ValidateMarkdownDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
         const maxLength = this.args.maxLength;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const markdown: string | undefined = args.content || args.value?.content || undefined;
@@ -36,7 +38,7 @@ export class ValidateMarkdownDirective extends SchemaDirectiveVisitor {
         _details: {
             objectType: GraphQLInputObjectType;
         }
-    ) {
+    ): void {
         field.type = ValidationType.create(field.type, new MarkdownConstraint());
     }
 }
@@ -55,7 +57,7 @@ class MarkdownConstraint implements ValidationConstraint {
     }
 }
 
-function validateMarkdown(markdown: string | undefined, maxLength: number = 50000): void {
+function validateMarkdown(markdown: string | undefined, maxLength = 50000): void {
     if (!markdown) {
         throw new Error("No markdown provided");
     } else if (markdown.length > maxLength) {

@@ -33,9 +33,12 @@ import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 import { getUserFromCacheOrDbById, getUserFromCacheOrDbByUsername } from "./UserResolver";
-import { Connection, EntityManager } from "typeorm";
+import { Connection, DeleteResult, EntityManager } from "typeorm";
 import { deleteFollowsByIds, getCollectionFollowsByCollectionId } from "./FollowResolver";
 import { isAuthenticatedContext } from "../util/contextHelpers";
+import { UserCollectionPermissionEntity } from "../entity/UserCollectionPermissionEntity";
+import { CollectionIdentifier, Package, User, UserCollectionPermissions } from "datapm-client-lib";
+import { GraphQLResolveInfo } from "graphql";
 
 export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
     if (!collectionEntity) {
@@ -54,23 +57,21 @@ export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): C
 };
 
 export const collectionSlugAvailable = async (
-    _0: any,
+    _0: unknown,
     { collectionSlug }: { collectionSlug: string },
     context: Context
-) => {
+): Promise<boolean> => {
     const isReservedKeyword = ReservedKeywordsService.isReservedKeyword(collectionSlug);
     if (isReservedKeyword) {
         return false;
     }
 
     try {
-
-        const collection = await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionSlug)
+        const collection = await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionSlug);
 
         return collection == null;
-        
     } catch (e) {
-        if(e.message.includes("NOT_FOUND")) {
+        if (e.message.includes("NOT_FOUND")) {
             return true;
         }
         throw e;
@@ -78,11 +79,11 @@ export const collectionSlugAvailable = async (
 };
 
 export const usersByCollection = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<UserCollectionPermissions[]> => {
     const relations = getGraphQlRelationName(info);
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
@@ -96,11 +97,11 @@ export const usersByCollection = async (
 };
 
 export const createCollection = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: CreateCollectionInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Collection> => {
     ReservedKeywordsService.validateReservedKeyword(value.collectionSlug);
     const repository = context.connection.manager.getCustomRepository(CollectionRepository);
 
@@ -129,24 +130,24 @@ export const createCollection = async (
 };
 
 export const updateCollection = async (
-    _0: any,
+    _0: unknown,
     { identifier, value }: { identifier: CollectionIdentifierInput; value: UpdateCollectionInput },
     context: AuthenticatedContext,
-    info: any
-) => {
-    const collection =  context.connection.transaction(async (transaction) => {
+    info: GraphQLResolveInfo
+): Promise<Collection> => {
+    const collection = context.connection.transaction(async (transaction) => {
         const repository = transaction.getCustomRepository(CollectionRepository);
         const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
 
         if (
             value.isPublic != null &&
-            value.isPublic != collection.isPublic &&
+            value.isPublic !== collection.isPublic &&
             !(await hasCollectionPermissions(context, collection, Permission.MANAGE))
         ) {
             throw new ValidationError("NOT_AUTHORIZED - must be manager to change public status");
         }
 
-        if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
+        if (value.newCollectionSlug && identifier.collectionSlug !== value.newCollectionSlug) {
             ReservedKeywordsService.validateReservedKeyword(value.newCollectionSlug);
             const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);
             if (existingCollection) {
@@ -190,7 +191,7 @@ export const updateCollection = async (
 export const deleteCollectionFollowsForUsersWithNoPermissions = async (
     collectionId: number,
     manager: EntityManager
-) => {
+): Promise<DeleteResult> => {
     const packagePermissions = await getAllCollectionPermissions(manager, collectionId);
     const follows = await getCollectionFollowsByCollectionId(collectionId, manager);
 
@@ -203,11 +204,15 @@ export const deleteCollectionFollowsForUsersWithNoPermissions = async (
 };
 
 export const myCollections = async (
-    _0: any,
+    _0: unknown,
     { limit, offSet }: { limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    collections: Collection[];
+    hasMore: boolean;
+    count: number;
+}> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(CollectionRepository)
@@ -221,11 +226,11 @@ export const myCollections = async (
 };
 
 export const collectionPackages = async (
-    _0: any,
+    _0: unknown,
     { identifier, limit, offset }: { identifier: CollectionIdentifierInput; limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Package[]> => {
     const user = await context.connection.manager
         .getCustomRepository(UserRepository)
         .getUserByUsername(context.me?.username);
@@ -242,15 +247,15 @@ export const collectionPackages = async (
         .getCustomRepository(CollectionPackageRepository)
         .collectionPackages(user.id, collectionEntity.id, limit, offset, relations);
 
-    return entities.map((e) => packageEntityToGraphqlObject(context, context.connection, e));
+    return entities.asyncMap((e) => packageEntityToGraphqlObject(context, context.connection, e));
 };
 
 export const setCollectionCoverImage = async (
-    _0: any,
+    _0: unknown,
     { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -260,11 +265,11 @@ export const setCollectionCoverImage = async (
 };
 
 export const deleteCollection = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
         const collectionEntity = await getCollectionFromCacheOrDbOrFail(
             context,
@@ -283,13 +288,13 @@ export const deleteCollection = async (
 };
 
 export const addPackageToCollection = async (
-    _0: any,
+    _0: unknown,
     {
         collectionIdentifier,
         packageIdentifier
     }: { collectionIdentifier: CollectionIdentifierInput; packageIdentifier: PackageIdentifierInput },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<CollectionPackage> => {
     const repository = context.connection.manager.getCustomRepository(CollectionRepository);
     const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);
@@ -314,7 +319,7 @@ export const addPackageToCollection = async (
         .getCustomRepository(CollectionPackageRepository)
         .findByCollectionIdAndPackageId(collectionEntity.id, packageEntity.id, relations);
 
-    if (value == undefined)
+    if (value == null)
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
     collectionEntity.updatedAt = new Date();
@@ -327,6 +332,9 @@ export const addPackageToCollection = async (
         targetPackageId: packageEntity.id
     });
 
+    if (process.env.REGISTRY_URL == null) {
+        throw new Error("REGISTRY_URL environment variable not set!");
+    }
     return {
         collection: {
             identifier: {
@@ -335,7 +343,7 @@ export const addPackageToCollection = async (
         },
         package: {
             identifier: {
-                registryURL: process.env["REGISTRY_URL"]!,
+                registryURL: process.env.REGISTRY_URL,
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug
             }
@@ -344,14 +352,14 @@ export const addPackageToCollection = async (
 };
 
 export const removePackageFromCollection = async (
-    _0: any,
+    _0: unknown,
     {
         collectionIdentifier,
         packageIdentifier
     }: { collectionIdentifier: CollectionIdentifierInput; packageIdentifier: PackageIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -374,7 +382,12 @@ export const removePackageFromCollection = async (
     });
 };
 
-export const findCollectionsForAuthenticatedUser = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+export const findCollectionsForAuthenticatedUser = async (
+    _0: unknown,
+    _1: unknown,
+    context: AuthenticatedContext,
+    info: GraphQLResolveInfo
+): Promise<Collection[]> => {
     const relations = getGraphQlRelationName(info);
     const collectionEntities = await context.connection.manager
         .getCustomRepository(CollectionRepository)
@@ -384,10 +397,10 @@ export const findCollectionsForAuthenticatedUser = async (_0: any, {}, context: 
 };
 
 export const findCollectionBySlug = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<Collection> => {
     return context.connection.transaction(async (transaction) => {
         const relations = getGraphQlRelationName(info);
@@ -409,18 +422,18 @@ export const findCollectionBySlug = async (
         return {
             identifier: {
                 collectionSlug: collectionEntity.collectionSlug,
-                registryURL: process.env["REGISTRY_URL"]
+                registryURL: process.env.REGISTRY_URL
             }
         };
     });
 };
 
 export const getPackageCollections = async (
-    _0: any,
+    _0: unknown,
     { packageIdentifier, limit, offset }: { packageIdentifier: PackageIdentifierInput; limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{ collections: Collection[]; hasMore: boolean; count: number }> => {
     const relations = getGraphQlRelationName(info);
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
@@ -437,11 +450,15 @@ export const getPackageCollections = async (
 };
 
 export const searchCollections = async (
-    _0: any,
+    _0: unknown,
     { query, limit, offset }: { query: string; limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    collections: Collection[];
+    hasMore: boolean;
+    count: number;
+}> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(CollectionRepository)
@@ -455,11 +472,15 @@ export const searchCollections = async (
 };
 
 export const userCollections = async (
-    _0: any,
+    _0: unknown,
     { username, limit, offSet }: { username: string; limit: number; offSet: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    collections: Collection[];
+    hasMore: boolean;
+    count: number;
+}> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(CollectionRepository)
@@ -472,20 +493,23 @@ export const userCollections = async (
     };
 };
 
-export const myPermissions = async (parent: Collection, _0: any, context: Context) => {
-
+export const myPermissions = async (parent: Collection, _0: unknown, context: Context): Promise<Permission[]> => {
     const username = isAuthenticatedContext(context) ? (context as AuthenticatedContext).me.username : undefined;
 
     return userCollectionPermissions(
         context,
         {
-            collectionSlug: parent.identifier.collectionSlug!
+            collectionSlug: parent.identifier.collectionSlug
         },
         username
     );
 };
 
-export const collectionIdentifier = async (parent: Collection, _1: any, context: Context) => {
+export const collectionIdentifier = async (
+    parent: Collection,
+    _1: unknown,
+    context: Context
+): Promise<CollectionIdentifier> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -504,7 +528,12 @@ export const collectionIdentifier = async (parent: Collection, _1: any, context:
     };
 };
 
-export const collectionCreator = async (parent: Collection, _1: any, context: Context, info: any) => {
+export const collectionCreator = async (
+    parent: Collection,
+    _1: unknown,
+    context: Context,
+    info: GraphQLResolveInfo
+): Promise<User | null> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -525,9 +554,9 @@ export const collectionCreator = async (parent: Collection, _1: any, context: Co
 
 export const collectionIsPublic = async (
     parent: Collection,
-    _1: any,
+    _1: unknown,
     context: Context,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<boolean> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
@@ -539,9 +568,9 @@ export const collectionIsPublic = async (
 
 export const collectionIsRecommended = async (
     parent: Collection,
-    _1: any,
+    _1: unknown,
     context: Context,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<boolean> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
@@ -551,7 +580,11 @@ export const collectionIsRecommended = async (
     return collectionEntity.isRecommended;
 };
 
-export const collectionDescription = async (parent: Collection, _1: any, context: Context): Promise<string | null> => {
+export const collectionDescription = async (
+    parent: Collection,
+    _1: unknown,
+    context: Context
+): Promise<string | null> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -564,7 +597,7 @@ export const collectionDescription = async (parent: Collection, _1: any, context
     return collectionEntity.description || null;
 };
 
-export const collectionCreatedAt = async (parent: Collection, _1: any, context: Context): Promise<Date | null> => {
+export const collectionCreatedAt = async (parent: Collection, _1: unknown, context: Context): Promise<Date | null> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -577,7 +610,7 @@ export const collectionCreatedAt = async (parent: Collection, _1: any, context: 
     return collectionEntity.createdAt || null;
 };
 
-export const collectionUpdatedAt = async (parent: Collection, _1: any, context: Context): Promise<Date | null> => {
+export const collectionUpdatedAt = async (parent: Collection, _1: unknown, context: Context): Promise<Date | null> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -590,7 +623,7 @@ export const collectionUpdatedAt = async (parent: Collection, _1: any, context: 
     return collectionEntity.updatedAt || null;
 };
 
-export const collectionName = async (parent: Collection, _1: any, context: Context) => {
+export const collectionName = async (parent: Collection, _1: unknown, context: Context): Promise<string> => {
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
@@ -636,11 +669,15 @@ export const userCollectionPermissions = async (
 };
 
 export const getLatestCollections = async (
-    _0: any,
+    _0: unknown,
     { limit, offset }: { limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<{
+    collections: Collection[];
+    hasMore: boolean;
+    count: number;
+}> => {
     const relations = getGraphQlRelationName(info);
     const [collections, count] = await context.connection.manager
         .getCustomRepository(CollectionRepository)
@@ -654,10 +691,10 @@ export const getLatestCollections = async (
 };
 
 export const getMyRecentlyViewedPackages = async (
-    _0: any,
+    _0: unknown,
     { limit, offset }: { limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<ActivityLogResult> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
@@ -675,7 +712,7 @@ export const getCollectionFromCacheOrDbById = async (
     context: Context,
     connection: EntityManager | Connection,
     id: number
-) => {
+): Promise<CollectionEntity> => {
     const collectionPromiseFunction = () => connection.getCustomRepository(CollectionRepository).findOneOrFail({ id });
     return await context.cache.loadCollection(id, collectionPromiseFunction);
 };
@@ -685,7 +722,7 @@ export const getCollectionFromCacheOrDbOrFail = async (
     connection: EntityManager | Connection,
     slug: string,
     relations: string[] = []
-) => {
+): Promise<CollectionEntity> => {
     const collectionPromiseFunction = () =>
         connection.getCustomRepository(CollectionRepository).findCollectionBySlugOrFail(slug, relations);
 

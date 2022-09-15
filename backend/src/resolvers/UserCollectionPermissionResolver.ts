@@ -27,7 +27,7 @@ export const hasCollectionPermissions = async (
     collection: CollectionEntity,
     permission: Permission
 ) => {
-    if (permission == Permission.VIEW) {
+    if (permission === Permission.VIEW) {
         if (collection?.isPublic) return true;
     }
 
@@ -61,7 +61,7 @@ export const setPermissionsForUser = async (
 };
 
 export const setUserCollectionPermissions = async (
-    _0: any,
+    _0: unknown,
     {
         identifier,
         value,
@@ -121,7 +121,7 @@ export const setUserCollectionPermissions = async (
                     throw new ValidationError("USER_NOT_FOUND - " + userCollectionPermission.usernameOrEmailAddress);
                 }
             } else {
-                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                if (user.status === UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
                     existingUsers.push(user);
@@ -158,7 +158,7 @@ export const setUserCollectionPermissions = async (
 };
 
 export const deleteUserCollectionPermissions = async (
-    _0: any,
+    _0: unknown,
     { identifier, usernameOrEmailAddress }: { identifier: CollectionIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {

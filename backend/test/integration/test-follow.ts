@@ -44,8 +44,8 @@ describe("Follow Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Making public package private removes package and package issues follows of users without permisisons", async function () {
@@ -77,7 +77,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -255,7 +255,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -470,7 +470,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -665,7 +665,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -860,7 +860,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -1053,7 +1053,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -1283,7 +1283,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -1482,7 +1482,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -1662,7 +1662,7 @@ describe("Follow Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({

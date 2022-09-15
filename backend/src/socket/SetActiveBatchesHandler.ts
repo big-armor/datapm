@@ -1,35 +1,43 @@
-import {BatchRepositoryIdentifier, Response, SetStreamActiveBatchesRequest, SetStreamActiveBatchesResponse } from "datapm-lib";
+import {
+    BatchRepositoryIdentifier,
+    Response,
+    SetStreamActiveBatchesRequest,
+    SetStreamActiveBatchesResponse
+} from "datapm-lib";
 import { EventEmitter } from "stream";
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
-import SocketIO from 'socket.io';
+import SocketIO from "socket.io";
 import { AuthenticatedSocketContext } from "../context";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 
-export class SetActiveBatchesHandler extends EventEmitter implements RequestHandler{
-
-
+export class SetActiveBatchesHandler extends EventEmitter implements RequestHandler {
     constructor(
         private request: SetStreamActiveBatchesRequest,
         private socket: SocketIO.Socket,
-        private socketContext:AuthenticatedSocketContext
+        private socketContext: AuthenticatedSocketContext
     ) {
         super();
     }
 
     async start(callback: (response: Response) => void): Promise<void> {
-        
         const batchIdentifiers = this.request.batchIdentifiers;
 
         await this.socketContext.connection.transaction(async (entityManager) => {
-
             await batchIdentifiers.asyncForEach(async (batchIdentifier: BatchRepositoryIdentifier) => {
-              
-                const packageEntity = await entityManager.getCustomRepository(PackageRepository).findPackageOrFail({identifier: batchIdentifier});
+                const packageEntity = await entityManager
+                    .getCustomRepository(PackageRepository)
+                    .findPackageOrFail({ identifier: batchIdentifier });
 
-                await checkPackagePermission(this.socket, this.socketContext, callback, batchIdentifier, Permission.EDIT);
+                await checkPackagePermission(
+                    this.socket,
+                    this.socketContext,
+                    callback,
+                    batchIdentifier,
+                    Permission.EDIT
+                );
 
                 const dataBatchEntity = await this.socketContext.connection
                     .getCustomRepository(DataBatchRepository)
@@ -42,11 +50,13 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
                         batchIdentifier.streamSlug,
                         batchIdentifier.schemaTitle,
                         batchIdentifier.batch
-                        );
+                    );
 
-                const currentlyActiveBatch = await entityManager.getCustomRepository(DataBatchRepository).findDefaultBatch({identifier: batchIdentifier});
-                
-                if(currentlyActiveBatch) {
+                const currentlyActiveBatch = await entityManager
+                    .getCustomRepository(DataBatchRepository)
+                    .findDefaultBatch({ identifier: batchIdentifier });
+
+                if (currentlyActiveBatch) {
                     currentlyActiveBatch.default = false;
                     await entityManager.save(currentlyActiveBatch);
                 }
@@ -65,18 +75,13 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
                         priorActiveBatch: currentlyActiveBatch?.batch
                     }
                 });
-
             });
-
-
         });
 
-
-        callback(new SetStreamActiveBatchesResponse(batchIdentifiers))
-
+        callback(new SetStreamActiveBatchesResponse(batchIdentifiers));
     }
+
     stop(reason: "server" | "client" | "disconnect"): Promise<void> {
         throw new Error("Method not implemented.");
     }
-
 }

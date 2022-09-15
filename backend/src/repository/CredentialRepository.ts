@@ -9,8 +9,6 @@ import { RepositoryRepository } from "./RepositoryRepository";
 
 @EntityRepository(CredentialEntity)
 export class CredentialRepository extends Repository<CredentialEntity> {
-
-    
     async repositoryCredentials({
         repositoryEntity,
         relations = []
@@ -18,11 +16,8 @@ export class CredentialRepository extends Repository<CredentialEntity> {
         repositoryEntity: RepositoryEntity;
         relations?: string[];
     }): Promise<CredentialEntity[]> {
-
         const response = await this.createQueryBuilder()
-            .where(
-                `("CredentialEntity".repository_id = :repositoryId)`
-            )
+            .where(`("CredentialEntity".repository_id = :repositoryId)`)
             .setParameter("repositoryId", repositoryEntity.id)
             .addRelations("CredentialEntity", relations)
             .getMany();
@@ -30,40 +25,47 @@ export class CredentialRepository extends Repository<CredentialEntity> {
         return response;
     }
 
+    public async deleteCredential(
+        identifier: PackageIdentifierInput,
+        connectorType: string,
+        repositoryIdentifier: string,
+        credentialIdentifier: string
+    ): Promise<void> {
+        const credential = await this.findCredential(
+            identifier,
+            connectorType,
+            repositoryIdentifier,
+            credentialIdentifier
+        );
 
-    public async deleteCredential(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<void> {
-
-        const credential = await this.findCredential(identifier, connectorType, repositoryIdentifier, credentialIdentifier);
-
-        if(credential == null)
-            throw new Error("CREDENTIALS_NOT_FOUND");
-
+        if (credential == null) throw new Error("CREDENTIALS_NOT_FOUND");
 
         await this.manager.nestedTransaction(async (transaction) => {
             await this.manager.getRepository(CredentialEntity).delete(credential.id);
         });
-
-
     }
 
-
-    public async createOrUpdateCredential(repositoryEntity: RepositoryEntity, connectorType: string, repositoryIdentifier: string, credentialIdentifier: string, encryptedCredential: string, creator: UserEntity): Promise<CredentialEntity> {
-
-    
-        return await this.manager.transaction( async(entityManager) => {
-
+    public async createOrUpdateCredential(
+        repositoryEntity: RepositoryEntity,
+        connectorType: string,
+        repositoryIdentifier: string,
+        credentialIdentifier: string,
+        encryptedCredential: string,
+        creator: UserEntity
+    ): Promise<CredentialEntity> {
+        return await this.manager.transaction(async (entityManager) => {
             const credential = await entityManager.getCustomRepository(CredentialRepository).findOne(undefined, {
                 where: {
                     repositoryId: repositoryEntity.id,
-                    credentialIdentifier: credentialIdentifier                }
+                    credentialIdentifier: credentialIdentifier
+                }
             });
 
-            if(credential != null) {
+            if (credential != null) {
                 credential.encryptedCredentials = encryptedCredential;
                 await entityManager.save(credential);
                 return credential;
             } else {
-
                 const credentialEntity = entityManager.create(CredentialEntity);
                 credentialEntity.credentialIdentifier = credentialIdentifier;
                 credentialEntity.encryptedCredentials = encryptedCredential;
@@ -74,35 +76,29 @@ export class CredentialRepository extends Repository<CredentialEntity> {
 
                 return credentialEntity;
             }
-
-
-        })
-
-
-
-
+        });
     }
 
-    public async findCredential(identifier: PackageIdentifierInput, connectorType: string, repositoryIdentifier: string,  credentialIdentifier: string): Promise<CredentialEntity | undefined> {
+    public async findCredential(
+        identifier: PackageIdentifierInput,
+        connectorType: string,
+        repositoryIdentifier: string,
+        credentialIdentifier: string
+    ): Promise<CredentialEntity | undefined> {
+        const repositoryEntity = await this.manager
+            .getCustomRepository(RepositoryRepository)
+            .findRepository(identifier, connectorType, repositoryIdentifier);
 
-        const repositoryEntity = await this.manager.getCustomRepository(RepositoryRepository).findRepository(
-            identifier,
-            connectorType,
-            repositoryIdentifier
-        );
-
-        if(repositoryEntity == null)
-            throw new Error("REPOSITORY_NOT_FOUND");
+        if (repositoryEntity == null) throw new Error("REPOSITORY_NOT_FOUND");
 
         const credential = await this.createQueryBuilder()
-                .where('"CredentialEntity"."repository_id" = :repositoryId AND "CredentialEntity"."credential_identifier" = :credentialIdentifier')
-                .setParameter("repositoryId", repositoryEntity.id)
-                .setParameter("credentialIdentifier", credentialIdentifier)
-                .getOne();
+            .where(
+                '"CredentialEntity"."repository_id" = :repositoryId AND "CredentialEntity"."credential_identifier" = :credentialIdentifier'
+            )
+            .setParameter("repositoryId", repositoryEntity.id)
+            .setParameter("credentialIdentifier", credentialIdentifier)
+            .getOne();
 
         return credential;
     }
-
-
-
 }

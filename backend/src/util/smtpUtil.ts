@@ -32,34 +32,41 @@ export class NotificationActionTemplate {
 
     userDisplayName?: string;
     get hasUserDisplayName(): boolean {
-        return this.userDisplayName != undefined;
+        return this.userDisplayName !== undefined;
     }
+
     userSlug?: string;
     get hasUserSlug(): boolean {
-        return this.userSlug != undefined;
+        return this.userSlug !== undefined;
     }
+
     prefix?: string;
     get hasPrefix(): boolean {
-        return this.prefix != undefined;
+        return this.prefix !== undefined;
     }
+
     itemSlug?: string;
     get hasItemSlug(): boolean {
-        return this.itemSlug != undefined;
+        return this.itemSlug !== undefined;
     }
+
     itemName?: string;
     get hasItemName(): boolean {
-        return this.itemName != undefined;
+        return this.itemName !== undefined;
     }
+
     get hasItemNameAndSlug(): boolean {
         return this.hasItemName && this.hasItemSlug;
     }
+
     get hasItemNameNotSlug(): boolean {
         return this.hasItemName && !this.hasItemSlug;
     }
+
     postfix?: string;
 
     get hasPostfix(): boolean {
-        return this.postfix != undefined;
+        return this.postfix !== undefined;
     }
 }
 
@@ -166,14 +173,14 @@ export async function sendShareNotification(
     validateMessageContents(message);
 
     emailText = replaceCommonTokens(user, emailText);
-    emailText = emailText.replace(/{{url}}/g, process.env["REGISTRY_URL"] + relativeUrl);
+    emailText = emailText.replace(/{{url}}/g, process.env.REGISTRY_URL + relativeUrl);
     emailText = emailText.replace(/{{data_name}}/g, dataName);
     emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
 
     emailText = emailText.replace(/{{message}}/g, message);
 
     emailHTML = replaceCommonTokens(user, emailHTML);
-    emailHTML = emailHTML.replace(/{{url}}/g, process.env["REGISTRY_URL"] + relativeUrl);
+    emailHTML = emailHTML.replace(/{{url}}/g, process.env.REGISTRY_URL + relativeUrl);
     emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
     emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
 
@@ -220,19 +227,19 @@ export async function sendVerifyEmail(user: UserEntity, token: string) {
 
 /** Wether or not all of the required values for SMTP sending are configured as environment variables. SMTP sending is optional for some features, and therefore may not be required.  */
 export function smtpConfigured(): boolean {
-    if (process.env["SMTP_SERVER"] == null) return false;
+    if (process.env.SMTP_SERVER == null) return false;
 
-    if (process.env["SMTP_PORT"] == null) return false;
+    if (process.env.SMTP_PORT == null) return false;
 
-    if (process.env["SMTP_USER"] === undefined) return false;
+    if (process.env.SMTP_USER === undefined) return false;
 
-    if (process.env["SMTP_PASSWORD"] === undefined) return false;
+    if (process.env.SMTP_PASSWORD === undefined) return false;
 
-    if (process.env["SMTP_FROM_ADDRESS"] == null) return false;
+    if (process.env.SMTP_FROM_ADDRESS == null) return false;
 
-    if (process.env["SMTP_FROM_NAME"] == null) return false;
+    if (process.env.SMTP_FROM_NAME == null) return false;
 
-    if (process.env["SMTP_SECURE"] == null) return false;
+    if (process.env.SMTP_SECURE == null) return false;
 
     return true;
 }
@@ -241,14 +248,14 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
     if (!smtpConfigured) throw new Error("SMTP_NOT_CONFIGURED");
 
     // create reusable transporter object using the default SMTP transport
-    let transporter = createTransport({
-        host: process.env["SMTP_SERVER"]!,
-        port: Number.parseInt(process.env["SMTP_PORT"]!),
-        secure: process.env["SMTP_SECURE"] == "true",
-        ignoreTLS: process.env["SMTP_SECURE"] != "true",
+    const transporter = createTransport({
+        host: process.env.SMTP_SERVER!,
+        port: Number.parseInt(process.env.SMTP_PORT!),
+        secure: process.env.SMTP_SECURE === "true",
+        ignoreTLS: process.env.SMTP_SECURE !== "true",
         auth: {
-            user: process.env["SMTP_USER"],
-            pass: process.env["SMTP_PASSWORD"]
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD
         }
     });
 
@@ -260,7 +267,7 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
 
     await transporter
         .sendMail({
-            from: '"' + process.env["SMTP_FROM_NAME"] + '" <' + process.env["SMTP_FROM_ADDRESS"] + ">",
+            from: '"' + process.env.SMTP_FROM_NAME + '" <' + process.env.SMTP_FROM_ADDRESS + ">",
             to,
             subject,
             text: bodyText,
@@ -273,8 +280,8 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
 }
 
 function replaceCommonTokens(user: UserEntity, content: string): string {
-    let returnValue = content.replace(/{{registry_name}}/g, process.env["REGISTRY_NAME"]!);
-    returnValue = returnValue.replace(/{{registry_url}}/g, process.env["REGISTRY_URL"]!);
+    let returnValue = content.replace(/{{registry_name}}/g, process.env.REGISTRY_NAME!);
+    returnValue = returnValue.replace(/{{registry_url}}/g, process.env.REGISTRY_URL!);
     returnValue = returnValue.replace(/{{username}}/g, user.username);
 
     return returnValue;

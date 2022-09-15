@@ -33,6 +33,7 @@ export class ValidGroupSlugDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         _argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }

@@ -1,5 +1,5 @@
 export interface ValidationConstraint {
     getName(): string;
-    validate(value: String): void;
+    validate(value: string): void;
     getCompatibleScalarKinds(): string[];
 }

@@ -39,7 +39,7 @@ export async function getCatalogOrFail({
 }): Promise<CatalogEntity> {
     const ALIAS = "catalogentity";
 
-    let query = manager
+    const query = manager
         .getRepository(CatalogEntity)
         .createQueryBuilder(ALIAS)
         .where({ slug: slug })
@@ -62,7 +62,10 @@ export const AUTHENTICATED_USER_OR_PUBLIC_CATALOG_QUERY = `(${PUBLIC_CATALOGS_QU
 @EntityRepository(CatalogEntity)
 export class CatalogRepository extends Repository<CatalogEntity> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: UserEntity | undefined, permission: Permission) {
+    createQueryBuilderWithUserConditions(
+        user: UserEntity | undefined,
+        permission: Permission
+    ): SelectQueryBuilder<CatalogEntity> {
         if (user == null) {
             return this.manager.getRepository(CatalogEntity).createQueryBuilder().where(PUBLIC_CATALOGS_QUERY);
         } else {
@@ -73,7 +76,13 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         }
     }
 
-    async findCatalogBySlug({ slug, relations = [] }: { slug: string; relations?: string[] }) {
+    async findCatalogBySlug({
+        slug,
+        relations = []
+    }: {
+        slug: string;
+        relations?: string[];
+    }): Promise<CatalogEntity | undefined> {
         return await this.manager
             .getRepository(CatalogEntity)
             .createQueryBuilder("catalog")
@@ -83,7 +92,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             .getOne();
     }
 
-    public async findAllUnclaimed(relations: string[] = []) {
+    public async findAllUnclaimed(relations: string[] = []): Promise<CatalogEntity[]> {
         return await this.manager
             .getRepository(CatalogEntity)
             .createQueryBuilder("catalog")
@@ -179,21 +188,21 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                 relations: ["packages"]
             });
 
-            if (value.newSlug && catalog.slug != value.newSlug) {
+            if (value.newSlug && catalog.slug !== value.newSlug) {
                 ReservedKeywordsService.validateReservedKeyword(value.newSlug);
                 catalog.slug = value.newSlug;
                 propertiesChanged.push("slug");
             }
 
-            if (value.displayName && catalog.displayName != value.displayName) {
+            if (value.displayName && catalog.displayName !== value.displayName) {
                 catalog.displayName = value.displayName;
                 propertiesChanged.push("displayName");
             }
 
-            if (value.isPublic != null && catalog.isPublic != value.isPublic) {
+            if (value.isPublic != null && catalog.isPublic !== value.isPublic) {
                 catalog.isPublic = value.isPublic;
 
-                if (catalog.isPublic == false) {
+                if (catalog.isPublic === false) {
                     for (const packageEntity of catalog.packages) {
                         packageEntity.isPublic = false;
                         await transaction.save(packageEntity);
@@ -202,17 +211,17 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                 propertiesChanged.push("isPublic");
             }
 
-            if (value.unclaimed != null && value.unclaimed != catalog.unclaimed) {
+            if (value.unclaimed != null && value.unclaimed !== catalog.unclaimed) {
                 catalog.unclaimed = value.unclaimed;
                 propertiesChanged.push("unclaimed");
             }
 
-            if (value.description && catalog.description != value.description) {
+            if (value.description && catalog.description !== value.description) {
                 catalog.description = value.description;
                 propertiesChanged.push("description");
             }
 
-            if (value.website && catalog.website != value.website) {
+            if (value.website && catalog.website !== value.website) {
                 catalog.website = value.website;
                 propertiesChanged.push("website");
             }
@@ -318,6 +327,10 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         relations?: string[];
     }): Promise<[CatalogEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+        if (targetUser == null) {
+            throw new Error(`USER_NOT_FOUND ${username}`);
+        }
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `("CatalogEntity"."creator_id" = :targetUserId or "CatalogEntity".id in (select catalog_id from user_catalog uc where uc.user_id  = :targetUserId and 'EDIT' = any(uc."permission")))`

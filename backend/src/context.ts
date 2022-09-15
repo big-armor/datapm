@@ -20,7 +20,7 @@ export interface HTTPContext extends Context {
     request: Request;
 }
 
-export interface SocketContext extends Context {}
+export type SocketContext = Context;
 
 export interface AuthenticatedContext extends Context {
     me: UserEntity;

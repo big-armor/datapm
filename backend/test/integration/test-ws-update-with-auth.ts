@@ -2,13 +2,26 @@
 
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
+import { LoginDocument, ActivityLogEventType, PackageDocument } from "./registry-client";
 import {
-    LoginDocument,
-    ActivityLogEventType,
-    PackageDocument
-} from "./registry-client";
-import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { StartPackageUpdateResponse, ErrorResponse, StartPackageUpdateRequest, SocketResponseType, SocketEvent, JobMessageResponse, JobMessageRequest, JobRequestType, StartPackageResponse, StartPackageRequest, ParameterAnswer } from "datapm-lib";
+    createAnonymousClient,
+    createAnonymousStreamingClient,
+    createAuthenicatedStreamingClient,
+    createUser
+} from "./test-utils";
+import {
+    StartPackageUpdateResponse,
+    ErrorResponse,
+    StartPackageUpdateRequest,
+    SocketResponseType,
+    SocketEvent,
+    JobMessageResponse,
+    JobMessageRequest,
+    JobRequestType,
+    StartPackageResponse,
+    StartPackageRequest,
+    ParameterAnswer
+} from "datapm-lib";
 import { describe, it } from "mocha";
 import { Socket } from "socket.io-client";
 import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
@@ -18,28 +31,26 @@ import { Client } from "pg";
 import fs from "fs";
 import path from "path";
 
-
 /** Tests when the registry is used as a proxy for a published data package */
 describe("Package Job With Authentication Tests", async () => {
-   let userAClient: ApolloClient<NormalizedCacheObject>;
+    let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
     let postgresContainer: StartedTestContainer;
     let postgresHost: string;
     let postgresPort: number;
 
-    let userAToken: string = "Bearer ";
-    let userBToken: string = "Bearer ";
+    let userAToken = "Bearer ";
+    let userBToken = "Bearer ";
 
-    let anonymousStreamingClient:Socket;
-    let userAStreamingClient:Socket;
-    let userBStreamingClient:Socket;
+    let anonymousStreamingClient: Socket;
+    let userAStreamingClient: Socket;
+    let userBStreamingClient: Socket;
 
-    let postgresClient:Client;
+    let postgresClient: Client;
 
-    before(async function() {
-
+    before(async function () {
         this.timeout(200000);
 
         console.log("Starting postgres source container");
@@ -56,7 +67,6 @@ describe("Package Job With Authentication Tests", async () => {
 
         console.log("test postgress server port  " + postgresPort);
 
-
         postgresClient = new Client({
             host: postgresHost,
             port: postgresPort,
@@ -64,7 +74,7 @@ describe("Package Job With Authentication Tests", async () => {
             password: "postgres",
             database: "datapm"
         });
-        
+
         // TODO This wait seems necessary, even though the database reports the system is ready.
         await new Promise((resolve, reject) => {
             setTimeout(resolve, 1000);
@@ -72,39 +82,33 @@ describe("Package Job With Authentication Tests", async () => {
 
         await postgresClient.connect();
 
-        const testData = fs.readFileSync(path.join("test","data-files","postgres-test-data.sql"));
-        await postgresClient.query(testData.toString())
-
+        const testData = fs.readFileSync(path.join("test", "data-files", "postgres-test-data.sql"));
+        await postgresClient.query(testData.toString());
     });
 
     after(async () => {
+        if (postgresClient) await postgresClient.end();
 
-        if(postgresClient)
-            await postgresClient.end();
-
-        if(userAStreamingClient
-            && userAStreamingClient.connected) {
+        if (userAStreamingClient && userAStreamingClient.connected) {
             userAStreamingClient.close();
         }
 
-        if(userBStreamingClient
-            && userBStreamingClient.connected) {
+        if (userBStreamingClient && userBStreamingClient.connected) {
             userBStreamingClient.close();
         }
 
-        if(anonymousStreamingClient
-            && anonymousStreamingClient.connected) {
+        if (anonymousStreamingClient && anonymousStreamingClient.connected) {
             anonymousStreamingClient.close();
         }
 
-        if(postgresContainer) {
+        if (postgresContainer) {
             await postgresContainer.stop();
         }
     });
 
     it("Create users A", async function () {
         this.timeout(10000);
-        
+
         userAClient = await createUser(
             "FirstA",
             "LastA",
@@ -112,14 +116,12 @@ describe("Package Job With Authentication Tests", async () => {
             "testA-ws-update-postgres@test.datapm.io",
             "passwordA!"
         );
-        expect(userAClient).to.exist;
-
+        expect(userAClient).to.not.equal(undefined);
     });
-
 
     it("Create users B", async function () {
         this.timeout(10000);
-        
+
         userBClient = await createUser(
             "FirstB",
             "LastB",
@@ -128,14 +130,13 @@ describe("Package Job With Authentication Tests", async () => {
             "passwordB!"
         );
 
-        expect(userBClient).to.exist;
-
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("User A login", async function () {
         this.timeout(10000);
 
-         const userALogin = await anonymousClient.mutate({
+        const userALogin = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-ws-update-postgres",
@@ -152,7 +153,7 @@ describe("Package Job With Authentication Tests", async () => {
 
     it("User B login", async function () {
         this.timeout(10000);
-        
+
         const userBLogin = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
@@ -168,47 +169,55 @@ describe("Package Job With Authentication Tests", async () => {
         userBToken += userBLogin.data.login;
     });
 
-    it("Connect to websocket", async function(){
-
+    it("Connect to websocket", async function () {
         anonymousStreamingClient = await createAnonymousStreamingClient();
 
         userAStreamingClient = await createAuthenicatedStreamingClient(
-                "testA-ws-update-postgres@test.datapm.io",
-                "passwordA!");
+            "testA-ws-update-postgres@test.datapm.io",
+            "passwordA!"
+        );
 
         userBStreamingClient = await createAuthenicatedStreamingClient(
             "testB-ws-update-postgres@test.datapm.io",
-            "passwordB!");
-
+            "passwordB!"
+        );
     });
 
     it("Should run package job", async () => {
-        
-        let response = await new Promise<StartPackageResponse | ErrorResponse>((resolve, reject) => {
-            userAStreamingClient.emit(SocketEvent.START_PACKAGE, new StartPackageRequest("testA-ws-update-postgres", "test-postgres", "Test package for updates", "Test package description"),(response: StartPackageResponse) => {
-                resolve(response);
-            });
+        const response = await new Promise<StartPackageResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(
+                SocketEvent.START_PACKAGE,
+                new StartPackageRequest(
+                    "testA-ws-update-postgres",
+                    "test-postgres",
+                    "Test package for updates",
+                    "Test package description"
+                ),
+                (response: StartPackageResponse) => {
+                    resolve(response);
+                }
+            );
         });
 
         expect(response.responseType).equal(SocketResponseType.START_PACKAGE_RESPONSE);
 
         expect(
-            serverLogLines.find((l: any) =>
+            serverLogLines.find((l: string) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
-                        activityLogLine.eventType == ActivityLogEventType.PACKAGE_JOB_STARTED &&
-                        activityLogLine.username == "testA-ws-update-postgres" &&
-                        activityLogLine.targetCatalogSlug == "testA-ws-update-postgres" 
+                        activityLogLine.eventType === ActivityLogEventType.PACKAGE_JOB_STARTED &&
+                        activityLogLine.username === "testA-ws-update-postgres" &&
+                        activityLogLine.targetCatalogSlug === "testA-ws-update-postgres"
                     );
                 })
             )
-        ).to.be.not.undefined;
-        
+        ).to.not.equal(undefined);
+
         const successResponse = response as StartPackageResponse;
 
         const promptResponses: {
-            name: string,
-            response: string | string[] | boolean
+            name: string;
+            response: string | string[] | boolean;
         }[] = [
             {
                 name: "source",
@@ -270,91 +279,89 @@ describe("Package Job With Authentication Tests", async () => {
 
         let currentPromptIndex = 0;
 
-        const jobExitMessage = await handleJobMessages(userAStreamingClient, successResponse.channelName,
+        const jobExitMessage = await handleJobMessages(
+            userAStreamingClient,
+            successResponse.channelName,
             (message: JobMessageRequest) => {
-              
-                if(message.requestType === JobRequestType.PRINT) {
+                if (message.requestType === JobRequestType.PRINT) {
                     // console.log(message.message);
                 } else if (message.requestType === JobRequestType.ERROR) {
                     console.log("Error: " + message.message);
-                } else if(message.requestType === JobRequestType.PROMPT) {
+                } else if (message.requestType === JobRequestType.PROMPT) {
+                    const responses: ParameterAnswer<string> = {};
 
-                    const responses: ParameterAnswer<string> = {};        
-                    
-                    if(currentPromptIndex + message.prompts!.length > promptResponses.length)
-                        throw new Error("Not enough prompt responses: " + message.prompts![0].name);
+                    if (message.prompts == null) throw new Error("No prompts found");
 
-                    for(const prompt of message.prompts!) {
+                    if (currentPromptIndex + message.prompts.length > promptResponses.length)
+                        throw new Error("Not enough prompt responses: " + message.prompts[0].name);
+
+                    for (const prompt of message.prompts) {
                         // console.log(prompt.message);
 
                         const currentPrompt = promptResponses[currentPromptIndex++];
 
-                        if(prompt.name === currentPrompt.name) 
-                            responses[prompt.name] = currentPrompt.response;
-                        else
-                            throw new Error("Unexpected prompt " + prompt.name);
+                        if (prompt.name === currentPrompt.name) responses[prompt.name] = currentPrompt.response;
+                        else throw new Error("Unexpected prompt " + prompt.name);
                     }
 
-                    const response =  new JobMessageResponse(JobRequestType.PROMPT);
+                    const response = new JobMessageResponse(JobRequestType.PROMPT);
                     response.answers = responses;
 
                     return response;
                 }
 
                 return undefined;
-
-                
-            });
+            }
+        );
 
         expect(jobExitMessage.exitCode).equal(0);
-
     });
 
     it("Modify database schema", async () => {
-        const testData = fs.readFileSync(path.join("test","data-files","postgres-test-update.sql"));
+        const testData = fs.readFileSync(path.join("test", "data-files", "postgres-test-update.sql"));
         await postgresClient.query(testData.toString());
-    })
+    });
 
-    it("Run Update Package Job using websocket", async function() {
-
-        let response = await new Promise<StartPackageUpdateResponse | ErrorResponse>((resolve, reject) => {
-            userAStreamingClient.emit(SocketEvent.START_PACKAGE_UPDATE, new StartPackageUpdateRequest({
-                catalogSlug: "testA-ws-update-postgres",
-                packageSlug: "test-postgres"
-            }),(response: StartPackageUpdateResponse) => {
-                resolve(response);
-            });
+    it("Run Update Package Job using websocket", async function () {
+        const response = await new Promise<StartPackageUpdateResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(
+                SocketEvent.START_PACKAGE_UPDATE,
+                new StartPackageUpdateRequest({
+                    catalogSlug: "testA-ws-update-postgres",
+                    packageSlug: "test-postgres"
+                }),
+                (response: StartPackageUpdateResponse) => {
+                    resolve(response);
+                }
+            );
         });
 
         expect(response.responseType).equal(SocketResponseType.START_PACKAGE_UPDATE_RESPONSE);
 
-        const startPackageUpdateResponse:StartPackageUpdateResponse = response as StartPackageUpdateResponse;
+        const startPackageUpdateResponse: StartPackageUpdateResponse = response as StartPackageUpdateResponse;
 
         expect(startPackageUpdateResponse.channelName).not.equal(null);
 
         const channelName = startPackageUpdateResponse.channelName;
 
         expect(
-            serverLogLines.find((l: any) =>
+            serverLogLines.find((l: string) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
-                        activityLogLine.eventType == ActivityLogEventType.PACKAGE_UPDATE_JOB_STARTED &&
-                        activityLogLine.username == "testA-ws-update-postgres" &&
-                        activityLogLine.targetPackageIdentifier == "testA-ws-update-postgres/test-postgres" 
+                        activityLogLine.eventType === ActivityLogEventType.PACKAGE_UPDATE_JOB_STARTED &&
+                        activityLogLine.username === "testA-ws-update-postgres" &&
+                        activityLogLine.targetPackageIdentifier === "testA-ws-update-postgres/test-postgres"
                     );
                 })
             )
-        ).to.be.not.undefined;
-        
+        ).to.not.equal(undefined);
 
         const jobExitMessage = await handleJobMessages(userAStreamingClient, channelName);
 
         expect(jobExitMessage.exitCode).equal(0);
-
-
     });
 
-    it("Package should be updated", async function() {
+    it("Package should be updated", async function () {
         const response = await userAClient.query({
             query: PackageDocument,
             variables: {
@@ -370,83 +377,75 @@ describe("Package Job With Authentication Tests", async () => {
         expect(response.data.package.latestVersion?.identifier.versionMajor).to.equal(2);
         expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(0);
         expect(response.data.package.latestVersion?.identifier.versionPatch).to.equal(0);
-        
-    })
-
-
+    });
 });
 
-async function handleJobMessages(client: Socket, channelName: string, messageHandler?: (message: JobMessageRequest) => JobMessageResponse | undefined): Promise<JobMessageRequest> {
-
-    let exitCallback: (message:JobMessageRequest) => void | undefined;
+async function handleJobMessages(
+    client: Socket,
+    channelName: string,
+    messageHandler?: (message: JobMessageRequest) => JobMessageResponse | undefined
+): Promise<JobMessageRequest> {
+    let exitCallback: (message: JobMessageRequest) => void | undefined;
     let disconnectCallBack: () => void | undefined;
     let errorCallback: (error: Error) => void | undefined;
 
     const disconnectPromise = new Promise<JobMessageRequest>((resolve, reject) => {
         disconnectCallBack = reject;
     });
-        
-    client.on(channelName, (message: JobMessageRequest, responseCallback:(response:any) => void) => {
+
+    client.on(channelName, (message: JobMessageRequest, responseCallback: (response: JobMessageResponse) => void) => {
         exitCallback(message);
         // console.log(JSON.stringify(message));
 
-        if(message.requestType === JobRequestType.END_TASK) {
+        if (message.requestType === JobRequestType.END_TASK) {
             responseCallback(new JobMessageResponse(JobRequestType.END_TASK));
-        } else if(messageHandler) {
-
+        } else if (messageHandler) {
             try {
                 const response = messageHandler(message);
-                if(response) {
+                if (response) {
                     responseCallback(response);
                 }
-            } catch(error) {
+            } catch (error) {
                 errorCallback(error);
             }
-
-
         }
-    });    
-    
+    });
+
     client.on("disconnect", () => {
         disconnectCallBack();
-    })
-
-    
+    });
 
     const jobExitPromise = new Promise<JobMessageRequest>((resolve, reject) => {
-
         exitCallback = (message: JobMessageRequest) => {
-
-            if(message.requestType == JobRequestType.EXIT) {
-        
-                if(message.exitCode === 0) {
+            if (message.requestType === JobRequestType.EXIT) {
+                if (message.exitCode === 0) {
                     resolve(message);
                 } else {
                     reject(new Error("Failed with exitCode: " + message.exitCode + " message: " + message.message));
                 }
             }
-
         };
 
         errorCallback = (error: Error) => {
             reject(error);
-        }
-
+        };
     });
 
-    let startResponse = await new Promise<JobMessageResponse>((resolve,reject) => {
-        client.emit(channelName, new JobMessageRequest(JobRequestType.START_JOB),(response: JobMessageResponse | ErrorResponse) => {
+    const startResponse = await new Promise<JobMessageResponse>((resolve, reject) => {
+        client.emit(
+            channelName,
+            new JobMessageRequest(JobRequestType.START_JOB),
+            (response: JobMessageResponse | ErrorResponse) => {
+                if (response.responseType === SocketResponseType.ERROR) {
+                    reject(new Error((response as ErrorResponse).message));
+                }
 
-            if(response.responseType === SocketResponseType.ERROR) {
-                reject(response as ErrorResponse);
+                resolve(response as JobMessageResponse);
             }
-
-            resolve(response as JobMessageResponse);
-        });
-
+        );
     });
 
     expect(startResponse.responseType).equal(JobRequestType.START_JOB);
 
-    return Promise.race([disconnectPromise,jobExitPromise]);
+    return Promise.race([disconnectPromise, jobExitPromise]);
 }

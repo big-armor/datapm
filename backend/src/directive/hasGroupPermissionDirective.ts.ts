@@ -8,11 +8,9 @@ import {
     EnumValueNode
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
-import { CatalogEntity } from "../entity/CatalogEntity";
 import { GroupEntity } from "../entity/GroupEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { CatalogIdentifierInput, Permission } from "../generated/graphql";
-import { getCatalogFromCacheOrDbOrFail } from "../resolvers/CatalogResolver";
+import { Permission } from "../generated/graphql";
 import { getGroupFromCacheOrDbBySlugOrFail, getGroupPermissionsFromCacheOrDb } from "../resolvers/GroupResolver";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 
@@ -20,26 +18,30 @@ export async function resolveGroupPermissions(
     context: Context,
     groupSlug: string,
     user?: UserEntity
-) {
+): Promise<Permission[]> {
     const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, groupSlug);
     return resolveGroupPermissionsForEntity(context, group, user);
 }
 
-export async function resolveGroupPermissionsForEntity(context: Context, group: GroupEntity, user?: UserEntity) {
+export async function resolveGroupPermissionsForEntity(
+    context: Context,
+    group: GroupEntity,
+    user?: UserEntity
+): Promise<Permission[]> {
     const permissions: Permission[] = [];
 
     if (user == null) {
         return permissions;
     }
 
-    const userPermission = await getGroupPermissionsFromCacheOrDb(context, group.id, user!.id);
+    const userPermission = await getGroupPermissionsFromCacheOrDb(context, group.id, user.id);
 
     return permissions.concat(userPermission);
 }
 export class HasGroupPermissionDirective extends SchemaDirectiveVisitor {
-    visitObject(object: GraphQLObjectType) {
+    visitObject(object: GraphQLObjectType): void {
         const fields = object.getFields();
-        for (let field of Object.values(fields)) {
+        for (const field of Object.values(fields)) {
             this.visitFieldDefinition(field);
         }
     }
@@ -47,15 +49,17 @@ export class HasGroupPermissionDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
-        const permission = (argument
-            .astNode!.directives!.find((d) => d.name.value == "hasGroupPermission")!
-            .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;
+        const permission = (argument.astNode?.directives
+            ?.find((d) => d.name.value === "hasGroupPermission")
+            ?.arguments?.find((a) => a.name.value === "permission")?.value as EnumValueNode).value as Permission;
         details.field.resolve = async function (source, args, context: Context, info) {
             const groupSlug: string = args[argument.name];
             await self.validatePermission(context, groupSlug, permission);
@@ -63,9 +67,10 @@ export class HasGroupPermissionDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         const permission: Permission = this.args.permission;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         field.resolve = async function (source, args, context: Context, info) {
             const catalogSlug: string | undefined =
@@ -85,7 +90,7 @@ export class HasGroupPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async validatePermission(context: Context, groupSlug: string, permission: Permission) {
-        const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, groupSlug );
+        const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, groupSlug);
         const permissions = await this.getUserGroupPermissions(context, group);
         if (permissions.includes(permission)) {
             return;
@@ -99,13 +104,11 @@ export class HasGroupPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async getUserGroupPermissions(context: Context, group: GroupEntity): Promise<Permission[]> {
-
-        if(isAuthenticatedContext(context)) {
+        if (isAuthenticatedContext(context)) {
             const authenticatedContext = context as AuthenticatedContext;
             return await resolveGroupPermissionsForEntity(context, group, authenticatedContext.me);
         } else {
             return [];
         }
-        
     }
 }

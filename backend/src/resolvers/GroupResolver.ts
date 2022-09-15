@@ -20,7 +20,7 @@ import { getUserFromCacheOrDbByUsername } from "./UserResolver";
 const GROUP_SEARCH_RESULT_LIMIT = 100;
 
 export const createGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, name, description }: { groupSlug: string; name: string; description: string },
     context: AuthenticatedContext,
     info: any
@@ -65,7 +65,7 @@ export const createGroup = async (
 };
 
 export const updateGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, name, description }: { groupSlug: string; name: string; description: string },
     context: AuthenticatedContext,
     info: any
@@ -87,7 +87,7 @@ export const updateGroup = async (
 };
 
 export const deleteGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug }: { groupSlug: string },
     context: AuthenticatedContext,
     info: any
@@ -106,7 +106,7 @@ export const deleteGroup = async (
 };
 
 export const addOrUpdateUserToGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, userPermissions }: { groupSlug: string; userPermissions: SetUserGroupPermissionsInput[] },
     context: AuthenticatedContext,
     info: any
@@ -136,10 +136,10 @@ export const addOrUpdateUserToGroup = async (
                     throw new ValidationError("USER_NOT_FOUND - " + userPermission.usernameOrEmailAddress);
                 }
             } else {
-                if (permissions.length == 0) {
+                if (permissions.length === 0) {
                     await removeUserFromGroup(_0, { groupSlug, username: userEntity.username }, context, info);
                     continue;
-                } else if (userEntity.status == UserStatus.PENDING_SIGN_UP) {
+                } else if (userEntity.status === UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(userEntity);
                 } else {
                     existingUsers.push(userEntity);
@@ -198,7 +198,7 @@ export const addOrUpdateUserToGroup = async (
 };
 
 export const removeUserFromGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, username }: { groupSlug: string; username: string },
     context: AuthenticatedContext,
     info: any
@@ -263,7 +263,7 @@ export const findGroup = async (manager: EntityManager, groupSlug: string, relat
     return groupEntity;
 };
 
-export const myGroups = async (_0: any, {}: {}, context: AuthenticatedContext, info: any) => {
+export const myGroups = async (_0: unknown, {}: {}, context: AuthenticatedContext, info: any) => {
     const groupEntity = await context.connection.getRepository(GroupUserEntity).find({
         where: {
             userId: context.me.id
@@ -275,7 +275,7 @@ export const myGroups = async (_0: any, {}: {}, context: AuthenticatedContext, i
 };
 
 export const group = async (
-    _0: any,
+    _0: unknown,
     { groupSlug }: { groupSlug: string },
     context: AuthenticatedContext,
     info: any
@@ -313,7 +313,7 @@ export const getGroupFromCacheOrDbBySlugOrFail = async (
     const groupPromiseFunction = async () => {
         const group = await connection.getRepository(GroupEntity).findOne({ slug: groupSlug }, { relations });
 
-        if (group == undefined) throw new Error("GROUP_NOT_FOUND - " + groupSlug);
+        if (group === undefined) throw new Error("GROUP_NOT_FOUND - " + groupSlug);
 
         return group;
     };
@@ -332,7 +332,7 @@ export const getGroupPermissionsFromCacheOrDb = async (context: Context, groupId
     return context.cache.loadGroupPermissionsById(groupId, permissionsPromiseFunction);
 };
 
-export const myGroupPermissions = async (parent: Group, _0: any, context: AuthenticatedContext) => {
+export const myGroupPermissions = async (parent: Group, _0: unknown, context: AuthenticatedContext) => {
     const groupEntity = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection.manager, parent.slug);
 
     return resolveGroupPermissionsForEntity(context, groupEntity, context.me);
@@ -340,7 +340,7 @@ export const myGroupPermissions = async (parent: Group, _0: any, context: Authen
 
 export const groupUsers = async (
     parent: Group,
-    _0: any,
+    _0: unknown,
     context: AuthenticatedContext,
     info: any
 ): Promise<GroupUser[]> => {
@@ -357,7 +357,7 @@ export const groupUsers = async (
 };
 
 export const setGroupAsAdmin = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, isAdmin }: { groupSlug: string; isAdmin: boolean },
     context: AuthenticatedContext,
     info: any
@@ -372,7 +372,7 @@ export const setGroupAsAdmin = async (
 };
 
 export const adminSearchGroups = async (
-    _0: any,
+    _0: unknown,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
@@ -390,7 +390,7 @@ export const adminSearchGroups = async (
 };
 
 export const adminDeleteGroup = async (
-    _0: any,
+    _0: unknown,
     { groupSlug }: { groupSlug: string },
     context: AuthenticatedContext,
     info: any

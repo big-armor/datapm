@@ -1,5 +1,5 @@
-import { GraphQLInputType, GraphQLNonNull, ValueNode } from "graphql";
-import { GraphQLScalarType } from "graphql";
+import { GraphQLInputType, GraphQLNonNull, ValueNode, GraphQLScalarType, GraphQLNullableType } from "graphql";
+
 import { Maybe } from "graphql/jsutils/Maybe";
 import { ValidationConstraint } from "./ValidationConstraint";
 
@@ -14,7 +14,10 @@ export class ValidationType extends GraphQLScalarType {
     /**
      * Create a new validation type with the existing type wrapped inside
      */
-    static create(type: GraphQLInputType, constraint: ValidationConstraint) {
+    static create(
+        type: GraphQLInputType,
+        constraint: ValidationConstraint
+    ): ValidationType | GraphQLNonNull<GraphQLNullableType> {
         // Wrap scalar types directly
         if (type instanceof GraphQLScalarType) {
             return new this(type, constraint);
@@ -57,7 +60,7 @@ export class ValidationType extends GraphQLScalarType {
             /**
              * Client (Param) -> Server
              */
-            parseLiteral(valueNode: ValueNode, variables?: Maybe<{ [key: string]: any }>) {
+            parseLiteral(valueNode: ValueNode, variables?: Maybe<{ [key: string]: unknown }>) {
                 const parsedValue = type.parseLiteral(valueNode, variables);
 
                 constraint.validate(parsedValue);

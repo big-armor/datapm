@@ -1,9 +1,9 @@
 import { GraphQLResolveInfo } from "graphql";
 import graphqlFields from "graphql-fields";
 
-function isEmpty(obj: any): boolean {
-    for (var x in obj) {
-        if (obj.hasOwnProperty(x)) return false;
+function isEmpty(obj: Record<string, unknown>): boolean {
+    for (const x in obj) {
+        if (obj[x] == null) return false;
     }
     return true;
 }
@@ -33,7 +33,7 @@ function isEmpty(obj: any): boolean {
       'f'
     ]
   */
-export function getRelationNames(obj: object, parentNames: string = ""): string[] {
+export function getRelationNames(obj: Record<string, unknown>, parentNames = ""): string[] {
     if (obj == null) return [];
     let out: string[] = [];
 
@@ -52,10 +52,10 @@ export function getRelationNames(obj: object, parentNames: string = ""): string[
         "packageIdentifier"
     ];
 
-    for (let [key, val] of Object.entries(obj)) {
-        if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {
+    for (const [key, val] of Object.entries(obj)) {
+        if (!isEmpty(val as Record<string, unknown>) && skipRelations.indexOf(key) === -1) {
             const names = parentNames.length > 0 ? [parentNames, key].join(".") : key;
-            out = [...out, names, ...getRelationNames(val, names)];
+            out = [...out, names, ...getRelationNames(val as Record<string, unknown>, names)];
         }
     }
 

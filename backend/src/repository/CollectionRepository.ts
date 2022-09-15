@@ -39,7 +39,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }
 
     public async updateCollection(
-        collectionSlug: String,
+        collectionSlug: string,
         collection: UpdateCollectionInput,
         relations?: string[]
     ): Promise<CollectionEntity> {
@@ -58,7 +58,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             collectionIdDb.description = collection.description;
         }
 
-        if (collection.isPublic != null && collection.isPublic != undefined) {
+        if (collection.isPublic != null && collection.isPublic !== undefined) {
             collectionIdDb.isPublic = collection.isPublic;
         }
 
@@ -96,6 +96,10 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }): Promise<[CollectionEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
+        if (targetUser == null) {
+            throw new UserInputError("USER_NOT_FOUND " + username);
+        }
+
         const query = this.createQueryBuilderWithUserConditions(user?.id, Permission.VIEW)
             .andWhere(`("CollectionEntity"."creator_id" = :targetUserId)`)
             .setParameter("targetUserId", targetUser.id)
@@ -123,7 +127,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         }
     }
 
-    public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<CollectionEntity> {
+    public async findCollectionBySlugOrFail(collectionSlug: string, relations?: string[]): Promise<CollectionEntity> {
         const collection = await this.createQueryBuilder()
             .where('"CollectionEntity"."slug" = :slug')
             .setParameter("slug", collectionSlug)
@@ -138,7 +142,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
     }
 
     public async findCollectionBySlug(
-        collectionSlug: String,
+        collectionSlug: string,
         relations?: string[]
     ): Promise<CollectionEntity | undefined> {
         return await this.createQueryBuilder()

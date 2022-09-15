@@ -1,5 +1,4 @@
-import { Kind } from "graphql";
-import { GraphQLScalarType } from "graphql";
+import { Kind, GraphQLScalarType } from "graphql";
 
 export class DateResolver extends GraphQLScalarType {
     constructor() {

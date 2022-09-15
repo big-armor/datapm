@@ -1,7 +1,7 @@
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 
-import execa from "execa";
-import { ExecaChildProcess } from "execa";
+import execa, { ExecaChildProcess } from "execa";
+
 import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
 import fs from "fs";
@@ -15,22 +15,32 @@ import path from "path";
 // NOTE: including "datapm-client-lib" here causes a build error where suddently the response objects
 // in the generated graphql schema are seen as "any" type.
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const maildev = require("maildev");
+
+export type MailDevEmail = { text: string; html: string; to: { address: string; name: string }[]; subject: string };
+export const tempMailDevEmail: MailDevEmail = {
+    html: "",
+    subject: "",
+    text: "",
+    to: [{ address: "", name: "" }]
+};
 
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 let container: StartedTestContainer;
 let serverProcess: ExecaChildProcess;
 let testDataServerProcess: execa.ExecaChildProcess<string>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mailServer: any;
-export let mailObservable: Observable<any>;
+export let mailObservable: Observable<MailDevEmail>;
 
 export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
 const MAX_SERVER_LOG_LINES = 25;
 
 // These hold the standard out log lines from the datapm server
-export let serverLogLines: string[] = [];
-export let serverErrorLogLines: string[] = [];
+export const serverLogLines: string[] = [];
+export const serverErrorLogLines: string[] = [];
 
 /** The object logged to the console */
 export interface ActivityLogLine {
@@ -48,7 +58,7 @@ export interface ActivityLogLine {
     propertiesEdited?: string[];
 }
 
-export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
+export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): boolean {
     const lines = line.split("\n");
 
     for (const splitLine of lines) {
@@ -56,7 +66,7 @@ export function findActivityLogLine(line: string, callback: (activityLogLine: Ac
         if (trimmedLine.length === 0 || !trimmedLine.startsWith("{")) continue;
         try {
             const lineObject = JSON.parse(trimmedLine) as ActivityLogLine;
-            if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+            if (lineObject._type === "ActivityLog" && callback(lineObject)) return true;
         } catch (e) {
             console.log("Error parsing line: " + trimmedLine);
             console.log(e.message);
@@ -84,21 +94,22 @@ before(async function () {
     console.log("Postgres started");
 
     // star the maildev server
+    // eslint-disable-next-line new-cap
     mailServer = new maildev({
         smtp: 1026,
         web: 1081,
         ignoreTLS: true
     });
 
-    let mailObserver: ZenObservable.SubscriptionObserver<any>;
+    let mailObserver: ZenObservable.SubscriptionObserver<MailDevEmail>;
 
-    mailServer.listen((err: any) => {
-        mailObservable = new Observable<any>((observer) => {
+    mailServer.listen(() => {
+        mailObservable = new Observable<MailDevEmail>((observer) => {
             mailObserver = observer;
         });
     });
 
-    mailServer.on("new", function (email: any) {
+    mailServer.on("new", function (email: MailDevEmail) {
         // console.log("Email recieved: " + email.subject);
         mailObserver.next(email);
     });
@@ -120,7 +131,7 @@ before(async function () {
         }
     });
 
-    serverProcess.stdout!.addListener("data", (chunk: Buffer) => {
+    serverProcess.stdout?.addListener("data", (chunk: Buffer) => {
         const line = chunk.toString();
 
         serverLogLines.push(line);
@@ -131,7 +142,7 @@ before(async function () {
         console.log(line);
     });
 
-    serverProcess.stderr!.addListener("data", (chunk: Buffer) => {
+    serverProcess.stderr?.addListener("data", (chunk: Buffer) => {
         const line = chunk.toString();
 
         serverErrorLogLines.push(line);
@@ -166,14 +177,14 @@ before(async function () {
     testDataServerProcess = serverStartResponse.serverProcess;
 
     // Wait for the server to start
-    await new Promise<void>(async (r) => {
+    await new Promise<void>((resolve, reject) => {
         let serverReady = false;
 
         console.log("Waiting for server to start");
-        serverProcess.stdout!.on("data", async (buffer: Buffer) => {
+        serverProcess.stdout?.on("data", async (buffer: Buffer) => {
             const line = buffer.toString();
-            //console.log(line);
-            if (line.indexOf("🚀") != -1) {
+            // console.log(line);
+            if (line.indexOf("🚀") !== -1) {
                 console.log("Server started!");
                 serverReady = true;
 
@@ -187,15 +198,15 @@ before(async function () {
                 );
                 AdminHolder.adminUsername = "admin-user";
 
-                r();
+                resolve();
             }
         });
 
-        serverProcess.stdout!.on("error", (err: Error) => {
+        serverProcess.stdout?.on("error", (err: Error) => {
             console.error(JSON.stringify(err, null, 1));
         });
 
-        serverProcess.stdout!.on("close", () => {
+        serverProcess.stdout?.on("close", () => {
             if (!serverReady) throw new Error("Registry server exited before becoming ready");
         });
     });
@@ -253,12 +264,12 @@ after(async function () {
         }
     }
 
-    serverProcess.stdout!.destroy();
-    serverProcess.stderr!.destroy();
+    serverProcess.stdout?.destroy();
+    serverProcess.stderr?.destroy();
 
     if (serverProcess.pid !== undefined) {
         try {
-            let pids = pidtree(serverProcess.pid, { root: true });
+            const pids = pidtree(serverProcess.pid, { root: true });
 
             // recursively kill all child processes
             (await pids).forEach((p) => {

@@ -149,7 +149,7 @@ describe("Following Package Issues Activity Log Tests", async () => {
             variables: { limit: 10, offset: 0 }
         });
 
-        expect(activitiesResponse.data).to.exist;
+        expect(activitiesResponse.data).to.not.equal(undefined);
 
         if (
             !activitiesResponse.data ||
@@ -170,12 +170,12 @@ describe("Following Package Issues Activity Log Tests", async () => {
             return;
         }
 
-        const targetPackageIdentifier = createdLog.targetPackage!.identifier;
+        const targetPackageIdentifier = createdLog.targetPackage.identifier;
         expect(createdLog.user.username).to.equal(userTwoUsername);
         expect(targetPackageIdentifier.catalogSlug).to.equal(catalogSlug);
         expect(targetPackageIdentifier.packageSlug).to.equal(packageSlug);
 
-        const targetPackageIssueNumber = createdLog.targetPackageIssue!.issueNumber;
+        const targetPackageIssueNumber = createdLog.targetPackageIssue.issueNumber;
         expect(targetPackageIssueNumber).to.equal(0);
     });
 
@@ -287,7 +287,7 @@ describe("Following Package Issues Activity Log Tests", async () => {
             variables: { limit: 10, offset: 0 }
         });
 
-        expect(activitiesResponse.data).to.exist;
+        expect(activitiesResponse.data).to.not.equal(undefined);
 
         if (
             !activitiesResponse.data ||
@@ -308,12 +308,12 @@ describe("Following Package Issues Activity Log Tests", async () => {
             return;
         }
 
-        const targetPackageIdentifier = createdLog.targetPackage!.identifier;
+        const targetPackageIdentifier = createdLog.targetPackage.identifier;
         expect(createdLog.user.username).to.equal(userTwoUsername);
         expect(targetPackageIdentifier.catalogSlug).to.equal(catalogSlug);
         expect(targetPackageIdentifier.packageSlug).to.equal(packageSlug);
 
-        const targetPackageIssueNumber = createdLog.targetPackageIssue!.issueNumber;
+        const targetPackageIssueNumber = createdLog.targetPackageIssue.issueNumber;
         expect(targetPackageIssueNumber).to.equal(0);
     });
 });

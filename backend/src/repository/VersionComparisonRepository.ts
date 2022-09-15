@@ -9,18 +9,18 @@ export async function saveVersionComparison(
     newVersionId: number,
     oldVersionId: number,
     differences: Difference[]
-) {
+): Promise<{ comparisonEntity: VersionComparisonEntity; differencesEntitities: VersionDifferenceEntity[] }> {
     const comparisonRepository = transaction.getCustomRepository(VersionComparisonRepository);
     const comparisonEntity = await comparisonRepository.createNewComparison(newVersionId, oldVersionId);
 
-    let differencesEntities: VersionDifferenceEntity[] = [];
+    let differencesEntitities: VersionDifferenceEntity[] = [];
 
     if (differences.length) {
         const differencesRepository = transaction.getCustomRepository(VersionDifferenceRepository);
-        differencesEntities = await differencesRepository.batchCreateNewDifferences(comparisonEntity.id, differences);
+        differencesEntitities = await differencesRepository.batchCreateNewDifferences(comparisonEntity.id, differences);
     }
 
-    return { comparisonEntity, differencesEntities };
+    return { comparisonEntity, differencesEntitities };
 }
 
 @EntityRepository(VersionComparisonEntity)

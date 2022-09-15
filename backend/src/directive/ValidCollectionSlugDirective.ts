@@ -8,11 +8,12 @@ import {
     GraphQLInputField,
     GraphQLInputObjectType,
     GraphQLNonNull,
-    GraphQLScalarType
+    GraphQLScalarType,
+    Kind
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
 import { collectionSlugValid } from "datapm-lib";
-import { Kind } from "graphql";
+
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
 
@@ -20,11 +21,13 @@ export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const slug: string | undefined = args.collectionSlug || undefined;
@@ -45,14 +48,14 @@ export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateSlug(slug: string | undefined) {
+export function validateSlug(slug: string | undefined): void {
     const validCollection = collectionSlugValid(slug);
 
     if (validCollection === "COLLECTION_SLUG_REQUIRED") throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
 
-    if (validCollection == "COLLECTION_SLUG_TOO_LONG") throw new ValidationError(`COLLECTION_SLUG_TOO_LONG`);
+    if (validCollection === "COLLECTION_SLUG_TOO_LONG") throw new ValidationError(`COLLECTION_SLUG_TOO_LONG`);
 
-    if (validCollection == "COLLECTION_SLUG_INVALID") throw new ValidationError("COLLECTION_SLUG_INVALID");
+    if (validCollection === "COLLECTION_SLUG_INVALID") throw new ValidationError("COLLECTION_SLUG_INVALID");
 }
 
 class CollectionSlugConstraint implements ValidationConstraint {

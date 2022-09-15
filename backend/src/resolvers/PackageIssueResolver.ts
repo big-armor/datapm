@@ -23,7 +23,7 @@ import { Connection, EntityManager } from "typeorm";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const getPackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         packageIssueIdentifier
@@ -60,7 +60,7 @@ export const getPackageIssueByIdentifiers = async (
 };
 
 export const deletePackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         packageIssueIdentifier
@@ -90,7 +90,7 @@ export const deletePackageIssue = async (
 };
 
 export const getIssuesByPackage = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         includeOpenIssues,
@@ -137,7 +137,7 @@ export const getIssuesByPackage = async (
     };
 };
 
-export const getPackageIssueAuthor = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const getPackageIssueAuthor = async (parent: any, _1: unknown, context: AuthenticatedContext, info: any) => {
     return await context.connection.getCustomRepository(UserRepository).findOneOrFail({
         where: { id: parent.authorId },
         relations: getGraphQlRelationName(info)
@@ -146,7 +146,7 @@ export const getPackageIssueAuthor = async (parent: any, _1: any, context: Authe
 
 export const getPackageIssuePackageIdentifier = async (
     parent: any,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -165,7 +165,7 @@ export const getPackageIssuePackageIdentifier = async (
 };
 
 export const createPackageIssue = async (
-    _0: any,
+    _0: unknown,
     { packageIdentifier, issue }: { packageIdentifier: PackageIdentifierInput; issue: CreatePackageIssueInput },
     context: AuthenticatedContext,
     info: any
@@ -204,7 +204,7 @@ export const createPackageIssue = async (
 };
 
 export const updatePackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -246,7 +246,7 @@ export const updatePackageIssue = async (
 };
 
 export const updatePackageIssueStatus = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -290,7 +290,7 @@ export const updatePackageIssueStatus = async (
 };
 
 export const updatePackageIssuesStatuses = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issuesIdentifiers,
@@ -338,7 +338,7 @@ export const updatePackageIssuesStatuses = async (
 };
 
 export const deletePackageIssues = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issuesIdentifiers
@@ -406,7 +406,6 @@ async function hasPermissionsToEditIssue(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
@@ -422,13 +421,11 @@ async function hasEditPermissionsForIssues(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
 
     const authenicatedContext = context as AuthenticatedContext;
-
 
     const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, authenicatedContext.me);
     return hasPermissionsToEditIssues(issues, packagePermissions, context);
@@ -443,7 +440,6 @@ function hasPermissionsToEditIssues(
 }
 
 function canEditIssue(issueEntity: PackageIssueEntity, packagePermissions: Permission[], context: Context): boolean {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }

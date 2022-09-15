@@ -30,11 +30,7 @@ import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { hasPackagePermission, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
-import {
-    catalogEntityToGraphQL,
-    getCatalogFromCacheOrDbById,
-    getCatalogFromCacheOrDbBySlug
-} from "./CatalogResolver";
+import { catalogEntityToGraphQL, getCatalogFromCacheOrDbById, getCatalogFromCacheOrDbBySlug } from "./CatalogResolver";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { Connection, EntityManager } from "typeorm";
@@ -51,7 +47,6 @@ import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 import { GroupEntity } from "../entity/GroupEntity";
 import { connection } from "mongoose";
-
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -73,7 +68,7 @@ export const packageEntityToGraphqlObject = async (
     if (packageEntity.catalog != null) {
         return {
             identifier: {
-                registryURL: process.env["REGISTRY_URL"]!,
+                registryURL: process.env.REGISTRY_URL!,
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug
             }
@@ -83,7 +78,7 @@ export const packageEntityToGraphqlObject = async (
     const packageEntityLoaded = await getPackageFromCacheOrDbByIdOrFail(context, connection, packageEntity.id, true);
     return {
         identifier: {
-            registryURL: process.env["REGISTRY_URL"]!,
+            registryURL: process.env.REGISTRY_URL!,
             catalogSlug: packageEntityLoaded.catalog.slug,
             packageSlug: packageEntityLoaded.slug
         }
@@ -91,7 +86,7 @@ export const packageEntityToGraphqlObject = async (
 };
 
 export const usersByPackage = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -105,7 +100,7 @@ export const usersByPackage = async (
 };
 
 export const myRecentlyViewedPackages = async (
-    _0: any,
+    _0: unknown,
     { limit, offSet }: { limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
@@ -123,7 +118,7 @@ export const myRecentlyViewedPackages = async (
 };
 
 export const myPackages = async (
-    _0: any,
+    _0: unknown,
     { limit, offset }: { limit: number; offset: number },
     context: AuthenticatedContext,
     info: any
@@ -143,7 +138,7 @@ export const myPackages = async (
 };
 
 export const getLatestPackages = async (
-    _0: any,
+    _0: unknown,
     { limit, offSet }: { limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
@@ -165,7 +160,7 @@ export const getLatestPackages = async (
     };
 };
 
-export const packageVersions = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
+export const packageVersions = async (parent: Package, _1: unknown, context: AuthenticatedContext, info: any) => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     const versions = await getPackageVersionsFromCacheOrDbById(
         context,
@@ -177,7 +172,7 @@ export const packageVersions = async (parent: Package, _1: any, context: Authent
 
 export const packageCatalog = async (
     parent: Package,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
     info: any
 ): Promise<Catalog> => {
@@ -195,7 +190,7 @@ export const packageCatalog = async (
         return {
             identifier: {
                 catalogSlug: catalog.slug,
-                registryURL: process.env["REGISTRY_URL"]
+                registryURL: process.env.REGISTRY_URL
             }
         };
     }
@@ -205,15 +200,14 @@ export const packageCatalog = async (
 
 export const packageLatestVersion = async (
     parent: Package,
-    _1: any,
+    _1: unknown,
     context: Context,
     info: any
 ): Promise<Version | null> => {
-
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
-    
+
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId);
@@ -226,7 +220,7 @@ export const packageLatestVersion = async (
         packageEntity.id,
         getGraphQlRelationName(info)
     );
-    if (version == undefined) {
+    if (version === undefined) {
         return null;
     }
 
@@ -235,7 +229,7 @@ export const packageLatestVersion = async (
 
 export const findPackagesForCollection = async (
     parent: Collection,
-    _1: any,
+    _1: unknown,
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -256,11 +250,11 @@ export const findPackagesForCollection = async (
     return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p)));
 };
 
-export const findPackageIdentifier = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
+export const findPackageIdentifier = async (parent: Package, _1: unknown, context: AuthenticatedContext, info: any) => {
     return parent.identifier;
 };
 
-export const myPackagePermissions = async (parent: Package, _0: any, context: AuthenticatedContext) => {
+export const myPackagePermissions = async (parent: Package, _0: unknown, context: AuthenticatedContext) => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId);
@@ -278,13 +272,13 @@ export const myPackagePermissions = async (parent: Package, _0: any, context: Au
     );
 };
 
-export const findPackageCreator = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
+export const findPackageCreator = async (parent: Package, _1: unknown, context: AuthenticatedContext, info: any) => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     return getUserFromCacheOrDbById(context, context.connection, packageEntity.creatorId, getGraphQlRelationName(info));
 };
 
 export const findPackage = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: PackageIdentifierInput },
     context: Context,
     info: any
@@ -308,7 +302,7 @@ export const findPackage = async (
 };
 
 export const packageFetched = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: VersionIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -331,7 +325,7 @@ export const packageFetched = async (
 };
 
 export const searchPackages = async (
-    _0: any,
+    _0: unknown,
     { query, limit, offSet }: { query: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
@@ -350,7 +344,7 @@ export const searchPackages = async (
 };
 
 export const createPackage = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: CreatePackageInput },
     context: AuthenticatedContext,
     info: any
@@ -388,7 +382,7 @@ export const createPackage = async (
 };
 
 export const updatePackage = async (
-    _0: any,
+    _0: unknown,
     { identifier, value }: { identifier: PackageIdentifierInput; value: UpdatePackageInput },
     context: AuthenticatedContext,
     info: any
@@ -410,7 +404,6 @@ export const updatePackage = async (
     let packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, getGraphQlRelationName(info));
 
     await context.connection.transaction(async (transaction) => {
-
         const [packageEntityUpdated, propertiesChanged] = await transaction
             .getCustomRepository(PackageRepository)
             .updatePackage({
@@ -441,28 +434,24 @@ export const updatePackage = async (
                 await deletePackageFollowsForUsersWithNoPermissions(packageEntity.id, transaction);
             }
         }
-
     });
 
     context.cache.clear();
 
-
-    if(value.newCatalogSlug || value.newPackageSlug) {
+    if (value.newCatalogSlug || value.newPackageSlug) {
         identifier = {
             catalogSlug: value.newCatalogSlug || identifier.catalogSlug,
             packageSlug: value.newPackageSlug || identifier.packageSlug
-        }
+        };
     }
-    
+
     packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, getGraphQlRelationName(info));
 
     return packageEntityToGraphqlObject(context, context.connection, packageEntity);
-
-
 };
 
 export const movePackage = async (
-    _0: any,
+    _0: unknown,
     {
         identifier,
         catalogIdentifier: targetCatalog
@@ -503,7 +492,7 @@ export const movePackage = async (
         await transaction.getCustomRepository(PackageRepository).save(packageEntity);
 
         const userPermission = await getCatalogPermissionsFromCacheOrDb(context, targetCatalogEntity.id, context.me.id);
-        
+
         await transaction
             .getCustomRepository(PackagePermissionRepository)
             .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission);
@@ -538,7 +527,7 @@ export const deletePackageFollowsForUsersWithNoPermissions = async (packageId: n
 };
 
 export const setPackageCoverImage = async (
-    _0: any,
+    _0: unknown,
     { identifier, image }: { identifier: PackageIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
@@ -548,7 +537,7 @@ export const setPackageCoverImage = async (
 };
 
 export const deletePackage = async (
-    _0: any,
+    _0: unknown,
     { identifier }: { identifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
@@ -581,7 +570,7 @@ export const deletePackage = async (
 };
 
 export const userPackages = async (
-    _0: any,
+    _0: unknown,
     { username, limit, offSet }: { username: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
@@ -601,7 +590,7 @@ export const userPackages = async (
 };
 
 export const catalogPackages = async (
-    _0: any,
+    _0: unknown,
     { identifier, limit, offset }: { identifier: CatalogIdentifierInput; limit: number; offset: number },
     context: AuthenticatedContext,
     info: any
@@ -616,7 +605,7 @@ export const catalogPackages = async (
     return packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
 };
 
-export const packageDescription = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
+export const packageDescription = async (parent: Package, _1: unknown, context: Context): Promise<string | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -626,7 +615,7 @@ export const packageDescription = async (parent: Package, _1: any, context: Cont
     return packageEntity.description || null;
 };
 
-export const packageDisplayName = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
+export const packageDisplayName = async (parent: Package, _1: unknown, context: Context): Promise<string | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -636,7 +625,7 @@ export const packageDisplayName = async (parent: Package, _1: any, context: Cont
     return packageEntity.displayName || null;
 };
 
-export const packageCreatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
+export const packageCreatedAt = async (parent: Package, _1: unknown, context: Context): Promise<Date | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -646,7 +635,7 @@ export const packageCreatedAt = async (parent: Package, _1: any, context: Contex
     return packageEntity.createdAt || null;
 };
 
-export const packageUpdatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
+export const packageUpdatedAt = async (parent: Package, _1: unknown, context: Context): Promise<Date | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -656,7 +645,7 @@ export const packageUpdatedAt = async (parent: Package, _1: any, context: Contex
     return packageEntity.updatedAt || null;
 };
 
-export const packageFetchCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
+export const packageFetchCount = async (parent: Package, _1: unknown, context: Context): Promise<number | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
@@ -666,33 +655,34 @@ export const packageFetchCount = async (parent: Package, _1: any, context: Conte
     return packageEntity.fetchCount || null;
 };
 
-export const packageViewedCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
+export const packageViewedCount = async (parent: Package, _1: unknown, context: Context): Promise<number | null> => {
     if (!(await hasPackagePermission(Permission.VIEW, context, parent.identifier))) {
         return null;
     }
-    
+
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
 
     return packageEntity.fetchCount || null;
 };
 
-export const packageIsPublic = async (parent: Package, _1: any, context: Context): Promise<boolean> => {
+export const packageIsPublic = async (parent: Package, _1: unknown, context: Context): Promise<boolean> => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     return packageEntity.isPublic;
 };
 
-export const packageUpdateMethods = async (parent: Package, _1: any, context: Context, info: any): Promise<UpdateMethod[]> => {
-
+export const packageUpdateMethods = async (
+    parent: Package,
+    _1: unknown,
+    context: Context,
+    info: any
+): Promise<UpdateMethod[]> => {
     const packageEntity = await getPackageFromCacheOrDbOrFail(context, parent.identifier);
     const latestVersion = await getPackageLatestVersionFromCacheOrDbById(context, packageEntity.id);
 
-
-    if(latestVersion == null)
-        return [];
+    if (latestVersion == null) return [];
 
     return latestVersion.updateMethods || [];
-
-}
+};
 
 export const getPackageFromCacheOrDbById = async (
     context: Context,
@@ -761,6 +751,3 @@ export const getPackageVersionsFromCacheOrDbById = async (
         context.connection.getCustomRepository(VersionRepository).findVersions({ packageId, relations });
     return await context.cache.loadPackageVersions(packageId, versionsPromiseFunction);
 };
-
-
-

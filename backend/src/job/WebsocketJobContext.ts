@@ -1,14 +1,16 @@
 import { Task, MessageType, TaskStatus } from "datapm-client-lib";
 import { JobMessageRequest, JobMessageResponse, JobRequestType, Parameter, ParameterAnswer } from "datapm-lib";
-import {  AuthenticatedContext, SocketContext } from "../context";
-import SocketIO from 'socket.io';
+import { AuthenticatedContext, SocketContext } from "../context";
+import SocketIO from "socket.io";
 import { BackendJobContextBase } from "./BackendJobContextBase";
 
-
 export class WebsocketJobContext extends BackendJobContextBase {
-
-
-    constructor(public jobId:string, private socketContext:AuthenticatedContext, private socket: SocketIO.Socket, private channelName: string) {
+    constructor(
+        public jobId: string,
+        private socketContext: AuthenticatedContext,
+        private socket: SocketIO.Socket,
+        private channelName: string
+    ) {
         super(jobId, socketContext);
     }
 
@@ -17,37 +19,35 @@ export class WebsocketJobContext extends BackendJobContextBase {
     }
 
     _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
-        
         this.parameterCount += parameters.length;
-        
+
         const request = new JobMessageRequest(JobRequestType.PROMPT);
         request.prompts = parameters;
 
         return new Promise<ParameterAnswer<T>>((resolve, reject) => {
             this.socket.emit(this.channelName, request, (response: JobMessageResponse) => {
-                if(response.responseType === JobRequestType.ERROR){
+                if (response.responseType === JobRequestType.ERROR) {
                     reject(response.message);
-                }else{
-                    if(!response.answers) {
-                        throw new Error("No answers received"); 
+                } else {
+                    if (!response.answers) {
+                        throw new Error("No answers received");
                     }
 
-                    for(const key of Object.keys(response.answers)){
-                        parameters.find(p => p.name === key)!.configuration[key] = response.answers[key];
+                    for (const key of Object.keys(response.answers)) {
+                        parameters.find((p) => p.name === key)!.configuration[key] = response.answers[key];
                     }
 
                     resolve(response.answers);
                 }
             });
         });
-
-
     }
 
     updateSteps(steps: string[]): void {
         const request = new JobMessageRequest(JobRequestType.SET_STEPS);
         request.steps = steps;
-        this.socket.emit(this.channelName, request);    }
+        this.socket.emit(this.channelName, request);
+    }
 
     setCurrentStep(step: string): void {
         const request = new JobMessageRequest(JobRequestType.SET_CURRENT_STEP);
@@ -67,7 +67,7 @@ export class WebsocketJobContext extends BackendJobContextBase {
         const request = new JobMessageRequest(JobRequestType.START_TASK);
         request.message = message;
 
-        let taskStatus:TaskStatus = "RUNNING";
+        const taskStatus: TaskStatus = "RUNNING";
         let lastMessage: string | undefined;
 
         const task: Task = {
@@ -75,7 +75,6 @@ export class WebsocketJobContext extends BackendJobContextBase {
                 return taskStatus;
             },
             end: (status: TaskStatus, message?: string) => {
-
                 const endTaskMessage = new JobMessageRequest(JobRequestType.END_TASK);
                 endTaskMessage.taskStatus = status;
                 endTaskMessage.message = message;
@@ -87,28 +86,23 @@ export class WebsocketJobContext extends BackendJobContextBase {
                         } else {
                             resolve();
                         }
-
                     });
                 });
             },
             setMessage: (message: string) => {
-
                 const request = new JobMessageRequest(JobRequestType.TASK_UPDATE);
                 request.message = message;
                 lastMessage = message;
 
                 this.socket.emit(this.channelName, request);
             },
-            getLastMessage: () =>  {
-                return lastMessage
+            getLastMessage: () => {
+                return lastMessage;
             }
-        }
+        };
 
         this.socket.emit(this.channelName, request);
 
         return task;
-
     }
-
-    
 }

@@ -5,10 +5,9 @@ import { UserEntity } from "./UserEntity";
 @Entity({
     name: "credential"
 })
-@Unique(["repositoryId","credentialIdentifier"])
+@Unique(["repositoryId", "credentialIdentifier"])
 export class CredentialEntity extends EntityBaseModel {
-
-    @PrimaryGeneratedColumn({name: "id", type: "int"})
+    @PrimaryGeneratedColumn({ name: "id", type: "int" })
     id: number;
 
     @Column({ nullable: false, name: "encrypted_credentials" })
@@ -30,5 +29,4 @@ export class CredentialEntity extends EntityBaseModel {
 
     @Column({ nullable: false, name: "credential_identifier" })
     credentialIdentifier: string;
-
 }

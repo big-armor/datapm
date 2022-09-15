@@ -16,10 +16,9 @@ import { AdminHolder } from "./admin-holder";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 
 describe("Admin Tests", async () => {
-    let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
+    const anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
     let nonAdminUserClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
     beforeEach((done) => setTimeout(done, 100));
 
     it("Non admin can't search for users without restrictions", async () => {
@@ -39,7 +38,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(userSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+        expect(userSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.equal(true);
     });
 
     it("Non admin can't suspend users", async () => {
@@ -59,7 +58,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(userStatusChangeResult.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+        expect(userStatusChangeResult.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.equal(true);
     });
 
     it("Admin can suspend users", async () => {
@@ -72,7 +71,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(userStatusChangeResult.errors).to.be.undefined;
+        expect(userStatusChangeResult.errors).to.equal(undefined);
     });
 
     it("Suspended user can't do queries that require valid authentication", async () => {
@@ -80,8 +79,9 @@ describe("Admin Tests", async () => {
             query: MeDocument
         });
 
-        expect(meResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))).to.be
-            .true;
+        expect(
+            meResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))
+        ).to.equal(true);
     });
 
     it("Suspended user can't login", async () => {
@@ -93,8 +93,9 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(loginResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))).to
-            .be.true;
+        expect(
+            loginResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))
+        ).to.equal(true);
     });
 
     it("Non admin can't delete users", async () => {
@@ -113,7 +114,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(userDeletion.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+        expect(userDeletion.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.equal(true);
     });
 
     it("Admin can delete users", async () => {
@@ -132,7 +133,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(deletedUserResponse.errors?.some((error) => error.message.includes("USER_NOT_FOUND"))).to.be.true;
+        expect(deletedUserResponse.errors?.some((error) => error.message.includes("USER_NOT_FOUND"))).to.equal(true);
     });
 
     it("Admin can see private user data in admin search query", async () => {
@@ -174,6 +175,6 @@ describe("Admin Tests", async () => {
         });
 
         const firstUser = usersSearchResults.data.searchUsers.users[0];
-        expect(firstUser?.firstName).to.be.undefined;
+        expect(firstUser?.firstName).to.equal(undefined);
     });
 });

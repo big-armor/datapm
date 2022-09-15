@@ -26,7 +26,7 @@ async function getAPIKey({
     relations?: string[];
 }): Promise<APIKeyEntity | null> {
     const ALIAS = "users";
-    let query = manager
+    const query = manager
         .getRepository(APIKeyEntity)
         .createQueryBuilder(ALIAS)
         .where({ id: id })
@@ -92,7 +92,7 @@ export class APIKeyRepository extends Repository<APIKeyEntity> {
                 .where({ userId: user.id, label: label })
                 .getOne();
 
-            if (existingKey != undefined) {
+            if (existingKey !== undefined) {
                 throw new ValidationError("NOT_UNIQUE");
             }
 
@@ -110,7 +110,7 @@ export class APIKeyRepository extends Repository<APIKeyEntity> {
             try {
                 const savedKey = await transaction.save(apiKey);
             } catch (error) {
-                if (error.code == 23505) throw new ValidationError("NOT_UNIQUE");
+                if (error.code === 23505) throw new ValidationError("NOT_UNIQUE");
                 console.error(error);
                 throw error;
             }

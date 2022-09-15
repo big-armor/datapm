@@ -11,7 +11,10 @@ import { PackageFile } from "datapm-lib";
 @EntityRepository()
 export class VersionRepository {
     readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     public async findVersion(
         packageId: number,
@@ -33,18 +36,20 @@ export class VersionRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: PackageIdentifierInput, packageFile: PackageFile) {
-        // TODO this should probably be in the transaction 
+    async save(userId: number, identifier: PackageIdentifierInput, packageFile: PackageFile): Promise<VersionEntity> {
+        // TODO this should probably be in the transaction
         // const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
 
         return await this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
-            let semVer = new SemVer(packageFile.version);
+            const semVer = new SemVer(packageFile.version);
 
-            const updateMethods = packageFile.sources.flatMap(source => source.streamSets.flatMap(streamSet => streamSet.updateMethods));
+            const updateMethods = packageFile.sources.flatMap((source) =>
+                source.streamSets.flatMap((streamSet) => streamSet.updateMethods)
+            );
 
-            let version = transaction.getRepository(VersionEntity).create({
+            const version = transaction.getRepository(VersionEntity).create({
                 packageId: packageEntity.id,
                 majorVersion: semVer.major,
                 minorVersion: semVer.minor,
@@ -138,9 +143,9 @@ export class VersionRepository {
         identifier: VersionIdentifierInput;
         relations?: string[];
     }): Promise<VersionEntity> {
-        let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
+        const packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
-        let version = await this.manager.getRepository(VersionEntity).findOneOrFail({
+        const version = await this.manager.getRepository(VersionEntity).findOneOrFail({
             where: {
                 packageId: packageEntity.id,
                 majorVersion: identifier.versionMajor,
@@ -202,7 +207,7 @@ export class VersionRepository {
     }
 
     async deleteVersions(versions: VersionEntity[]): Promise<void> {
-        if (versions.length == 0) return;
+        if (versions.length === 0) return;
 
         for (const version of versions) {
             const versionIdentifier: VersionIdentifierInput = {

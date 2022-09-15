@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { ActivityLogEventType } from "../generated/graphql";
 
 export interface Notification {

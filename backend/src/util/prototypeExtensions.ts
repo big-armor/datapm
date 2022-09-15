@@ -16,7 +16,7 @@ function addRelations<Entity>(
     topLevelAlias: string,
     names: string[][]
 ): SelectQueryBuilder<Entity> {
-    for (let name of names) {
+    for (const name of names) {
         const relationName = [topLevelAlias, ...name];
         const alias = relationName.slice(0, relationName.length - 1).join("");
         const relation = relationName[relationName.length - 1];

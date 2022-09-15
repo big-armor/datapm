@@ -6,10 +6,9 @@ import { UserEntity } from "./UserEntity";
 @Entity({
     name: "repository"
 })
-@Unique(["packageId","connectorType","repositoryIdentifier"])
+@Unique(["packageId", "connectorType", "repositoryIdentifier"])
 export class RepositoryEntity extends EntityBaseModel {
-
-    @PrimaryGeneratedColumn({name: "id", type: "int"})
+    @PrimaryGeneratedColumn({ name: "id", type: "int" })
     id: number;
 
     @ManyToOne(() => PackageEntity, { eager: true })
@@ -39,5 +38,4 @@ export class RepositoryEntity extends EntityBaseModel {
 
     @Column({ nullable: false, name: "connection_configuration" })
     connectionConfiguration: string;
-    
 }

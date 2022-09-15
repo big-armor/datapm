@@ -13,13 +13,13 @@ import { createAnonymousClient, createUser } from "./test-utils";
 describe("Group tests", () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
     before(async () => {
         userAClient = await createUser("FirstA", "LastA", "testA-group", "testA-group@test.datapm.io", "passwordA!");
         userBClient = await createUser("FirstB", "LastB", "testB-group", "testB-group@test.datapm.io", "passwordB!");
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should create a group", async () => {
@@ -46,7 +46,11 @@ describe("Group tests", () => {
         });
 
         expect(response.errors != null, "has errors").to.equal(true);
-        expect(response.errors![0].message.startsWith("NOT_UNIQUE")).equal(true);
+
+        if (response.errors == null) {
+            throw new Error("expected errors");
+        }
+        expect(response.errors[0].message.startsWith("NOT_UNIQUE")).equal(true);
     });
 
     it("UserA should have all permissions", async () => {
@@ -116,7 +120,12 @@ describe("Group tests", () => {
         });
 
         expect(response.errors != null).equal(true);
-        expect(response.errors![0].message).equal("NOT_AUTHORIZED");
+
+        if (response.errors == null) {
+            throw new Error("expected errors");
+        }
+
+        expect(response.errors[0].message).equal("NOT_AUTHORIZED");
     });
 
     it("Should remove userB from the group", async () => {
@@ -150,7 +159,12 @@ describe("Group tests", () => {
         });
 
         expect(response.errors != null).equal(true);
-        expect(response.errors![0].message.startsWith("NOT_VALID")).eq(true);
+
+        if (response.errors == null) {
+            throw new Error("expected errors");
+        }
+
+        expect(response.errors[0].message.startsWith("NOT_VALID")).eq(true);
     });
 
     it("UserA should not able to remove their own manager permission", async () => {
@@ -168,6 +182,11 @@ describe("Group tests", () => {
         });
 
         expect(response.errors != null).equal(true);
-        expect(response.errors![0].message.startsWith("NOT_VALID")).eq(true);
+
+        if (response.errors == null) {
+            throw new Error("expected errors");
+        }
+
+        expect(response.errors[0].message.startsWith("NOT_VALID")).eq(true);
     });
 });

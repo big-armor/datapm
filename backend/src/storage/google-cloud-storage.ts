@@ -1,5 +1,5 @@
 import { DPMStorage } from "./dpm-storage";
-import { Stream, Readable } from "stream";
+import { Stream, Readable, Transform } from "stream";
 import { Bucket, File, MoveCallback, Storage } from "@google-cloud/storage";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
@@ -38,7 +38,7 @@ export class GoogleCloudStorage implements DPMStorage {
         await this.bucket.deleteFiles({ prefix: this.buildPath(namespace, "") });
     }
 
-    public async deleteItem(namespace: string[], itemId: string) {
+    public async deleteItem(namespace: string[], itemId: string): Promise<void> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
 
@@ -79,15 +79,25 @@ export class GoogleCloudStorage implements DPMStorage {
         });
     }
 
-    public async writeStream(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async writeStream(
+        namespace: string[],
+        itemId: string,
+        byteStream: Readable,
+        transformer?: Transform
+    ): Promise<void> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
         const writeStream = file.createWriteStream();
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
-    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback: any): Promise<void> {
-        
+    public async moveFile(
+        oldNamespace: string[],
+        oldItemId: string,
+        newNamespace: string[],
+        newItemId: string,
+        callback: (error: Error | undefined) => void
+    ): Promise<void> {
         const oldFilePath = this.buildPath(oldNamespace, oldItemId);
         const newFilePath = this.buildPath(newNamespace, newItemId);
         const oldFile = await this.getBucketFileByPath(oldFilePath);
@@ -108,7 +118,7 @@ export class GoogleCloudStorage implements DPMStorage {
     }
 
     private buildPath(namespace: string[], itemId: string): string {
-        const itemPath = `${namespace.join('/')}/${itemId}`;
+        const itemPath = `${namespace.join("/")}/${itemId}`;
         if (!this.pathPrefix) {
             return itemPath;
         }

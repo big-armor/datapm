@@ -1,4 +1,3 @@
-
 declare module "minizlib" {
     import { Transform, TransformOptions } from "stream";
 

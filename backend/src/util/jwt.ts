@@ -6,6 +6,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { getEnvVariable } from "./getEnvVariable";
 
 export class InvalidAuthenticationError extends ApolloError {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(message: string, extensions?: Record<string, any>) {
         super(message, "INVALID_AUTHENTICATION", extensions);
 
@@ -14,6 +15,7 @@ export class InvalidAuthenticationError extends ApolloError {
 }
 
 export class NoAuthenticationError extends ApolloError {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(message: string, extensions?: Record<string, any>) {
         super(message, "NO_AUTHENTICATION_TOKEN", extensions);
 
@@ -36,8 +38,8 @@ const verifyToken = (token: string, secretOrPublicKey: jwt.Secret, options?: jwt
 };
 
 function getToken(req: express.Request): string {
-    if (req.cookies != null && req.cookies["token"] != null) {
-        const token = req.cookies["token"] || "";
+    if (req.cookies != null && req.cookies.token != null) {
+        const token = req.cookies.token || "";
         return token;
     }
 
@@ -73,7 +75,7 @@ export async function getJwtFromRequest(req: express.Request): Promise<Jwt> {
 }
 
 export async function parseJwt(token: string): Promise<Jwt> {
-    const decoded: any = jwt.decode(token, { complete: true });
+    const decoded = jwt.decode(token, { complete: true });
     if (!decoded || !decoded.header || !decoded.header.kid) {
         throw new AuthenticationError("invalid token");
     }

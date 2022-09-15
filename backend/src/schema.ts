@@ -22,7 +22,14 @@ import { HasGroupPermissionDirective } from "./directive/hasGroupPermissionDirec
 import { ValidGroupSlugDirective } from "./directive/ValidGroupSlugDirective";
 
 const SCHEMAS_DIRECTORY = "node_modules/datapm-lib/";
-const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql", "group-schema.gql"];
+const SCHEMA_FILES = [
+    "schema.gql",
+    "auth-schema.gql",
+    "user-schema.gql",
+    "api-key-schema.gql",
+    "images-schema.gql",
+    "group-schema.gql"
+];
 
 const readFile = promisify(fs.readFile);
 

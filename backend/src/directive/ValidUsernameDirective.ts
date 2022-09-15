@@ -1,6 +1,6 @@
 import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
-import { Kind } from "graphql";
 import {
+    Kind,
     GraphQLField,
     defaultFieldResolver,
     GraphQLArgument,
@@ -9,6 +9,7 @@ import {
     GraphQLInputField,
     GraphQLInputObjectType
 } from "graphql";
+
 import { Context } from "../context";
 import { INVALID_USERNAME_ERROR } from "../generated/graphql";
 import { ValidationConstraint } from "./ValidationConstraint";
@@ -19,11 +20,13 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined = args.username || args.value?.username || undefined;
@@ -32,8 +35,9 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined = args.username || args.value?.username || undefined;
@@ -57,15 +61,15 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
 export function validateUsername(username: string | undefined): void {
     const validUsername = usernameValid(username);
 
-    if (validUsername == "USERNAME_REQUIRED") {
+    if (validUsername === "USERNAME_REQUIRED") {
         throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_REQUIRED);
     }
 
-    if (validUsername == "USERNAME_TOO_LONG") {
+    if (validUsername === "USERNAME_TOO_LONG") {
         throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_TOO_LONG);
     }
 
-    if (validUsername == "INVALID_CHARACTERS") {
+    if (validUsername === "INVALID_CHARACTERS") {
         throw new ValidationError(INVALID_USERNAME_ERROR.INVALID_CHARACTERS);
     }
 }

@@ -7,7 +7,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { sendAPIKeyCreatedEmail } from "../util/smtpUtil";
 
 export const createAPIKey = async (
-    _0: any,
+    _0: unknown,
     { value }: { value: CreateAPIKeyInput },
     context: AuthenticatedContext,
     info: any
@@ -21,9 +21,9 @@ export const createAPIKey = async (
     }
 
     if (
-        value.scopes.indexOf(Scope.MANAGE_API_KEYS) == -1 ||
-        value.scopes.indexOf(Scope.MANAGE_PRIVATE_ASSETS) == -1 ||
-        value.scopes.indexOf(Scope.READ_PRIVATE_ASSETS) == -1
+        value.scopes.indexOf(Scope.MANAGE_API_KEYS) === -1 ||
+        value.scopes.indexOf(Scope.MANAGE_PRIVATE_ASSETS) === -1 ||
+        value.scopes.indexOf(Scope.READ_PRIVATE_ASSETS) === -1
     )
         throw new ValidationError("ALL_SCOPES_REQUIRED");
 
@@ -32,8 +32,8 @@ export const createAPIKey = async (
         .findByUser(context.me.id);
 
     if (existingAPIKeyLabel != null) {
-        for (let apiKey of existingAPIKeyLabel) {
-            if (apiKey.label == value.label) throw new ValidationError("APIKEY_LABEL_NOT_AVIALABLE");
+        for (const apiKey of existingAPIKeyLabel) {
+            if (apiKey.label === value.label) throw new ValidationError("APIKEY_LABEL_NOT_AVIALABLE");
         }
     }
 
@@ -48,7 +48,7 @@ export const createAPIKey = async (
 };
 
 export const deleteAPIKey = async (
-    _0: any,
+    _0: unknown,
     { id }: { id: string },
     context: AuthenticatedContext,
     info: any
@@ -58,7 +58,7 @@ export const deleteAPIKey = async (
         .deleteAPIKey({ id, relations: getGraphQlRelationName(info) });
 };
 
-export const myAPIKeys = async (_0: any, {}, context: AuthenticatedContext) => {
+export const myAPIKeys = async (_0: unknown, {}, context: AuthenticatedContext) => {
     const apiKeys = await context.connection.manager.getCustomRepository(APIKeyRepository).findByUser(context.me?.id);
 
     return apiKeys;

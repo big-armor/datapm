@@ -21,7 +21,7 @@ import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from 
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
 
 export const setPackagePermissions = async (
-    _0: any,
+    _0: unknown,
     {
         identifier,
         value,
@@ -92,7 +92,7 @@ export const setPackagePermissions = async (
                     throw new ValidationError("USER_NOT_FOUND - " + userPackagePermission.usernameOrEmailAddress);
                 }
             } else {
-                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                if (user.status === UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
                     existingUsers.push(user);
@@ -130,7 +130,7 @@ export const setPackagePermissions = async (
 };
 
 export const removePackagePermissions = async (
-    _0: any,
+    _0: unknown,
     { identifier, usernameOrEmailAddress }: { identifier: PackageIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {

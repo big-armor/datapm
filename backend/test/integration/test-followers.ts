@@ -30,7 +30,7 @@ describe("Followers Tests", async () => {
             userAUsername + "@test.datapm.io",
             "passwordA!"
         );
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
 
         console.log("User A created");
 
@@ -41,7 +41,7 @@ describe("Followers Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userBClient).to.exist;
+        expect(userBClient).to.not.equal(undefined);
         console.log("User B created");
     });
 
@@ -86,7 +86,7 @@ describe("Followers Tests", async () => {
 
         expect(catalogFollowers.errors == null).to.equal(true);
         expect(catalogFollowers.data.catalogFollowers.count).to.equal(1);
-        expect(catalogFollowers.data.catalogFollowers.followers!.some((f) => f.username === userAUsername)).to.equal(
+        expect(catalogFollowers.data.catalogFollowers.followers?.some((f) => f.username === userAUsername)).to.equal(
             true
         );
     });
@@ -132,7 +132,7 @@ describe("Followers Tests", async () => {
 
         expect(catalogFollowers.errors != null).to.equal(true);
         expect(catalogFollowers.data == null).to.equal(true);
-        expect(catalogFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(catalogFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 
     it("Catalog followers count returns count", async function () {
@@ -215,7 +215,7 @@ describe("Followers Tests", async () => {
 
         expect(catalogFollowers.errors != null).to.equal(true);
         expect(catalogFollowers.data == null).to.equal(true);
-        expect(catalogFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(catalogFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 
     it("Collection followers returns followers list and count", async function () {
@@ -259,7 +259,7 @@ describe("Followers Tests", async () => {
         expect(collectionFollowers.errors == null).to.equal(true);
         expect(collectionFollowers.data.collectionFollowers.count).to.equal(1);
         expect(
-            collectionFollowers.data.collectionFollowers.followers!.some((f) => f.username === userAUsername)
+            collectionFollowers.data.collectionFollowers.followers?.some((f) => f.username === userAUsername)
         ).to.equal(true);
     });
 
@@ -303,7 +303,7 @@ describe("Followers Tests", async () => {
 
         expect(collectionFollowers.errors != null).to.equal(true);
         expect(collectionFollowers.data == null).to.equal(true);
-        expect(collectionFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(collectionFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 
     it("Collection followers count returns followers count", async function () {
@@ -384,7 +384,7 @@ describe("Followers Tests", async () => {
 
         expect(collectionFollowers.errors != null).to.equal(true);
         expect(collectionFollowers.data == null).to.equal(true);
-        expect(collectionFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(collectionFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 
     it("Package followers returns followers list and count", async function () {
@@ -443,7 +443,7 @@ describe("Followers Tests", async () => {
 
         expect(packageFollowers.errors == null).to.equal(true);
         expect(packageFollowers.data.packageFollowers.count).to.equal(1);
-        expect(packageFollowers.data.packageFollowers.followers!.some((f) => f.username === userAUsername)).to.equal(
+        expect(packageFollowers.data.packageFollowers.followers?.some((f) => f.username === userAUsername)).to.equal(
             true
         );
     });
@@ -504,7 +504,7 @@ describe("Followers Tests", async () => {
 
         expect(packageFollowers.errors != null).to.equal(true);
         expect(packageFollowers.data == null).to.equal(true);
-        expect(packageFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(packageFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 
     it("Package followers count returns followers count", async function () {
@@ -617,6 +617,6 @@ describe("Followers Tests", async () => {
 
         expect(packageFollowers.errors != null).to.equal(true);
         expect(packageFollowers.data == null).to.equal(true);
-        expect(packageFollowers.errors!.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
+        expect(packageFollowers.errors?.some((e) => e.message === "NOT_AUTHORIZED")).to.equal(true);
     });
 });

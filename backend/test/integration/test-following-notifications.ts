@@ -14,7 +14,7 @@ import {
     SaveFollowDocument,
     UpdatePackageDocument
 } from "./registry-client";
-import { mailObservable } from "./setup";
+import { MailDevEmail, mailObservable, tempMailDevEmail } from "./setup";
 import { createUser } from "./test-utils";
 
 describe("Follow Tests", async () => {
@@ -43,8 +43,8 @@ describe("Follow Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user A to create a new catalog", async () => {
@@ -139,7 +139,7 @@ describe("Follow Tests", async () => {
 
         expect(createPackageResponse.errors).to.equal(undefined);
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         const createVersionResponse = await userAClient.mutate({
@@ -190,7 +190,7 @@ describe("Follow Tests", async () => {
     });
 
     it("Should allow user A to create a new package version", async () => {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.readmeMarkdown = "A new readme value";
         packageFileContents.version = "1.0.1";
         const packageFileString = JSON.stringify(packageFileContents);
@@ -228,15 +228,15 @@ describe("Follow Tests", async () => {
     });
 
     it("Should send email after instant notification updates", async () => {
-        let userBEmail: any = null;
+        let userBEmail: MailDevEmail = tempMailDevEmail;
 
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -252,21 +252,23 @@ describe("Follow Tests", async () => {
         expect(response.errors).eq(undefined);
 
         await verifyEmailPromise;
+
+        if (userBEmail == null) throw new Error("User B email was not received");
         expect(userBEmail.text).to.contain("This is your instant");
         expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
         expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
     });
 
     it("Should send email after daily notification updates", async () => {
-        let userBEmail: any = null;
+        let userBEmail: MailDevEmail = tempMailDevEmail;
 
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -291,15 +293,15 @@ describe("Follow Tests", async () => {
     });
 
     it("Should send email after hourly notification updates", async () => {
-        let userBEmail: any = null;
+        let userBEmail: MailDevEmail = tempMailDevEmail;
 
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -322,15 +324,15 @@ describe("Follow Tests", async () => {
     });
 
     it("Should send email after weekly notification updates", async () => {
-        let userBEmail: any = null;
+        let userBEmail: MailDevEmail = tempMailDevEmail;
 
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
