@@ -234,7 +234,7 @@ export const myFollowingActivity = async (
     context: AuthenticatedContext,
     info: GraphQLResolveInfo
 ): Promise<{
-    logs: ActivityLogEntity[];
+    logs: ActivityLog[];
     count: number;
     hasMore: boolean;
 }> => {
@@ -242,8 +242,10 @@ export const myFollowingActivity = async (
     const [logs, count] = await context.connection.manager
         .getCustomRepository(ActivityLogRepository)
         .getUserFollowingActivity(context.me.id, offset, limit, relations);
+
+    const convertedLogs = await logs.asyncMap((l) => activtyLogEntityToGraphQL(context, context.connection, l));
     return {
-        logs,
+        logs: convertedLogs,
         count,
         hasMore: count - (limit + offset) > 0
     };
