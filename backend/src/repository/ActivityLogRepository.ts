@@ -216,7 +216,7 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                 (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
                 "Follow",
                 `
-                    "ActivityLog"."user_id"!=="Follow"."user_id"
+                    "ActivityLog"."user_id" != "Follow"."user_id"
                 AND "ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
                 AND
                 (
@@ -322,7 +322,7 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                             (
                                 -- Check whether the log is included in user's log level follow settings
                                 CASE
-                                    WHEN "ActivityLog"."event_type"!=='VERSION_CREATED'::activity_log_event_type_enum THEN TRUE
+                                    WHEN "ActivityLog"."event_type" != 'VERSION_CREATED'::activity_log_event_type_enum THEN TRUE
                                     ELSE ("ActivityLog"."change_type"::activity_log_change_type_enum IN (SELECT * FROM unnest("Follow"."change_type")))
                                 END
                                 AND

@@ -161,7 +161,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
             // If the permissions input is empty, it will delete the row in collection permissions
             else {
                 // If the permissions row exists in the table delete it
-                if (permissions !== undefined) {
+                if (permissions != null) {
                     try {
                         await transaction
                             .createQueryBuilder()

@@ -208,7 +208,7 @@ export class PackageRepository extends Repository<PackageEntity> {
     }): Promise<PackageEntity> {
         const packageEntity = await findPackageById(this.manager, packageId, relations);
 
-        if (packageEntity === null) throw new Error("PACKAGE_NOT_FOUND");
+        if (packageEntity == null) throw new Error("PACKAGE_NOT_FOUND");
 
         return packageEntity;
     }
@@ -355,7 +355,7 @@ export class PackageRepository extends Repository<PackageEntity> {
 
             const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
-            if (packageEntity === null) {
+            if (packageEntity == null) {
                 throw new Error("PACKAGE_NOT_FOUND");
             }
 

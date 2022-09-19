@@ -58,7 +58,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             collectionIdDb.description = collection.description;
         }
 
-        if (collection.isPublic != null && collection.isPublic !== undefined) {
+        if (collection.isPublic != null) {
             collectionIdDb.isPublic = collection.isPublic;
         }
 

@@ -43,9 +43,8 @@ describe("User Tests", async () => {
     it("Create an email that already exists", async function () {
         let errorFound = false;
         await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!")
-            .catch((response: FetchResult<LoginMutation, Record<string, unknown>, Record<string, unknown>>) => {
-                if (response.errors?.find((e) => e.message === "EMAIL_ADDRESS_NOT_AVAILABLE") != null)
-                    errorFound = true;
+            .catch((response: Error) => {
+                if (response.message === "EMAIL_ADDRESS_NOT_AVAILABLE") errorFound = true;
             })
             .then((client) => {
                 expect(errorFound, "email address not available error").equal(true);
@@ -55,8 +54,8 @@ describe("User Tests", async () => {
     it("Create a username that already exists", async function () {
         let errorFound = false;
         await createUser("FirstA", "LastA", "testA-user", "testA-user2@test.datapm.io", "passwordA!")
-            .catch((response: FetchResult<LoginMutation, Record<string, unknown>, Record<string, unknown>>) => {
-                if (response.errors?.find((e) => e.message === "USERNAME_NOT_AVAILABLE") != null) errorFound = true;
+            .catch((response: Error) => {
+                if (response.message === "USERNAME_NOT_AVAILABLE") errorFound = true;
             })
             .then((client) => {
                 expect(errorFound, "username not available error").equal(true);

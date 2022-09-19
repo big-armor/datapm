@@ -315,6 +315,8 @@ export const addPackageToCollection = async (
 
     const relations = getGraphQlRelationName(info);
 
+    // if (!relations.includes("collection")) relations.push("collection");
+
     const value = await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
         .findByCollectionIdAndPackageId(collectionEntity.id, packageEntity.id, relations);

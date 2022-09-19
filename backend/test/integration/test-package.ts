@@ -928,7 +928,7 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors !== null).equal(true);
+        expect(response.errors != null).equal(true);
         expect(response.errors?.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))).is.not.equal(
             null
         );
@@ -980,7 +980,7 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors !== null).equal(true);
+        expect(response.errors != null).equal(true);
         expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 
@@ -1026,7 +1026,7 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors !== null).equal(true);
+        expect(response.errors != null).equal(true);
 
         expect(response.errors?.find((e) => e.message.includes("NOT_AUTHORIZED"))).is.not.equal(null);
     });

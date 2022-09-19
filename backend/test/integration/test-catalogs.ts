@@ -881,7 +881,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User B can't delete permissions of creator User A", async function () {
-        const response = await userAClient.mutate({
+        const response = await userBClient.mutate({
             mutation: DeleteUserCatalogPermissionsDocument,
             variables: {
                 identifier: {
@@ -891,7 +891,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors !== null).equal(true);
+        expect(response.errors != null).equal(true);
         expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 

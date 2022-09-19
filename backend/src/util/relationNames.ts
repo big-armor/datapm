@@ -3,7 +3,7 @@ import graphqlFields from "graphql-fields";
 
 function isEmpty(obj: Record<string, unknown>): boolean {
     for (const x in obj) {
-        if (obj[x] == null) return false;
+        if (obj[x] !== undefined) return false;
     }
     return true;
 }

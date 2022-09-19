@@ -217,7 +217,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                 const offsetFilterTransform = new Transform({
                     objectMode: true,
                     transform: (chunk: RecordContext, encoding, callback) => {
-                        if (chunk.offset !== undefined && chunk.offset >= startRequest.offset) {
+                        if (chunk.offset != null && chunk.offset >= startRequest.offset) {
                             callback(null, chunk);
                         } else {
                             callback();

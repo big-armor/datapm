@@ -158,12 +158,14 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
         if (testUserPersmission == null) {
             throw new Error("Expected user to exist");
         }
-        expect(response.errors == null).equal(true);
+
         expect(testUserPersmission).to.not.equal(undefined);
         expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
         expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(false);
@@ -202,12 +204,14 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
         if (testUserPersmission == null) {
             throw new Error("Expected user to exist");
         }
-        expect(response.errors == null).equal(true);
+
         expect(testUserPersmission).to.not.equal(undefined);
         expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
         expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(true);
@@ -225,7 +229,7 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors !== null).equal(true);
+        expect(response.errors != null).equal(true);
         expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 
@@ -332,13 +336,13 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
         if (testUserPersmission == null) {
             throw new Error("Expected user to exist");
         }
-
-        expect(response.errors == null).equal(true);
         expect(testUserPersmission).to.not.equal(undefined);
         expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
         expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(true);

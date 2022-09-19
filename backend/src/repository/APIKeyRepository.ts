@@ -57,23 +57,6 @@ async function getAPIKeyOrFail({
 
 @EntityRepository(UserEntity)
 export class APIKeyRepository extends Repository<APIKeyEntity> {
-    constructor() {
-        super();
-    }
-
-    async findAllForUser({ user, relations = [] }: { user: UserEntity; relations?: string[] }) {
-        const ALIAS = "users";
-        const keys = await this.manager
-            .getRepository(APIKeyEntity)
-            .createQueryBuilder(ALIAS)
-            .where({ user: UserEntity })
-            .addRelations(ALIAS, relations)
-            .getMany();
-
-        // Never return the hash
-        keys.forEach((k) => delete k.hash);
-    }
-
     async createAPIKey({
         user,
         label,
@@ -92,7 +75,7 @@ export class APIKeyRepository extends Repository<APIKeyEntity> {
                 .where({ userId: user.id, label: label })
                 .getOne();
 
-            if (existingKey !== undefined) {
+            if (existingKey != null) {
                 throw new ValidationError("NOT_UNIQUE");
             }
 

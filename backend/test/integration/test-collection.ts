@@ -380,9 +380,9 @@ describe("Collection Tests", async () => {
         });
         const newUpdatedDate = collectionAfterUpdate.data.collection.updatedAt;
 
-        expect(response.errors !== undefined).equal(false);
-        expect(oldUpdatedDate !== undefined).equal(true);
-        expect(newUpdatedDate !== undefined).equal(true);
+        expect(response.errors != null).equal(false);
+        expect(oldUpdatedDate != null).equal(true);
+        expect(newUpdatedDate != null).equal(true);
         expect(newUpdatedDate !== oldUpdatedDate).equal(true);
 
         await userAClient.mutate({

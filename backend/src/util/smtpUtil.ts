@@ -32,27 +32,27 @@ export class NotificationActionTemplate {
 
     userDisplayName?: string;
     get hasUserDisplayName(): boolean {
-        return this.userDisplayName !== undefined;
+        return this.userDisplayName != null;
     }
 
     userSlug?: string;
     get hasUserSlug(): boolean {
-        return this.userSlug !== undefined;
+        return this.userSlug != null;
     }
 
     prefix?: string;
     get hasPrefix(): boolean {
-        return this.prefix !== undefined;
+        return this.prefix != null;
     }
 
     itemSlug?: string;
     get hasItemSlug(): boolean {
-        return this.itemSlug !== undefined;
+        return this.itemSlug != null;
     }
 
     itemName?: string;
     get hasItemName(): boolean {
-        return this.itemName !== undefined;
+        return this.itemName != null;
     }
 
     get hasItemNameAndSlug(): boolean {
@@ -66,7 +66,7 @@ export class NotificationActionTemplate {
     postfix?: string;
 
     get hasPostfix(): boolean {
-        return this.postfix !== undefined;
+        return this.postfix != null;
     }
 }
 
@@ -93,7 +93,7 @@ export async function sendFollowNotificationEmail(
     user: UserEntity,
     frequency: string,
     notification: NotificationEmailTemplate
-) {
+): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/follow-notification.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/follow-notification.html", "utf8");
 
@@ -103,10 +103,10 @@ export async function sendFollowNotificationEmail(
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = Mustache.render(emailHTML, notification);
 
-    sendEmail(user, frequency.toLowerCase() + ` data updates`, emailText, emailHTML);
+    return sendEmail(user, frequency.toLowerCase() + ` data updates`, emailText, emailHTML);
 }
 
-export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
+export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/api-key-created.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/api-key-created.html", "utf8");
 
@@ -119,7 +119,7 @@ export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: stri
     await sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
-export async function sendUserSuspendedEmail(user: UserEntity, message: string) {
+export async function sendUserSuspendedEmail(user: UserEntity, message: string): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/user-suspended.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/user-suspended.html", "utf8");
 
@@ -129,10 +129,10 @@ export async function sendUserSuspendedEmail(user: UserEntity, message: string) 
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{message}}/g, message);
 
-    sendEmail(user, EMAIL_SUBJECTS.USER_SUSPENDED, emailText, emailHTML);
+    return sendEmail(user, EMAIL_SUBJECTS.USER_SUSPENDED, emailText, emailHTML);
 }
 
-export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
+export async function sendForgotPasswordEmail(user: UserEntity, token: string): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/forgot-password.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/forgot-password.html", "utf8");
     emailText = replaceCommonTokens(user, emailText);
@@ -141,10 +141,10 @@ export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{token}}/g, token);
 
-    sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
+    return sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
 }
 
-export function validateMessageContents(message: string) {
+export function validateMessageContents(message: string): void {
     if (message.length > 250) throw new Error("MESSAGE_TOO_LONG");
 
     if (message.match(/([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gim) != null)
@@ -152,7 +152,7 @@ export function validateMessageContents(message: string) {
 
     if (
         message.match(
-            /(?:(?:https?|ftp|file):\/\/)(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-a-zA-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[a-zA-Z0-9+&@#\/%=~_|$])/gm
+            /(?:(?:https?|ftp|file):\/\/)(?:\([-a-zA-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[-a-zA-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-a-zA-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[a-zA-Z0-9+&@#\\/%=~_|$])/gm
         ) != null
     )
         throw new Error("MESSAGE_CANNOT_CONTAIN_URL");
@@ -166,7 +166,7 @@ export async function sendShareNotification(
     dataName: string,
     relativeUrl: string,
     message: string
-) {
+): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/share-notification.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/share-notification.html", "utf8");
 
@@ -186,33 +186,41 @@ export async function sendShareNotification(
 
     emailHTML = emailHTML.replace(/{{message}}/g, message);
 
-    sendEmail(user, EMAIL_SUBJECTS.DATA_SHARED, emailText, emailHTML);
+    return sendEmail(user, EMAIL_SUBJECTS.DATA_SHARED, emailText, emailHTML);
 }
 
-export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string, message: string) {
+export async function sendInviteUser(
+    user: UserEntity,
+    inviterName: string,
+    dataName: string,
+    message: string
+): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/user-invite.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/user-invite.html", "utf8");
 
     validateMessageContents(message);
 
+    if (user.verifyEmailToken == null) throw new Error("User does not have a verify email token");
+
     emailText = replaceCommonTokens(user, emailText);
-    emailText = emailText.replace(/{{token}}/g, user.verifyEmailToken!);
+    emailText = emailText.replace(/{{token}}/g, user.verifyEmailToken);
     emailText = emailText.replace(/{{data_name}}/g, dataName);
     emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
 
     emailText = emailText.replace(/{{message}}/g, message);
 
     emailHTML = replaceCommonTokens(user, emailHTML);
-    emailHTML = emailHTML.replace(/{{token}}/g, user.verifyEmailToken!);
+
+    emailHTML = emailHTML.replace(/{{token}}/g, user.verifyEmailToken);
     emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
     emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
 
     emailHTML = emailHTML.replace(/{{message}}/g, message);
 
-    sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
+    return sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
 }
 
-export async function sendVerifyEmail(user: UserEntity, token: string) {
+export async function sendVerifyEmail(user: UserEntity, token: string): Promise<void> {
     let emailText = fs.readFileSync("./static/email-templates/validate-email-address.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/validate-email-address.html", "utf8");
 
@@ -222,7 +230,7 @@ export async function sendVerifyEmail(user: UserEntity, token: string) {
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{token}}/g, token);
 
-    sendEmail(user, EMAIL_SUBJECTS.VERIFY_EMAIL, emailText, emailHTML);
+    return sendEmail(user, EMAIL_SUBJECTS.VERIFY_EMAIL, emailText, emailHTML);
 }
 
 /** Wether or not all of the required values for SMTP sending are configured as environment variables. SMTP sending is optional for some features, and therefore may not be required.  */
@@ -249,8 +257,8 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
 
     // create reusable transporter object using the default SMTP transport
     const transporter = createTransport({
-        host: process.env.SMTP_SERVER!,
-        port: Number.parseInt(process.env.SMTP_PORT!),
+        host: process.env.SMTP_SERVER,
+        port: Number.parseInt(process.env.SMTP_PORT || "25"),
         secure: process.env.SMTP_SECURE === "true",
         ignoreTLS: process.env.SMTP_SECURE !== "true",
         auth: {
@@ -280,8 +288,16 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
 }
 
 function replaceCommonTokens(user: UserEntity, content: string): string {
-    let returnValue = content.replace(/{{registry_name}}/g, process.env.REGISTRY_NAME!);
-    returnValue = returnValue.replace(/{{registry_url}}/g, process.env.REGISTRY_URL!);
+    if (process.env.REGISTRY_NAME == null) {
+        throw new Error("REGISTRY_NAME environment variable not set");
+    }
+
+    if (process.env.REGISTRY_URL == null) {
+        throw new Error("REGISTRY_URL environment variable not set");
+    }
+
+    let returnValue = content.replace(/{{registry_name}}/g, process.env.REGISTRY_NAME);
+    returnValue = returnValue.replace(/{{registry_url}}/g, process.env.REGISTRY_URL);
     returnValue = returnValue.replace(/{{username}}/g, user.username);
 
     return returnValue;

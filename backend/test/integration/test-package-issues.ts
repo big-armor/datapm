@@ -141,7 +141,7 @@ describe("Package Issues and Comments Tests", async () => {
         expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
             expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
-            expect(issuesResponse.data.packageIssues).to.not.have.length(0);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
@@ -205,7 +205,7 @@ describe("Package Issues and Comments Tests", async () => {
         expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
             expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
-            expect(issuesResponse.data.packageIssues).to.not.have.length(0);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
@@ -254,7 +254,7 @@ describe("Package Issues and Comments Tests", async () => {
         expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
             expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
-            expect(issuesResponse.data.packageIssues).to.not.have.length(0);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
