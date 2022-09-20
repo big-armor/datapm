@@ -406,15 +406,9 @@ export const getCatalogByIdentifier = async (
     _0: unknown,
     { identifier }: { identifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: GraphQLResolveInfo
+    relations: string[] = []
 ): Promise<Catalog | undefined> => {
-    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-    const catalog = await getCatalogFromCacheOrDbBySlug(
-        context,
-        context.connection,
-        identifier.catalogSlug,
-        graphQLRelationName
-    );
+    const catalog = await getCatalogFromCacheOrDbBySlug(context, context.connection, identifier.catalogSlug, relations);
 
     if (catalog == null) {
         return undefined;

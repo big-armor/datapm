@@ -219,9 +219,6 @@ describe("Follow Catalog's Packages Notifications Tests", async () => {
             const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") {
                     userBEmail = email;
-                }
-
-                if (userBEmail) {
                     subscription.unsubscribe();
                     resolve();
                 }
@@ -304,9 +301,6 @@ describe("Follow Catalog's Packages Notifications Tests", async () => {
             const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") {
                     userBEmail = email;
-                }
-
-                if (userBEmail) {
                     subscription.unsubscribe();
                     resolve();
                 }

@@ -1,5 +1,7 @@
 import { ValidationError } from "apollo-server";
+import { GraphQLResolveInfo } from "graphql";
 import { AuthenticatedContext } from "../context";
+import { APIKeyEntity } from "../entity/APIKeyEntity";
 import { APIKey, APIKeyWithSecret, AUTHENTICATION_ERROR, CreateAPIKeyInput, Scope } from "../generated/graphql";
 import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -10,7 +12,7 @@ export const createAPIKey = async (
     _0: unknown,
     { value }: { value: CreateAPIKeyInput },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<APIKeyWithSecret> => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).findUser({
         username: context.me.username
@@ -37,7 +39,7 @@ export const createAPIKey = async (
         }
     }
 
-    sendAPIKeyCreatedEmail(user, value.label);
+    await sendAPIKeyCreatedEmail(user, value.label);
 
     return context.connection.manager.getCustomRepository(APIKeyRepository).createAPIKey({
         user,
@@ -51,14 +53,14 @@ export const deleteAPIKey = async (
     _0: unknown,
     { id }: { id: string },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<APIKey> => {
     return await context.connection.manager
         .getCustomRepository(APIKeyRepository)
         .deleteAPIKey({ id, relations: getGraphQlRelationName(info) });
 };
 
-export const myAPIKeys = async (_0: unknown, {}, context: AuthenticatedContext) => {
+export const myAPIKeys = async (_0: unknown, _1: unknown, context: AuthenticatedContext): Promise<APIKeyEntity[]> => {
     const apiKeys = await context.connection.manager.getCustomRepository(APIKeyRepository).findByUser(context.me?.id);
 
     return apiKeys;

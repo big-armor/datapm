@@ -179,7 +179,7 @@ async function sendNotifications(
             users: userChanges
         };
 
-        sendFollowNotificationEmail(user, frequency, notificationEmail);
+        await sendFollowNotificationEmail(user, frequency, notificationEmail);
     }
 }
 

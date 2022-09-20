@@ -67,6 +67,8 @@ describe("Page Content Catalog", () => {
             }
         });
 
+        expect(result.errors).to.equal(undefined);
+
         expect(result.data).to.not.equal(undefined);
         expect(result.data.pageContent).to.not.equal(undefined);
         expect(result.data.pageContent.catalog).to.not.equal(undefined);

@@ -32,8 +32,6 @@ describe("Followers Tests", async () => {
         );
         expect(userAClient).to.not.equal(undefined);
 
-        console.log("User A created");
-
         userBClient = await createUser(
             "FirstB",
             "LastB",
@@ -42,7 +40,6 @@ describe("Followers Tests", async () => {
             "passwordB!"
         );
         expect(userBClient).to.not.equal(undefined);
-        console.log("User B created");
     });
 
     it("Catalog followers returns followers list and count", async function () {

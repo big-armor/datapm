@@ -623,12 +623,12 @@ describe("Data Store on Registry", async () => {
 
             socket.on(
                 openChannelResponse.channelName,
-                (event: DataSend | DataStop, callback: (response: FetchResponse | ErrorResponse) => void) => {
+                (event: DataSend | DataStop, callback?: (response: FetchResponse | ErrorResponse) => void) => {
                     if (event.requestType === FetchRequestType.DATA) {
                         records = records.concat((event as DataSend).records);
-                        callback(new DataAcknowledge());
+                        callback && callback(new DataAcknowledge());
                     } else if (event.requestType === FetchRequestType.STOP) {
-                        callback(new DataStopAcknowledge());
+                        callback && callback(new DataStopAcknowledge());
 
                         const serverLineFound = serverLogLines.find((l: string) =>
                             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
@@ -647,7 +647,7 @@ describe("Data Store on Registry", async () => {
                             resolve(records);
                         }
                     } else {
-                        callback(new ErrorResponse("Unknown message type", SocketError.NOT_VALID));
+                        callback && callback(new ErrorResponse("Unknown message type", SocketError.NOT_VALID));
                         throw new Error("Unknown message type:" + JSON.stringify(event));
                     }
                 }
@@ -983,15 +983,15 @@ describe("Data Store on Registry", async () => {
 
             userAStreamingClient.on(
                 openChannelResponse.channelName,
-                (event: DataSend | DataStop, callback: (response: FetchResponse | ErrorResponse) => void) => {
+                (event: DataSend | DataStop, callback?: (response: FetchResponse | ErrorResponse) => void) => {
                     if (event.requestType === FetchRequestType.DATA) {
                         records = records.concat((event as DataSend).records);
-                        callback(new DataAcknowledge());
+                        callback && callback(new DataAcknowledge());
                     } else if (event.requestType === FetchRequestType.STOP) {
-                        callback(new DataStopAcknowledge());
+                        callback && callback(new DataStopAcknowledge());
                         resolve(records);
                     } else {
-                        callback(new ErrorResponse("Unknown message type", SocketError.NOT_VALID));
+                        callback && callback(new ErrorResponse("Unknown message type", SocketError.NOT_VALID));
                         throw new Error("Unknown message type:" + JSON.stringify(event));
                     }
                 }

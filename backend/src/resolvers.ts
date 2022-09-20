@@ -279,7 +279,9 @@ export const getPageContentByRoute = async (
         return { user };
     }
 
-    const catalog = await getCatalogByIdentifier(_0, { identifier: { catalogSlug: route } }, context, info);
+    const graphqlFields2 = graphqlFields(info);
+    const catalogRelations = getRelationNames(graphqlFields2.catalog);
+    const catalog = await getCatalogByIdentifier(_0, { identifier: { catalogSlug: route } }, context, catalogRelations);
     if (catalog) {
         return { catalog };
     }
@@ -287,8 +289,7 @@ export const getPageContentByRoute = async (
     const builderIOSettings = (await getDeserializedPublicPlatformSettingsByKey(
         _0,
         { key: "builder-io-settings" },
-        context,
-        info
+        context
     )) as BuilderIOSettings;
 
     let template = builderIOSettings.templates?.find((t) => t.key === route);

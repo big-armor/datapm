@@ -11,12 +11,13 @@ import {
 } from "../service/notification-service";
 import { JobType } from "../generated/graphql";
 import { packageUpdateScheduling } from "../service/package-update-service";
+import { GraphQLResolveInfo } from "graphql";
 
 export const runJob = async (
     _0: unknown,
     { key, job }: { key: string; job: string },
     context: Context,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<void> => {
     if (process.env.LEADER_ELECTION_DISABLED !== "true") {
         throw new Error("Leader election is not disabled. Jobs can not be invoked remotely.");

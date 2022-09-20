@@ -6,9 +6,8 @@ import { PlatformSettingsRepository } from "../repository/PlatformSettingsReposi
 export const savePlatformSettings = async (
     _0: unknown,
     { settings }: { settings: PlatformSettingsInput },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<PlatformSettingsEntity> => {
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     const settingsToSave = new PlatformSettingsEntity();
 
@@ -24,7 +23,11 @@ export const savePlatformSettings = async (
     return await repository.save(settingsToSave);
 };
 
-export const getPlatformSettingsByKey = async (_0: unknown, {}, context: AuthenticatedContext, info: any) => {
+export const getPlatformSettingsByKey = async (
+    _0: unknown,
+    _1: unknown,
+    context: AuthenticatedContext
+): Promise<PlatformSettingsEntity[]> => {
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     return await repository.createQueryBuilder().getMany();
 };
@@ -32,9 +35,8 @@ export const getPlatformSettingsByKey = async (_0: unknown, {}, context: Authent
 export const getPublicPlatformSettingsByKeyOrFail = async (
     _0: unknown,
     { key }: { key: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<PlatformSettingsEntity> => {
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     const settings = await repository.findPublicSettingsByKey(key);
     if (!settings) {
@@ -47,9 +49,8 @@ export const getPublicPlatformSettingsByKeyOrFail = async (
 export const getDeserializedPublicPlatformSettingsByKey = async (
     _0: unknown,
     { key }: { key: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<Record<string, unknown> | null> => {
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     const entity = await repository.findPublicSettingsByKey(key);
     if (!entity) {
