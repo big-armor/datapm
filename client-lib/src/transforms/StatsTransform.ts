@@ -267,7 +267,7 @@ export function inspectObject(
 
 function inspectValue(
     title: string,
-    value: any,
+    value: DPMRecordValue,
     types: ValueTypes,
     labelDetector: ContentLabelDetector,
     iterationDepth: number

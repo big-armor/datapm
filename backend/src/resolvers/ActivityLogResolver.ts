@@ -20,11 +20,15 @@ import {
 } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { catalogEntityToGraphQL, getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
-import { collectionEntityToGraphQL, getCollectionFromCacheOrDbById } from "./CollectionResolver";
+import {
+    collectionEntityToGraphQL,
+    getCollectionFromCacheOrDbById,
+    getCollectionFromCacheOrDbByIdOrFail
+} from "./CollectionResolver";
 import { getPackageFromCacheOrDbByIdOrFail, packageEntityToGraphqlObject } from "./PackageResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { VersionEntity } from "../entity/VersionEntity";
-import { getUserFromCacheOrDbById } from "./UserResolver";
+import { getUserFromCacheOrDbByIdOrFail } from "./UserResolver";
 import { ActivityLogRepository } from "../repository/ActivityLogRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
@@ -49,7 +53,7 @@ export const activtyLogEntityToGraphQL = async function (
     if (activityLogEntity.userId) {
         if (activityLogEntity.user) activityLog.user = activityLogEntity.user;
         else {
-            activityLog.user = await getUserFromCacheOrDbById(context, connection, activityLogEntity.userId);
+            activityLog.user = await getUserFromCacheOrDbByIdOrFail(context, connection, activityLogEntity.userId);
         }
     }
 
@@ -68,7 +72,7 @@ export const activtyLogEntityToGraphQL = async function (
             activityLog.targetCollection = collectionEntityToGraphQL(activityLogEntity.targetCollection);
         else {
             activityLog.targetCollection = collectionEntityToGraphQL(
-                await getCollectionFromCacheOrDbById(context, connection, activityLogEntity.targetCollectionId)
+                await getCollectionFromCacheOrDbByIdOrFail(context, connection, activityLogEntity.targetCollectionId)
             );
         }
     }
@@ -437,5 +441,11 @@ export const getActivityLogFromCacheOrDbByIdOrFail = async (
 
     const logPromiseFunction = () =>
         connection.getCustomRepository(ActivityLogRepository).findOneOrFail({ id: logId }, { relations });
-    return await context.cache.loadActivityLog(logId, logPromiseFunction, forceReload);
+    const activityLog = await context.cache.loadActivityLog(logId, logPromiseFunction, forceReload);
+
+    if (!activityLog) {
+        throw new Error("ACTIVITY_LOG_NOT_FOUND");
+    }
+
+    return activityLog;
 };

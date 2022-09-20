@@ -10,5 +10,7 @@ export class OptionalFields1599138803334 implements MigrationInterface {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

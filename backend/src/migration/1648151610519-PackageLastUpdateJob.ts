@@ -8,5 +8,7 @@ export class PackageLastUpdateJob1648151610519 implements MigrationInterface {
         await queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

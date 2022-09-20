@@ -29,5 +29,7 @@ export class AddVersionReadmeAndLicense1604719596366 implements MigrationInterfa
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

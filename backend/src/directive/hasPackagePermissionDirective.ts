@@ -79,10 +79,8 @@ export async function resolvePackagePermissionsForEntity(
         return permissions;
     };
 
-    const packagePermissions = await context.cache.loadPackagePermissionsById(
-        packageEntity.id,
-        userPermissionPromiseFunction
-    );
+    const packagePermissions =
+        (await context.cache.loadPackagePermissionsById(packageEntity.id, userPermissionPromiseFunction)) || [];
 
     const catalogPermissions = await getCatalogPackagePermissionsFromCacheOrDb(
         context,

@@ -9,6 +9,7 @@ import { SocketContext } from "../context";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace SchemaInfoHandler {
@@ -47,7 +48,7 @@ export namespace SchemaInfoHandler {
 
     function entityToIdentifier(entity: DataBatchEntity): BatchRepositoryIdentifier {
         return {
-            registryUrl: process.env.REGISTRY_URL as string,
+            registryUrl: getEnvVariable("REGISTRY_URL") as string,
             catalogSlug: entity.package.catalog.slug,
             packageSlug: entity.package.slug,
             majorVersion: entity.majorVersion,

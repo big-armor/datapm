@@ -1,3 +1,4 @@
+import { GraphQLResolveInfo } from "graphql";
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupEntity } from "../entity/GroupEntity";
@@ -18,6 +19,7 @@ import { findGroup, getGroupFromCacheOrDbByIdOrFail, getGroupFromCacheOrDbBySlug
 import {
     getPackageFromCacheOrDb,
     getPackageFromCacheOrDbByIdOrFail,
+    getPackageFromCacheOrDbOrFail,
     packageEntityToGraphqlObject
 } from "./PackageResolver";
 
@@ -52,10 +54,9 @@ export const groupPackagePermissionEntityToGraphqlObject = async (
 export const groupsByPackage = async (
     _0: unknown,
     { packageIdentifier }: { packageIdentifier: PackageIdentifierInput },
-    context: AuthenticatedContext,
-    info: any
-) => {
-    const packageEntity = await getPackageFromCacheOrDb(context, packageIdentifier, []);
+    context: AuthenticatedContext
+): Promise<GroupPackagePermission[]> => {
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, packageIdentifier, []);
 
     const groups = await context.connection.getRepository(GroupPackagePermissionEntity).find({
         where: {
@@ -63,7 +64,7 @@ export const groupsByPackage = async (
         }
     });
 
-    return groups.map((g) => groupPackagePermissionEntityToGraphqlObject(context, context.connection.manager, g));
+    return groups.asyncMap((g) => groupPackagePermissionEntityToGraphqlObject(context, context.connection.manager, g));
 };
 
 export const addOrUpdateGroupToPackage = async (
@@ -73,16 +74,15 @@ export const addOrUpdateGroupToPackage = async (
         packageIdentifier,
         permissions
     }: { groupSlug: string; packageIdentifier: PackageIdentifierInput; permissions: Permission[] },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<GroupPackagePermission> => {
     const groupPermission = await context.connection.transaction(async (transactionManager) => {
         const groupEntity = await findGroup(transactionManager, groupSlug);
 
-        const packageEntity = await getPackageFromCacheOrDb(context, packageIdentifier, []);
+        const packageEntity = await getPackageFromCacheOrDbOrFail(context, packageIdentifier, []);
 
         await createActivityLog(transactionManager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_GROUP_PERMISSION_ADDED_UPDATED,
             targetGroupId: groupEntity.id,
             targetPackageId: packageEntity.id,
@@ -105,13 +105,12 @@ export const addOrUpdateGroupToPackage = async (
 export const removeGroupFromPackage = async (
     _0: unknown,
     { groupSlug, packageIdentifier }: { groupSlug: string; packageIdentifier: PackageIdentifierInput },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
-        const packageEntity = await getPackageFromCacheOrDb(context, packageIdentifier, []);
+        const packageEntity = await getPackageFromCacheOrDbOrFail(context, packageIdentifier, []);
 
         const groupPermission = await manager.getRepository(GroupPackagePermissionEntity).findOne({
             groupId: groupEntity.id,
@@ -123,7 +122,7 @@ export const removeGroupFromPackage = async (
         }
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_GROUP_PERMISSION_REMOVED,
             targetGroupId: groupEntity.id,
             targetPackageId: packageEntity.id
@@ -139,8 +138,8 @@ export const packagePermissionsByGroupForUser = async (
     parent: Group,
     _0: unknown,
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<GroupPackagePermission[]> => {
     const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
 
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;
@@ -153,7 +152,7 @@ export const packagePermissionsByGroupForUser = async (
             relations: getGraphQlRelationName(info)
         });
 
-    return packagePermissions.map((p) =>
+    return packagePermissions.asyncMap((p) =>
         groupPackagePermissionEntityToGraphqlObject(context, context.connection.manager, p)
     );
 };

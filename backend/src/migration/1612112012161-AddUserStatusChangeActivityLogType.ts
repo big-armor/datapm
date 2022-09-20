@@ -36,5 +36,7 @@ export class AddUserStatusChangeActivityLogType1612112012161 implements Migratio
         );
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

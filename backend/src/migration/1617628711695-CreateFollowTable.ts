@@ -28,5 +28,7 @@ export class CreateFollowTable1617628711695 implements MigrationInterface {
         return queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

@@ -1,4 +1,5 @@
 import { ValidationError } from "apollo-server";
+import { UserCatalogPermissions } from "datapm-client-lib";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
 import { UserEntity } from "../entity/UserEntity";
@@ -18,7 +19,7 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 import { getCatalogFromCacheOrDbByIdOrFail, getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 import { deleteCatalogFollowByUserId } from "./FollowResolver";
 import { deletePackageFollowsForUsersWithNoPermissions } from "./PackageResolver";
-import { getUserFromCacheOrDbById } from "./UserResolver";
+import { getUserFromCacheOrDbByIdOrFail } from "./UserResolver";
 
 export const setUserCatalogPermission = async (
     _0: unknown,
@@ -31,9 +32,8 @@ export const setUserCatalogPermission = async (
         value: SetUserCatalogPermissionInput[];
         message: string;
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     validateMessageContents(message);
 
     const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier, ["packages"]);
@@ -88,7 +88,7 @@ export const setUserCatalogPermission = async (
             }
 
             await createActivityLog(transaction, {
-                userId: context.me!.id,
+                userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_USER_PERMISSION_ADDED_UPDATED,
                 targetCatalogId: catalog.id,
                 targetUserId: user.id,
@@ -115,7 +115,7 @@ export const deleteUserCatalogPermissions = async (
     _0: unknown,
     { identifier, usernameOrEmailAddress }: { identifier: CatalogIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
-) => {
+): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
         const user = await transaction
             .getCustomRepository(UserRepository)
@@ -134,7 +134,7 @@ export const deleteUserCatalogPermissions = async (
         }
 
         await createActivityLog(transaction, {
-            userId: context.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.CATALOG_USER_PERMISSION_REMOVED,
             targetCatalogId: catalogEntity.id,
             targetUserId: user.id
@@ -148,7 +148,11 @@ export const deleteUserCatalogPermissions = async (
 };
 
 /** The catalog specific permissions (not the packages in the catalog) */
-export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
+export const getCatalogPermissionsFromCacheOrDb = async (
+    context: Context,
+    catalogId: number,
+    userId: number
+): Promise<Permission[]> => {
     const catalogPermissionsPromiseFunction = async () => {
         const userPermissions = await context.connection
             .getCustomRepository(UserCatalogPermissionRepository)
@@ -179,7 +183,7 @@ export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catal
 
         const catalog = await getCatalogFromCacheOrDbByIdOrFail(context, context.connection, catalogId);
 
-        const user = await getUserFromCacheOrDbById(context, context.connection, userId);
+        const user = await getUserFromCacheOrDbByIdOrFail(context, context.connection, userId);
 
         if (catalog.slug === user.username) {
             permissions.push(Permission.VIEW);
@@ -190,7 +194,7 @@ export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catal
         return permissions;
     };
 
-    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
+    return (await context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction)) || [];
 };
 
 /** The permissions for all packages in the catalog (not the catalog itself) */
@@ -198,7 +202,7 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (
     context: Context,
     catalogId: number,
     userId: number
-) => {
+): Promise<Permission[]> => {
     const catalogPermissionsPromiseFunction = async () => {
         const userPermissions = await context.connection
             .getCustomRepository(UserCatalogPermissionRepository)
@@ -229,7 +233,7 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (
 
         const catalog = await getCatalogFromCacheOrDbByIdOrFail(context, context.connection, catalogId);
 
-        const user = await getUserFromCacheOrDbById(context, context.connection, userId);
+        const user = await getUserFromCacheOrDbByIdOrFail(context, context.connection, userId);
 
         if (catalog.slug === user.username) {
             permissions.push(Permission.VIEW);
@@ -240,5 +244,5 @@ export const getCatalogPackagePermissionsFromCacheOrDb = async (
         return permissions;
     };
 
-    return context.cache.loadCatalogPackagePermissionsById(catalogId, catalogPermissionsPromiseFunction);
+    return (await context.cache.loadCatalogPackagePermissionsById(catalogId, catalogPermissionsPromiseFunction)) || [];
 };

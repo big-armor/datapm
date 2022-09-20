@@ -10,5 +10,7 @@ export class CatalogPackagePermissions1609553026656 implements MigrationInterfac
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

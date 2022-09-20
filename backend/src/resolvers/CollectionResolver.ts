@@ -32,7 +32,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
-import { getUserFromCacheOrDbById, getUserFromCacheOrDbByUsername } from "./UserResolver";
+import { getUserFromCacheOrDbByIdOrFail, getUserFromCacheOrDbByUsernameOrFail } from "./UserResolver";
 import { Connection, DeleteResult, EntityManager } from "typeorm";
 import { deleteFollowsByIds, getCollectionFollowsByCollectionId } from "./FollowResolver";
 import { isAuthenticatedContext } from "../util/contextHelpers";
@@ -334,7 +334,7 @@ export const addPackageToCollection = async (
         targetPackageId: packageEntity.id
     });
 
-    if (process.env.REGISTRY_URL == null) {
+    if (getEnvVariable("REGISTRY_URL") == null) {
         throw new Error("REGISTRY_URL environment variable not set!");
     }
     return {
@@ -345,7 +345,7 @@ export const addPackageToCollection = async (
         },
         package: {
             identifier: {
-                registryURL: process.env.REGISTRY_URL,
+                registryURL: getEnvVariable("REGISTRY_URL"),
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug
             }
@@ -424,7 +424,7 @@ export const findCollectionBySlug = async (
         return {
             identifier: {
                 collectionSlug: collectionEntity.collectionSlug,
-                registryURL: process.env.REGISTRY_URL
+                registryURL: getEnvVariable("REGISTRY_URL")
             }
         };
     });
@@ -546,7 +546,7 @@ export const collectionCreator = async (
         return null;
     }
 
-    return await getUserFromCacheOrDbById(
+    return await getUserFromCacheOrDbByIdOrFail(
         context,
         context.connection,
         collectionEntity.creatorId,
@@ -653,7 +653,7 @@ export const userCollectionPermissions = async (
         }
     }
 
-    const user = await getUserFromCacheOrDbByUsername(context, username);
+    const user = await getUserFromCacheOrDbByUsernameOrFail(context, username);
     const userPermission = await context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .findCollectionPermissions({
@@ -714,7 +714,7 @@ export const getCollectionFromCacheOrDbById = async (
     context: Context,
     connection: EntityManager | Connection,
     id: number
-): Promise<CollectionEntity> => {
+): Promise<CollectionEntity | null> => {
     const collectionPromiseFunction = () => connection.getCustomRepository(CollectionRepository).findOneOrFail({ id });
     return await context.cache.loadCollection(id, collectionPromiseFunction);
 };
@@ -728,5 +728,23 @@ export const getCollectionFromCacheOrDbOrFail = async (
     const collectionPromiseFunction = () =>
         connection.getCustomRepository(CollectionRepository).findCollectionBySlugOrFail(slug, relations);
 
-    return await context.cache.loadCollectionBySlug(slug, collectionPromiseFunction);
+    const response = await context.cache.loadCollectionBySlug(slug, collectionPromiseFunction);
+
+    if (response == null) {
+        throw new Error("COLLECTION_NOT_FOUND");
+    }
+
+    return response;
+};
+
+export const getCollectionFromCacheOrDbByIdOrFail = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    id: number
+): Promise<CollectionEntity> => {
+    const response = await getCollectionFromCacheOrDbById(context, connection, id);
+    if (response == null) {
+        throw new Error("COLLECTION_NOT_FOUND");
+    }
+    return response;
 };

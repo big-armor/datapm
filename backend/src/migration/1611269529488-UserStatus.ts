@@ -16,5 +16,7 @@ export class UserStatus1611269529488 implements MigrationInterface {
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

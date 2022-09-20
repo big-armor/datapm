@@ -7,6 +7,7 @@ import { PackageEntity } from "../entity/PackageEntity";
 import { HeadlessJobContext } from "../job/HeadlessJobContext";
 import { PackageRepository } from "../repository/PackageRepository";
 import { SessionCache } from "../session-cache";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 let databaseConnection: Connection | null;
 
@@ -63,7 +64,7 @@ export async function packageUpdateScheduling(connection: Connection): Promise<v
             reference: {
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug,
-                registryURL: process.env.REGISTRY_URL as string
+                registryURL: getEnvVariable("REGISTRY_URL") as string
             }
         });
 

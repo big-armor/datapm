@@ -13,6 +13,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `
@@ -486,7 +487,7 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "PackageEntity";
 
         const queryArray = startsWith
-            .replace(process.env.REGISTRY_URL as string, "")
+            .replace(getEnvVariable("REGISTRY_URL") as string, "")
             .trim()
             .toLowerCase()
             .split(/\s+/)

@@ -3,6 +3,7 @@ import { createTransport } from "nodemailer";
 import * as fs from "fs";
 import { Address } from "nodemailer/lib/mailer";
 import Mustache from "mustache";
+import { getEnvVariable } from "./getEnvVariable";
 
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
@@ -173,14 +174,14 @@ export async function sendShareNotification(
     validateMessageContents(message);
 
     emailText = replaceCommonTokens(user, emailText);
-    emailText = emailText.replace(/{{url}}/g, process.env.REGISTRY_URL + relativeUrl);
+    emailText = emailText.replace(/{{url}}/g, getEnvVariable("REGISTRY_URL") + relativeUrl);
     emailText = emailText.replace(/{{data_name}}/g, dataName);
     emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
 
     emailText = emailText.replace(/{{message}}/g, message);
 
     emailHTML = replaceCommonTokens(user, emailHTML);
-    emailHTML = emailHTML.replace(/{{url}}/g, process.env.REGISTRY_URL + relativeUrl);
+    emailHTML = emailHTML.replace(/{{url}}/g, getEnvVariable("REGISTRY_URL") + relativeUrl);
     emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
     emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
 
@@ -292,12 +293,12 @@ function replaceCommonTokens(user: UserEntity, content: string): string {
         throw new Error("REGISTRY_NAME environment variable not set");
     }
 
-    if (process.env.REGISTRY_URL == null) {
+    if (getEnvVariable("REGISTRY_URL") == null) {
         throw new Error("REGISTRY_URL environment variable not set");
     }
 
     let returnValue = content.replace(/{{registry_name}}/g, process.env.REGISTRY_NAME);
-    returnValue = returnValue.replace(/{{registry_url}}/g, process.env.REGISTRY_URL);
+    returnValue = returnValue.replace(/{{registry_url}}/g, getEnvVariable("REGISTRY_URL"));
     returnValue = returnValue.replace(/{{username}}/g, user.username);
 
     return returnValue;

@@ -20,3 +20,5 @@ backend/dist
 backend/src/generated
 backend/tmp-*
 backend/node_modules
+backend/test/integration/registry-client.ts
+backend/gulpfile.js

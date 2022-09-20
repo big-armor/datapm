@@ -1,17 +1,12 @@
 import { DPMConfiguration } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
-import {
-    Credential,
-    CredentialsResult,
-    PackageIdentifierInput,
-    RepositoriesResult,
-    Repository
-} from "../generated/graphql";
+import { PackageIdentifierInput, RepositoriesResult, Repository } from "../generated/graphql";
 import { getGraphQlRelationName } from "../util/relationNames";
-import { getPackageFromCacheOrDb, packageEntityToGraphqlObject } from "./PackageResolver";
+import { getPackageFromCacheOrDbOrFail, packageEntityToGraphqlObject } from "./PackageResolver";
 import { RepositoryEntity } from "../entity/RepositoryEntity";
 import { RepositoryRepository } from "../repository/RepositoryRepository";
 import { credentialEntityToGraphQL } from "./CredentialResolver";
+import { GraphQLResolveInfo } from "graphql";
 
 async function repositoryEntityToGraphQL(context: Context, repositoryEntity: RepositoryEntity): Promise<Repository> {
     return {
@@ -41,10 +36,10 @@ export const createRepository = async (
         connectionConfiguration: DPMConfiguration;
     },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<Repository> => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-    const packageEntity = await getPackageFromCacheOrDb(context, identifier, graphQLRelationName);
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, graphQLRelationName);
 
     const repositoryEntity = await context.connection
         .getCustomRepository(RepositoryRepository)
@@ -72,11 +67,11 @@ export const listRepositories = async (
     _0: unknown,
     { identifier, limit, offset }: { identifier: PackageIdentifierInput; limit: number; offset: number },
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<RepositoriesResult> => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
 
-    const packageEntity = await getPackageFromCacheOrDb(context, identifier, graphQLRelationName);
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier, graphQLRelationName);
 
     const credentialRelations = graphQLRelationName
         .map((r) => r.replace(/^repositories\.?/, ""))
@@ -105,9 +100,8 @@ export const deleteRepository = async (
         connectorType,
         repositoryIdentifier
     }: { identifier: PackageIdentifierInput; connectorType: string; repositoryIdentifier: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     return context.connection
         .getCustomRepository(RepositoryRepository)
         .deleteRepository(identifier, connectorType, repositoryIdentifier);

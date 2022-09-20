@@ -34,7 +34,9 @@ export class WebsocketJobContext extends BackendJobContextBase {
                     }
 
                     for (const key of Object.keys(response.answers)) {
-                        parameters.find((p) => p.name === key)!.configuration[key] = response.answers[key];
+                        const parameter = parameters.find((p) => p.name === key);
+                        if (parameter == null) continue;
+                        parameter.configuration[key] = response.answers[key];
                     }
 
                     resolve(response.answers);

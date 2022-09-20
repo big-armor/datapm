@@ -2,7 +2,7 @@ import { SelectQueryBuilder, EntityManager } from "typeorm";
 
 declare module "typeorm" {
     interface SelectQueryBuilder<Entity> {
-        addRelations(topLevelAlias: string, info: any): SelectQueryBuilder<Entity>;
+        addRelations(topLevelAlias: string, info: unknown): SelectQueryBuilder<Entity>;
         filterCaseCatalog(topLevelAlias: string, catalogId: number): SelectQueryBuilder<Entity>;
     }
 

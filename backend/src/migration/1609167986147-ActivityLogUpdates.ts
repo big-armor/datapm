@@ -13,5 +13,7 @@ export class ActivityLogUpdates1609167986147 implements MigrationInterface {
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

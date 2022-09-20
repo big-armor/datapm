@@ -99,5 +99,7 @@ export class Group1658499088645 implements MigrationInterface {
         await queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

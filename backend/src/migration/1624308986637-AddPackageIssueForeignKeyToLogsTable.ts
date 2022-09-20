@@ -10,5 +10,7 @@ export class AddPackageIssueForeignKeyToLogsTable1624308986637 implements Migrat
         await queryRunner.connection.query("ALTER TYPE activity_log_change_type_enum ADD VALUE 'CLOSED'");
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

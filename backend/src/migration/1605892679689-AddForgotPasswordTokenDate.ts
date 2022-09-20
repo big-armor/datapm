@@ -9,5 +9,7 @@ export class AddForgotPasswordTokenDate1605892679689 implements MigrationInterfa
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

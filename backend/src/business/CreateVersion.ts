@@ -27,6 +27,7 @@ import { saveVersionComparison } from "../repository/VersionComparisonRepository
 import { VersionRepository } from "../repository/VersionRepository";
 import { versionEntityToGraphqlObject } from "../resolvers/VersionResolver";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 export async function createOrUpdateVersion(
     context: AuthenticatedContext,
@@ -46,7 +47,7 @@ export async function createOrUpdateVersion(
         const newPackageFile = upgradePackageFile(rawPackageFile);
 
         const registryReference = newPackageFile.registries?.find(
-            (registry) => registry.url === process.env.REGISTRY_URL
+            (registry) => registry.url === getEnvVariable("REGISTRY_URL")
         );
 
         const publishMethod = registryReference?.publishMethod || PublishMethod.SCHEMA_ONLY;
@@ -78,7 +79,7 @@ export async function createOrUpdateVersion(
                 throw new ApolloError("INTERNAL_SERVER_ERROR");
             }
 
-            const latestVersionSemVer = new SemVer(packageFile!.version);
+            const latestVersionSemVer = new SemVer(packageFile.version);
 
             diff = comparePackages(packageFile, newPackageFile);
 

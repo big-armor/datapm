@@ -346,7 +346,7 @@ export const acceptInvite = async (
     });
 };
 
-export const getUserFromCacheOrDbById = async (
+export const getUserFromCacheOrDbByIdOrFail = async (
     context: Context,
     connection: EntityManager | Connection,
     id: number,
@@ -358,15 +358,23 @@ export const getUserFromCacheOrDbById = async (
             relations
         });
 
-    return context.cache.loadUser(id, userPromiseFunction);
+    const response = await context.cache.loadUser(id, userPromiseFunction);
+
+    if (response == null) throw new Error("USER_NOT_FOUND-" + id);
+
+    return response;
 };
 
-export const getUserFromCacheOrDbByUsername = async (
+export const getUserFromCacheOrDbByUsernameOrFail = async (
     context: Context,
     username: string,
     relations: string[] = []
 ): Promise<UserEntity> => {
     const userPromiseFunction = () =>
         context.connection.getCustomRepository(UserRepository).findUserByUserNameOrFail({ username, relations });
-    return context.cache.loadUserByUsername(username, userPromiseFunction);
+    const response = await context.cache.loadUserByUsername(username, userPromiseFunction);
+
+    if (response == null) throw new Error("USER_NOT_FOUND-" + username);
+
+    return response;
 };

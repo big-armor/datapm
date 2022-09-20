@@ -1,13 +1,10 @@
 import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
-import { Connection } from "typeorm";
-import { AuthenticatedContext, Context } from "../context";
-import { PackageEntity } from "../entity/PackageEntity";
+import { AuthenticatedContext } from "../context";
 import { UserEntity } from "../entity/UserEntity";
 import {
     ActivityLogEventType,
     PackageIdentifierInput,
-    Permission,
     SetPackagePermissionInput,
     UserStatus
 } from "../generated/graphql";
@@ -18,7 +15,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
-import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
+import { getPackageFromCacheOrDbOrFail } from "./PackageResolver";
 
 export const setPackagePermissions = async (
     _0: unknown,
@@ -31,9 +28,8 @@ export const setPackagePermissions = async (
         value: SetPackagePermissionInput[];
         message: string;
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     validateMessageContents(message);
 
     const packageEntity = await context.connection
@@ -133,7 +129,7 @@ export const removePackagePermissions = async (
     _0: unknown,
     { identifier, usernameOrEmailAddress }: { identifier: PackageIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
-) => {
+): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
         const user = await transaction
             .getCustomRepository(UserRepository)
@@ -143,6 +139,10 @@ export const removePackagePermissions = async (
         }
 
         const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier);
+
+        if (packageEntity == null)
+            throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
+
         if (!packageEntity.isPublic) {
             await deletePackageFollowByUserId(transaction, packageEntity.id, user.id);
             await deletePackageIssuesFollowsByUserId(transaction, packageEntity.id, user.id);

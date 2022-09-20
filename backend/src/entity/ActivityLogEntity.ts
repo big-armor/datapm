@@ -104,7 +104,7 @@ export class ActivityLogEntity extends EntityBaseModel {
         default: () => "'{}'::jsonb",
         nullable: false
     })
-    public additionalProperties?: { [key: string]: any };
+    public additionalProperties?: { [key: string]: unknown };
 
     // The following are not persisted to the database
     // but are used during logging to the console.

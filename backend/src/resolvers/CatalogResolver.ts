@@ -28,7 +28,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
 import { deletePackageFollowsForUsersWithNoPermissions, packageEntityToGraphqlObject } from "./PackageResolver";
-import { getUserFromCacheOrDbById } from "./UserResolver";
+import { getUserFromCacheOrDbByIdOrFail } from "./UserResolver";
 
 export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
     if (!catalogEntity) {
@@ -112,7 +112,12 @@ export const catalogCreator = async (
 
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
 
-    return await getUserFromCacheOrDbById(context, context.connection, catalog.creatorId, getGraphQlRelationName(info));
+    return await getUserFromCacheOrDbByIdOrFail(
+        context,
+        context.connection,
+        catalog.creatorId,
+        getGraphQlRelationName(info)
+    );
 };
 
 export const myCatalogPermissions = async (parent: Catalog, _1: unknown, context: Context): Promise<Permission[]> => {
@@ -421,7 +426,7 @@ export const getCatalogFromCacheOrDbById = async (
     context: Context,
     catalogId: number,
     relations: string[] = []
-): Promise<CatalogEntity> => {
+): Promise<CatalogEntity | null> => {
     // TODO Make this return a Catalog and not CatalogEntity
 
     const catalogPromiseFunction = () =>
@@ -442,7 +447,13 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     const catalogPromiseFunction = () =>
         connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
 
-    return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
+    const response = await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
+
+    if (response == null) {
+        throw new Error("CATALOG_NOT_FOUND - " + catalogId);
+    }
+
+    return response;
 };
 
 export const getCatalogFromCacheOrDbOrFail = async (
@@ -460,7 +471,13 @@ export const getCatalogFromCacheOrDbOrFail = async (
             .getCustomRepository(CatalogRepository)
             .findCatalogBySlugOrFail(identifier.catalogSlug, relations);
 
-    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
+    const response = await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
+
+    if (response == null) {
+        throw new Error("CATALOG_NOT_FOUND - " + identifier.catalogSlug);
+    }
+
+    return response;
 };
 
 export const getCatalogFromCacheOrDbBySlug = async (
@@ -468,7 +485,7 @@ export const getCatalogFromCacheOrDbBySlug = async (
     connection: EntityManager | Connection,
     slug: string,
     relations?: string[]
-): Promise<CatalogEntity> => {
+): Promise<CatalogEntity | null> => {
     // TODO Make this return a Catalog and not CatalogEntity
 
     const catalogPromiseFunction = () =>
@@ -477,4 +494,21 @@ export const getCatalogFromCacheOrDbBySlug = async (
         >;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
+};
+
+export const getCatalogFromCacheOrDbBySlugOrFail = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    slug: string,
+    relations?: string[]
+): Promise<CatalogEntity> => {
+    // TODO Make this return a Catalog and not CatalogEntity
+
+    const response = await getCatalogFromCacheOrDbBySlug(context, connection, slug, relations);
+
+    if (response == null) {
+        throw new Error("CATALOG_NOT_FOUND - " + slug);
+    }
+
+    return response;
 };

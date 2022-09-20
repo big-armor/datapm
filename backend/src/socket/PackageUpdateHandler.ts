@@ -20,6 +20,7 @@ import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { UpdatePackageJob } from "datapm-client-lib";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
@@ -123,14 +124,14 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
 
         const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
 
-        if (process.env.REGISTRY_URL == null) {
+        if (getEnvVariable("REGISTRY_URL") == null) {
             throw new Error("REGISTRY_URL is not defined");
         }
 
         const job = new UpdatePackageJob(context, {
             reference: {
                 ...this.request.packageIdentifier,
-                registryURL: process.env.REGISTRY_URL
+                registryURL: getEnvVariable("REGISTRY_URL")
             },
             defaults: true
         });

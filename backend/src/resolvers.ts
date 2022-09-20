@@ -94,7 +94,7 @@ import {
     adminSearchUsers,
     adminDeleteUser,
     adminSetUserStatus,
-    getUserFromCacheOrDbByUsername
+    getUserFromCacheOrDbByUsernameOrFail
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -263,6 +263,7 @@ import {
 } from "./resolvers/GroupCollectionPermissionResolver";
 import { me } from "./resolvers/MeResolver";
 import { Catalog } from "datapm-client-lib";
+import { getEnvVariable } from "./util/getEnvVariable";
 
 export const getPageContentByRoute = async (
     _0: unknown,
@@ -449,7 +450,7 @@ export const resolvers: {
             return parent.username;
         },
         displayName: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
 
             if (user.status === UserStatus.PENDING_SIGN_UP) {
                 if (isAuthenticatedAsAdmin(context)) {
@@ -465,7 +466,7 @@ export const resolvers: {
             return returnValue;
         },
         firstName: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.firstName || null;
             }
@@ -473,7 +474,7 @@ export const resolvers: {
             return null;
         },
         lastName: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.lastName || null;
             }
@@ -481,7 +482,7 @@ export const resolvers: {
             return null;
         },
         emailAddress: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.emailAddressIsPublic) {
                 return user.emailAddress;
             }
@@ -489,7 +490,7 @@ export const resolvers: {
             return null;
         },
         twitterHandle: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
                 return user.twitterHandle || null;
             }
@@ -497,7 +498,7 @@ export const resolvers: {
             return null;
         },
         gitHubHandle: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
                 return user.gitHubHandle || null;
             }
@@ -505,7 +506,7 @@ export const resolvers: {
             return null;
         },
         website: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.websiteIsPublic) {
                 return user.website || null;
             }
@@ -513,7 +514,7 @@ export const resolvers: {
             return null;
         },
         location: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.locationIsPublic) {
                 return user.location || null;
             }
@@ -521,14 +522,14 @@ export const resolvers: {
             return null;
         },
         status: async (parent: User, _1: unknown, context: Context) => {
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
+            const user = await getUserFromCacheOrDbByUsernameOrFail(context, parent.username);
             return user.status;
         },
         uiDarkModeEnabled: async (parent: User, _1: unknown, context: Context) => {
             if (Object.hasOwnProperty.call(context, "me")) {
                 const authenticatedContext = context as AuthenticatedContext;
 
-                const user = await getUserFromCacheOrDbByUsername(authenticatedContext, parent.username);
+                const user = await getUserFromCacheOrDbByUsernameOrFail(authenticatedContext, parent.username);
                 if (isRequestingUserOrAdmin(authenticatedContext, user.username)) {
                     return user.uiDarkModeEnabled;
                 }
@@ -620,7 +621,7 @@ export const resolvers: {
             return {
                 status: RegistryStatus.SERVING_REQUESTS,
                 version: DATAPM_VERSION,
-                registryUrl: process.env.REGISTRY_URL as string
+                registryUrl: getEnvVariable("REGISTRY_URL") as string
             };
         },
         me: me,
@@ -630,7 +631,7 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: GraphQLResolveInfo
         ) => {
-            return await getUserFromCacheOrDbByUsername(context, args.username, getGraphQlRelationName(info));
+            return await getUserFromCacheOrDbByUsernameOrFail(context, args.username, getGraphQlRelationName(info));
         },
 
         catalog: getCatalogByIdentifierOrFail,

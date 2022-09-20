@@ -13,5 +13,7 @@ export class AddAuthorToVersions1601997753078 implements MigrationInterface {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

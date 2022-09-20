@@ -5,5 +5,7 @@ export class DeleteAllPackages1610566212911 implements MigrationInterface {
         return queryRunner.query("Delete from package");
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

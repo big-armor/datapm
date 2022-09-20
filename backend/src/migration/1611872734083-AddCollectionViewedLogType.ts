@@ -37,5 +37,7 @@ export class AddCollectionViewedLogType1611872734083 implements MigrationInterfa
         );
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

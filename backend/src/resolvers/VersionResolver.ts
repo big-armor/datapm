@@ -19,13 +19,18 @@ import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
 import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
-import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
+import {
+    getPackageFromCacheOrDbById,
+    getPackageFromCacheOrDbByIdOrFail,
+    packageEntityToGraphqlObject
+} from "./PackageResolver";
 import { Connection, EntityManager } from "typeorm";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { GraphQLResolveInfo } from "graphql";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { hasPackagePermission } from "../directive/hasPackagePermissionDirective";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 export const versionEntityToGraphqlObject = async (
     context: Context,
@@ -34,7 +39,7 @@ export const versionEntityToGraphqlObject = async (
 ): Promise<Version> => {
     let catalogSlug: string;
 
-    const packageEntity = await getPackageFromCacheOrDbById(context, connection, versionEntity.packageId);
+    const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, connection, versionEntity.packageId);
     const packageSlug = packageEntity.slug;
 
     if (versionEntity.package?.catalog != null) {
@@ -48,7 +53,7 @@ export const versionEntityToGraphqlObject = async (
 
     return {
         identifier: {
-            registryURL: process.env.REGISTRY_URL,
+            registryURL: getEnvVariable("REGISTRY_URL"),
             catalogSlug: catalogSlug,
             packageSlug: packageSlug,
             versionMajor: versionEntity.majorVersion,
@@ -98,7 +103,7 @@ export const canonicalPackageFile = async (
     }
 
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
-    const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
+    const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, version.packageId);
 
     const permissions = await context.connection
         .getCustomRepository(PackagePermissionRepository)
@@ -138,7 +143,7 @@ export const modifiedPackageFile = async (
     info: GraphQLResolveInfo
 ): Promise<PackageFile> => {
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
-    const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
+    const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, version.packageId);
 
     let packageFile: PackageFile;
     try {
@@ -157,7 +162,7 @@ export const modifiedPackageFile = async (
         throw error;
     }
     // Find this registry in the package file
-    const registry = (packageFile.registries || []).find((reg) => reg.url === process.env.REGISTRY_URL);
+    const registry = (packageFile.registries || []).find((reg) => reg.url === getEnvVariable("REGISTRY_URL"));
 
     const publishMethod = registry?.publishMethod || PublishMethod.SCHEMA_ONLY;
 
@@ -170,7 +175,7 @@ export const modifiedPackageFile = async (
 
             return {
                 connectionConfiguration: {
-                    url: process.env.REGISTRY_URL as string
+                    url: getEnvVariable("REGISTRY_URL") as string
                 },
                 slug: schema.title,
                 type: "datapm",
@@ -216,7 +221,7 @@ export const modifiedPackageFile = async (
         const registrySources: Source[] = packageFile.sources.map<Source>((source) => {
             return {
                 connectionConfiguration: {
-                    url: process.env.REGISTRY_URL as string
+                    url: getEnvVariable("REGISTRY_URL") as string
                 },
                 slug: source.slug,
                 type: "datapmRegistryProxy",
@@ -332,5 +337,11 @@ export const getPackageVersionFromCacheOrDbByIdentifier = async (
     const versionPromiseFunction = () =>
         context.connection.getCustomRepository(VersionRepository).findOneOrFail({ identifier, relations });
 
-    return await context.cache.loadPackageVersion(identifier, versionPromiseFunction, forceReload);
+    const response = await context.cache.loadPackageVersion(identifier, versionPromiseFunction, forceReload);
+
+    if (response == null) {
+        throw new Error("VERSION_NOT_FOUND");
+    }
+
+    return response;
 };

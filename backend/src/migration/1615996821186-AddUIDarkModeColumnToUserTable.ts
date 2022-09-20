@@ -7,5 +7,7 @@ export class AddUIDarkModeColumnToUserTable1615996821186 implements MigrationInt
         `);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

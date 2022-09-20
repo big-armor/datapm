@@ -44,14 +44,12 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
     if (req.header("X-API-Key") != null) {
         return getMeFromAPIKey(req.header("X-API-Key") as string, manager);
     } else if (req.header("Authorization") != null) {
-        return new Promise<UserEntity | undefined>(async (success, error) => {
-            try {
-                success(getMeJwt(await getJwtFromRequest(req), manager));
-            } catch (err) {
-                if (err.name === "NoAuthenticationError") return success(undefined);
-                else error(err);
-            }
-        });
+        try {
+            return getMeJwt(await getJwtFromRequest(req), manager);
+        } catch (err) {
+            if (err.name === "NoAuthenticationError") return undefined;
+            throw err;
+        }
     } else {
         return Promise.resolve(undefined);
     }

@@ -2,12 +2,7 @@
 // TODO Fix the no-case-declarations issues in this file
 
 import { DeleteResult, EntityManager } from "typeorm";
-import {
-    hasCatalogPermission,
-    hasCatalogPermissionOrFail,
-    resolveCatalogPermissions,
-    resolveCatalogPermissionsForEntity
-} from "../directive/hasCatalogPermissionDirective";
+import { hasCatalogPermissionOrFail } from "../directive/hasCatalogPermissionDirective";
 import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
@@ -31,15 +26,13 @@ import { getCatalogOrFail } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { FollowRepository } from "../repository/FollowRepository";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
-import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
-import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { catalogEntityToGraphQLOrNull, getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 import { collectionEntityToGraphQLOrNull, getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
 import { getPackageIssueByIdentifiers } from "./PackageIssueResolver";
-import { getUserFromCacheOrDbByUsername } from "./UserResolver";
+import { getUserFromCacheOrDbByUsernameOrFail } from "./UserResolver";
 import { hasPackagePermissionOrFail } from "../directive/hasPackagePermissionDirective";
 import { hasCollectionPermissionOrFail } from "../directive/hasCollectionPermissionDirective";
 import { GraphQLResolveInfo } from "graphql";
@@ -537,7 +530,7 @@ export const userFollowers = async (
     context: AuthenticatedContext,
     info: GraphQLResolveInfo
 ): Promise<FollowersResult> => {
-    const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+    const userEntity = await getUserFromCacheOrDbByUsernameOrFail(context, username);
 
     const [followers, count] = await context.connection
         .getCustomRepository(FollowRepository)
@@ -617,7 +610,7 @@ export const userFollowersCount = async (
     context: AuthenticatedContext,
     info: GraphQLResolveInfo
 ): Promise<number> => {
-    const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+    const userEntity = await getUserFromCacheOrDbByUsernameOrFail(context, username);
 
     return await context.connection.getCustomRepository(FollowRepository).getFollowersByUserIdCount(userEntity.id);
 };

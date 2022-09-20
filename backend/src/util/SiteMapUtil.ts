@@ -3,6 +3,7 @@ import { HTTPContext } from "../context";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { getEnvVariable } from "./getEnvVariable";
 
 const LIMIT = 50000;
 const DATE_FORMAT = "YYYY-MM-DDThh:mm:ssZ";
@@ -14,7 +15,7 @@ export async function generateSiteMapIndex(context: HTTPContext): Promise<string
 
     responseXml += `
         <sitemap>
-            <loc>${process.env.REGISTRY_URL}/sitemap_static.xml</loc>
+            <loc>${getEnvVariable("REGISTRY_URL")}/sitemap_static.xml</loc>
         </sitemap>
     `;
 
@@ -25,7 +26,7 @@ export async function generateSiteMapIndex(context: HTTPContext): Promise<string
     for (let i = 0; i < packageSiteMapCount; i++) {
         responseXml += `
     <sitemap>
-        <loc>${process.env.REGISTRY_URL}/sitemap_packages_${i}.xml</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/sitemap_packages_${i}.xml</loc>
     </sitemap>
 `;
     }
@@ -37,7 +38,7 @@ export async function generateSiteMapIndex(context: HTTPContext): Promise<string
     for (let i = 0; i < catalogsSiteMapCount; i++) {
         responseXml += `
     <sitemap>
-        <loc>${process.env.REGISTRY_URL}/sitemap_catalogs_${i}.xml</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/sitemap_catalogs_${i}.xml</loc>
     </sitemap>
 `;
     }
@@ -51,7 +52,7 @@ export async function generateSiteMapIndex(context: HTTPContext): Promise<string
     for (let i = 0; i < collectionsSiteMapCount; i++) {
         responseXml += `
     <sitemap>
-        <loc>${process.env.REGISTRY_URL}/sitemap_collections_${i}.xml</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/sitemap_collections_${i}.xml</loc>
     </sitemap>
 `;
     }
@@ -63,7 +64,7 @@ export async function generateSiteMapIndex(context: HTTPContext): Promise<string
     return responseXml;
 }
 
-export async function generateStaticSiteMap() {
+export async function generateStaticSiteMap(): Promise<string> {
     // XML header
     let responseXml = `<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">        
@@ -71,27 +72,27 @@ export async function generateStaticSiteMap() {
 
     responseXml += `
     <url>
-        <loc>${process.env.REGISTRY_URL}</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
     <url>
-        <loc>${process.env.REGISTRY_URL}/docs</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/docs</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
     <url>
-        <loc>${process.env.REGISTRY_URL}/privacy</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/privacy</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
     <url>
-        <loc>${process.env.REGISTRY_URL}/terms</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/terms</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
     <url>
-        <loc>${process.env.REGISTRY_URL}/contact</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/contact</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
     <url>
-        <loc>${process.env.REGISTRY_URL}/downloads</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/downloads</loc>
         <lastmod>${moment().format(DATE_FORMAT)}</lastmod>
     </url>
 `;
@@ -119,7 +120,7 @@ export async function generatePackageSiteMap(siteMapNumber: number, context: HTT
 
         responseXml += `
     <url>
-        <loc>${process.env.REGISTRY_URL}/${packageEntity.catalog.slug}/${packageEntity.slug}</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/${packageEntity.catalog.slug}/${packageEntity.slug}</loc>
         <lastmod>${date}</lastmod>
     </url>
 `;
@@ -149,7 +150,7 @@ export async function generateCatalogSiteMap(siteMapNumber: number, context: HTT
 
         responseXml += `
     <url>
-        <loc>${process.env.REGISTRY_URL}/${catalogEntity.slug}</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/${catalogEntity.slug}</loc>
         <lastmod>${date}</lastmod>
     </url>
 `;
@@ -179,7 +180,7 @@ export async function generateCollectionsSiteMap(siteMapNumber: number, context:
 
         responseXml += `
     <url>
-        <loc>${process.env.REGISTRY_URL}/collection/${collectionEntity.collectionSlug}</loc>
+        <loc>${getEnvVariable("REGISTRY_URL")}/collection/${collectionEntity.collectionSlug}</loc>
         <lastmod>${date}</lastmod>
     </url>
 `;

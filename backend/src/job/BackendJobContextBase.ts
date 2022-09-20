@@ -21,6 +21,7 @@ import { RepositoryRepository } from "../repository/RepositoryRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { decryptValue, encryptValue } from "../util/EncryptionUtil";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 export abstract class BackendJobContextBase extends JobContext {
     constructor(public jobId: string, private context: AuthenticatedContext) {
@@ -192,23 +193,19 @@ export abstract class BackendJobContextBase extends JobContext {
     }
 
     getRegistryConfigs(): RegistryConfig[] {
-        if (!process.env.REGISTRY_URL) {
-            // TODO - this should really be in an interface that has no undefined values
-            throw new Error("Registry URL not defined");
-        }
-
         return [
             {
-                url: process.env.REGISTRY_URL
+                url: getEnvVariable("REGISTRY_URL")
             }
         ];
     }
 
     getRegistryConfig(url: string): RegistryConfig | undefined {
-        if (process.env.REGISTRY_URL !== url) throw new Error("Server does not support getting other registry configs");
+        if (getEnvVariable("REGISTRY_URL") !== url)
+            throw new Error("Server does not support getting other registry configs");
 
         return {
-            url: process.env.REGISTRY_URL
+            url: getEnvVariable("REGISTRY_URL")
         };
     }
 
@@ -244,6 +241,8 @@ export abstract class BackendJobContextBase extends JobContext {
             []
         );
 
+        const registryUrl = getEnvVariable("REGISTRY_URL");
+
         return {
             hasPermissionToSave: true,
             contextType: "registry",
@@ -251,8 +250,8 @@ export abstract class BackendJobContextBase extends JobContext {
             packageFile: packageFile,
             permitsSaving: true,
             packageReference: catalogSlug + "/" + packageFile.packageSlug,
-            readmeFileUrl: process.env.REGISTRY_URL + "/" + catalogSlug + "/" + packageFile.packageSlug,
-            licenseFileUrl: process.env.REGISTRY_URL + "/" + catalogSlug + "/" + packageFile.packageSlug,
+            readmeFileUrl: registryUrl + "/" + catalogSlug + "/" + packageFile.packageSlug,
+            licenseFileUrl: registryUrl + "/" + catalogSlug + "/" + packageFile.packageSlug,
             save: async () => {
                 throw new Error("Not implemented");
             }
@@ -304,7 +303,8 @@ export abstract class BackendJobContextBase extends JobContext {
         return {
             contextType: "registry",
             hasPermissionToSave: editPermission,
-            packageReference: process.env.REGISTRY_URL + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
+            packageReference:
+                getEnvVariable("REGISTRY_URL") + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
             packageFile: latestPackageFile,
             permitsSaving: true,
             save: async (packageFile: PackageFile): Promise<void> => {
@@ -320,9 +320,19 @@ export abstract class BackendJobContextBase extends JobContext {
                 );
             },
             licenseFileUrl:
-                process.env.REGISTRY_URL + "/" + identifier.catalogSlug + "/" + identifier.packageSlug + "#license",
+                getEnvVariable("REGISTRY_URL") +
+                "/" +
+                identifier.catalogSlug +
+                "/" +
+                identifier.packageSlug +
+                "#license",
             readmeFileUrl:
-                process.env.REGISTRY_URL + "/" + identifier.catalogSlug + "/" + identifier.packageSlug + "#readme",
+                getEnvVariable("REGISTRY_URL") +
+                "/" +
+                identifier.catalogSlug +
+                "/" +
+                identifier.packageSlug +
+                "#readme",
             catalogSlug: identifier.catalogSlug,
             cantSaveReason
         };

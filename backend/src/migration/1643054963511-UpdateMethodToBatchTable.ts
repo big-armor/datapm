@@ -15,5 +15,7 @@ export class UpdateMethodToBatchTable1643054963511 implements MigrationInterface
         await queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

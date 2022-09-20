@@ -10,5 +10,7 @@ export class InviteUser1611026765149 implements MigrationInterface {
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

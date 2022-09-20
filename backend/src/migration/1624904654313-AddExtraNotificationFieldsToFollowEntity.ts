@@ -15,5 +15,7 @@ export class AddExtraNotificationFieldsToFollowEntity1624904654313 implements Mi
         `);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

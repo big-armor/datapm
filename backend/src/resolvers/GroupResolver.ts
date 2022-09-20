@@ -1,6 +1,7 @@
 import { ValidationError } from "apollo-server";
-import { ActivityLogEventType, UserStatus } from "datapm-client-lib";
+import { ActivityLogEventType, SearchGroupsResult, UserStatus } from "datapm-client-lib";
 import { emailAddressValid } from "datapm-lib";
+import { GraphQLResolveInfo } from "graphql";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { resolveGroupPermissionsForEntity } from "../directive/hasGroupPermissionDirective.ts";
@@ -16,15 +17,14 @@ import { asyncForEach } from "../util/AsyncUtils";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { sendInviteUser, sendShareNotification } from "../util/smtpUtil";
 
-import { getUserFromCacheOrDbByUsername } from "./UserResolver";
+import { getUserFromCacheOrDbByUsernameOrFail } from "./UserResolver";
 const GROUP_SEARCH_RESULT_LIMIT = 100;
 
 export const createGroup = async (
     _0: unknown,
     { groupSlug, name, description }: { groupSlug: string; name: string; description: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<Group> => {
     return await context.connection.transaction(async (manager) => {
         const existingGroup = await manager.getRepository(GroupEntity).findOne({
             where: {
@@ -55,7 +55,7 @@ export const createGroup = async (
         manager.save(groupUserEntity);
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.GROUP_CREATED,
             targetGroupId: groupEntity.id
         });
@@ -67,9 +67,8 @@ export const createGroup = async (
 export const updateGroup = async (
     _0: unknown,
     { groupSlug, name, description }: { groupSlug: string; name: string; description: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<Group> => {
     return await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
@@ -77,7 +76,7 @@ export const updateGroup = async (
         groupEntity.description = description;
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.GROUP_EDIT,
             targetGroupId: groupEntity.id
         });
@@ -89,14 +88,13 @@ export const updateGroup = async (
 export const deleteGroup = async (
     _0: unknown,
     { groupSlug }: { groupSlug: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.GROUP_DELETED,
             targetGroupId: groupEntity.id
         });
@@ -108,9 +106,8 @@ export const deleteGroup = async (
 export const addOrUpdateUserToGroup = async (
     _0: unknown,
     { groupSlug, userPermissions }: { groupSlug: string; userPermissions: SetUserGroupPermissionsInput[] },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     const inviteUsers: UserEntity[] = [];
     const existingUsers: UserEntity[] = [];
     const groupEntity = await findGroup(context.connection.manager, groupSlug);
@@ -137,7 +134,7 @@ export const addOrUpdateUserToGroup = async (
                 }
             } else {
                 if (permissions.length === 0) {
-                    await removeUserFromGroup(_0, { groupSlug, username: userEntity.username }, context, info);
+                    await removeUserFromGroup(_0, { groupSlug, username: userEntity.username }, context);
                     continue;
                 } else if (userEntity.status === UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(userEntity);
@@ -147,7 +144,7 @@ export const addOrUpdateUserToGroup = async (
             }
 
             await createActivityLog(manager, {
-                userId: context!.me!.id,
+                userId: context.me.id,
                 eventType: ActivityLogEventType.GROUP_MEMBER_PERMISSION_ADDED_UPDATED,
                 targetGroupId: groupEntity.id,
                 targetUserId: userEntity.id,
@@ -200,12 +197,11 @@ export const addOrUpdateUserToGroup = async (
 export const removeUserFromGroup = async (
     _0: unknown,
     { groupSlug, username }: { groupSlug: string; username: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<Group> => {
     return await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
-        const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+        const userEntity = await getUserFromCacheOrDbByUsernameOrFail(context, username);
 
         const groupUserEntity = await manager.getRepository(GroupUserEntity).findOneOrFail({
             groupId: groupEntity.id,
@@ -217,7 +213,7 @@ export const removeUserFromGroup = async (
         }
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.GROUP_MEMBER_REMOVED,
             targetGroupId: groupEntity.id,
             targetUserId: userEntity.id
@@ -250,7 +246,11 @@ async function ensureOtherManagers(entityManager: EntityManager, groupId: number
     }
 }
 
-export const findGroup = async (manager: EntityManager, groupSlug: string, relations: string[] = []) => {
+export const findGroup = async (
+    manager: EntityManager,
+    groupSlug: string,
+    relations: string[] = []
+): Promise<GroupEntity> => {
     const groupEntity = await manager.getRepository(GroupEntity).findOne({
         where: {
             slug: groupSlug
@@ -263,7 +263,7 @@ export const findGroup = async (manager: EntityManager, groupSlug: string, relat
     return groupEntity;
 };
 
-export const myGroups = async (_0: unknown, {}: {}, context: AuthenticatedContext, info: any) => {
+export const myGroups = async (_0: unknown, _1: unknown, context: AuthenticatedContext): Promise<Group[]> => {
     const groupEntity = await context.connection.getRepository(GroupUserEntity).find({
         where: {
             userId: context.me.id
@@ -277,9 +277,8 @@ export const myGroups = async (_0: unknown, {}: {}, context: AuthenticatedContex
 export const group = async (
     _0: unknown,
     { groupSlug }: { groupSlug: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<GroupEntity> => {
     const groupEntity = await context.connection.getRepository(GroupEntity).findOne({
         where: {
             slug: groupSlug
@@ -297,10 +296,14 @@ export const getGroupFromCacheOrDbByIdOrFail = async (
     groupId: number,
     forceReload?: boolean,
     relations: string[] = []
-) => {
+): Promise<GroupEntity> => {
     const groupPromiseFunction = () =>
         connection.getRepository(GroupEntity).findOneOrFail({ id: groupId }, { relations });
-    return await context.cache.loadGroup(groupId, groupPromiseFunction, forceReload);
+    const response = await context.cache.loadGroup(groupId, groupPromiseFunction, forceReload);
+
+    if (response == null) throw new Error("GROUP_NOT_FOUND - " + groupId);
+
+    return response;
 };
 
 export const getGroupFromCacheOrDbBySlugOrFail = async (
@@ -309,7 +312,7 @@ export const getGroupFromCacheOrDbBySlugOrFail = async (
     groupSlug: string,
     forceReload?: boolean,
     relations: string[] = []
-) => {
+): Promise<GroupEntity> => {
     const groupPromiseFunction = async () => {
         const group = await connection.getRepository(GroupEntity).findOne({ slug: groupSlug }, { relations });
 
@@ -317,10 +320,18 @@ export const getGroupFromCacheOrDbBySlugOrFail = async (
 
         return group;
     };
-    return await context.cache.loadGroupBySlug(groupSlug, groupPromiseFunction, forceReload);
+    const response = await context.cache.loadGroupBySlug(groupSlug, groupPromiseFunction, forceReload);
+
+    if (response == null) throw new Error("GROUP_NOT_FOUND - " + groupSlug);
+
+    return response;
 };
 
-export const getGroupPermissionsFromCacheOrDb = async (context: Context, groupId: number, userId: number) => {
+export const getGroupPermissionsFromCacheOrDb = async (
+    context: Context,
+    groupId: number,
+    userId: number
+): Promise<Permission[]> => {
     const permissionsPromiseFunction = async () => {
         const userPermissions = await context.connection.getRepository(GroupUserEntity).findOne({ groupId, userId });
 
@@ -329,10 +340,14 @@ export const getGroupPermissionsFromCacheOrDb = async (context: Context, groupId
         return userPermissions.permissions;
     };
 
-    return context.cache.loadGroupPermissionsById(groupId, permissionsPromiseFunction);
+    return (await context.cache.loadGroupPermissionsById(groupId, permissionsPromiseFunction)) || [];
 };
 
-export const myGroupPermissions = async (parent: Group, _0: unknown, context: AuthenticatedContext) => {
+export const myGroupPermissions = async (
+    parent: Group,
+    _0: unknown,
+    context: AuthenticatedContext
+): Promise<Permission[]> => {
     const groupEntity = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection.manager, parent.slug);
 
     return resolveGroupPermissionsForEntity(context, groupEntity, context.me);
@@ -342,7 +357,7 @@ export const groupUsers = async (
     parent: Group,
     _0: unknown,
     context: AuthenticatedContext,
-    info: any
+    info: GraphQLResolveInfo
 ): Promise<GroupUser[]> => {
     const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
 
@@ -359,8 +374,7 @@ export const groupUsers = async (
 export const setGroupAsAdmin = async (
     _0: unknown,
     { groupSlug, isAdmin }: { groupSlug: string; isAdmin: boolean },
-    context: AuthenticatedContext,
-    info: any
+    context: AuthenticatedContext
 ): Promise<void> => {
     await context.connection.transaction(async (manager) => {
         const group = await getGroupFromCacheOrDbBySlugOrFail(context, manager, groupSlug);
@@ -374,9 +388,8 @@ export const setGroupAsAdmin = async (
 export const adminSearchGroups = async (
     _0: unknown,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<SearchGroupsResult> => {
     const clampedLimit = Math.min(limit, GROUP_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(GroupRepository)
@@ -392,9 +405,8 @@ export const adminSearchGroups = async (
 export const adminDeleteGroup = async (
     _0: unknown,
     { groupSlug }: { groupSlug: string },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     await context.connection.getRepository(GroupEntity).delete({
         slug: groupSlug
     });
