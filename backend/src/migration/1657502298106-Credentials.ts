@@ -1,5 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
-
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
 
@@ -56,17 +55,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS source_credential ON credential(repository_id,
 
 ALTER TABLE public.credential ADD CONSTRAINT credential_pkey PRIMARY KEY (id);
 
-`
+`;
 
 export class Credentials1657502298106 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(sql);
-
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         throw new Error("Not implemented");
     }
-
 }

@@ -26,7 +26,7 @@ async function getAPIKey({
     relations?: string[];
 }): Promise<APIKeyEntity | null> {
     const ALIAS = "users";
-    let query = manager
+    const query = manager
         .getRepository(APIKeyEntity)
         .createQueryBuilder(ALIAS)
         .where({ id: id })
@@ -57,23 +57,6 @@ async function getAPIKeyOrFail({
 
 @EntityRepository(UserEntity)
 export class APIKeyRepository extends Repository<APIKeyEntity> {
-    constructor() {
-        super();
-    }
-
-    async findAllForUser({ user, relations = [] }: { user: UserEntity; relations?: string[] }) {
-        const ALIAS = "users";
-        const keys = await this.manager
-            .getRepository(APIKeyEntity)
-            .createQueryBuilder(ALIAS)
-            .where({ user: UserEntity })
-            .addRelations(ALIAS, relations)
-            .getMany();
-
-        // Never return the hash
-        keys.forEach((k) => delete k.hash);
-    }
-
     async createAPIKey({
         user,
         label,
@@ -92,7 +75,7 @@ export class APIKeyRepository extends Repository<APIKeyEntity> {
                 .where({ userId: user.id, label: label })
                 .getOne();
 
-            if (existingKey != undefined) {
+            if (existingKey != null) {
                 throw new ValidationError("NOT_UNIQUE");
             }
 
@@ -110,7 +93,7 @@ export class APIKeyRepository extends Repository<APIKeyEntity> {
             try {
                 const savedKey = await transaction.save(apiKey);
             } catch (error) {
-                if (error.code == 23505) throw new ValidationError("NOT_UNIQUE");
+                if (error.code === 23505) throw new ValidationError("NOT_UNIQUE");
                 console.error(error);
                 throw error;
             }

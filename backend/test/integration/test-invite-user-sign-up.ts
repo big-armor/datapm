@@ -11,7 +11,7 @@ import {
     SetPackagePermissionsDocument,
     VerifyEmailAddressDocument
 } from "./registry-client";
-import { mailObservable } from "./setup";
+import { MailDevEmail, mailObservable } from "./setup";
 import { createAnonymousClient, createTestClient, createUser, createUserDoNotVerifyEmail } from "./test-utils";
 
 /* This file tests the user invite through package sharing, but this invited
@@ -22,9 +22,9 @@ describe("Invite User That Then Signs Up", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let invitedUserClient: ApolloClient<NormalizedCacheObject>;
     let invitedUserEmailToken: string;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
-    let emailVerificationToken: string = "";
+    let emailVerificationToken: string | undefined;
 
     before(async function () {
         userAClient = await createUser(
@@ -53,14 +53,14 @@ describe("Invite User That Then Signs Up", function () {
     });
 
     it("Should send invite email", async function () {
-        let userBEmail: any = null;
-        let verifyEmailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        let userBEmail: MailDevEmail | null = null;
+        const verifyEmailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === "testb-invite-sign-up@test.datapm.io") userBEmail = email;
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -85,10 +85,10 @@ describe("Invite User That Then Signs Up", function () {
         expect(response.errors == null).equal(true);
 
         await verifyEmailPromise.then(() => {
-            expect(userBEmail.html).to.not.contain("{{");
-            emailVerificationToken = (userBEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
+            expect(userBEmail?.html).to.not.contain("{{");
+            emailVerificationToken = (userBEmail?.text as string).match(/\?token=([a-zA-z0-9-]+)/)?.pop();
             expect(emailVerificationToken != null).equal(true);
-            expect(userBEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userBEmail?.html).to.contain("Here is my message!@#$%^&*()-=+");
         });
     });
 
@@ -115,18 +115,18 @@ describe("Invite User That Then Signs Up", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("EMAIL_ADDRESS_NOT_VERIFIED"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("EMAIL_ADDRESS_NOT_VERIFIED"))).not.equal(null);
     });
 
     it("Should allow user to verify email address with token", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: invitedUserEmailToken
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("Should allow new user to login", async function () {
@@ -141,7 +141,7 @@ describe("Invite User That Then Signs Up", function () {
         expect(response.errors == null).equal(true);
 
         invitedUserClient = createTestClient({
-            Authorization: "Bearer " + response.data!.login
+            Authorization: "Bearer " + response.data?.login
         });
 
         const whoAmIResponse = await invitedUserClient.query({
@@ -177,6 +177,6 @@ describe("Invite User That Then Signs Up", function () {
             }
         });
 
-        expect(response.errors!.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
+        expect(response.errors?.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
     });
 });

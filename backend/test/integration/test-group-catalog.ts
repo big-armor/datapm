@@ -23,7 +23,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 describe("Group Package Access", () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
     before(async () => {
         userAClient = await createUser(
@@ -40,12 +40,12 @@ describe("Group Package Access", () => {
             "testB-group-catalog@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -58,16 +58,16 @@ describe("Group Package Access", () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-group-catalog");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-group-catalog");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-group-catalog");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-group-catalog");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -90,10 +90,10 @@ describe("Group Package Access", () => {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-group-catalog");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-group-catalog");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -102,7 +102,7 @@ describe("Group Package Access", () => {
     });
 
     it("package should not be available anonymously", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -114,13 +114,13 @@ describe("Group Package Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHENTICATED") != null,
             "should have not authenticated error"
         ).equal(true);
     });
 
     it("package should not be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -132,7 +132,7 @@ describe("Group Package Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorization error"
         ).equal(true);
     });
@@ -195,7 +195,7 @@ describe("Group Package Access", () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.package.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.package.displayName).to.equal("Congressional Legislators");
     });
 
     it("Package should appear in userB auto-complete", async () => {
@@ -208,10 +208,10 @@ describe("Group Package Access", () => {
 
         expect(response.error == null, "no errors").equal(true);
         expect(
-            response.data!.autoComplete.packages?.find(
+            response.data?.autoComplete.packages?.find(
                 (p) =>
-                    p.identifier.catalogSlug == "testA-group-catalog" &&
-                    p.identifier.packageSlug == "congressional-legislators"
+                    p.identifier.catalogSlug === "testA-group-catalog" &&
+                    p.identifier.packageSlug === "congressional-legislators"
             ) != null
         ).equal(true);
     });
@@ -226,7 +226,8 @@ describe("Group Package Access", () => {
 
         expect(response.error == null, "no errors").equal(true);
         expect(
-            response.data!.autoComplete.catalogs?.find((c) => c.identifier.catalogSlug == "testA-group-catalog") != null
+            response.data?.autoComplete.catalogs?.find((c) => c.identifier.catalogSlug === "testA-group-catalog") !=
+                null
         ).equal(true);
     });
 
@@ -244,8 +245,9 @@ describe("Group Package Access", () => {
             }
         });
 
+        if (response.errors == null) throw new Error("response.errors is null");
         expect(response.errors != null, "should have errors").to.equal(true);
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("Grant group edit access to package", async () => {
@@ -342,8 +344,10 @@ describe("Group Package Access", () => {
             }
         });
 
+        if (response.errors == null) throw new Error("response.errors is null");
+
         expect(response.errors != null, "should have errors").to.equal(true);
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("Grant group manage access to catalog", async () => {
@@ -377,7 +381,11 @@ describe("Group Package Access", () => {
         expect(response.data.groupsByCatalog[0].group?.slug).equal("test-group-catalog");
 
         expect(response.data.groupsByCatalog[0].permissions?.length).equal(1);
-        expect(response.data.groupsByCatalog[0].permissions![0]).equal(Permission.VIEW);
+
+        if (response.data.groupsByCatalog[0].permissions == null)
+            throw new Error("response.data.groupsByCatalog[0].permissions is null");
+
+        expect(response.data.groupsByCatalog[0].permissions[0]).equal(Permission.VIEW);
 
         expect(response.data.groupsByCatalog[0].packagePermissions?.length).equal(3);
     });
@@ -397,7 +405,7 @@ describe("Group Package Access", () => {
     });
 
     it("package should not be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -409,7 +417,7 @@ describe("Group Package Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorization error"
         ).equal(true);
     });

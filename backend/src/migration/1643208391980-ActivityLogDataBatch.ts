@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     ALTER TABLE "public"."activity_log" ADD COLUMN target_data_batch_id BIGINT DEFAULT NULL;
@@ -12,15 +12,14 @@ const SQL = `
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'DATA_SINK_STATE_REQUESTED';
 
     alter table "public"."activity_log" add column additional_properties jsonb;
-`
+`;
 
 export class ActivityLogDataBatch1643208391980 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.query(SQL);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
     }
-
 }

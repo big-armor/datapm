@@ -3,10 +3,6 @@ import { PlatformSettingsEntity } from "../entity/PlatformSettingsEntity";
 
 @EntityRepository(PlatformSettingsEntity)
 export class PlatformSettingsRepository extends Repository<PlatformSettingsEntity> {
-    constructor() {
-        super();
-    }
-
     public async findSettingsByKey(key: string): Promise<PlatformSettingsEntity | undefined> {
         return await this.createQueryBuilder().where("key = :key").setParameter("key", key).getOne();
     }

@@ -3,6 +3,7 @@ import "reflect-metadata";
 import express from "express";
 import helmet from "helmet";
 import querystring from "querystring";
+// eslint-disable-next-line camelcase
 import express_enforces_ssl from "express-enforces-ssl";
 import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
@@ -27,6 +28,7 @@ import { SessionCache } from "./session-cache";
 import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
+// eslint-disable-next-line node/no-deprecated-api
 import { parse } from "url";
 import { libPackageVersion } from "datapm-lib";
 import {
@@ -38,6 +40,7 @@ import {
 } from "./util/SiteMapUtil";
 import * as SegfaultHandler from "segfault-raub";
 import { GroupRepository } from "./repository/GroupRepository";
+import { getEnvVariable } from "./util/getEnvVariable";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -130,8 +133,8 @@ async function main() {
                 return err;
             },
             generateClientInfo: ({ request }) => {
-                let clientName: string | undefined = undefined;
-                let clientVersion: string | undefined = undefined;
+                let clientName: string | undefined;
+                let clientVersion: string | undefined;
 
                 const headers = request.http?.headers;
                 if (headers) {
@@ -228,33 +231,33 @@ async function main() {
     });
 
     app.use("/robots.txt", function (req, res, next) {
-        switch (process.env["ALLOW_WEB_CRAWLERS"]) {
-            case "true":
-            case "1":
-            case "yes":
-                const localRobotsTxt = path.join(__dirname, "robots-production.txt");
-                const staticRobotsTxt = path.join(__dirname, "..", "static", "robots-production.txt");
-                let content = "";
-                if (fs.existsSync(localRobotsTxt)) content = fs.readFileSync(localRobotsTxt, "utf-8").toString();
-                else if (fs.existsSync(staticRobotsTxt)) content = fs.readFileSync(staticRobotsTxt, "utf-8").toString();
-                else {
-                    res.sendStatus(404);
-                    return;
-                }
+        if (
+            process.env.ALLOW_WEB_CRAWLERS === "true" ||
+            process.env.ALLOW_WEB_CRAWLERS === "1" ||
+            process.env.ALLOW_WEB_CRAWLERS === "yes"
+        ) {
+            const localRobotsTxt = path.join(__dirname, "robots-production.txt");
+            const staticRobotsTxt = path.join(__dirname, "..", "static", "robots-production.txt");
+            let content = "";
+            if (fs.existsSync(localRobotsTxt)) content = fs.readFileSync(localRobotsTxt, "utf-8").toString();
+            else if (fs.existsSync(staticRobotsTxt)) content = fs.readFileSync(staticRobotsTxt, "utf-8").toString();
+            else {
+                res.sendStatus(404);
+                return;
+            }
 
-                content = content.replace("${REGISTRY_URL}", process.env["REGISTRY_URL"] as string);
+            // eslint-disable-next-line no-template-curly-in-string
+            content = content.replace("${REGISTRY_URL}", getEnvVariable("REGISTRY_URL") as string);
 
-                res.header("Content-Type", "text/plain").send(content);
-
-                break;
-            default:
-                const localRobotsTxt2 = path.join(__dirname, "robots.txt");
-                const staticRobotsTxt2 = path.join(__dirname, "..", "static", "robots.txt");
-
-                if (fs.existsSync(localRobotsTxt2)) res.header("Content-Type", "text/plain").sendFile(localRobotsTxt2);
-                else if (fs.existsSync(staticRobotsTxt2))
-                    res.header("Content-Type", "text/plain").sendFile(staticRobotsTxt2);
+            res.header("Content-Type", "text/plain").send(content);
+            return;
         }
+
+        const localRobotsTxt2 = path.join(__dirname, "robots.txt");
+        const staticRobotsTxt2 = path.join(__dirname, "..", "static", "robots.txt");
+
+        if (fs.existsSync(localRobotsTxt2)) res.header("Content-Type", "text/plain").sendFile(localRobotsTxt2);
+        else if (fs.existsSync(staticRobotsTxt2)) res.header("Content-Type", "text/plain").sendFile(staticRobotsTxt2);
     });
 
     /** Terraform script Downloads */
@@ -268,7 +271,7 @@ async function main() {
 
         const files = fs.readdirSync(terraFormScriptsDirectory);
 
-        let startsWith: string | undefined = undefined;
+        let startsWith: string | undefined;
 
         if (req.params.type === "gcp") {
             startsWith = "datapm-gcp-terraform-";
@@ -309,7 +312,7 @@ async function main() {
         express.static(path.join(__dirname, "..", "static"), {
             setHeaders: (res, path) => {
                 // set cache to 1 year for anything that includes a hash
-                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
+                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\\/]+$/) ? 31536000 : 0;
                 res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
             }
         })
@@ -320,7 +323,7 @@ async function main() {
         express.static(path.join(__dirname, "..", "static/docs"), {
             setHeaders: (res, path) => {
                 // set cache to 1 year for anything that includes a hash
-                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
+                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\\/]+$/) ? 31536000 : 0;
                 res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
             }
         })
@@ -333,14 +336,14 @@ async function main() {
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const respondWithReadable = async (readable: Readable, response: express.Response) => {
-        const imageBuffer = await new Promise<Buffer>((res) => {
-            const bufferedData: any[] = [];
+        const imageBuffer = await new Promise<Buffer>((resolve) => {
+            const bufferedData: Array<Uint8Array> = [];
             readable.on("data", (d) => {
                 bufferedData.push(d);
             });
             readable.on("end", () => {
                 const buffer = Buffer.concat(bufferedData);
-                res(buffer);
+                resolve(buffer);
             });
         });
 
@@ -357,10 +360,15 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: req.params.username });
+
+            if (user == null) {
+                res.sendStatus(404);
+                return;
+            }
+
             await respondWithReadable(await imageService.readUserAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -370,10 +378,15 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: req.params.username });
+
+            if (user == null) {
+                res.sendStatus(404);
+                return;
+            }
+
             await respondWithReadable(await imageService.readUserCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -388,7 +401,6 @@ async function main() {
             await respondWithReadable(await imageService.readPackageCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -401,7 +413,6 @@ async function main() {
             await respondWithReadable(await imageService.readCatalogAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -414,7 +425,6 @@ async function main() {
             await respondWithReadable(await imageService.readCatalogCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -427,7 +437,6 @@ async function main() {
             await respondWithReadable(await imageService.readCollectionCoverImage(collection.id), res);
         } catch (err) {
             res.status(404).send();
-            return;
         }
     });
 
@@ -573,24 +582,26 @@ async function main() {
             (contextObject as AuthenticatedSocketContext).me = user;
         }
 
+        // TODO handle server shutdowns by disconnecting sockets
+        // eslint-disable-next-line no-new
         new SocketConnectionHandler(socket, contextObject, distributedLockingService);
     });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
-        const registryHostName = parse(process.env["REGISTRY_URL"] as string).hostname;
+        const registryHostName = parse(getEnvVariable("REGISTRY_URL") as string).hostname;
 
         // If the request was to a hostname other than the
         // hostname in hte registry_url environment variable,
         // redirect to the equivalent url on the correct name
-        if (req.hostname != registryHostName) {
-            const redirectDestination = `${process.env["REGISTRY_URL"]}${req.originalUrl}`;
+        if (req.hostname !== registryHostName) {
+            const redirectDestination = `${getEnvVariable("REGISTRY_URL")}${req.originalUrl}`;
             res.redirect(301, redirectDestination);
             return;
         }
 
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);
-        res.setHeader("x-datapm-registry-url", process.env["REGISTRY_URL"] as string); // TODO support other paths
+        res.setHeader("x-datapm-registry-url", getEnvVariable("REGISTRY_URL") as string); // TODO support other paths
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
 

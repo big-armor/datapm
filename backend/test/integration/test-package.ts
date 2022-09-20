@@ -28,9 +28,7 @@ import { AdminHolder } from "./admin-holder";
 describe("Package Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -47,12 +45,12 @@ describe("Package Tests", async () => {
             "testB-packages@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should have catalog not found error", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -64,7 +62,7 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
+            response.errors?.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
             "should have catalog not found error"
         ).equal(true);
     });
@@ -106,7 +104,7 @@ describe("Package Tests", async () => {
             }
         });
 
-        let findMyPackagesA = await userAClient.query({
+        const findMyPackagesA = await userAClient.query({
             query: MyPackagesDocument,
             variables: {
                 offset: 0,
@@ -114,7 +112,7 @@ describe("Package Tests", async () => {
             }
         });
 
-        let findMyPackagesB = await userBClient.query({
+        const findMyPackagesB = await userBClient.query({
             query: MyPackagesDocument,
             variables: {
                 offset: 0,
@@ -127,7 +125,7 @@ describe("Package Tests", async () => {
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -140,16 +138,16 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("package should not be available anonymously", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -161,13 +159,13 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHENTICATED") != null,
             "should have not authenticated error"
         ).equal(true);
     });
 
     it("package should not be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -179,13 +177,13 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorization error"
         ).equal(true);
     });
 
     it("User A package list should not available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserPackagesDocument,
             variables: {
                 username: "testA-packages",
@@ -201,7 +199,7 @@ describe("Package Tests", async () => {
     });
 
     it("User A can get package", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -212,17 +210,17 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package!.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.package!.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.package!.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.package!.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.package!.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.package!.latestVersion).to.equal(null);
-        expect(response.data!.package!.versions?.length).equal(0);
+        expect(response.data?.package?.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.package?.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.package?.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.package?.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.package?.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.package?.latestVersion).to.equal(null);
+        expect(response.data?.package?.versions?.length).equal(0);
     });
 
     it("User A update catalog to be public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -234,11 +232,11 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A package list should not available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserPackagesDocument,
             variables: {
                 username: "testA-packages",
@@ -254,7 +252,7 @@ describe("Package Tests", async () => {
     });
 
     it("package should not be available anonymously - package is private", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -266,13 +264,13 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHENTICATED") != null,
             "should have not authenticated error"
         ).equal(true);
     });
 
     it("Should not be in latest list - because it is not public", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: GetLatestPackagesDocument,
             variables: {
                 limit: 10,
@@ -282,12 +280,12 @@ describe("Package Tests", async () => {
 
         expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+            response.data?.latestPackages.packages?.find((p) => p.identifier.packageSlug === "new-package-slug")
         ).to.equal(undefined);
     });
 
     it("User A can not set package public - no versions", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -300,15 +298,15 @@ describe("Package Tests", async () => {
             }
         });
         expect(response.errors != null, "has errors").equal(true);
-        expect(response.errors!.find((e) => e.message.includes("PACKAGE_HAS_NO_VERSIONS"))).to.not.equal(undefined);
+        expect(response.errors?.find((e) => e.message.includes("PACKAGE_HAS_NO_VERSIONS"))).to.not.equal(undefined);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -321,10 +319,10 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-packages");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-packages");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -333,7 +331,7 @@ describe("Package Tests", async () => {
     });
 
     it("User A can update package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -349,22 +347,22 @@ describe("Package Tests", async () => {
             }
         });
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.updatePackage.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.updatePackage.description).to.equal("New description");
-        expect(response.data!.updatePackage.displayName).to.equal("New displayName");
-        expect(response.data!.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.updatePackage.identifier.packageSlug).to.equal("new-package-slug");
-        expect(response.data!.updatePackage.latestVersion).to.not.equal(null);
+        expect(response.data?.updatePackage.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.updatePackage.description).to.equal("New description");
+        expect(response.data?.updatePackage.displayName).to.equal("New displayName");
+        expect(response.data?.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.updatePackage.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.data?.updatePackage.latestVersion).to.not.equal(null);
 
-        const identifier = response.data!.updatePackage.latestVersion!.identifier;
+        const identifier = response.data?.updatePackage.latestVersion?.identifier;
 
-        expect(identifier.versionMajor).to.equal(1);
-        expect(identifier.versionMinor).to.equal(0);
-        expect(identifier.versionPatch).to.equal(0);
+        expect(identifier?.versionMajor).to.equal(1);
+        expect(identifier?.versionMinor).to.equal(0);
+        expect(identifier?.versionPatch).to.equal(0);
     });
 
     it("Anonymous user can access package", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -375,23 +373,23 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.package.description).to.equal("New description");
-        expect(response.data!.package.displayName).to.equal("New displayName");
-        expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
-        expect(response.data!.package.latestVersion).to.not.equal(null);
-        expect(response.data!.package.versions?.length).equal(1);
+        expect(response.data?.package.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.package.description).to.equal("New description");
+        expect(response.data?.package.displayName).to.equal("New displayName");
+        expect(response.data?.package.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.package.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.data?.package.latestVersion).to.not.equal(null);
+        expect(response.data?.package.versions?.length).equal(1);
 
-        const identifier = response.data!.package.latestVersion!.identifier;
+        const identifier = response.data?.package.latestVersion?.identifier;
 
-        expect(identifier.versionMajor).to.equal(1);
-        expect(identifier.versionMinor).to.equal(0);
-        expect(identifier.versionPatch).to.equal(0);
+        expect(identifier?.versionMajor).to.equal(1);
+        expect(identifier?.versionMinor).to.equal(0);
+        expect(identifier?.versionPatch).to.equal(0);
     });
 
     it("user B can access package", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -402,20 +400,20 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.package.description).to.equal("New description");
-        expect(response.data!.package.displayName).to.equal("New displayName");
-        expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
-        const identifier = response.data!.package.latestVersion!.identifier;
+        expect(response.data?.package.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.package.description).to.equal("New description");
+        expect(response.data?.package.displayName).to.equal("New displayName");
+        expect(response.data?.package.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.package.identifier.packageSlug).to.equal("new-package-slug");
+        const identifier = response.data?.package.latestVersion?.identifier;
 
-        expect(identifier.versionMajor).to.equal(1);
-        expect(identifier.versionMinor).to.equal(0);
-        expect(identifier.versionPatch).to.equal(0);
+        expect(identifier?.versionMajor).to.equal(1);
+        expect(identifier?.versionMinor).to.equal(0);
+        expect(identifier?.versionPatch).to.equal(0);
     });
 
     it("User A package list should be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserPackagesDocument,
             variables: {
                 username: "testA-packages",
@@ -431,7 +429,7 @@ describe("Package Tests", async () => {
     });
 
     it("User b can not update package", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -449,13 +447,13 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have authorization error"
         ).equal(true);
     });
 
     it("Anonymous can not update package", async function () {
-        let response = await anonymousClient.mutate({
+        const response = await anonymousClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -473,13 +471,13 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHENTICATED") != null,
             "should have authentication error"
         ).equal(true);
     });
 
     it("Should be in latest list - anonymous user", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: GetLatestPackagesDocument,
             variables: {
                 limit: 10,
@@ -489,12 +487,12 @@ describe("Package Tests", async () => {
 
         expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+            response.data?.latestPackages.packages?.find((p) => p.identifier.packageSlug === "new-package-slug")
         ).to.not.equal(undefined);
     });
 
     it("User A packages list should be available to anonymous user", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: UserPackagesDocument,
             variables: {
                 username: "testA-packages",
@@ -510,7 +508,7 @@ describe("Package Tests", async () => {
     });
 
     it("Should be in latest list - creator", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: GetLatestPackagesDocument,
             variables: {
                 limit: 10,
@@ -520,12 +518,12 @@ describe("Package Tests", async () => {
 
         expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+            response.data?.latestPackages.packages?.find((p) => p.identifier.packageSlug === "new-package-slug")
         ).to.not.equal(undefined);
     });
 
     it("Anonymous get package file", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -535,25 +533,24 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
-        expect(response.data!.package.description).to.equal("New description");
-        expect(response.data!.package.displayName).to.equal("New displayName");
-        expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.package.catalog?.displayName).to.equal("testA-packages");
+        expect(response.data?.package.description).to.equal("New description");
+        expect(response.data?.package.displayName).to.equal("New displayName");
+        expect(response.data?.package.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.package.identifier.packageSlug).to.equal("new-package-slug");
 
-        expect(response.data!.package.latestVersion!.identifier.versionMajor).equal(1);
-        expect(response.data!.package.latestVersion!.identifier.versionMinor).equal(0);
-        expect(response.data!.package.latestVersion!.identifier.versionPatch).equal(0);
-
+        expect(response.data?.package.latestVersion?.identifier.versionMajor).equal(1);
+        expect(response.data?.package.latestVersion?.identifier.versionMinor).equal(0);
+        expect(response.data?.package.latestVersion?.identifier.versionPatch).equal(0);
     });
 
     it("User A publish second version - allow update without version change", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -567,20 +564,20 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
-        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
-        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+        expect(response.data?.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data?.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data?.createVersion.identifier.versionPatch).equal(0);
     });
 
     it("User A publish malformed package JSON", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         let packageFileString = JSON.stringify(packageFileContents);
         packageFileString += "}";
 
         let errorFound = false;
 
-        let response = await userAClient
+        const response = await userAClient
             .mutate({
                 mutation: CreateVersionDocument,
                 variables: {
@@ -594,7 +591,7 @@ describe("Package Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
 
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
@@ -612,14 +609,14 @@ describe("Package Tests", async () => {
     });
 
     it("User A publish invalid schema - packageSlug", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.packageSlug += "-";
 
-        let packageFileString = JSON.stringify(packageFileContents);
+        const packageFileString = JSON.stringify(packageFileContents);
 
         let errorFound = false;
 
-        let response = await userAClient
+        const response = await userAClient
             .mutate({
                 mutation: CreateVersionDocument,
                 variables: {
@@ -633,7 +630,7 @@ describe("Package Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
                         return (
@@ -650,12 +647,12 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - patch - fail on version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.description = "new description";
 
-        let packageFileString = JSON.stringify(packageFileContents);
+        const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -670,18 +667,18 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should  have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            response.errors?.find((e) => e.extensions?.code === "HIGHER_VERSION_REQUIRED") != null,
             "should have higher version required"
         ).equal(true);
     });
 
     it("User A update package schema - patch", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.description = "new description";
         packageFileContents.version = "1.0.1";
-        let packageFileString = JSON.stringify(packageFileContents);
+        const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -695,18 +692,18 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.data?.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.createVersion.identifier.packageSlug).to.equal("new-package-slug");
 
-        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
-        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
-        expect(response.data!.createVersion.identifier.versionPatch).equal(1);
+        expect(response.data?.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data?.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data?.createVersion.identifier.versionPatch).equal(1);
     });
 
     it("User A update package schema - minor - fail on version number", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.version = "1.0.2";
-        packageFileContents.schemas[0].properties!["new_column"] = {
+        packageFileContents.schemas[0].properties.new_column = {
             title: "new_column",
             types: {
                 string: {
@@ -716,9 +713,9 @@ describe("Package Tests", async () => {
                 }
             }
         };
-        let packageFileString = JSON.stringify(packageFileContents);
+        const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -733,15 +730,15 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should  have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            response.errors?.find((e) => e.extensions?.code === "HIGHER_VERSION_REQUIRED") != null,
             "should have higher version required"
         ).equal(true);
     });
 
     it("User A update package schema - minor", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.version = "1.2.0";
-        packageFileContents.schemas[0].properties!["new_column"] = {
+        packageFileContents.schemas[0].properties.new_column = {
             title: "new_column",
             types: {
                 string: {
@@ -751,9 +748,9 @@ describe("Package Tests", async () => {
                 }
             }
         };
-        let packageFileString = JSON.stringify(packageFileContents);
+        const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -767,21 +764,21 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.data?.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.createVersion.identifier.packageSlug).to.equal("new-package-slug");
 
-        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
-        expect(response.data!.createVersion.identifier.versionMinor).equal(2);
-        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+        expect(response.data?.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data?.createVersion.identifier.versionMinor).equal(2);
+        expect(response.data?.createVersion.identifier.versionPatch).equal(0);
     });
 
     it("User A update package schema - major - fail high version required", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.version = "1.3.0";
 
-        let packageFile = JSON.stringify(packageFileContents);
+        const packageFile = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -796,18 +793,18 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should  have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            response.errors?.find((e) => e.extensions?.code === "HIGHER_VERSION_REQUIRED") != null,
             "should have higher version required"
         ).equal(true);
     });
 
     it("User A update package schema - major", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFileContents.version = "2.0.0";
 
-        let packageFile = JSON.stringify(packageFileContents);
+        const packageFile = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -821,16 +818,16 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
-        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+        expect(response.data?.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data?.createVersion.identifier.packageSlug).to.equal("new-package-slug");
 
-        expect(response.data!.createVersion.identifier.versionMajor).equal(2);
-        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
-        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+        expect(response.data?.createVersion.identifier.versionMajor).equal(2);
+        expect(response.data?.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data?.createVersion.identifier.versionPatch).equal(0);
     });
 
     it("User A find myPermissions on package", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -840,15 +837,15 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.EDIT) !== -1).equal(true);
     });
 
     it("User B find myPermissions on package - view only", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -858,17 +855,17 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.EDIT) === -1).equal(true);
     });
 
     it("User A give User B permission to package", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetPackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -885,13 +882,13 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A update User B permission to package", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetPackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -908,13 +905,13 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A set own permissions should fail", async function () {
         const newPermissions = [Permission.VIEW];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetPackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -931,12 +928,14 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! !== null).true;
-        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))).is.not.null;
+        expect(response.errors != null).equal(true);
+        expect(response.errors?.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))).is.not.equal(
+            null
+        );
     });
 
     it("User B find myPermissions on package - all", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -946,15 +945,15 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.EDIT) !== -1).equal(true);
     });
 
     it("User A should be able to list users with access to package", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UsersByPackageDocument,
             variables: {
                 identifier: {
@@ -964,13 +963,13 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.usersByPackage!.length).equal(2);
+        expect(response.data.usersByPackage?.length).equal(2);
     });
 
     it("User B can't delete permissions of creator User A", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: RemovePackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -981,12 +980,12 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! !== null).true;
-        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
+        expect(response.errors != null).equal(true);
+        expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 
     it("Remove User B permissions on package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: RemovePackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -997,11 +996,11 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A should be able to list users with access to package - after removing user B", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UsersByPackageDocument,
             variables: {
                 identifier: {
@@ -1011,13 +1010,13 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.usersByPackage!.length).equal(1);
+        expect(response.data.usersByPackage?.length).equal(1);
     });
 
     it("User B should not be able to list users with access to package - not a manager", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UsersByPackageDocument,
             variables: {
                 identifier: {
@@ -1027,13 +1026,13 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! !== null).true;
+        expect(response.errors != null).equal(true);
 
-        expect(response.errors!.find((e) => e.message.includes("NOT_AUTHORIZED"))).is.not.null;
+        expect(response.errors?.find((e) => e.message.includes("NOT_AUTHORIZED"))).is.not.equal(null);
     });
 
     it("User B find myPermissions on package - view only after permissions removed", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -1043,15 +1042,15 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
 
-        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
-        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions?.indexOf(Permission.EDIT) === -1).equal(true);
     });
 
     it("User A delete package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: DeletePackageDocument,
             variables: {
                 identifier: {
@@ -1060,11 +1059,11 @@ describe("Package Tests", async () => {
                 }
             }
         });
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("Anonymous User get Package", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -1076,7 +1075,7 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message.includes("PACKAGE_NOT_FOUND")) != null,
+            response.errors?.find((e) => e.message.includes("PACKAGE_NOT_FOUND")) != null,
             "should have not package not found error"
         ).equal(true);
     });
@@ -1126,11 +1125,11 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiff).to.not.be.undefined;
-            expect(result.data.packageVersionsDiff.differences).to.be.empty;
+            expect(result.data.packageVersionsDiff).to.not.equal(undefined);
+            expect(result.data.packageVersionsDiff.differences).to.have.length(0);
         }
     });
 
@@ -1179,8 +1178,8 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.not.be.undefined;
-        expect(result.data).to.be.null;
+        expect(result.errors).to.not.equal(undefined);
+        expect(result.data).to.equal(null);
         if (result.errors) {
             expect(result.errors.length).to.equal(1);
             if (result.errors[0]) {
@@ -1260,8 +1259,8 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.not.be.undefined;
-        expect(result.data).to.be.null;
+        expect(result.errors).to.not.equal(undefined);
+        expect(result.data).to.equal(null);
         if (result.errors) {
             expect(result.errors.length).to.equal(1);
             if (result.errors[0]) {
@@ -1303,8 +1302,8 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.not.be.undefined;
-        expect(result.data).to.be.null;
+        expect(result.errors).to.not.equal(undefined);
+        expect(result.data).to.equal(null);
         if (result.errors) {
             expect(result.errors.length).to.equal(1);
             if (result.errors[0]) {
@@ -1380,12 +1379,12 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            expect(result.data.packageVersionsDiff).to.not.equal(undefined);
             if (result.data.packageVersionsDiff) {
-                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                expect(result.data.packageVersionsDiff.differences).to.not.have.length(0);
                 if (result.data.packageVersionsDiff.differences) {
                     expect(result.data.packageVersionsDiff.differences.length).to.equal(1);
                     const difference = result.data.packageVersionsDiff.differences[0];
@@ -1464,12 +1463,12 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            expect(result.data.packageVersionsDiff).to.not.equal(undefined);
             if (result.data.packageVersionsDiff) {
-                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                expect(result.data.packageVersionsDiff.differences).to.not.have.length(0);
                 if (result.data.packageVersionsDiff.differences) {
                     expect(result.data.packageVersionsDiff.differences.length).to.equal(1);
                     const difference = result.data.packageVersionsDiff.differences[0];
@@ -1548,12 +1547,12 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            expect(result.data.packageVersionsDiff).to.not.equal(undefined);
             if (result.data.packageVersionsDiff) {
-                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                expect(result.data.packageVersionsDiff.differences).to.not.have.length(0);
                 const differences = result.data.packageVersionsDiff.differences;
                 if (differences) {
                     expect(differences.length).to.equal(4);
@@ -1644,12 +1643,12 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            expect(result.data.packageVersionsDiff).to.not.equal(undefined);
             if (result.data.packageVersionsDiff) {
-                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                expect(result.data.packageVersionsDiff.differences).to.not.have.length(0);
                 const differences = result.data.packageVersionsDiff.differences;
                 if (differences) {
                     expect(differences.length).to.equal(4);
@@ -1750,20 +1749,20 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(result.errors).to.be.undefined;
-        expect(result.data).to.not.be.undefined;
+        expect(result.errors).to.equal(undefined);
+        expect(result.data).to.not.equal(undefined);
         if (result.data) {
-            expect(result.data.packageVersionsDiffs).to.not.be.undefined;
+            expect(result.data.packageVersionsDiffs).to.not.equal(undefined);
             if (result.data.packageVersionsDiffs) {
-                expect(result.data.packageVersionsDiffs).to.not.be.empty;
+                expect(result.data.packageVersionsDiffs).to.not.have.length(0);
                 const differenceSets = result.data.packageVersionsDiffs;
                 expect(differenceSets.length).to.equal(2);
 
                 const latestVersionDiff = differenceSets[0];
-                expect(latestVersionDiff).to.not.be.null;
-                expect(latestVersionDiff.newVersion).to.not.be.null;
-                expect(latestVersionDiff.oldVersion).to.not.be.null;
-                expect(latestVersionDiff.differences).to.not.be.null;
+                expect(latestVersionDiff).to.not.equal(null);
+                expect(latestVersionDiff.newVersion).to.not.equal(null);
+                expect(latestVersionDiff.oldVersion).to.not.equal(null);
+                expect(latestVersionDiff.differences).to.not.equal(null);
 
                 if (latestVersionDiff.newVersion && latestVersionDiff.oldVersion && latestVersionDiff.differences) {
                     expect(latestVersionDiff.newVersion.versionMajor).to.equal(2);
@@ -1775,7 +1774,7 @@ describe("Package Tests", async () => {
                     expect(latestVersionDiff.differences.length).to.equal(4);
 
                     const differences = latestVersionDiff.differences;
-                    expect(differences).to.not.be.null;
+                    expect(differences).to.not.equal(null);
                     if (differences) {
                         expect(differences.length).to.equal(4);
                         if (differences) {
@@ -1813,7 +1812,7 @@ describe("Package Tests", async () => {
                     expect(firstVersionDiff.differences.length).to.equal(1);
 
                     const difference = firstVersionDiff.differences[0];
-                    expect(difference).to.not.be.null;
+                    expect(difference).to.not.equal(null);
                     if (difference) {
                         expect(difference.type).to.equal("CHANGE_VERSION");
                     }

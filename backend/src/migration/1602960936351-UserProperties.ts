@@ -16,5 +16,7 @@ export class UserProperties1602960936351 implements MigrationInterface {
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

@@ -1,3 +1,4 @@
+import { GraphQLResolveInfo } from "graphql";
 import { EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { GroupCatalogPermissionEntity } from "../entity/GroupCatalogPermissionEntity";
@@ -48,11 +49,11 @@ export const groupCatalogPermissionEntityToGraphqlObject = async (
 };
 
 export const groupsByCatalog = async (
-    _0: any,
+    _0: unknown,
     { catalogIdentifier }: { catalogIdentifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<GroupCatalogPermission[]> => {
     const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, catalogIdentifier, []);
 
     const groups = await context.connection.getRepository(GroupCatalogPermissionEntity).find({
@@ -61,11 +62,11 @@ export const groupsByCatalog = async (
         }
     });
 
-    return groups.map((g) => groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, g));
+    return groups.asyncMap((g) => groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, g));
 };
 
 export const addOrUpdateGroupToCatalog = async (
-    _0: any,
+    _0: unknown,
     {
         groupSlug,
         catalogIdentifier,
@@ -78,8 +79,8 @@ export const addOrUpdateGroupToCatalog = async (
         packagePermissions: Permission[];
     },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<GroupCatalogPermission> => {
     return context.connection.transaction(async (transaction) => {
         const groupEntity = await findGroup(transaction, groupSlug);
 
@@ -96,7 +97,7 @@ export const addOrUpdateGroupToCatalog = async (
             });
 
         await createActivityLog(transaction, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.CATALOG_GROUP_PERMISSION_ADDED_UPDATED,
             targetGroupId: groupEntity.id,
             targetCatalogId: catalogEntity.id,
@@ -108,11 +109,11 @@ export const addOrUpdateGroupToCatalog = async (
 };
 
 export const removeGroupFromCatalog = async (
-    _0: any,
+    _0: unknown,
     { groupSlug, catalogIdentifier }: { groupSlug: string; catalogIdentifier: CatalogIdentifierInput },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     await context.connection.transaction(async (manager) => {
         const groupEntity = await findGroup(manager, groupSlug);
 
@@ -130,7 +131,7 @@ export const removeGroupFromCatalog = async (
         await manager.getRepository(GroupCatalogPermissionEntity).remove(groupPermission);
 
         await createActivityLog(manager, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.CATALOG_GROUP_PERMISSION_REMOVED,
             targetGroupId: groupEntity.id,
             targetCatalogId: catalogEntity.id
@@ -140,10 +141,10 @@ export const removeGroupFromCatalog = async (
 
 export const catalogPermissionsByGroupForUser = async (
     parent: Group,
-    _0: any,
+    _0: unknown,
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<GroupCatalogPermission[]> => {
     const group = await getGroupFromCacheOrDbBySlugOrFail(context, context.connection, parent.slug);
 
     const user: UserEntity | undefined = (context as AuthenticatedContext).me;
@@ -156,5 +157,7 @@ export const catalogPermissionsByGroupForUser = async (
             relations: getGraphQlRelationName(info)
         });
 
-    return permissions.map((p) => groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, p));
+    return permissions.asyncMap((p) =>
+        groupCatalogPermissionEntityToGraphqlObject(context, context.connection.manager, p)
+    );
 };

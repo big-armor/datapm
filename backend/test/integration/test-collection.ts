@@ -24,9 +24,7 @@ import { loadPackageFileFromDisk } from "datapm-lib";
 describe("Collection Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousUser = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousUser = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -43,8 +41,8 @@ describe("Collection Tests", async () => {
             "testB-collection@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to see own collections", async function () {
@@ -81,7 +79,7 @@ describe("Collection Tests", async () => {
             }
         });
 
-        let findMyCollectionsA = await userAClient.query({
+        const findMyCollectionsA = await userAClient.query({
             query: MyCollectionsDocument,
             variables: {
                 offSet: 0,
@@ -89,7 +87,7 @@ describe("Collection Tests", async () => {
             }
         });
 
-        let findMyCollectionsB = await userBClient.query({
+        const findMyCollectionsB = await userBClient.query({
             query: MyCollectionsDocument,
             variables: {
                 offSet: 0,
@@ -101,8 +99,8 @@ describe("Collection Tests", async () => {
         expect(findMyCollectionsB.data.myCollections.count).to.equal(2);
     });
 
-    it("Should return Collection slug not available", async function() {
-        let response = await userBClient.query({
+    it("Should return Collection slug not available", async function () {
+        const response = await userBClient.query({
             query: CollectionSlugAvailableDocument,
             variables: {
                 collectionSlug: "testA-collection"
@@ -113,8 +111,8 @@ describe("Collection Tests", async () => {
         expect(response.data.collectionSlugAvailable).equal(false);
     });
 
-    it("Should return Collection slug not available for reserved word", async function() {
-        let response = await userBClient.query({
+    it("Should return Collection slug not available for reserved word", async function () {
+        const response = await userBClient.query({
             query: CollectionSlugAvailableDocument,
             variables: {
                 collectionSlug: "trending"
@@ -125,8 +123,8 @@ describe("Collection Tests", async () => {
         expect(response.data.collectionSlugAvailable).equal(false);
     });
 
-    it("Should return Collection slug available", async function() {
-        let response = await userBClient.query({
+    it("Should return Collection slug available", async function () {
+        const response = await userBClient.query({
             query: CollectionSlugAvailableDocument,
             variables: {
                 collectionSlug: "something-that-is-not-taken-96"
@@ -138,7 +136,7 @@ describe("Collection Tests", async () => {
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -151,16 +149,16 @@ describe("Collection Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-collection");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-collection");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-collection");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-collection");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("Get collection that does not exist", async function () {
-        let response = await anonymousUser.query({
+        const response = await anonymousUser.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -169,13 +167,16 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "has error").true;
-        expect(response.errors![0].message).equal("COLLECTION_NOT_FOUND");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors != null, "has error").equal(true);
+        expect(response.errors[0].message).equal("COLLECTION_NOT_FOUND");
     });
 
     it("Create Collection with invalid slug", async function () {
         let errorFound = false;
-        let response = await userBClient
+        const response = await userBClient
             .mutate({
                 mutation: CreateCollectionDocument,
                 variables: {
@@ -187,7 +188,7 @@ describe("Collection Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
@@ -204,7 +205,7 @@ describe("Collection Tests", async () => {
     });
 
     it("User B create a collection", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
@@ -215,15 +216,15 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createCollection.creator?.username).equal("testB-collection");
-        expect(response.data!.createCollection.identifier.collectionSlug).equal("testB-collection");
-        expect(response.data!.createCollection.name).equal("test b collection");
-        expect(response.data!.createCollection.description).equal("Short test");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createCollection.creator?.username).equal("testB-collection");
+        expect(response.data?.createCollection.identifier.collectionSlug).equal("testB-collection");
+        expect(response.data?.createCollection.name).equal("test b collection");
+        expect(response.data?.createCollection.description).equal("Short test");
     });
 
     it("User B create a collection - slug collision", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
@@ -234,12 +235,16 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "has errors").true;
-        expect(response.errors![0].message).equal("COLLECTION_SLUG_NOT_AVAILABLE");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors != null, "has errors").equal(true);
+        expect(response.errors[0].message).equal("COLLECTION_SLUG_NOT_AVAILABLE");
     });
 
     it("User B add package to collection - fail for permissions", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
@@ -252,12 +257,16 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "has errors").true;
-        expect(response.errors![0].message).equal("NOT_AUTHORIZED");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors != null, "has errors").equal(true);
+        expect(response.errors[0].message).equal("NOT_AUTHORIZED");
     });
 
     it("User A make catalog public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -269,15 +278,15 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -290,11 +299,11 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("User A make package public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -307,11 +316,11 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("User A make catalog public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -323,7 +332,7 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("Adding a package to a collection changes its update date", async function () {
@@ -348,7 +357,7 @@ describe("Collection Tests", async () => {
         });
         const oldUpdatedDate = collectionBeforeUpdate.data.collection.updatedAt;
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
@@ -371,10 +380,10 @@ describe("Collection Tests", async () => {
         });
         const newUpdatedDate = collectionAfterUpdate.data.collection.updatedAt;
 
-        expect(response.errors != undefined).false;
-        expect(oldUpdatedDate != undefined).true;
-        expect(newUpdatedDate != undefined).true;
-        expect(newUpdatedDate != oldUpdatedDate).true;
+        expect(response.errors != null).equal(false);
+        expect(oldUpdatedDate != null).equal(true);
+        expect(newUpdatedDate != null).equal(true);
+        expect(newUpdatedDate !== oldUpdatedDate).equal(true);
 
         await userAClient.mutate({
             mutation: RemovePackageFromCollectionDocument,
@@ -391,7 +400,7 @@ describe("Collection Tests", async () => {
     });
 
     it("User B add package to collection", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
@@ -404,14 +413,14 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.addPackageToCollection.collection.identifier.collectionSlug).equal("testB-collection");
-        expect(response.data!.addPackageToCollection.package.identifier.catalogSlug).equal("testA-collection");
-        expect(response.data!.addPackageToCollection.package.identifier.packageSlug).equal("congressional-legislators");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.addPackageToCollection.collection.identifier.collectionSlug).equal("testB-collection");
+        expect(response.data?.addPackageToCollection.package.identifier.catalogSlug).equal("testA-collection");
+        expect(response.data?.addPackageToCollection.package.identifier.packageSlug).equal("congressional-legislators");
     });
 
     it("User A get testB-collection - fail no authorizaiton", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -420,12 +429,16 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "has errors").true;
-        expect(response.errors![0].message).equal("NOT_AUTHORIZED");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors != null, "has errors").equal(true);
+        expect(response.errors[0].message).equal("NOT_AUTHORIZED");
     });
 
     it("User A list user B collections - not present", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UserCollectionsDocument,
             variables: {
                 username: "testB-collection",
@@ -434,14 +447,14 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "has no errors").true;
+        expect(response.errors == null, "has no errors").equal(true);
         expect(response.data.userCollections.hasMore).equal(false);
         expect(response.data.userCollections.count).equal(0);
         expect(response.data.userCollections.collections?.length).equal(0);
     });
 
     it("User B set collection public", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
                 identifier: {
@@ -455,15 +468,20 @@ describe("Collection Tests", async () => {
                 }
             }
         });
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.updateCollection.description).equal("new description");
-        expect(response.data!.updateCollection.name).equal("new name");
-        expect(response.data!.updateCollection.packages!.length == 1).true;
-        expect(response.data!.updateCollection.identifier.collectionSlug).equal("new-collection-slug");
+
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.updateCollection.description).equal("new description");
+        expect(response.data?.updateCollection.name).equal("new name");
+
+        if (response.data?.updateCollection.packages == null) {
+            throw new Error("Expected packages");
+        }
+        expect(response.data?.updateCollection.packages.length === 1).equal(true);
+        expect(response.data?.updateCollection.identifier.collectionSlug).equal("new-collection-slug");
     });
 
     it("User A set collection public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
                 identifier: {
@@ -475,13 +493,13 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.updateCollection.identifier.collectionSlug).equal("testA-collection");
-        expect(response.data!.updateCollection.isPublic).equal(true);
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.updateCollection.identifier.collectionSlug).equal("testA-collection");
+        expect(response.data?.updateCollection.isPublic).equal(true);
     });
 
     it("User A get collection", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -490,15 +508,19 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.collection.description).equal("new description");
-        expect(response.data!.collection.name).equal("new name");
-        expect(response.data!.collection.packages!.length == 1).true;
-        expect(response.data!.collection.identifier.collectionSlug).equal("new-collection-slug");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.collection.description).equal("new description");
+        expect(response.data?.collection.name).equal("new name");
+
+        if (response.data?.collection.packages == null) {
+            throw new Error("Expected packages");
+        }
+        expect(response.data?.collection.packages.length === 1).equal(true);
+        expect(response.data?.collection.identifier.collectionSlug).equal("new-collection-slug");
     });
 
     it("User A list user B collections - present", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UserCollectionsDocument,
             variables: {
                 username: "testB-collection",
@@ -507,15 +529,19 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "has no errors").true;
+        expect(response.errors == null, "has no errors").equal(true);
         expect(response.data.userCollections.hasMore).equal(false);
         expect(response.data.userCollections.count).equal(1);
         expect(response.data.userCollections.collections?.length).equal(1);
-        expect(response.data.userCollections.collections![0].identifier.collectionSlug).equal("new-collection-slug");
+
+        if (response.data.userCollections.collections == null) {
+            throw new Error("Expected packages");
+        }
+        expect(response.data.userCollections.collections[0].identifier.collectionSlug).equal("new-collection-slug");
     });
 
     it("Adding at least three unique packages to a collection", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -609,7 +635,7 @@ describe("Collection Tests", async () => {
                 offset: 0
             }
         });
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
         expect(response.data?.collectionPackages?.length).to.equal(3);
     });
 
@@ -626,7 +652,7 @@ describe("Collection Tests", async () => {
             }
         });
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
@@ -639,12 +665,14 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null).true;
-        expect(response.errors![0].message).to.equal("PACKAGE_HAS_NO_VERSIONS");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors[0].message).to.equal("PACKAGE_HAS_NO_VERSIONS");
     });
 
     it("Anonymous get collection", async function () {
-        let response = await anonymousUser.query({
+        const response = await anonymousUser.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -653,15 +681,18 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.collection.description).equal("new description");
-        expect(response.data!.collection.name).equal("new name");
-        expect(response.data!.collection.packages!.length == 1).true;
-        expect(response.data!.collection.identifier.collectionSlug).equal("new-collection-slug");
+        if (response.data?.collection.packages == null) {
+            throw new Error("Expected packages");
+        }
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.collection.description).equal("new description");
+        expect(response.data?.collection.name).equal("new name");
+        expect(response.data?.collection.packages.length === 1).equal(true);
+        expect(response.data?.collection.identifier.collectionSlug).equal("new-collection-slug");
     });
 
     it("Anonymous list user B collections - present", async function () {
-        let response = await anonymousUser.query({
+        const response = await anonymousUser.query({
             query: UserCollectionsDocument,
             variables: {
                 username: "testB-collection",
@@ -670,14 +701,14 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "has no errors").true;
+        expect(response.errors == null, "has no errors").equal(true);
         expect(response.data.userCollections.hasMore).equal(false);
         expect(response.data.userCollections.count).equal(1);
         expect(response.data.userCollections.collections?.length).equal(1);
     });
 
     it("Delete collection", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: DeleteCollectionDocument,
             variables: {
                 identifier: {
@@ -686,11 +717,11 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("Get collection after delete", async function () {
-        let response = await anonymousUser.query({
+        const response = await anonymousUser.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -699,7 +730,10 @@ describe("Collection Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "has error").true;
-        expect(response.errors![0].message).equal("COLLECTION_NOT_FOUND");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors != null, "has error").equal(true);
+        expect(response.errors[0].message).equal("COLLECTION_NOT_FOUND");
     });
 });

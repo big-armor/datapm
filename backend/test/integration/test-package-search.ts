@@ -15,9 +15,7 @@ import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 describe("Package Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -34,12 +32,12 @@ describe("Package Search Tests", async () => {
             "testB-packages-search@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -52,16 +50,16 @@ describe("Package Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-packages-search");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-packages-search");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-packages-search");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-packages-search");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -84,10 +82,10 @@ describe("Package Search Tests", async () => {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-packages-search");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-packages-search");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -96,7 +94,7 @@ describe("Package Search Tests", async () => {
     });
 
     it("Should allow User A to search for package", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
                 limit: 999,
@@ -105,17 +103,21 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") !=
+            response.data?.searchPackages.packages?.find((p) => p.identifier.catalogSlug === "testA-packages-search") !=
                 null,
             "package returned"
-        ).true;
-        expect(response.data!.searchPackages.packages![0].displayName).to.equal("Congressional Legislators");
+        ).equal(true);
+
+        if (response.data?.searchPackages.packages == null) {
+            throw new Error("packages is null");
+        }
+        expect(response.data?.searchPackages.packages[0].displayName).to.equal("Congressional Legislators");
     });
 
     it("Should allow User A to search for package by README file content", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
                 limit: 1000,
@@ -124,19 +126,22 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
-        const targetPackage = response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search");
-        expect(
-            targetPackage !=
-                null,
-            "package returned"
-        ).true;
-        expect(targetPackage!.displayName).to.equal("Congressional Legislators");
+        const targetPackage = response.data?.searchPackages.packages?.find(
+            (p) => p.identifier.catalogSlug === "testA-packages-search"
+        );
+        expect(targetPackage != null, "package returned").equal(true);
+
+        if (targetPackage == null) {
+            throw new Error("targetPackage is null");
+        }
+
+        expect(targetPackage.displayName).to.equal("Congressional Legislators");
     });
 
     it("Should not allow anonymous access to package", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
                 limit: 999,
@@ -145,16 +150,16 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") ==
+            response.data?.searchPackages.packages?.find((p) => p.identifier.catalogSlug === "testA-packages-search") ==
                 null,
             "package not returned"
-        ).true;
+        ).equal(true);
     });
 
     it("User A update catalog to be public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -166,11 +171,11 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A set package public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -186,7 +191,7 @@ describe("Package Search Tests", async () => {
     });
 
     it("Should allow anonymous search package", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
                 limit: 999,
@@ -194,16 +199,21 @@ describe("Package Search Tests", async () => {
                 query: "congress"
             }
         });
-        expect(response.errors == null, "no errors").true;
-        let targetPackage = response.data!.searchPackages.packages!.find(
-            (p) => p.identifier.catalogSlug == "testA-packages-search"
+        expect(response.errors == null, "no errors").equal(true);
+        const targetPackage = response.data?.searchPackages.packages?.find(
+            (p) => p.identifier.catalogSlug === "testA-packages-search"
         );
-        expect(targetPackage != null, "package returned").true;
-        expect(targetPackage!.displayName).to.equal("Congressional Legislators");
+        expect(targetPackage != null, "package returned").equal(true);
+
+        if (targetPackage == null) {
+            throw new Error("targetPackage is null");
+        }
+
+        expect(targetPackage.displayName).to.equal("Congressional Legislators");
     });
 
     it("User A delete package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: DeletePackageDocument,
             variables: {
                 identifier: {
@@ -213,11 +223,11 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("Should not return package after delete", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
                 limit: 999,
@@ -226,11 +236,11 @@ describe("Package Search Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
         expect(
-            response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") ==
+            response.data?.searchPackages.packages?.find((p) => p.identifier.catalogSlug === "testA-packages-search") ==
                 null,
             "package not returned"
-        ).true;
+        ).equal(true);
     });
 });

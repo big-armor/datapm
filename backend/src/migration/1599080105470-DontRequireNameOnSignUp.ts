@@ -10,5 +10,7 @@ export class DontRequireNameOnSignUp1599080105470 implements MigrationInterface 
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

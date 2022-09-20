@@ -11,7 +11,7 @@ import { AdminHolder } from "./admin-holder";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 
 describe("Admin Tests", async () => {
-    let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
+    const anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
     let nonAdminUserClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {
@@ -35,7 +35,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
     });
 
     it("Non admin can't search for group without restrictions", async () => {
@@ -48,7 +48,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(groupSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+        expect(groupSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.equal(true);
     });
 
     it("Admin can see private group data in admin search query", async () => {
@@ -73,7 +73,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(groupDeletion.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+        expect(groupDeletion.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.equal(true);
     });
 
     it("Admin can delete groups", async () => {
@@ -84,7 +84,7 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
 
         const deletedGroupResponse = await AdminHolder.adminClient.query({
             query: GroupDocument,
@@ -93,6 +93,6 @@ describe("Admin Tests", async () => {
             }
         });
 
-        expect(deletedGroupResponse.errors?.some((error) => error.message.includes("GROUP_NOT_FOUND"))).to.be.true;
+        expect(deletedGroupResponse.errors?.some((error) => error.message.includes("GROUP_NOT_FOUND"))).to.equal(true);
     });
 });

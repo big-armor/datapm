@@ -112,7 +112,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: { limit: 10, offset: 0 }
         });
 
-        expect(activitiesResponse.data).to.exist;
+        expect(activitiesResponse.data).to.not.equal(undefined);
 
         if (
             !activitiesResponse.data ||
@@ -133,12 +133,12 @@ describe("Following Catalogs Activity Log Tests", async () => {
             return;
         }
 
-        const targetPackageIdentifier = createdLog.targetPackage!.identifier;
+        const targetPackageIdentifier = createdLog.targetPackage.identifier;
         expect(createdLog.user.username).to.equal(userTwoUsername);
         expect(targetPackageIdentifier.catalogSlug).to.equal(catalogSlug);
         expect(targetPackageIdentifier.packageSlug).to.equal(packageSlug);
 
-        const targetCatalogIdentifier = createdLog.targetCatalog!.identifier;
+        const targetCatalogIdentifier = createdLog.targetCatalog.identifier;
         expect(targetCatalogIdentifier.catalogSlug).to.equal(catalogSlug);
     });
 
@@ -226,7 +226,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: { limit: 10, offset: 0 }
         });
 
-        expect(activitiesResponse.data).to.exist;
+        expect(activitiesResponse.data).to.not.equal(undefined);
 
         if (
             !activitiesResponse.data ||
@@ -249,7 +249,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
 
         expect(createdLog.user.username).to.equal(userTwoUsername);
 
-        const targetCatalogIdentifier = createdLog.targetCatalog!.identifier;
+        const targetCatalogIdentifier = createdLog.targetCatalog.identifier;
         expect(targetCatalogIdentifier.catalogSlug).to.equal(catalogSlug);
     });
 });

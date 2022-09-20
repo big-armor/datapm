@@ -16,37 +16,35 @@ describe("User Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create users A & B", async function () {
         userAClient = await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!");
 
         userBClient = await createUser("FirstB", "LastB", "testB-user", "testB-user@test.datapm.io", "passwordB!");
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("The first created user is an admin and the second one isn't", async function () {
-        let firstUserResponse = await AdminHolder.adminClient.query({
+        const firstUserResponse = await AdminHolder.adminClient.query({
             query: MeDocument
         });
 
-        let userA = firstUserResponse.data;
-        expect(userA.me.isAdmin).is.true;
+        const userA = firstUserResponse.data;
+        expect(userA.me.isAdmin).equal(true);
 
-        let secondUserResponse = await userAClient.query({
+        const secondUserResponse = await userAClient.query({
             query: MeDocument
         });
 
-        let userB = secondUserResponse.data;
-        expect(userB.me.isAdmin).is.false;
+        const userB = secondUserResponse.data;
+        expect(userB.me.isAdmin).equal(false);
     });
 
     it("Create an email that already exists", async function () {
         let errorFound = false;
         await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!")
-            .catch((response: FetchResult<LoginMutation, Record<string, any>, Record<string, any>>) => {
-                if (response.errors!.find((e) => e.message == "EMAIL_ADDRESS_NOT_AVAILABLE") != null) errorFound = true;
+            .catch((response: Error) => {
+                if (response.message === "EMAIL_ADDRESS_NOT_AVAILABLE") errorFound = true;
             })
             .then((client) => {
                 expect(errorFound, "email address not available error").equal(true);
@@ -56,8 +54,8 @@ describe("User Tests", async () => {
     it("Create a username that already exists", async function () {
         let errorFound = false;
         await createUser("FirstA", "LastA", "testA-user", "testA-user2@test.datapm.io", "passwordA!")
-            .catch((response: FetchResult<LoginMutation, Record<string, any>, Record<string, any>>) => {
-                if (response.errors!.find((e) => e.message == "USERNAME_NOT_AVAILABLE") != null) errorFound = true;
+            .catch((response: Error) => {
+                if (response.message === "USERNAME_NOT_AVAILABLE") errorFound = true;
             })
             .then((client) => {
                 expect(errorFound, "username not available error").equal(true);
@@ -65,11 +63,11 @@ describe("User Tests", async () => {
     });
 
     it("Get User A", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: MeDocument
         });
 
-        let userA = response.data.me.user;
+        const userA = response.data.me.user;
         expect(userA.firstName).equal("FirstA");
         expect(userA.lastName).equal("LastA");
         expect(userA.username).to.equal("testA-user");
@@ -82,7 +80,7 @@ describe("User Tests", async () => {
     });
 
     it("First created user in registry is an admin", async function () {
-        let response = await AdminHolder.adminClient.query({
+        const response = await AdminHolder.adminClient.query({
             query: MeDocument
         });
 
@@ -90,11 +88,11 @@ describe("User Tests", async () => {
     });
 
     it("Get User B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: MeDocument
         });
 
-        let userB = response.data.me.user;
+        const userB = response.data.me.user;
         expect(userB.firstName).equal("FirstB");
         expect(userB.lastName).equal("LastB");
         expect(userB.username).to.equal("testB-user");
@@ -107,7 +105,7 @@ describe("User Tests", async () => {
     });
 
     it("Second created user in registry is not an admin", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: MeDocument
         });
 
@@ -115,14 +113,14 @@ describe("User Tests", async () => {
     });
 
     it("User B Get User A", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.firstName).equal(null);
         expect(userA.user.lastName).equal(null);
         expect(userA.user.username).to.equal("testA-user");
@@ -135,7 +133,7 @@ describe("User Tests", async () => {
     });
 
     it("Set User A Name Is Public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -144,25 +142,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.nameIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.nameIsPublic).to.equal(true);
     });
 
     it("User B Get User A Public Name", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.nameIsPublic).to.equal(true);
         expect(userA.user.firstName).equal("FirstA");
         expect(userA.user.lastName).equal("LastA");
     });
 
     it("Search Users By Username, Email, Firstname, Lastname", async function () {
-        let firstName = await userAClient.query({
+        const firstName = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
                 value: "Fir",
@@ -171,7 +169,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let lastName = await userAClient.query({
+        const lastName = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
                 value: "Las",
@@ -180,7 +178,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let email = await userAClient.query({
+        const email = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
                 value: "testA-user@te",
@@ -189,7 +187,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let username = await userAClient.query({
+        const username = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
                 value: "testA-",
@@ -198,9 +196,9 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(firstName.data?.searchUsers["users"][0]?.firstName).to.equal("FirstA");
-        expect(lastName.data?.searchUsers["users"][0]?.lastName).to.equal("LastA");
-        expect(username.data?.searchUsers["users"][0]?.username).to.equal("testA-user");
+        expect(firstName.data?.searchUsers.users[0]?.firstName).to.equal("FirstA");
+        expect(lastName.data?.searchUsers.users[0]?.lastName).to.equal("LastA");
+        expect(username.data?.searchUsers.users[0]?.username).to.equal("testA-user");
     });
 
     it("Make userA an admin", async function () {
@@ -212,7 +210,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let userAResponse = await userAClient.query({
+        const userAResponse = await userAClient.query({
             query: MeDocument
         });
 
@@ -228,7 +226,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let userBResponse = await userBClient.query({
+        const userBResponse = await userBClient.query({
             query: MeDocument
         });
 
@@ -244,7 +242,7 @@ describe("User Tests", async () => {
             }
         });
 
-        let userBResponse = await userBClient.query({
+        const userBResponse = await userBClient.query({
             query: MeDocument
         });
 
@@ -270,7 +268,7 @@ describe("User Tests", async () => {
     });
 
     it("Set User A twitterHandle", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -279,24 +277,24 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
+        expect(response.data?.updateMe.user.twitterHandle).to.equal("testTwitterA");
     });
 
     it("User B Access User A Twitter Handle - Not Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.twitterHandleIsPublic).to.equal(false);
         expect(userA.user.twitterHandle).equal(null);
     });
 
     it("Set User A set twitter handle public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -305,25 +303,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
-        expect(response.data!.updateMe.user.twitterHandleIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.twitterHandle).to.equal("testTwitterA");
+        expect(response.data?.updateMe.user.twitterHandleIsPublic).to.equal(true);
     });
 
     it("User B Access User A Twitter Handle - Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.twitterHandleIsPublic).to.equal(true);
         expect(userA.user.twitterHandle).equal("testTwitterA");
     });
 
     it("Set User A set twitter handle public not public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -332,25 +330,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.twitterHandle).to.equal("testTwitterA");
-        expect(response.data!.updateMe.user.twitterHandleIsPublic).to.equal(false);
+        expect(response.data?.updateMe.user.twitterHandle).to.equal("testTwitterA");
+        expect(response.data?.updateMe.user.twitterHandleIsPublic).to.equal(false);
     });
 
     it("User B Access User A Twitter Handle - Not Public again", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.twitterHandleIsPublic).to.equal(false);
         expect(userA.user.twitterHandle).equal(null);
     });
 
     it("Set User A gitHubHandle", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -359,24 +357,24 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
+        expect(response.data?.updateMe.user.gitHubHandle).to.equal("testGithubA");
     });
 
     it("User B Access User A Github Handle - Not Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.gitHubHandleIsPublic).to.equal(false);
         expect(userA.user.gitHubHandle).equal(null);
     });
 
     it("Set User A set github handle public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -385,25 +383,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
-        expect(response.data!.updateMe.user.gitHubHandleIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.gitHubHandle).to.equal("testGithubA");
+        expect(response.data?.updateMe.user.gitHubHandleIsPublic).to.equal(true);
     });
 
     it("User B Access User A Github Handle - Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.gitHubHandleIsPublic).to.equal(true);
         expect(userA.user.gitHubHandle).equal("testGithubA");
     });
 
     it("Set User A set github handle public not public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -412,25 +410,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.gitHubHandle).to.equal("testGithubA");
-        expect(response.data!.updateMe.user.gitHubHandleIsPublic).to.equal(false);
+        expect(response.data?.updateMe.user.gitHubHandle).to.equal("testGithubA");
+        expect(response.data?.updateMe.user.gitHubHandleIsPublic).to.equal(false);
     });
 
     it("User B Access User A Github Handle - Not Public again", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.gitHubHandleIsPublic).to.equal(false);
         expect(userA.user.gitHubHandle).equal(null);
     });
 
     it("Set User A location", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -439,11 +437,11 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
+        expect(response.data?.updateMe.user.location).to.equal("testLocationA");
     });
 
     it("Set User A description", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -452,24 +450,24 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.description).to.equal("This is my new description");
+        expect(response.data?.updateMe.user.description).to.equal("This is my new description");
     });
 
     it("User B Access User A Location - Not Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.locationIsPublic).to.equal(false);
         expect(userA.user.location).equal(null);
     });
 
     it("Set User A set location public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -478,25 +476,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
-        expect(response.data!.updateMe.user.locationIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.location).to.equal("testLocationA");
+        expect(response.data?.updateMe.user.locationIsPublic).to.equal(true);
     });
 
     it("User B Access User A Location - Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.locationIsPublic).to.equal(true);
         expect(userA.user.location).equal("testLocationA");
     });
 
     it("Set User A set location public not public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -505,25 +503,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.location).to.equal("testLocationA");
-        expect(response.data!.updateMe.user.locationIsPublic).to.equal(false);
+        expect(response.data?.updateMe.user.location).to.equal("testLocationA");
+        expect(response.data?.updateMe.user.locationIsPublic).to.equal(false);
     });
 
     it("User B Access User A Location - Not Public again", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.locationIsPublic).to.equal(false);
         expect(userA.user.location).equal(null);
     });
 
     it("Set User A website", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -532,24 +530,24 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
+        expect(response.data?.updateMe.user.website).to.equal("testWebsiteA");
     });
 
     it("User B Access User A Website - Not Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.websiteIsPublic).to.equal(false);
         expect(userA.user.website).equal(null);
     });
 
     it("Set User A set website public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -558,25 +556,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
-        expect(response.data!.updateMe.user.websiteIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.website).to.equal("testWebsiteA");
+        expect(response.data?.updateMe.user.websiteIsPublic).to.equal(true);
     });
 
     it("User B Access User A Website - Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.websiteIsPublic).to.equal(true);
         expect(userA.user.website).equal("testWebsiteA");
     });
 
     it("Set User A set website public not public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -585,25 +583,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.website).to.equal("testWebsiteA");
-        expect(response.data!.updateMe.user.websiteIsPublic).to.equal(false);
+        expect(response.data?.updateMe.user.website).to.equal("testWebsiteA");
+        expect(response.data?.updateMe.user.websiteIsPublic).to.equal(false);
     });
 
     it("User B Access User A Website - Not Public again", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.websiteIsPublic).to.equal(false);
         expect(userA.user.website).equal(null);
     });
 
     it("Set User A emailAddress", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -612,24 +610,24 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data?.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
     });
 
     it("User B Access User A emailAddress - Not Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.emailAddressIsPublic).to.equal(false);
         expect(userA.user.emailAddress).equal(null);
     });
 
     it("Set User A set emailAddress public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -638,25 +636,25 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
-        expect(response.data!.updateMe.user.emailAddressIsPublic).to.equal(true);
+        expect(response.data?.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data?.updateMe.user.emailAddressIsPublic).to.equal(true);
     });
 
     it("User B Access User A emailAddress - Public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.emailAddressIsPublic).to.equal(true);
         expect(userA.user.emailAddress).equal("testEmailAddressA@a.com");
     });
 
     it("Set User A set emailAddress public not public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -665,34 +663,34 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
-        expect(response.data!.updateMe.user.emailAddressIsPublic).to.equal(false);
+        expect(response.data?.updateMe.user.emailAddress).to.equal("testEmailAddressA@a.com");
+        expect(response.data?.updateMe.user.emailAddressIsPublic).to.equal(false);
     });
 
     it("User B Access User A emailAddress - Not Public again", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserDocument,
             variables: {
                 username: "testA-user"
             }
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.user.emailAddressIsPublic).to.equal(false);
         expect(userA.user.emailAddress).equal(null);
     });
 
     it("User A dark mode default value is false", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: MeDocument
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.me.user.uiDarkModeEnabled).to.equal(false);
     });
 
     it("Set User A toggles dark mode on", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -701,20 +699,20 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.uiDarkModeEnabled).to.equal(true);
+        expect(response.data?.updateMe.user.uiDarkModeEnabled).to.equal(true);
     });
 
     it("User A fetches dark mode toggle value", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: MeDocument
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.me.user.uiDarkModeEnabled).to.equal(true);
     });
 
     it("Set User A toggles dark mode off", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -723,15 +721,15 @@ describe("User Tests", async () => {
             }
         });
 
-        expect(response.data!.updateMe.user.uiDarkModeEnabled).to.equal(false);
+        expect(response.data?.updateMe.user.uiDarkModeEnabled).to.equal(false);
     });
 
     it("User A fetches dark mode toggle", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: MeDocument
         });
 
-        let userA = response.data;
+        const userA = response.data;
         expect(userA.me.user.uiDarkModeEnabled).to.equal(false);
     });
 
@@ -745,11 +743,11 @@ describe("User Tests", async () => {
             true
         );
 
-        let response = await darkModeUserClient.query({
+        const response = await darkModeUserClient.query({
             query: MeDocument
         });
 
-        let darkModeUser = response.data;
+        const darkModeUser = response.data;
         expect(darkModeUser.me.user.uiDarkModeEnabled).to.equal(true);
     });
 

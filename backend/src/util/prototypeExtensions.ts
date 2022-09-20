@@ -2,7 +2,7 @@ import { SelectQueryBuilder, EntityManager } from "typeorm";
 
 declare module "typeorm" {
     interface SelectQueryBuilder<Entity> {
-        addRelations(topLevelAlias: string, info: any): SelectQueryBuilder<Entity>;
+        addRelations(topLevelAlias: string, info: unknown): SelectQueryBuilder<Entity>;
         filterCaseCatalog(topLevelAlias: string, catalogId: number): SelectQueryBuilder<Entity>;
     }
 
@@ -16,7 +16,7 @@ function addRelations<Entity>(
     topLevelAlias: string,
     names: string[][]
 ): SelectQueryBuilder<Entity> {
-    for (let name of names) {
+    for (const name of names) {
         const relationName = [topLevelAlias, ...name];
         const alias = relationName.slice(0, relationName.length - 1).join("");
         const relation = relationName[relationName.length - 1];

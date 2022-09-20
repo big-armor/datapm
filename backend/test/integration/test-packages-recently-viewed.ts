@@ -39,8 +39,8 @@ describe("Recently Viewed", async () => {
             query: MeDocument
         });
 
-        userOne = userOneResponse.data!.me.user;
-        userTwo = userTwoResponse.data!.me.user;
+        userOne = userOneResponse.data?.me.user;
+        userTwo = userTwoResponse.data?.me.user;
     });
 
     it("Create test package", async function () {
@@ -95,13 +95,13 @@ describe("Recently Viewed", async () => {
         });
 
         expect(response.errors == null).to.equal(true);
-        expect(response.data.myRecentlyViewedPackages.logs?.length == 1).to.equal(true);
+        expect(response.data.myRecentlyViewedPackages.logs?.length === 1).to.equal(true);
         expect(
-            response.data.myRecentlyViewedPackages.logs![0].targetPackage!.identifier.catalogSlug ==
+            response.data.myRecentlyViewedPackages.logs[0].targetPackage?.identifier.catalogSlug ===
                 "testOne-recently-viewed"
         ).to.equal(true);
         expect(
-            response.data.myRecentlyViewedPackages.logs![0].targetPackage!.identifier.packageSlug ==
+            response.data.myRecentlyViewedPackages.logs[0].targetPackage?.identifier.packageSlug ===
                 "congressional-legislators"
         ).to.equal(true);
     });

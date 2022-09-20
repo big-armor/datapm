@@ -7,6 +7,7 @@ import {
     ActivityLogEventType,
     CreatePackageIssueInput,
     PackageIdentifierInput,
+    PackageIssue,
     PackageIssueIdentifierInput,
     Permission,
     UpdatePackageIssueInput,
@@ -21,9 +22,11 @@ import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { Connection, EntityManager } from "typeorm";
 import { isAuthenticatedContext } from "../util/contextHelpers";
+import { GraphQLResolveInfo } from "graphql";
+import { PackageIssuesResult, User } from "datapm-client-lib";
 
 export const getPackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         packageIssueIdentifier
@@ -32,8 +35,8 @@ export const getPackageIssue = async (
         packageIssueIdentifier: PackageIssueIdentifierInput;
     },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<PackageIssue> => {
     const relations = getGraphQlRelationName(info);
     return await getPackageIssueByIdentifiers(context.connection, packageIdentifier, packageIssueIdentifier, relations);
 };
@@ -43,7 +46,7 @@ export const getPackageIssueByIdentifiers = async (
     packageIdentifier: PackageIdentifierInput,
     packageIssueIdentifier: PackageIssueIdentifierInput,
     relations: string[] = []
-) => {
+): Promise<PackageIssueEntity> => {
     const packageEntity = await connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -60,7 +63,7 @@ export const getPackageIssueByIdentifiers = async (
 };
 
 export const deletePackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         packageIssueIdentifier
@@ -69,8 +72,8 @@ export const deletePackageIssue = async (
         packageIssueIdentifier: PackageIssueIdentifierInput;
     },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<void> => {
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -90,7 +93,7 @@ export const deletePackageIssue = async (
 };
 
 export const getIssuesByPackage = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         includeOpenIssues,
@@ -107,8 +110,8 @@ export const getIssuesByPackage = async (
         orderBy: OrderBy;
     },
     context: AuthenticatedContext,
-    info: any
-) => {
+    info: GraphQLResolveInfo
+): Promise<PackageIssuesResult> => {
     const relations = getGraphQlRelationName(info);
 
     const packageEntity = await context.connection.manager
@@ -137,26 +140,30 @@ export const getIssuesByPackage = async (
     };
 };
 
-export const getPackageIssueAuthor = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const getPackageIssueAuthor = async (
+    parent: PackageIssue,
+    _1: unknown,
+    context: AuthenticatedContext,
+    info: GraphQLResolveInfo
+): Promise<User> => {
     return await context.connection.getCustomRepository(UserRepository).findOneOrFail({
-        where: { id: parent.authorId },
+        where: { id: (parent as PackageIssueEntity).authorId },
         relations: getGraphQlRelationName(info)
     });
 };
 
 export const getPackageIssuePackageIdentifier = async (
-    parent: any,
-    _1: any,
-    context: AuthenticatedContext,
-    info: any
-) => {
-    if (!parent.packageId) {
+    parent: PackageIssue,
+    _1: unknown,
+    context: AuthenticatedContext
+): Promise<PackageIdentifierInput | null> => {
+    if (!(parent as PackageIssueEntity).packageId) {
         return null;
     }
 
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageByIdOrFail({ packageId: parent.packageId, relations: ["catalog"] });
+        .findPackageByIdOrFail({ packageId: (parent as PackageIssueEntity).packageId, relations: ["catalog"] });
 
     return {
         catalogSlug: packageEntity.catalog.slug,
@@ -165,11 +172,10 @@ export const getPackageIssuePackageIdentifier = async (
 };
 
 export const createPackageIssue = async (
-    _0: any,
+    _0: unknown,
     { packageIdentifier, issue }: { packageIdentifier: PackageIdentifierInput; issue: CreatePackageIssueInput },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<PackageIssue> => {
     if (!context.me) {
         throwNotAuthorizedError();
     }
@@ -193,7 +199,7 @@ export const createPackageIssue = async (
         const savedIssueEntity = await issueRepository.save(issueEntity);
 
         await createActivityLog(transaction, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
             targetPackageIssueId: savedIssueEntity.id,
             targetPackageId: packageEntity.id
@@ -204,7 +210,7 @@ export const createPackageIssue = async (
 };
 
 export const updatePackageIssue = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -214,9 +220,8 @@ export const updatePackageIssue = async (
         issueIdentifier: PackageIssueIdentifierInput;
         issue: UpdatePackageIssueInput;
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<PackageIssue> => {
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -235,7 +240,7 @@ export const updatePackageIssue = async (
         const savedIssueEntity = await issueRepository.save(issueEntity);
 
         await createActivityLog(transaction, {
-            userId: context!.me!.id,
+            userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_EDIT,
             targetPackageIssueId: savedIssueEntity.id,
             targetPackageId: packageEntity.id
@@ -246,7 +251,7 @@ export const updatePackageIssue = async (
 };
 
 export const updatePackageIssueStatus = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issueIdentifier,
@@ -256,9 +261,8 @@ export const updatePackageIssueStatus = async (
         issueIdentifier: PackageIssueIdentifierInput;
         status: UpdatePackageIssueStatusInput;
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<PackageIssueEntity> => {
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -277,7 +281,7 @@ export const updatePackageIssueStatus = async (
 
         if (PackageIssueStatus.CLOSED === status.status) {
             await createActivityLog(transaction, {
-                userId: context!.me!.id,
+                userId: context.me.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
                 changeType: ActivityLogChangeType.CLOSED,
                 targetPackageIssueId: savedIssueEntity.id,
@@ -290,7 +294,7 @@ export const updatePackageIssueStatus = async (
 };
 
 export const updatePackageIssuesStatuses = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issuesIdentifiers,
@@ -300,9 +304,8 @@ export const updatePackageIssuesStatuses = async (
         issuesIdentifiers: PackageIssueIdentifierInput[];
         status: UpdatePackageIssueStatusInput;
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -323,7 +326,7 @@ export const updatePackageIssuesStatuses = async (
         if (isClosingIssues) {
             const logsPromises = issues.map((issue) =>
                 createActivityLog(transaction, {
-                    userId: context!.me!.id,
+                    userId: context.me.id,
                     eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
                     changeType: ActivityLogChangeType.CLOSED,
                     targetPackageIssueId: issue.id,
@@ -338,7 +341,7 @@ export const updatePackageIssuesStatuses = async (
 };
 
 export const deletePackageIssues = async (
-    _0: any,
+    _0: unknown,
     {
         packageIdentifier,
         issuesIdentifiers
@@ -346,9 +349,8 @@ export const deletePackageIssues = async (
         packageIdentifier: PackageIdentifierInput;
         issuesIdentifiers: PackageIssueIdentifierInput[];
     },
-    context: AuthenticatedContext,
-    info: any
-) => {
+    context: AuthenticatedContext
+): Promise<void> => {
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -367,33 +369,23 @@ export const deletePackageIssues = async (
     await context.connection.transaction(async (transaction) => {
         await issueRepository.delete(issuesIds);
 
-        const logsPromises = issuesIds.map((issueId) =>
-            createActivityLog(transaction, {
-                userId: context!.me!.id,
+        const logsPromises = issuesIds.map((issueId) => {
+            const issue = issues.find((i) => i.id === issueId);
+            return createActivityLog(transaction, {
+                userId: context.me.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-                targetPackageIssueId: issueId,
+                removedItemId: issueId,
+                removedItemName: issue?.subject,
                 targetPackageId: packageEntity.id
-            })
-        );
+            });
+        });
 
         await Promise.all(logsPromises);
     });
 };
 
-async function getIssueEntity(
-    context: any,
-    packageIdentifier: PackageIdentifierInput,
-    issueIdentifier: PackageIssueIdentifierInput
-) {
-    const packageEntity = await context.connection.manager
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: packageIdentifier });
-
-    return getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
-}
-
 async function getIssueEntityWithPackage(
-    context: any,
+    context: Context,
     packageEntity: PackageEntity,
     issueIdentifier: PackageIssueIdentifierInput
 ) {
@@ -406,7 +398,6 @@ async function hasPermissionsToEditIssue(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
@@ -422,13 +413,11 @@ async function hasEditPermissionsForIssues(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }
 
     const authenicatedContext = context as AuthenticatedContext;
-
 
     const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, authenicatedContext.me);
     return hasPermissionsToEditIssues(issues, packagePermissions, context);
@@ -443,7 +432,6 @@ function hasPermissionsToEditIssues(
 }
 
 function canEditIssue(issueEntity: PackageIssueEntity, packagePermissions: Permission[], context: Context): boolean {
-
     if (!isAuthenticatedContext(context)) {
         return false;
     }

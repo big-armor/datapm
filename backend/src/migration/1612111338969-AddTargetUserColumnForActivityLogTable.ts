@@ -5,5 +5,7 @@ export class AddTargetUserColumnForActivityLogTable1612111338969 implements Migr
         return queryRunner.query("ALTER TABLE public.activity_log ADD COLUMN target_user_id INTEGER");
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

@@ -1,5 +1,4 @@
 # TODO Needs Linting
-backend
 frontend
 docs
 
@@ -16,3 +15,10 @@ client-lib/node_modules
 client-lib/dist
 client-lib/src/generated
 client-lib/test/integration/registry-client.ts
+
+backend/dist
+backend/src/generated
+backend/tmp-*
+backend/node_modules
+backend/test/integration/registry-client.ts
+backend/gulpfile.js

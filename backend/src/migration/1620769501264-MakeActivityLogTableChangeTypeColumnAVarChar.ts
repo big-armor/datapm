@@ -6,5 +6,7 @@ export class MakeActivityLogTableChangeTypeColumnAVarChar1620769501264 implement
         return queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

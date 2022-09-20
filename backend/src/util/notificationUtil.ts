@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { ActivityLogEventType } from "../generated/graphql";
 
 export interface Notification {
@@ -69,7 +70,7 @@ export interface PackageNotification {
     }[];
 }
 
-export function combineNotifications(a: Notification, b: Notification) {
+export function combineNotifications(a: Notification, b: Notification): void {
     if (a.catalogNotifications && b.catalogNotifications)
         a.catalogNotifications = a.catalogNotifications.concat(b.catalogNotifications);
     else if (b.catalogNotifications) a.catalogNotifications = b.catalogNotifications;

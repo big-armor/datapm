@@ -42,7 +42,7 @@ export class PackageFileStorageService {
         );
     }
 
-    deletePackageFile(packageId: number, identifier: VersionIdentifierInput) {
+    deletePackageFile(packageId: number, identifier: VersionIdentifierInput): Promise<void> {
         return this.fileStorageService.deleteFile(
             this.versionIdentifierPath(packageId, identifier),
             FileType.PACKAGE_FILE
@@ -50,23 +50,23 @@ export class PackageFileStorageService {
     }
 
     private async streamToString(stream: Stream): Promise<string> {
-        return new Promise((r) => {
-            var tempBuffer: any[] = [];
+        return new Promise((resolve) => {
+            const tempBuffer: Array<Uint8Array> = [];
             stream.on("data", function (d) {
                 tempBuffer.push(d);
             });
             stream.on("end", function () {
-                var buffer = Buffer.concat(tempBuffer).toString();
-                r(buffer);
+                const buffer = Buffer.concat(tempBuffer).toString();
+                resolve(buffer);
             });
         });
     }
 
     private versionIdentifierPath(packageId: number, identifier: VersionIdentifierInput): string[] {
         return [
-            Prefixes.PACKAGE ,
-            packageId.toString() ,
-            identifier.versionMajor.toString() ,
+            Prefixes.PACKAGE,
+            packageId.toString(),
+            identifier.versionMajor.toString(),
             identifier.versionMinor.toString(),
             identifier.versionPatch.toString()
         ];

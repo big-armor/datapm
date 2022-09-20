@@ -1,5 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
-
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
 CREATE TABLE public.batch (
@@ -28,15 +27,14 @@ ALTER TABLE public.batch ADD COLUMN sourceSlug TEXT NOT NULL;
 ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,sourceType,sourceSlug,streamSetSlug,streamSlug,schematitle,batch);
 
 create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,sourceType,sourceSlug,streamSetSlug,streamSlug,schematitle,"default") where "default" is true;
-`
+`;
 
 export class CreateDataBatchTable1636656866265 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(sql);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
     }
-
 }

@@ -39,5 +39,4 @@ export class GroupCatalogPermissionEntity extends EntityBaseModel {
 
     @Column({ name: "creator_id" })
     creatorId: number;
-
 }

@@ -14,5 +14,7 @@ export class APIKeyChanges1599181511315 implements MigrationInterface {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

@@ -6,5 +6,7 @@ export class AddUnclaimedCatalogColumn1620666572765 implements MigrationInterfac
         return queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

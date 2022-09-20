@@ -9,5 +9,7 @@ export class AddTargetIssueIdColumnToActivityLogTable1618418751085 implements Mi
         return queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

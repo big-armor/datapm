@@ -39,6 +39,5 @@ export async function getSecretVariable(envVariableName: string): Promise<void> 
         return;
     } catch (err) {
         console.warn(`Unable to find ${envVariableName} from environment or secret manager - ${err}`);
-        return;
     }
 }

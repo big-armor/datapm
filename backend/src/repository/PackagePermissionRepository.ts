@@ -42,7 +42,10 @@ export async function getAllPackagePermissions(
 
 @EntityRepository()
 export class PackagePermissionRepository {
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     public findPackagePermissions({
         packageId,
@@ -103,7 +106,7 @@ export class PackagePermissionRepository {
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });
 
-            if (packageEntity.creatorId == user.id) {
+            if (packageEntity.creatorId === user.id) {
                 throw new Error("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS");
             }
 
@@ -113,9 +116,9 @@ export class PackagePermissionRepository {
             });
 
             // If user does not exist in collection permissions, it creates new record
-            if (packagePermissions == undefined) {
+            if (packagePermissions === undefined) {
                 try {
-                    return await this.storePackagePermissions(transaction, user.id, packageEntity.id, permissions);
+                    await this.storePackagePermissions(transaction, user.id, packageEntity.id, permissions);
                 } catch (e) {
                     console.log(e);
                 }
@@ -123,7 +126,7 @@ export class PackagePermissionRepository {
             // If user does exists in package permissions, it updates the record found
             else {
                 try {
-                    return await transaction
+                    await transaction
                         .createQueryBuilder()
                         .update(UserPackagePermissionEntity)
                         .set({ permissions: permissions })
@@ -133,7 +136,6 @@ export class PackagePermissionRepository {
                     console.log(e);
                 }
             }
-            return;
         });
     }
 
@@ -163,7 +165,7 @@ export class PackagePermissionRepository {
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });
 
-            if (packageEntity.creatorId == user.id) {
+            if (packageEntity.creatorId === user.id) {
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
             await transaction.delete(UserPackagePermissionEntity, { package: packageEntity, user });

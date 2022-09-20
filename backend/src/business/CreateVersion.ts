@@ -1,6 +1,22 @@
 import { ApolloError } from "apollo-server";
-import { ActivityLogChangeType, ActivityLogEventType, CreateVersionInput, PackageIdentifierInput, VersionConflict } from "datapm-client-lib";
-import { Compability, comparePackages, compatibilityToString, diffCompatibility, Difference, nextVersion, PackageFile, PublishMethod, upgradePackageFile } from "datapm-lib";
+import {
+    ActivityLogChangeType,
+    ActivityLogEventType,
+    CreateVersionInput,
+    PackageIdentifierInput,
+    VersionConflict
+} from "datapm-client-lib";
+import {
+    Compability,
+    comparePackages,
+    compatibilityToString,
+    diffCompatibility,
+    Difference,
+    nextVersion,
+    PackageFile,
+    PublishMethod,
+    upgradePackageFile
+} from "datapm-lib";
 import { SemVer } from "semver";
 import { AuthenticatedContext } from "../context";
 import { VersionEntity } from "../entity/VersionEntity";
@@ -11,8 +27,14 @@ import { saveVersionComparison } from "../repository/VersionComparisonRepository
 import { VersionRepository } from "../repository/VersionRepository";
 import { versionEntityToGraphqlObject } from "../resolvers/VersionResolver";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { getEnvVariable } from "../util/getEnvVariable";
 
-export async function createOrUpdateVersion(context:AuthenticatedContext, packageIdentifier: PackageIdentifierInput, value: CreateVersionInput, returnRelations:string[]):Promise<Version> {
+export async function createOrUpdateVersion(
+    context: AuthenticatedContext,
+    packageIdentifier: PackageIdentifierInput,
+    value: CreateVersionInput,
+    returnRelations: string[]
+): Promise<Version> {
     let latestVersion: VersionEntity | undefined | null;
     let savedVersion: VersionEntity | undefined | null;
     let diff: Difference[] | null = null;
@@ -24,14 +46,16 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
 
         const newPackageFile = upgradePackageFile(rawPackageFile);
 
-        const registryReference = newPackageFile.registries?.find(registry => registry.url === process.env["REGISTRY_URL"]);
+        const registryReference = newPackageFile.registries?.find(
+            (registry) => registry.url === getEnvVariable("REGISTRY_URL")
+        );
 
         const publishMethod = registryReference?.publishMethod || PublishMethod.SCHEMA_ONLY;
 
-        if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        if (publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
             // TODO check that the referenced credentials are available
             // TODO check that the data can be accessed
-        } else if(publishMethod === PublishMethod.SCHEMA_ONLY) {
+        } else if (publishMethod === PublishMethod.SCHEMA_ONLY) {
             // TODO check that the data can be accessed??? (or maybe it doesn't matter until they try to set it public)
         }
 
@@ -55,7 +79,7 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
                 throw new ApolloError("INTERNAL_SERVER_ERROR");
             }
 
-            const latestVersionSemVer = new SemVer(packageFile!.version);
+            const latestVersionSemVer = new SemVer(packageFile.version);
 
             diff = comparePackages(packageFile, newPackageFile);
 
@@ -65,12 +89,12 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
 
             const minVersionCompare = minNextVersion.compare(proposedNewVersion.version);
 
-            if (compatibility == Compability.Identical) {
+            if (compatibility === Compability.Identical) {
                 changeType = ActivityLogChangeType.VERSION_TRIVIAL_CHANGE;
                 latestVersion.updatedAt = new Date();
                 savedVersion = await transaction.getRepository(VersionEntity).save(latestVersion);
             } else {
-                if (minVersionCompare == 1) {
+                if (minVersionCompare === 1) {
                     throw new ApolloError(
                         packageIdentifier.catalogSlug +
                             "/" +
@@ -86,11 +110,11 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
                         VersionConflict.HIGHER_VERSION_REQUIRED,
                         { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                     );
-                } else if (compatibility == Compability.MinorChange) {
+                } else if (compatibility === Compability.MinorChange) {
                     changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
-                } else if (compatibility == Compability.CompatibleChange) {
+                } else if (compatibility === Compability.CompatibleChange) {
                     changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
-                } else if (compatibility == Compability.BreakingChange) {
+                } else if (compatibility === Compability.BreakingChange) {
                     changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
                 }
 
@@ -111,7 +135,9 @@ export async function createOrUpdateVersion(context:AuthenticatedContext, packag
             versionPatch: proposedNewVersion.patch
         };
 
-        const packageEntity = await transaction.getCustomRepository(PackageRepository).findOrFail({ identifier: packageIdentifier });
+        const packageEntity = await transaction
+            .getCustomRepository(PackageRepository)
+            .findOrFail({ identifier: packageIdentifier });
 
         await transaction
             .getCustomRepository(PackageRepository)

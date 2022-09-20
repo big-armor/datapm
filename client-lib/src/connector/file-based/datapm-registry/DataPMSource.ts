@@ -129,7 +129,7 @@ export class DataPMSource implements Source {
                                             openChannelResponse.channelName,
                                             async (
                                                 dataOrError: DataSend | DataStop | ErrorResponse,
-                                                callback: (response: FetchResponse | ErrorResponse) => void
+                                                callback?: (response: FetchResponse | ErrorResponse) => void
                                             ) => {
                                                 if (
                                                     (dataOrError as ErrorResponse).responseType ===
@@ -144,7 +144,7 @@ export class DataPMSource implements Source {
                                                 if (data.requestType === FetchRequestType.STOP) {
                                                     duplex.end();
                                                     socket.off(openChannelResponse.channelName);
-                                                    callback(new DataStopAcknowledge());
+                                                    callback && callback(new DataStopAcknowledge());
                                                 } else {
                                                     const dataSend = data as DataSend;
 
@@ -163,7 +163,7 @@ export class DataPMSource implements Source {
                                                             });
                                                         }
                                                     }
-                                                    callback(new DataAcknowledge());
+                                                    callback && callback(new DataAcknowledge());
                                                 }
                                             }
                                         );

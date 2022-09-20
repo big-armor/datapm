@@ -1,6 +1,6 @@
 import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
-import { Kind } from "graphql";
 import {
+    Kind,
     GraphQLField,
     defaultFieldResolver,
     GraphQLInputField,
@@ -9,6 +9,7 @@ import {
     GraphQLInterfaceType,
     GraphQLObjectType
 } from "graphql";
+
 import { Context } from "../context";
 import { INVALID_PASSWORD_ERROR } from "../generated/graphql";
 import { ValidationConstraint } from "./ValidationConstraint";
@@ -19,6 +20,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
@@ -31,7 +33,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
             const password: string | undefined = args.password || args.value.password || undefined;
@@ -75,7 +77,7 @@ export class PasswordConstraint implements ValidationConstraint {
         return "Password";
     }
 
-    validate(value: string) {
+    validate(value: string): void {
         validatePassword(value);
     }
 

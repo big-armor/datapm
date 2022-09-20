@@ -8,9 +8,7 @@ import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 describe("Upgrading package files automatically", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -27,12 +25,12 @@ describe("Upgrading package files automatically", function () {
             "testB-package-auto-upgrade@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -45,16 +43,16 @@ describe("Upgrading package files automatically", function () {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-package-auto-upgrade");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-package-auto-upgrade");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-package-auto-upgrade");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-package-auto-upgrade");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish old package file v0.1.0", async function () {
-        let packageFileContents = loadPackageFileFromDisk(
+        const packageFileContents = loadPackageFileFromDisk(
             "test/packageFiles/v0.1.0/congressional-legislators-schema-v0.1.0.datapm.json"
         );
 
@@ -80,17 +78,17 @@ describe("Upgrading package files automatically", function () {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-package-auto-upgrade");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-package-auto-upgrade");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
         expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.32.1.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
 
-        expect(Array.isArray(packageFile.sources[0].configuration!.uris)).equal(true);
+        expect(Array.isArray(packageFile.sources[0].configuration?.uris)).equal(true);
 
         expect(packageFile.canonical).equal(true);
     });

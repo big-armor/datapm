@@ -13,11 +13,13 @@ export class ValidBase64ImageUploadDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         details.field.resolve = async function (source, args, context: Context, info) {
             const imageUpload: Base64ImageUpload | undefined = args.image || args.value?.image || undefined;

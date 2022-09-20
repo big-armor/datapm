@@ -5,7 +5,10 @@ import { AUTHENTICATED_USER_OR_PUBLIC_COLLECTIONS_QUERY } from "./CollectionRepo
 
 @EntityRepository()
 export class GroupCollectionPermissionRepository {
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     async getCollectionPermissionsByUser({
         collectionId,

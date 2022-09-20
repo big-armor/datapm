@@ -16,11 +16,11 @@ describe("Catalog Slug Case Tests", async () => {
             "passwordA!"
         );
 
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
     });
 
     it("User A Create Second Catalog - cased slug", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -33,13 +33,13 @@ describe("Catalog Slug Case Tests", async () => {
             }
         });
 
-        expect(response.errors! == null, "no errors returned").to.equal(true);
+        expect(response.errors == null, "no errors returned").to.equal(true);
 
-        expect(response.data!.createCatalog.identifier.catalogSlug, "correct slug").to.equal("CaSeD-CaTaLoG");
+        expect(response.data?.createCatalog.identifier.catalogSlug, "correct slug").to.equal("CaSeD-CaTaLoG");
     });
 
     it("Get catalog no matter the case of catalog-slug", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -50,6 +50,6 @@ describe("Catalog Slug Case Tests", async () => {
 
         expect(response.errors == null, "no errors returned").to.equal(true);
 
-        expect(response.data!.catalog.identifier.catalogSlug, "correct slug").to.equal("CaSeD-CaTaLoG");
+        expect(response.data?.catalog.identifier.catalogSlug, "correct slug").to.equal("CaSeD-CaTaLoG");
     });
 });

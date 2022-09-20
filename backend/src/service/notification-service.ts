@@ -29,7 +29,7 @@ const dailyJob = new CronJob("0 0 8 * * *", dailyNotificationsJob, null, false, 
 const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotificationsJob, null, false, "America/New_York");
 const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotificationsJob, null, false, "America/New_York");
 
-export function startNotificationService(connection: Connection) {
+export function startNotificationService(connection: Connection): void {
     databaseConnection = connection;
     instantJob.start();
     hourlyJob.start();
@@ -38,7 +38,7 @@ export function startNotificationService(connection: Connection) {
     monthlyJob.start();
 }
 
-export async function stopNotificationService() {
+export function stopNotificationService(): void {
     instantJob.stop();
     hourlyJob.stop();
     dailyJob.stop();
@@ -47,42 +47,52 @@ export async function stopNotificationService() {
 }
 
 async function instantNotificationJob() {
-    instantNotifications(databaseConnection!);
+    if (databaseConnection == null) throw new Error("Database connection is null!");
+
+    instantNotifications(databaseConnection);
 }
 
 async function hourlyNotificationsJob() {
-    hourlyNotifications(databaseConnection!);
+    if (databaseConnection == null) throw new Error("Database connection is null!");
+
+    hourlyNotifications(databaseConnection);
 }
 
 async function dailyNotificationsJob() {
-    dailyNotifications(databaseConnection!);
+    if (databaseConnection == null) throw new Error("Database connection is null!");
+
+    dailyNotifications(databaseConnection);
 }
 
 async function weeklyNotificationsJob() {
-    weeklyNotifications(databaseConnection!);
+    if (databaseConnection == null) throw new Error("Database connection is null!");
+
+    weeklyNotifications(databaseConnection);
 }
 
 async function monthlyNotificationsJob() {
-    monthlyNotifications(databaseConnection!);
+    if (databaseConnection == null) throw new Error("Database connection is null!");
+
+    monthlyNotifications(databaseConnection);
 }
 
-export async function instantNotifications(databaseConnection: Connection) {
+export async function instantNotifications(databaseConnection: Connection): Promise<void> {
     await prepareAndSendNotifications(databaseConnection, "lastInstantNotificationDate", NotificationFrequency.INSTANT);
 }
 
-export async function hourlyNotifications(databaseConnection: Connection) {
+export async function hourlyNotifications(databaseConnection: Connection): Promise<void> {
     await prepareAndSendNotifications(databaseConnection, "lastHourlyNotificationDate", NotificationFrequency.HOURLY);
 }
 
-export async function dailyNotifications(databaseConnection: Connection) {
+export async function dailyNotifications(databaseConnection: Connection): Promise<void> {
     await prepareAndSendNotifications(databaseConnection, "lastDailyNotificationDate", NotificationFrequency.DAILY);
 }
 
-export async function weeklyNotifications(databaseConnection: Connection) {
+export async function weeklyNotifications(databaseConnection: Connection): Promise<void> {
     await prepareAndSendNotifications(databaseConnection, "lastWeeklyNotificationDate", NotificationFrequency.WEEKLY);
 }
 
-export async function monthlyNotifications(databaseConnection: Connection) {
+export async function monthlyNotifications(databaseConnection: Connection): Promise<void> {
     await prepareAndSendNotifications(databaseConnection, "lastMonthlyNotificationDate", NotificationFrequency.MONTHLY);
 }
 
@@ -95,7 +105,7 @@ async function prepareAndSendNotifications(
 
     let lastNotificationDate = new Date(new Date().getTime() - 60 * 1000);
 
-    if (frequency == NotificationFrequency.DAILY) {
+    if (frequency === NotificationFrequency.DAILY) {
         lastNotificationDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
     } else if (frequency === NotificationFrequency.HOURLY) {
         lastNotificationDate = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
@@ -148,8 +158,8 @@ async function sendNotifications(
 
         const context: Context = {
             cache: new SessionCache(),
-            connection: connection,
-        }
+            connection: connection
+        };
 
         const catalogChanges = await getCatalogChanges(user, notification, context);
         const packageChanges = await getPackageChanges(user, notification, context);
@@ -169,7 +179,7 @@ async function sendNotifications(
             users: userChanges
         };
 
-        sendFollowNotificationEmail(user, frequency, notificationEmail);
+        await sendFollowNotificationEmail(user, frequency, notificationEmail);
     }
 }
 
@@ -198,12 +208,12 @@ async function getUserChanges(
                         throw new Error("USER_NOT_FOUND_DURING_ACTIVITY_LOOKUP");
                     }
 
-                    let userDisplayName = "";
-                    let action = "took an unknown action";
+                    const userDisplayName = "";
+                    const action = "took an unknown action";
 
                     const timeAgo = "unknown time ago";
 
-                    if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
+                    if (n.event_type === ActivityLogEventType.VERSION_CREATED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
                                 const version = await connection.getRepository(VersionEntity).findOneOrFail({
@@ -250,7 +260,7 @@ async function getPackageChanges(
                 .getRepository(PackageEntity)
                 .findOneOrFail(pn.packageId, { relations: ["catalog"] });
 
-            const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity)
+            const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity);
 
             if (!hasPermission) {
                 return null;
@@ -275,13 +285,13 @@ async function getPackageChanges(
                     let userDisplayName = user?.displayName;
 
                     const uniqueUsers = [
-                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f !== n.actions[0].user_id))
                     ];
                     if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
                     }
 
-                    if (n.event_type == ActivityLogEventType.PACKAGE_EDIT) {
+                    if (n.event_type === ActivityLogEventType.PACKAGE_EDIT) {
                         const alertableProperties = n.properties_edited.filter((p) =>
                             ["description", "displayName", "slug"].includes(p)
                         );
@@ -296,7 +306,7 @@ async function getPackageChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: " enabled public access!",
@@ -308,7 +318,7 @@ async function getPackageChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: " disabled public access",
@@ -317,7 +327,7 @@ async function getPackageChanges(
                                     });
                                 })
                         );
-                    } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
+                    } else if (n.event_type === ActivityLogEventType.VERSION_CREATED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
                                 const version = await context.connection
@@ -337,7 +347,7 @@ async function getPackageChanges(
                                 });
                             })
                         );
-                    } else if (n.event_type == ActivityLogEventType.VERSION_DELETED) {
+                    } else if (n.event_type === ActivityLogEventType.VERSION_DELETED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
                                 const version = await context.connection
@@ -375,7 +385,9 @@ async function getCatalogChanges(
 ): Promise<NotificationResourceTypeTemplate[]> {
     return await Promise.all(
         (await notification.catalogNotifications?.asyncMap(async (cn) => {
-            const catalogEntity = await context.connection.getCustomRepository(CatalogRepository).findOneOrFail(cn.catalogId);
+            const catalogEntity = await context.connection
+                .getCustomRepository(CatalogRepository)
+                .findOneOrFail(cn.catalogId);
 
             return {
                 displayName: catalogEntity.displayName,
@@ -394,10 +406,10 @@ async function getCatalogChanges(
                     }
 
                     let userDisplayName = user?.displayName;
-                    let action = "took an unknown action";
+                    const action = "took an unknown action";
 
                     const uniqueUsers = [
-                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f !== n.actions[0].user_id))
                     ];
                     if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
@@ -405,7 +417,7 @@ async function getCatalogChanges(
 
                     const timeAgo = "unknown time ago";
 
-                    if (n.event_type == ActivityLogEventType.CATALOG_EDIT) {
+                    if (n.event_type === ActivityLogEventType.CATALOG_EDIT) {
                         const alertableProperties = n.properties_edited.filter((p) =>
                             ["description", "displayName", "slug", "website"].includes(p)
                         );
@@ -420,7 +432,7 @@ async function getCatalogChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: "enabled public access!",
@@ -432,7 +444,7 @@ async function getCatalogChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: "disabled public access",
@@ -441,14 +453,18 @@ async function getCatalogChanges(
                                     });
                                 })
                         );
-                    } else if (n.event_type == ActivityLogEventType.CATALOG_PACKAGE_ADDED) {
+                    } else if (n.event_type === ActivityLogEventType.CATALOG_PACKAGE_ADDED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncFlatMap(async (a) => {
                                 const packageEntity = await context.connection
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id } });
 
-                                const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity);
+                                const hasPermission = await hasPackagePermissionForEntity(
+                                    Permission.VIEW,
+                                    context,
+                                    packageEntity
+                                );
 
                                 if (!hasPermission) {
                                     return [];
@@ -503,10 +519,10 @@ async function getCollectionChanges(
                     }
 
                     let userDisplayName = user?.displayName;
-                    let action = "took an unknown action";
+                    const action = "took an unknown action";
 
                     const uniqueUsers = [
-                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f !== n.actions[0].user_id))
                     ];
                     if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
@@ -514,7 +530,7 @@ async function getCollectionChanges(
 
                     const timeAgo = "unknown time ago";
 
-                    if (n.event_type == ActivityLogEventType.COLLECTION_EDIT) {
+                    if (n.event_type === ActivityLogEventType.COLLECTION_EDIT) {
                         const alertableProperties = n.properties_edited.filter((p) =>
                             ["description", "name", "collectionSlug"].includes(p)
                         );
@@ -529,7 +545,7 @@ async function getCollectionChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: "enabled public access!",
@@ -541,7 +557,7 @@ async function getCollectionChanges(
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
-                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
+                                .filter((a) => a.change_type === ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
                                     return new NotificationActionTemplate({
                                         prefix: "disabled public access",
@@ -550,14 +566,18 @@ async function getCollectionChanges(
                                     });
                                 })
                         );
-                    } else if (n.event_type == ActivityLogEventType.COLLECTION_PACKAGE_ADDED) {
+                    } else if (n.event_type === ActivityLogEventType.COLLECTION_PACKAGE_ADDED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncFlatMap(async (a) => {
                                 const packageEntity = await context.connection
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
 
-                                const hasPermission = await hasPackagePermissionForEntity(Permission.VIEW, context, packageEntity);
+                                const hasPermission = await hasPackagePermissionForEntity(
+                                    Permission.VIEW,
+                                    context,
+                                    packageEntity
+                                );
 
                                 if (!hasPermission) {
                                     return [];

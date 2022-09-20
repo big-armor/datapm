@@ -45,8 +45,8 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user A to create a new catalog", async () => {
@@ -95,7 +95,7 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
 
         expect(createPackageResponse.errors).to.equal(undefined);
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         const createVersionResponse = await userAClient.mutate({
@@ -164,17 +164,17 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
     });
 
     it("Should send email after instant notification updates containing packages followed through collection", async () => {
-        let userBEmail: any = null;
+        let userBEmail: { text: string } = { text: "notset" };
 
-        let emailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const emailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") {
                     userBEmail = email;
                 }
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -198,7 +198,7 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
     });
 
     it("Should allow user A to create patch version change", async () => {
-        let packageFileContents = loadPackageFileFromDisk(
+        const packageFileContents = loadPackageFileFromDisk(
             "test/packageFiles/congressional-legislators-version-changed.datapm.json"
         );
         const packageFileString = JSON.stringify(packageFileContents);
@@ -250,17 +250,17 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
     });
 
     it("Should send email after daily notification updates not containing package because of the following options selected", async () => {
-        let userBEmail: any = null;
+        let userBEmail: { text: string } = { text: "notset" };
 
-        let emailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const emailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") {
                     userBEmail = email;
                 }
 
                 if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });
@@ -283,7 +283,7 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
     });
 
     it("Should allow user A to create major version change", async () => {
-        let packageFileContents = loadPackageFileFromDisk(
+        const packageFileContents = loadPackageFileFromDisk(
             "test/packageFiles/congressional-legislators-updated.datapm.json"
         );
         const packageFileString = JSON.stringify(packageFileContents);
@@ -335,17 +335,14 @@ describe("Follow Collection's Packages Notifications Tests", async () => {
     });
 
     it("Should send email after daily notification updates containing package because of major change", async () => {
-        let userBEmail: any = null;
+        let userBEmail: { text: string } = { text: "notset" };
 
-        let emailPromise = new Promise<void>((r) => {
-            let subscription = mailObservable.subscribe((email) => {
+        const emailPromise = new Promise<void>((resolve, reject) => {
+            const subscription = mailObservable.subscribe((email) => {
                 if (email.to[0].address === userBUsername + "@test.datapm.io") {
                     userBEmail = email;
-                }
-
-                if (userBEmail) {
                     subscription.unsubscribe();
-                    r();
+                    resolve();
                 }
             });
         });

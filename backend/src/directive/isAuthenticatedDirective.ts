@@ -5,14 +5,14 @@ import { AUTHENTICATION_ERROR, UserStatus } from "../generated/graphql";
 import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
-    visitObject(object: GraphQLObjectType) {
+    visitObject(object: GraphQLObjectType): void {
         const fields = object.getFields();
-        for (let field of Object.values(fields)) {
+        for (const field of Object.values(fields)) {
             this.visitFieldDefinition(field);
         }
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    visitFieldDefinition(field: GraphQLField<unknown, Context>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
             if (!isAuthenticatedContext(context)) throw new AuthenticationError("NOT_AUTHENTICATED");
@@ -23,7 +23,7 @@ export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
                 throw new ValidationError("EMAIL_ADDRESS_NOT_VERIFIED");
             }
 
-            if (UserStatus.SUSPENDED == authenicatedContext.me.status) {
+            if (UserStatus.SUSPENDED === authenicatedContext.me.status) {
                 throw new ValidationError(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED);
             }
 

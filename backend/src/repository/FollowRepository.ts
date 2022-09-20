@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { DeleteResult, EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { FollowEntity } from "../entity/FollowEntity";
 import { ActivityLogChangeType, ActivityLogEventType, NotificationFrequency, User } from "../generated/graphql";

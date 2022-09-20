@@ -10,7 +10,6 @@ import { UserEntity } from "./UserEntity";
 })
 @Unique(["groupId", "userId"])
 export class GroupUserEntity extends EntityBaseModel {
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -37,5 +36,4 @@ export class GroupUserEntity extends EntityBaseModel {
 
     @Column("enum", { array: true, name: "permissions", enum: Permission })
     permissions: Permission[];
-
 }

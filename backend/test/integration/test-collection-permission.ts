@@ -18,16 +18,14 @@ describe("Collection Permissions", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let userCClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create users A & B", async function () {
         userAClient = await createUser("Alol", "Aulu", "my-test-user100", "hellocat12@test.datapm.io", "catPassword2!");
         userBClient = await createUser("Foo1", "Bar2", "my-test-user101", "hellocat13@test.datapm.io", "catPassword2!");
         userCClient = await createUser("Foo3", "Bar3", "my-test-user102", "hellocat14@test.datapm.io", "catPassword2!");
 
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
-        expect(userCClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
+        expect(userCClient).to.not.equal(undefined);
     });
 
     it("user attempting to grant permissions to a collection on which they do not have the MANAGE permission", async function () {
@@ -56,7 +54,7 @@ describe("Collection Permissions", async () => {
 
         const newPermissions = [Permission.VIEW];
 
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -72,13 +70,16 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("attempting to grant permissions to a user that does not exist", async function () {
         const newPermissions = [Permission.VIEW];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -94,12 +95,15 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user103");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors[0].message).to.equal("USER_NOT_FOUND - my-test-user103");
     });
 
     it("Can not set permissions for creator", async function () {
         const newPermissions = [Permission.VIEW];
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -115,14 +119,17 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors! !== null).equal(true);
-        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))).is.not
-            .null;
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors?.find((e) => e.message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))).not.equal(
+            null
+        );
     });
 
     it("successfully setting permissions for authorized use case", async function () {
         const newPermissions = [Permission.VIEW];
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -138,11 +145,11 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("get users list for collection", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UsersByCollectionDocument,
             variables: {
                 identifier: {
@@ -151,19 +158,24 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
-        expect(response.errors! == null).true;
+        if (testUserPersmission == null) {
+            throw new Error("Expected user to exist");
+        }
+
         expect(testUserPersmission).to.not.equal(undefined);
-        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
-        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(false);
-        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(false);
+        expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(false);
+        expect(testUserPersmission.permissions.includes(Permission.MANAGE)).to.equal(false);
     });
 
     it("update collection user permissions by changing the permissions list", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -179,11 +191,11 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("get users list for collection part 2", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UsersByCollectionDocument,
             variables: {
                 identifier: {
@@ -192,17 +204,22 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
-        expect(response.errors! == null).true;
+        if (testUserPersmission == null) {
+            throw new Error("Expected user to exist");
+        }
+
         expect(testUserPersmission).to.not.equal(undefined);
-        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
-        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(true);
-        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.MANAGE)).to.equal(true);
     });
 
     it("Should not allow other user to remove creator permissions", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: DeleteUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -212,8 +229,8 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors !== null).true;
-        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
+        expect(response.errors != null).equal(true);
+        expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 
     it("Validate that the target user has the permission granted to view a collection that they did not previously", async function () {
@@ -276,7 +293,10 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(beforeGrantedViewOnUserB.errors![0].message).to.equal("NOT_AUTHORIZED");
+        if (beforeGrantedViewOnUserB.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(beforeGrantedViewOnUserB.errors[0].message).to.equal("NOT_AUTHORIZED");
         expect(beforeGrantedViewOnUserB.data).to.equal(null);
         expect(afterGrantedViewOnUserB.data?.collection.name).to.equal("testing collectionPackages5");
         expect(afterGrantedViewOnUserB.data?.collection.description).to.equal(
@@ -287,7 +307,7 @@ describe("Collection Permissions", async () => {
     it("remove user B manage permission", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -303,11 +323,11 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("get users list for collection part 2", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UsersByCollectionDocument,
             variables: {
                 identifier: {
@@ -316,17 +336,21 @@ describe("Collection Permissions", async () => {
             }
         });
 
+        expect(response.errors == null).equal(true);
+
         const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
 
-        expect(response.errors! == null).true;
+        if (testUserPersmission == null) {
+            throw new Error("Expected user to exist");
+        }
         expect(testUserPersmission).to.not.equal(undefined);
-        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
-        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(true);
-        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(false);
+        expect(testUserPersmission.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.EDIT)).to.equal(true);
+        expect(testUserPersmission.permissions.includes(Permission.MANAGE)).to.equal(false);
     });
 
     it("should allow user b to edit the collection", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
                 identifier: {
@@ -338,12 +362,12 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
-        expect(response.data!.updateCollection.description).equal("new description");
+        expect(response.errors == null).equal(true);
+        expect(response.data?.updateCollection.description).equal("new description");
     });
 
     it("should not allow user b to change the collection public setting", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
                 identifier: {
@@ -355,12 +379,15 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors!.length).equal(1);
-        expect(response.errors!.find((e) => e.message.startsWith("NOT_AUTHORIZED"))).to.not.equal(undefined);
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+        expect(response.errors.length).equal(1);
+        expect(response.errors.find((e) => e.message.startsWith("NOT_AUTHORIZED"))).to.not.equal(undefined);
     });
 
     it("should allow user a to make the collection public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCollectionDocument,
             variables: {
                 identifier: {
@@ -372,11 +399,11 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors).to.be.undefined;
+        expect(response.errors).to.equal(undefined);
     });
 
     it("should return only view permission for user C", async function () {
-        let response = await userCClient.query({
+        const response = await userCClient.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -385,7 +412,10 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.data.collection.myPermissions!.length).equal(1);
-        expect(response.data.collection.myPermissions![0]).equal(Permission.VIEW);
+        if (response.data.collection.myPermissions == null) {
+            throw new Error("Expected myPermissions to exist");
+        }
+        expect(response.data.collection.myPermissions?.length).equal(1);
+        expect(response.data.collection.myPermissions[0]).equal(Permission.VIEW);
     });
 });

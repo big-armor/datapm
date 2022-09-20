@@ -39,10 +39,6 @@ export class VersionEntity extends EntityBaseModel {
     @Column({ length: 250 })
     description: string;
 
-    @Column({ name: "update_methods",
-        type: 'jsonb',
-        array: true,
-        default: () => "'[]'::jsonb",
-        nullable: false,})
+    @Column({ name: "update_methods", type: "jsonb", array: true, default: () => "'[]'::jsonb", nullable: false })
     updateMethods: UpdateMethod[];
 }

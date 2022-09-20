@@ -34,8 +34,6 @@ describe("Catalog Tests", async () => {
 
     let adminClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create users A & B", async function () {
         userAClient = await createUser(
             "FirstA",
@@ -55,9 +53,9 @@ describe("Catalog Tests", async () => {
 
         adminClient = AdminHolder.adminClient;
 
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
-        expect(adminClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
+        expect(adminClient).to.not.equal(undefined);
     });
 
     it("MyCatalog for user A", async function () {
@@ -70,16 +68,23 @@ describe("Catalog Tests", async () => {
                 expect(true, "getting user catalogs failed").equal(false);
             })
             .then((value) => {
-                expect(value).to.exist;
+                expect(value).to.not.equal(undefined);
 
                 if (value) {
-                    let catalogs = value!.data.myCatalogs;
+                    const catalogs = value?.data.myCatalogs;
 
+                    if (catalogs[0] == null) {
+                        throw new Error("Catalogs[0] is null");
+                    }
+
+                    if (catalogs[0].myPermissions == null) {
+                        throw new Error("Catalogs[0].myPermissions is null");
+                    }
                     expect(catalogs.length).equal(1);
 
-                    expect(catalogs[0]!.identifier.catalogSlug == "testA-catalog");
-                    expect(catalogs[0]!.isPublic).equal(false);
-                    expect(catalogs[0]!.myPermissions!.length).equal(3);
+                    expect(catalogs[0].identifier.catalogSlug === "testA-catalog");
+                    expect(catalogs[0].isPublic).equal(false);
+                    expect(catalogs[0].myPermissions.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -96,16 +101,24 @@ describe("Catalog Tests", async () => {
                 expect(true, "getting user catalogs failed").equal(false);
             })
             .then((value) => {
-                expect(value).to.exist;
+                expect(value).to.not.equal(undefined);
 
                 if (value) {
-                    let catalogs = value!.data.myCatalogs;
+                    const catalogs = value.data.myCatalogs;
 
                     expect(catalogs.length).equal(1);
 
-                    expect(catalogs[0]!.identifier.catalogSlug == "testB-catalog");
-                    expect(catalogs[0]!.isPublic).equal(false);
-                    expect(catalogs[0]!.myPermissions!.length).equal(3);
+                    if (catalogs[0] == null) {
+                        throw new Error("Catalogs[0] is null");
+                    }
+
+                    if (catalogs[0].myPermissions == null) {
+                        throw new Error("Catalogs[0].myPermissions is null");
+                    }
+
+                    expect(catalogs[0].identifier.catalogSlug === "testB-catalog");
+                    expect(catalogs[0].isPublic).equal(false);
+                    expect(catalogs[0].myPermissions.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -113,7 +126,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Catalog that does not yet exist - should fail", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -122,9 +135,8 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
+            response.errors?.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
             "should have invalid login error"
         ).equal(true);
     });
@@ -145,12 +157,12 @@ describe("Catalog Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
                             e.extensions.exception.stacktrace.find(
-                                (s) => s == "ValidationError: CATALOG_SLUG_REQUIRED"
+                                (s) => s === "ValidationError: CATALOG_SLUG_REQUIRED"
                             ) != null
                     ) != null
                 )
@@ -177,12 +189,12 @@ describe("Catalog Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
                             e.extensions.exception.stacktrace.find(
-                                (s) => s == "ValidationError: CATALOG_SLUG_INVALID"
+                                (s) => s === "ValidationError: CATALOG_SLUG_INVALID"
                             ) != null
                     ) != null
                 )
@@ -209,12 +221,12 @@ describe("Catalog Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
                             e.extensions.exception.stacktrace.find(
-                                (s) => s == "ValidationError: CATALOG_SLUG_TOO_LONG"
+                                (s) => s === "ValidationError: CATALOG_SLUG_TOO_LONG"
                             ) != null
                     ) != null
                 )
@@ -226,7 +238,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Non admin user can't create unclaimed catalog", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -307,7 +319,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Admin user can create unclaimed catalog", async function () {
-        let response = await adminClient.mutate({
+        const response = await adminClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -324,7 +336,6 @@ describe("Catalog Tests", async () => {
         expect(response.errors).equal(undefined);
         if (!response.data || !response.data.createCatalog) {
             expect(true, "Should've been able to create unclaimed catalog").equal(false);
-            return;
         }
     });
 
@@ -363,7 +374,6 @@ describe("Catalog Tests", async () => {
         expect(response.errors).equal(undefined);
         if (!response.data || !response.data.updateCatalog) {
             expect(true, "Should've been able to create unclaimed catalog").equal(false);
-            return;
         }
     });
 
@@ -411,7 +421,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User A Create Second Catalog", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -424,20 +434,20 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors! == null, "no errors returned").to.equal(true);
+        expect(response.errors == null, "no errors returned").to.equal(true);
 
-        expect(response.data!.createCatalog.description, "correct description").to.equal(
+        expect(response.data?.createCatalog.description, "correct description").to.equal(
             "This is an integration test User A second catalog"
         );
-        expect(response.data!.createCatalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
-        expect(response.data!.createCatalog.displayName, "correct displayName").to.equal("User A Second Catalog");
-        expect(response.data!.createCatalog.website, "correct website").to.equal("https://usera.datapm.io");
-        expect(response.data!.createCatalog.isPublic, "not public").to.equal(false);
-        expect(response.data!.createCatalog.myPermissions!.length).to.equal(3);
+        expect(response.data?.createCatalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
+        expect(response.data?.createCatalog.displayName, "correct displayName").to.equal("User A Second Catalog");
+        expect(response.data?.createCatalog.website, "correct website").to.equal("https://usera.datapm.io");
+        expect(response.data?.createCatalog.isPublic, "not public").to.equal(false);
+        expect(response.data?.createCatalog.myPermissions?.length).to.equal(3);
     });
 
     it("User A Get Second Catalog", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -448,17 +458,17 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null, "no errors returned").to.equal(true);
 
-        expect(response.data!.catalog.description, "correct description").to.equal(
+        expect(response.data?.catalog.description, "correct description").to.equal(
             "This is an integration test User A second catalog"
         );
-        expect(response.data!.catalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
-        expect(response.data!.catalog.displayName, "correct displayName").to.equal("User A Second Catalog");
-        expect(response.data!.catalog.website, "correct website").to.equal("https://usera.datapm.io");
-        expect(response.data!.catalog.myPermissions!.length).to.equal(3);
+        expect(response.data?.catalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
+        expect(response.data?.catalog.displayName, "correct displayName").to.equal("User A Second Catalog");
+        expect(response.data?.catalog.website, "correct website").to.equal("https://usera.datapm.io");
+        expect(response.data?.catalog.myPermissions?.length).to.equal(3);
     });
 
     it("User A add package to catalog", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -470,11 +480,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User A set package public - should fail", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -487,12 +497,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors != null).true;
-        expect(response.errors!.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).true;
+        expect(response.errors?.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).equal(true);
     });
 
     it("User B Get User A private catalog - should fail", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -503,13 +512,13 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorized message"
         ).equal(true);
     });
 
     it("User B List User A catalogs - should be empty", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserCatalogsDocument,
             variables: {
                 username: "testA-catalog",
@@ -525,7 +534,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User A set package public - should fail", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -537,12 +546,12 @@ describe("Catalog Tests", async () => {
                 }
             }
         });
-        expect(response.errors != null).true;
-        expect(response.errors!.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).true;
+        expect(response.errors != null).equal(true);
+        expect(response.errors?.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).equal(true);
     });
 
     it("User A update second catalog", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -559,15 +568,15 @@ describe("Catalog Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.updateCatalog.description).to.equal("Second description");
-        expect(response.data!.updateCatalog.displayName).to.equal("Display after update");
-        expect(response.data!.updateCatalog.isPublic).to.equal(true);
-        expect(response.data!.updateCatalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
-        expect(response.data!.updateCatalog.website).to.equal("https://second-website.co.uk");
+        expect(response.data?.updateCatalog.description).to.equal("Second description");
+        expect(response.data?.updateCatalog.displayName).to.equal("Display after update");
+        expect(response.data?.updateCatalog.isPublic).to.equal(true);
+        expect(response.data?.updateCatalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
+        expect(response.data?.updateCatalog.website).to.equal("https://second-website.co.uk");
     });
 
     it("User B get User A second catalog", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -576,16 +585,19 @@ describe("Catalog Tests", async () => {
             }
         });
 
+        if (response.data?.catalog.myPermissions == null) {
+            throw new Error("No permissions returned");
+        }
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.catalog.description).to.equal("Second description");
-        expect(response.data!.catalog.displayName).to.equal("Display after update");
-        expect(response.data!.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
-        expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
-        expect(response.data!.catalog.myPermissions![0]).to.equal(Permission.VIEW);
+        expect(response.data?.catalog.description).to.equal("Second description");
+        expect(response.data?.catalog.displayName).to.equal("Display after update");
+        expect(response.data?.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
+        expect(response.data?.catalog.website).to.equal("https://second-website.co.uk");
+        expect(response.data?.catalog.myPermissions[0]).to.equal(Permission.VIEW);
     });
 
     it("User B List User A catalogs - should return catalog", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: UserCatalogsDocument,
             variables: {
                 username: "testA-catalog",
@@ -601,7 +613,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Anonymous User List User A catalogs - should return catalog", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: UserCatalogsDocument,
             variables: {
                 username: "testA-catalog",
@@ -617,11 +629,11 @@ describe("Catalog Tests", async () => {
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -634,11 +646,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
     });
 
     it("User B get package should fail - package not public", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -648,15 +660,15 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors != null).true;
+        expect(response.errors != null).equal(true);
         expect(
-            response.errors!.find((p) => p.message.includes("NOT_AUTHORIZED")) != null,
+            response.errors?.find((p) => p.message.includes("NOT_AUTHORIZED")) != null,
             "Should return NOT_AUTHORIZED"
-        ).true;
+        ).equal(true);
     });
 
     it("User A set package public", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -669,11 +681,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("User B get package", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -683,12 +695,12 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
-        expect(response.data!.package.identifier.packageSlug).equals("us-congressional-legislators");
+        expect(response.errors == null).equal(true);
+        expect(response.data?.package.identifier.packageSlug).equals("us-congressional-legislators");
     });
 
     it("User B update User A's catalog - should fail", async function () {
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -706,13 +718,13 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorized message"
         ).equal(true);
     });
 
     it("User A make catalog private again", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -725,15 +737,15 @@ describe("Catalog Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.updateCatalog.description).to.equal("Second description");
-        expect(response.data!.updateCatalog.displayName).to.equal("Display after update");
-        expect(response.data!.updateCatalog.isPublic, "should no longer be public").to.equal(false);
-        expect(response.data!.updateCatalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
-        expect(response.data!.updateCatalog.website).to.equal("https://second-website.co.uk");
+        expect(response.data?.updateCatalog.description).to.equal("Second description");
+        expect(response.data?.updateCatalog.displayName).to.equal("Display after update");
+        expect(response.data?.updateCatalog.isPublic, "should no longer be public").to.equal(false);
+        expect(response.data?.updateCatalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
+        expect(response.data?.updateCatalog.website).to.equal("https://second-website.co.uk");
     });
 
     it("User B Get User A private catalog - should fail", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -744,13 +756,13 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorized message"
         ).equal(true);
     });
 
     it("User A get package - check is not public", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -760,13 +772,13 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
-        expect(response.data!.package.identifier.packageSlug).equals("us-congressional-legislators");
-        expect(response.data!.package.isPublic).false;
+        expect(response.errors == null).equal(true);
+        expect(response.data?.package.identifier.packageSlug).equals("us-congressional-legislators");
+        expect(response.data?.package.isPublic).equals(false);
     });
 
     it("User A grant catalog permissions to User B", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -787,7 +799,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User B get User A second catalog", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -796,14 +808,18 @@ describe("Catalog Tests", async () => {
             }
         });
 
+        if (response.data?.catalog.myPermissions == null) {
+            throw new Error("myPermissions should be defined");
+        }
+
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.catalog.myPermissions!.includes(Permission.VIEW)).equal(true);
-        expect(response.data!.catalog.myPermissions!.includes(Permission.EDIT)).equal(true);
-        expect(response.data!.catalog.myPermissions!.includes(Permission.MANAGE)).equal(true);
+        expect(response.data?.catalog.myPermissions.includes(Permission.VIEW)).equal(true);
+        expect(response.data?.catalog.myPermissions.includes(Permission.EDIT)).equal(true);
+        expect(response.data?.catalog.myPermissions.includes(Permission.MANAGE)).equal(true);
     });
 
     it("User A request user catalogs, should include second catalog", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: UserCatalogsDocument,
             variables: {
                 username: "testB-catalog",
@@ -813,12 +829,12 @@ describe("Catalog Tests", async () => {
         });
         expect(response.errors == null, "no errors").to.equal(true);
         expect(
-            response.data?.userCatalogs.catalogs?.find((c) => c.identifier.catalogSlug == "user-a-second-catalog-v2")
+            response.data?.userCatalogs.catalogs?.find((c) => c.identifier.catalogSlug === "user-a-second-catalog-v2")
         ).to.not.equal(undefined);
     });
 
     it("User A grant catalog permissions to User B", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -839,7 +855,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User B get User A second catalog", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -850,7 +866,7 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
-        let packagesResponse = await userBClient.query({
+        const packagesResponse = await userBClient.query({
             query: CatalogPackagesDocument,
             variables: {
                 limit: 100,
@@ -861,11 +877,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(packagesResponse.data!.catalogPackages!.length).to.equal(1);
+        expect(packagesResponse.data?.catalogPackages?.length).to.equal(1);
     });
 
     it("User B can't delete permissions of creator User A", async function () {
-        let response = await userAClient.mutate({
+        const response = await userBClient.mutate({
             mutation: DeleteUserCatalogPermissionsDocument,
             variables: {
                 identifier: {
@@ -875,12 +891,12 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors! !== null).true;
-        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
+        expect(response.errors != null).equal(true);
+        expect(response.errors?.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.equal(null);
     });
 
     it("User A remove catalog package permissions for User B", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -901,7 +917,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Give User B package permissions", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetPackagePermissionsDocument,
             variables: {
                 identifier: {
@@ -922,7 +938,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User B get User A second catalog", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -933,7 +949,7 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
-        let packagesResponse = await userBClient.query({
+        const packagesResponse = await userBClient.query({
             query: CatalogPackagesDocument,
             variables: {
                 limit: 100,
@@ -944,11 +960,11 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(packagesResponse.data!.catalogPackages!.length).to.equal(1);
+        expect(packagesResponse.data?.catalogPackages?.length).to.equal(1);
     });
 
     it("Delete catalog", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: DeleteCatalogDocument,
             variables: {
                 identifier: {
@@ -961,7 +977,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User A Get Deleted Catalog", async function () {
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -972,13 +988,13 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
+            response.errors?.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
             "should not return deleted catalog"
         ).equal(true);
     });
 
     it("should update catalog slug after changing a user's username", async () => {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
@@ -989,7 +1005,7 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null).equal(true);
 
-        let catalogRequest = await userAClient.query({
+        const catalogRequest = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -1003,7 +1019,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("old catalog should not be available", async () => {
-        let catalogRequest = await userAClient.query({
+        const catalogRequest = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
                 identifier: {
@@ -1012,7 +1028,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(catalogRequest.errors!.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
+        expect(catalogRequest.errors?.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
     });
 
     it("CatalogPackages returned in DESC order, with view permissions", async function () {
@@ -1065,7 +1081,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        let response = await userAClient.query({
+        const response = await userAClient.query({
             query: CatalogPackagesDocument,
             variables: {
                 identifier: {
@@ -1076,7 +1092,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
         expect(response.data?.catalogPackages.length).to.equal(3);
     });
     // TODO Test package and catalog association, and permissions of packages in private catalogs

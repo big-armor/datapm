@@ -22,5 +22,7 @@ export class CreateCollectionAndPackageRelation1600840245777 implements Migratio
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

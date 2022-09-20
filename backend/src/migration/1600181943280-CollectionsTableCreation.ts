@@ -65,5 +65,7 @@ export class CollectionsTableCreation1600181943280 implements MigrationInterface
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

@@ -2,9 +2,12 @@ import { EntityManager, EntityRepository } from "typeorm";
 import { GroupUserEntity } from "../entity/GroupUserEntity";
 import { Permission } from "../generated/graphql";
 
-@EntityRepository() 
+@EntityRepository()
 export class GroupUserRepository {
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // nothing to do
+    }
 
     async findByUserId({
         userId,
@@ -45,13 +48,12 @@ export class GroupUserRepository {
             relations
         });
 
-        if(entity) {
+        if (entity) {
             entity.permissions = permissions;
             return this.manager.save(entity);
         }
 
-
-        const groupPermission =  this.manager.getRepository(GroupUserEntity).create({
+        const groupPermission = this.manager.getRepository(GroupUserEntity).create({
             groupId,
             userId,
             creatorId,
@@ -67,6 +69,5 @@ export class GroupUserRepository {
             },
             relations
         });
-
     }
 }

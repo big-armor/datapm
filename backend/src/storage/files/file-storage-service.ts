@@ -1,6 +1,6 @@
 import { DPMStorage } from "../dpm-storage";
 import { StorageProvider } from "../storage-provider";
-import { Readable } from "stream";
+import { Duplex, Readable, Transform } from "stream";
 import { off } from "process";
 
 export enum StorageErrors {
@@ -16,7 +16,7 @@ export class FileStorageService {
         namespace: string[],
         itemId: string,
         contents: Buffer,
-        transformer?: any
+        transformer?: Duplex
     ): Promise<void> {
         const stream = this.convertBufferToStream(contents);
         return this.storageService.writeStream(namespace, itemId, stream, transformer);
@@ -26,7 +26,7 @@ export class FileStorageService {
         namespace: string[],
         itemId: string,
         stream: Readable,
-        transformer?: any
+        transformer?: Duplex
     ): Promise<void> {
         return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
@@ -35,13 +35,18 @@ export class FileStorageService {
         namespace: string[],
         itemId: string,
         contents: string,
-        transformer?: any
+        transformer?: Duplex
     ): Promise<void> {
         const stream = this.convertStringToStream(contents);
         return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
-    public async writeFile(namespace: string[], itemId: string, stream: Readable, transformer?: any): Promise<void> {
+    public async writeFile(
+        namespace: string[],
+        itemId: string,
+        stream: Readable,
+        transformer?: Transform
+    ): Promise<void> {
         return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
@@ -49,27 +54,27 @@ export class FileStorageService {
         return this.storageService.itemExists(namespace, itemId);
     }
 
-    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string): Promise<void> {
+    public async moveFile(
+        oldNamespace: string[],
+        oldItemId: string,
+        newNamespace: string[],
+        newItemId: string
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
             return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, (error) => {
-
-                if(error)  {
+                if (error) {
                     reject(error);
                 } else {
                     resolve();
                 }
-
             });
-
         });
     }
 
-    public async deleteFiles(namespace: string[], fileNames:string[] = []): Promise<void> {
-        
-        if(fileNames.length === 0) 
-            return this.storageService.deleteAllItems(namespace);
+    public async deleteFiles(namespace: string[], fileNames: string[] = []): Promise<void> {
+        if (fileNames.length === 0) return this.storageService.deleteAllItems(namespace);
         else {
-            for(let i = 0; i < fileNames.length; i++) {
+            for (let i = 0; i < fileNames.length; i++) {
                 await this.deleteFile(namespace, fileNames[i]);
             }
         }
@@ -88,7 +93,7 @@ export class FileStorageService {
         }
     }
 
-    public async listFiles(namespace:string[]): Promise<string[]> {
+    public async listFiles(namespace: string[]): Promise<string[]> {
         return this.storageService.listItems(namespace);
     }
 

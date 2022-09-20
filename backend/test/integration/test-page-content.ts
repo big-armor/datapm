@@ -7,9 +7,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 describe("Page Content Catalog", () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -26,8 +24,8 @@ describe("Page Content Catalog", () => {
             "testB-page-content@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should create a catalog", async function () {
@@ -43,8 +41,8 @@ describe("Page Content Catalog", () => {
             }
         });
 
-        expect(response.errors).to.not.exist;
-        expect(response.data?.createCatalog).to.exist;
+        expect(response.errors).to.equal(undefined);
+        expect(response.data?.createCatalog).to.not.equal(undefined);
     });
 
     it("Should create a test package", async function () {
@@ -69,12 +67,15 @@ describe("Page Content Catalog", () => {
             }
         });
 
-        expect(result.data).to.exist;
-        expect(result.data.pageContent).to.exist;
-        expect(result.data.pageContent.catalog).to.exist;
-        expect(result.data.pageContent.catalog?.packages).to.exist;
+        expect(result.errors).to.equal(undefined);
 
-        expect(result.data.pageContent.catalog?.packages![0]?.identifier.packageSlug).to.equal("food-a");
+        expect(result.data).to.not.equal(undefined);
+        expect(result.data.pageContent).to.not.equal(undefined);
+        expect(result.data.pageContent.catalog).to.not.equal(undefined);
+        expect(result.data.pageContent.catalog?.packages).to.not.equal(undefined);
+
+        if (result.data.pageContent.catalog?.packages == null) throw new Error("packages is null");
+        expect(result.data.pageContent.catalog?.packages[0]?.identifier.packageSlug).to.equal("food-a");
     });
 
     it("Should return page content for user A ", async function () {
@@ -85,9 +86,9 @@ describe("Page Content Catalog", () => {
             }
         });
 
-        expect(result.data).to.exist;
-        expect(result.data.pageContent).to.exist;
-        expect(result.data.pageContent.user).to.exist;
+        expect(result.data).to.not.equal(undefined);
+        expect(result.data.pageContent).to.not.equal(undefined);
+        expect(result.data.pageContent.user).to.not.equal(undefined);
         expect(result.data.pageContent.user?.username).to.equal("testA-page-content");
         expect(result.data.pageContent.user?.displayName).to.equal("testA-page-content");
     });

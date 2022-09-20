@@ -26,9 +26,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 describe("Package Issues and Comments Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -45,8 +43,8 @@ describe("Package Issues and Comments Tests", async () => {
             "testB-package-issues@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create an issue in their package", async function () {
@@ -73,7 +71,7 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({
@@ -116,10 +114,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issueResponse.data).to.exist;
-        expect(issueResponse.errors).to.be.undefined;
+        expect(issueResponse.data).to.not.equal(undefined);
+        expect(issueResponse.errors).to.equal(undefined);
         if (issueResponse.data) {
-            expect(issueResponse.data.createPackageIssue).to.not.be.undefined;
+            expect(issueResponse.data.createPackageIssue).to.not.equal(undefined);
         }
     });
 
@@ -139,11 +137,11 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesResponse.data).to.exist;
-        expect(issuesResponse.errors).to.be.undefined;
+        expect(issuesResponse.data).to.not.equal(undefined);
+        expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
-            expect(issuesResponse.data.packageIssues).to.not.be.undefined;
-            expect(issuesResponse.data.packageIssues).to.not.be.empty;
+            expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
@@ -163,8 +161,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesResponse.data).to.exist;
-        expect(issuesResponse.errors).to.not.be.undefined;
+        expect(issuesResponse.data).to.not.equal(undefined);
+        expect(issuesResponse.errors).to.not.equal(undefined);
         if (issuesResponse.errors) {
             expect(issuesResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -203,11 +201,11 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesResponse.data).to.exist;
-        expect(issuesResponse.errors).to.be.undefined;
+        expect(issuesResponse.data).to.not.equal(undefined);
+        expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
-            expect(issuesResponse.data.packageIssues).to.not.be.undefined;
-            expect(issuesResponse.data.packageIssues).to.not.be.empty;
+            expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
@@ -252,11 +250,11 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesResponse.data).to.exist;
-        expect(issuesResponse.errors).to.be.undefined;
+        expect(issuesResponse.data).to.not.equal(undefined);
+        expect(issuesResponse.errors).to.equal(undefined);
         if (issuesResponse.data) {
-            expect(issuesResponse.data.packageIssues).to.not.be.undefined;
-            expect(issuesResponse.data.packageIssues).to.not.be.empty;
+            expect(issuesResponse.data.packageIssues).to.not.equal(undefined);
+            expect(issuesResponse.data.packageIssues?.issues).to.not.have.length(0);
         }
     });
 
@@ -274,10 +272,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesDetailsResponse.data).to.exist;
-        expect(issuesDetailsResponse.errors).to.be.undefined;
+        expect(issuesDetailsResponse.data).to.not.equal(undefined);
+        expect(issuesDetailsResponse.errors).to.equal(undefined);
         if (issuesDetailsResponse.data) {
-            expect(issuesDetailsResponse.data.packageIssue).to.not.be.undefined;
+            expect(issuesDetailsResponse.data.packageIssue).to.not.equal(undefined);
         }
     });
 
@@ -295,8 +293,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesDetailsResponse.data).to.exist;
-        expect(issuesDetailsResponse.errors).to.not.be.undefined;
+        expect(issuesDetailsResponse.data).to.not.equal(undefined);
+        expect(issuesDetailsResponse.errors).to.not.equal(undefined);
         if (issuesDetailsResponse.errors) {
             expect(issuesDetailsResponse.errors[0].message).to.equal("NOT_AUTHENTICATED");
         }
@@ -316,7 +314,7 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesDetailsResponse.errors).to.not.be.undefined;
+        expect(issuesDetailsResponse.errors).to.not.equal(undefined);
         if (issuesDetailsResponse.errors) {
             expect(issuesDetailsResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -371,10 +369,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issuesDetailsResponse.data).to.exist;
-        expect(issuesDetailsResponse.errors).to.be.undefined;
+        expect(issuesDetailsResponse.data).to.not.equal(undefined);
+        expect(issuesDetailsResponse.errors).to.equal(undefined);
         if (issuesDetailsResponse.data) {
-            expect(issuesDetailsResponse.data.packageIssue).to.not.be.undefined;
+            expect(issuesDetailsResponse.data.packageIssue).to.not.equal(undefined);
         }
     });
 
@@ -414,10 +412,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issueUpdateResponse.data).to.exist;
-        expect(issueUpdateResponse.errors).to.be.undefined;
+        expect(issueUpdateResponse.data).to.not.equal(undefined);
+        expect(issueUpdateResponse.errors).to.equal(undefined);
         if (issueUpdateResponse.data) {
-            expect(issueUpdateResponse.data.updatePackageIssue).to.not.be.undefined;
+            expect(issueUpdateResponse.data.updatePackageIssue).to.not.equal(undefined);
             if (issueUpdateResponse.data.updatePackageIssue) {
                 expect(issueUpdateResponse.data.updatePackageIssue.subject).to.equal("Hi");
             }
@@ -442,8 +440,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issueUpdateResponse.data).to.exist;
-        expect(issueUpdateResponse.errors).to.not.be.undefined;
+        expect(issueUpdateResponse.data).to.not.equal(undefined);
+        expect(issueUpdateResponse.errors).to.not.equal(undefined);
         if (issueUpdateResponse.errors) {
             expect(issueUpdateResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -467,10 +465,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issueUpdateResponse.data).to.exist;
-        expect(issueUpdateResponse.errors).to.be.undefined;
+        expect(issueUpdateResponse.data).to.not.equal(undefined);
+        expect(issueUpdateResponse.errors).to.equal(undefined);
         if (issueUpdateResponse.data) {
-            expect(issueUpdateResponse.data.updatePackageIssue).to.not.be.undefined;
+            expect(issueUpdateResponse.data.updatePackageIssue).to.not.equal(undefined);
             if (issueUpdateResponse.data.updatePackageIssue) {
                 expect(issueUpdateResponse.data.updatePackageIssue.subject).to.equal("Hello there buddy");
             }
@@ -491,8 +489,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(issueDeleteResponse.data).to.exist;
-        expect(issueDeleteResponse.errors).to.not.be.undefined;
+        expect(issueDeleteResponse.data).to.not.equal(undefined);
+        expect(issueDeleteResponse.errors).to.not.equal(undefined);
         if (issueDeleteResponse.errors) {
             expect(issueDeleteResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -534,8 +532,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete own issue");
         }
 
-        expect(issueDeleteResponse.errors).to.be.undefined;
-        expect(issueDeleteResponse.data.deletePackageIssue).to.be.null;
+        expect(issueDeleteResponse.errors).to.equal(undefined);
+        expect(issueDeleteResponse.data.deletePackageIssue).to.equal(null);
     });
 
     it("Should be able to delete other's issue with manager permissions", async function () {
@@ -574,8 +572,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issueDeleteResponse.errors).to.be.undefined;
-        expect(issueDeleteResponse.data.deletePackageIssue).to.be.null;
+        expect(issueDeleteResponse.errors).to.equal(undefined);
+        expect(issueDeleteResponse.data.deletePackageIssue).to.equal(null);
     });
 
     it("Should be able to batch delete other's issues with manager permissions", async function () {
@@ -634,8 +632,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issueDeleteResponse.errors).to.be.undefined;
-        expect(issueDeleteResponse.data.deletePackageIssues).to.be.null;
+        expect(issueDeleteResponse.errors).to.equal(undefined);
+        expect(issueDeleteResponse.data.deletePackageIssues).to.equal(null);
     });
 
     it("Should be able to batch delete own issues without manager permissions", async function () {
@@ -694,8 +692,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issueDeleteResponse.errors).to.be.undefined;
-        expect(issueDeleteResponse.data.deletePackageIssues).to.be.null;
+        expect(issueDeleteResponse.errors).to.equal(undefined);
+        expect(issueDeleteResponse.data.deletePackageIssues).to.equal(null);
     });
 
     it("Should not be able to batch delete own issues without manager permissions", async function () {
@@ -754,8 +752,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issueDeleteResponse.data).to.exist;
-        expect(issueDeleteResponse.errors).to.not.be.undefined;
+        expect(issueDeleteResponse.data).to.not.equal(undefined);
+        expect(issueDeleteResponse.errors).to.not.equal(undefined);
         if (issueDeleteResponse.errors) {
             expect(issueDeleteResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -818,8 +816,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issuesStatusChangeResponse.errors).to.be.undefined;
-        expect(issuesStatusChangeResponse.data.updatePackageIssuesStatuses).to.be.null;
+        expect(issuesStatusChangeResponse.errors).to.equal(undefined);
+        expect(issuesStatusChangeResponse.data.updatePackageIssuesStatuses).to.equal(null);
     });
 
     it("Should be able to batch change statuses of own issues without manager permissions", async function () {
@@ -879,8 +877,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issuesStatusChangeResponse.errors).to.be.undefined;
-        expect(issuesStatusChangeResponse.data.updatePackageIssuesStatuses).to.be.null;
+        expect(issuesStatusChangeResponse.errors).to.equal(undefined);
+        expect(issuesStatusChangeResponse.data.updatePackageIssuesStatuses).to.equal(null);
     });
 
     it("Should not be able to batch change statuses of own issues without manager permissions", async function () {
@@ -940,8 +938,8 @@ describe("Package Issues and Comments Tests", async () => {
             expect.fail("Should've been able to delete other's issue as manager");
         }
 
-        expect(issuesStatusChangeResponse.data).to.exist;
-        expect(issuesStatusChangeResponse.errors).to.not.be.undefined;
+        expect(issuesStatusChangeResponse.data).to.not.equal(undefined);
+        expect(issuesStatusChangeResponse.errors).to.not.equal(undefined);
         if (issuesStatusChangeResponse.errors) {
             expect(issuesStatusChangeResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -964,8 +962,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -988,10 +986,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.createPackageIssueComment).to.not.be.undefined;
+            expect(commentResponse.data.createPackageIssueComment).to.not.equal(undefined);
         }
     });
 
@@ -1012,10 +1010,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.createPackageIssueComment).to.not.be.undefined;
+            expect(commentResponse.data.createPackageIssueComment).to.not.equal(undefined);
         }
     });
 
@@ -1037,10 +1035,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.updatePackageIssueComment).to.not.be.undefined;
+            expect(commentResponse.data.updatePackageIssueComment).to.not.equal(undefined);
             if (commentResponse.data.updatePackageIssueComment) {
                 expect(commentResponse.data.updatePackageIssueComment.content).to.equal("Hello my friendzzz");
             }
@@ -1065,8 +1063,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -1090,10 +1088,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.updatePackageIssueComment).to.not.be.undefined;
+            expect(commentResponse.data.updatePackageIssueComment).to.not.equal(undefined);
             if (commentResponse.data.updatePackageIssueComment) {
                 expect(commentResponse.data.updatePackageIssueComment.content).to.equal("Hello cool friends");
             }
@@ -1115,10 +1113,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.updatePackageIssueStatus).to.not.be.undefined;
+            expect(commentResponse.data.updatePackageIssueStatus).to.not.equal(undefined);
             if (commentResponse.data.updatePackageIssueStatus) {
                 expect(commentResponse.data.updatePackageIssueStatus.status).to.equal(PackageIssueStatus.CLOSED);
             }
@@ -1140,10 +1138,10 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.equal(undefined);
         if (commentResponse.data) {
-            expect(commentResponse.data.updatePackageIssueStatus).to.not.be.undefined;
+            expect(commentResponse.data.updatePackageIssueStatus).to.not.equal(undefined);
             if (commentResponse.data.updatePackageIssueStatus) {
                 expect(commentResponse.data.updatePackageIssueStatus.status).to.equal(PackageIssueStatus.OPEN);
             }
@@ -1165,8 +1163,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -1187,8 +1185,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -1206,8 +1204,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -1225,8 +1223,8 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        expect(commentResponse.data).to.exist;
-        expect(commentResponse.errors).to.not.be.undefined;
+        expect(commentResponse.data).to.not.equal(undefined);
+        expect(commentResponse.errors).to.not.equal(undefined);
         if (commentResponse.errors) {
             expect(commentResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }

@@ -16,5 +16,7 @@ export class CreatePlatformSettingsTable1618864385071 implements MigrationInterf
         `);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

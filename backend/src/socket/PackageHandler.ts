@@ -1,10 +1,21 @@
 import { randomUUID } from "crypto";
-import { ErrorResponse, JobMessageRequest, JobRequestType, JobMessageResponse, Response, SocketError, StartPackageUpdateRequest, StartPackageUpdateResponse, StartPackageRequest, StartPackageResponse } from "datapm-lib";
+import {
+    ErrorResponse,
+    JobMessageRequest,
+    JobRequestType,
+    JobMessageResponse,
+    Response,
+    SocketError,
+    StartPackageUpdateRequest,
+    StartPackageUpdateResponse,
+    StartPackageRequest,
+    StartPackageResponse
+} from "datapm-lib";
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
 import { checkCatalogPermission, checkPackagePermission, RequestHandler } from "./SocketHandler";
-import SocketIO from 'socket.io';
+import SocketIO from "socket.io";
 import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
@@ -15,24 +26,35 @@ import { PackageJob, UpdatePackageJob } from "datapm-client-lib";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
-
-export class PackageHandler extends EventEmitter implements RequestHandler{
-
-    private channelName:string;
+export class PackageHandler extends EventEmitter implements RequestHandler {
+    private channelName: string;
     private catalogId: number;
 
-    constructor(private request: StartPackageRequest, private socket: SocketIO.Socket, private socketContext:AuthenticatedSocketContext, private distributedLockingService: DistributedLockingService) {
+    constructor(
+        private request: StartPackageRequest,
+        private socket: SocketIO.Socket,
+        private socketContext: AuthenticatedSocketContext,
+        private distributedLockingService: DistributedLockingService
+    ) {
         super();
-            this.channelName = randomUUID();
-
+        this.channelName = randomUUID();
     }
 
     async start(callback: (response: Response) => void): Promise<void> {
-        
-        const catalogEntity = await this.socketContext.connection.getCustomRepository(CatalogRepository).findCatalogBySlugOrFail( this.request.catalogSlug);
+        const catalogEntity = await this.socketContext.connection
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(this.request.catalogSlug);
         this.catalogId = catalogEntity.id;
 
-        if(!await checkCatalogPermission(this.socket, this.socketContext, callback, {catalogSlug: this.request.catalogSlug}, Permission.EDIT)) {
+        if (
+            !(await checkCatalogPermission(
+                this.socket,
+                this.socketContext,
+                callback,
+                { catalogSlug: this.request.catalogSlug },
+                Permission.EDIT
+            ))
+        ) {
             return;
         }
 
@@ -44,15 +66,15 @@ export class PackageHandler extends EventEmitter implements RequestHandler{
             }
         });
 
-        if(!packageEntity) {
+        if (!packageEntity) {
             this.socketContext.connection.getCustomRepository(PackageRepository).createPackage({
                 packageInput: {
                     catalogSlug: this.request.catalogSlug,
                     packageSlug: this.request.packageSlug,
                     displayName: this.request.packageTitle,
-                    description: this.request.packageDescription,
+                    description: this.request.packageDescription
                 },
-                userId: this.socketContext.me.id,
+                userId: this.socketContext.me.id
             });
         }
 
@@ -62,50 +84,45 @@ export class PackageHandler extends EventEmitter implements RequestHandler{
             targetCatalogId: this.catalogId
         });
 
-        this.socket.on(this.channelName,this.handleChannelEvents);
+        this.socket.on(this.channelName, this.handleChannelEvents);
 
         callback(new StartPackageResponse(this.channelName));
-
     }
 
     stop(reason: "server" | "client" | "disconnect"): Promise<void> {
-
         return new Promise<void>((resolve) => {
-             if(reason === "client") {
+            if (reason === "client") {
                 this.socket.emit(this.channelName, new JobMessageResponse(JobRequestType.EXIT));
-            } else if(reason === "disconnect") {
-
-            } else if(reason === "server") {
+            } else if (reason === "disconnect") {
+                // Nothing to do
+            } else if (reason === "server") {
+                // Nothing to do
             }
 
-            this.socket.off(this.channelName,this.handleChannelEvents);
+            this.socket.off(this.channelName, this.handleChannelEvents);
 
             resolve();
         });
-        
     }
 
-    handleChannelEvents = async (request:JobMessageRequest, callback:(response:JobMessageResponse | ErrorResponse) => void) => {
-
-          if(request.requestType === JobRequestType.EXIT) {
+    handleChannelEvents = async (
+        request: JobMessageRequest,
+        callback: (response: JobMessageResponse | ErrorResponse) => void
+    ): Promise<void> => {
+        if (request.requestType === JobRequestType.EXIT) {
             this.stop("client");
-            return;
-        } else if(request.requestType === JobRequestType.START_JOB) {
-
+        } else if (request.requestType === JobRequestType.START_JOB) {
             try {
                 this.startJob();
 
                 callback(new JobMessageResponse(JobRequestType.START_JOB));
-            } catch(error) {
+            } catch (error) {
                 callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
             }
-
         }
+    };
 
-    }
-
-    async startJob() {
-
+    async startJob(): Promise<void> {
         const jobId = "user-package-" + randomUUID();
 
         const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
@@ -122,7 +139,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler{
         exitMessage.exitCode = jobResult.exitCode;
         exitMessage.message = jobResult.errorMessage;
 
-        this.socket.emit(this.channelName, exitMessage)
+        this.socket.emit(this.channelName, exitMessage);
 
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
@@ -131,8 +148,5 @@ export class PackageHandler extends EventEmitter implements RequestHandler{
         });
 
         this.stop("server");
-
     }
-
-
 }

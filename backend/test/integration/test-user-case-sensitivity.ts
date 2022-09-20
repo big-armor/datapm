@@ -7,16 +7,14 @@ describe("User Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create user", async function () {
         userAClient = await createUser("FirstA", "LastA", "testA-case", "testA-case@test.datapm.io", "passwordA!");
 
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
     });
 
     it("Do not allow a new user with the same email in different case", async function () {
-        let errorFound: any | null = null;
+        let errorFound: Error | null = null;
 
         try {
             await createUser("FirstA", "LastA", "testA-case2", "testa-case@test.datapm.io", "passwordA!");
@@ -26,11 +24,11 @@ describe("User Tests", async () => {
 
         expect(errorFound).to.not.equal(null);
 
-        expect(errorFound?.errors[0].message).to.include("EMAIL_ADDRESS_NOT_AVAILABLE");
+        expect(errorFound?.message).to.include("EMAIL_ADDRESS_NOT_AVAILABLE");
     });
 
     it("Do not allow a new user with the same username in different case", async function () {
-        let errorFound: any | null = null;
+        let errorFound: Error | null = null;
 
         try {
             await createUser("FirstA", "LastA", "testa-case", "testa-case2@test.datapm.io", "passwordA!");
@@ -40,6 +38,6 @@ describe("User Tests", async () => {
 
         expect(errorFound).to.not.equal(null);
 
-        expect(errorFound?.errors[0].message).to.include("USERNAME_NOT_AVAILABLE");
+        expect(errorFound?.message).to.include("USERNAME_NOT_AVAILABLE");
     });
 });

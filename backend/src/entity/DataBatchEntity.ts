@@ -2,14 +2,13 @@ import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique }
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";
 import { UserEntity } from "./UserEntity";
-import {  UpdateMethod } from "datapm-lib";
+import { UpdateMethod } from "datapm-lib";
 
 @Entity({
     name: "batch"
 })
-@Unique(["packageId","majorVersion", "schemaTitle", "streamSlug", "batch"])
+@Unique(["packageId", "majorVersion", "schemaTitle", "streamSlug", "batch"])
 export class DataBatchEntity extends EntityBaseModel {
-    
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -24,25 +23,25 @@ export class DataBatchEntity extends EntityBaseModel {
     @Column({ name: "package_id" })
     packageId: number;
 
-    @Column({name: "major_version"})
+    @Column({ name: "major_version" })
     majorVersion: number;
 
     @Column({ name: "author_id" })
     authorId: number;
 
-    @Column({name: "schematitle"})
+    @Column({ name: "schematitle" })
     schemaTitle: string;
 
-    @Column({name: "sourcetype"})
+    @Column({ name: "sourcetype" })
     sourceType: string;
 
-    @Column({name: "sourceslug"})
+    @Column({ name: "sourceslug" })
     sourceSlug: string;
 
-    @Column({name: "streamsetslug"})
+    @Column({ name: "streamsetslug" })
     streamSetSlug: string;
 
-    @Column({name: "streamslug"})
+    @Column({ name: "streamslug" })
     streamSlug: string;
 
     @Column()
@@ -51,13 +50,15 @@ export class DataBatchEntity extends EntityBaseModel {
     @Column("enum", { name: "updatemethod", enum: UpdateMethod })
     updateMethod: UpdateMethod;
 
-    @Column({name: "lastoffset",  transformer: {
-        to: (value) => value,
-        from: (value) => parseInt(value),
-      }})
+    @Column({
+        name: "lastoffset",
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseInt(value)
+        }
+    })
     lastOffset: number;
 
     @Column()
     default: boolean;
-
 }

@@ -8,5 +8,7 @@ export class PackageFollowCorrection1624567282854 implements MigrationInterface 
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

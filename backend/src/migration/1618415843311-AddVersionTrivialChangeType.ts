@@ -8,5 +8,7 @@ export class AddVersionTrivialChangeType1618415843311 implements MigrationInterf
         await queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

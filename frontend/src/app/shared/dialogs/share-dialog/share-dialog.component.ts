@@ -11,7 +11,10 @@ import { SnackBarService } from "src/app/services/snackBar.service";
 })
 export class ShareDialogComponent implements OnInit {
     constructor(
-        @Inject(MAT_DIALOG_DATA) public info: any,
+        @Inject(MAT_DIALOG_DATA) public info: {
+            displayName: string,
+            url: string
+        },
         public clipboard: Clipboard,
         private snackBarService: SnackBarService
     ) {}

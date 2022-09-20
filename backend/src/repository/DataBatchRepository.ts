@@ -9,7 +9,10 @@ import { DataStorageService } from "../storage/data/data-storage";
 export class DataBatchRepository {
     readonly dataStorageService = DataStorageService.INSTANCE;
 
-    constructor(private manager: EntityManager) {}
+    // eslint-disable-next-line no-useless-constructor
+    constructor(private manager: EntityManager) {
+        // Nothing to do
+    }
 
     public async findBatchOrFail(
         packageId: number,
@@ -19,18 +22,25 @@ export class DataBatchRepository {
         streamSetSlug: string,
         streamSlug: string,
         schemaTitle: string,
-        batch:number
+        batch: number
     ): Promise<DataBatchEntity> {
-        
-        const batchEntity = await this.findBatch(packageId, majorVersion, sourceType, sourceSlug, streamSetSlug, streamSlug, schemaTitle, batch);
+        const batchEntity = await this.findBatch(
+            packageId,
+            majorVersion,
+            sourceType,
+            sourceSlug,
+            streamSetSlug,
+            streamSlug,
+            schemaTitle,
+            batch
+        );
 
-        if(batchEntity === undefined) {
+        if (batchEntity === undefined) {
             throw new Error("BATCH_NOT_FOUND");
         }
 
         return batchEntity;
     }
-
 
     public async findDefaultBatchesForSchema(
         packageId: number,
@@ -77,7 +87,7 @@ export class DataBatchRepository {
         streamSetSlug: string,
         streamSlug: string,
         schemaTitle: string,
-        batch:number
+        batch: number
     ): Promise<DataBatchEntity | undefined> {
         return this.manager
             .getRepository(DataBatchEntity)
@@ -101,9 +111,12 @@ export class DataBatchRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: BatchRepositoryIdentifier, updateMethod: UpdateMethod) {
+    async save(
+        userId: number,
+        identifier: BatchRepositoryIdentifier,
+        updateMethod: UpdateMethod
+    ): Promise<DataBatchEntity> {
         return await this.manager.nestedTransaction(async (transaction) => {
-
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
                 identifier: {
                     catalogSlug: identifier.catalogSlug,
@@ -111,7 +124,7 @@ export class DataBatchRepository {
                 }
             });
 
-            let version = transaction.getRepository(DataBatchEntity).create({
+            const version = transaction.getRepository(DataBatchEntity).create({
                 packageId: packageEntity.id,
                 schemaTitle: identifier.schemaTitle,
                 streamSetSlug: identifier.streamSetSlug,
@@ -143,7 +156,9 @@ export class DataBatchRepository {
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findLatestBatch";
 
-        const packageObject = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+        const packageObject = await this.manager
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({ identifier });
 
         return this.manager
             .getRepository(DataBatchEntity)
@@ -168,7 +183,6 @@ export class DataBatchRepository {
             .getOne();
     }
 
-
     async findDefaultBatch({
         identifier,
         relations = []
@@ -178,7 +192,9 @@ export class DataBatchRepository {
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findDefault";
 
-        const packageObject = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+        const packageObject = await this.manager
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({ identifier });
 
         return this.manager
             .getRepository(DataBatchEntity)
@@ -208,11 +224,11 @@ export class DataBatchRepository {
         identifier: SchemaRepositoryStreamIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
-        
-        const batch = await this.findDefaultBatch({identifier, relations});
+        const batch = await this.findDefaultBatch({ identifier, relations });
 
-        if(!batch) {
-            throw new Error(`BATCH_NOT_FOUND ${identifier.catalogSlug}/${identifier.packageSlug}/${identifier.majorVersion}/${identifier.schemaTitle}/${identifier.streamSlug}`
+        if (!batch) {
+            throw new Error(
+                `BATCH_NOT_FOUND ${identifier.catalogSlug}/${identifier.packageSlug}/${identifier.majorVersion}/${identifier.schemaTitle}/${identifier.streamSlug}`
             );
         }
 
@@ -226,9 +242,9 @@ export class DataBatchRepository {
         identifier: BatchRepositoryIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
-        let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
+        const packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
-        let batch = await this.manager.getRepository(DataBatchEntity).findOneOrFail({
+        const batch = await this.manager.getRepository(DataBatchEntity).findOneOrFail({
             where: {
                 packageId: packageEntity.id,
                 schemaTitle: identifier.schemaTitle,
@@ -257,7 +273,9 @@ export class DataBatchRepository {
     }): Promise<DataBatchEntity[]> {
         const ALIAS = "batchesByPackageVersion";
 
-        let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier: streamIdentifier });
+        const packageEntity = await this.manager
+            .getCustomRepository(PackageRepository)
+            .findOrFail({ identifier: streamIdentifier });
 
         const batches = await this.manager
             .getRepository(DataBatchEntity)
@@ -270,10 +288,10 @@ export class DataBatchRepository {
             .andWhere('"DataBatchEntity"."streamSlug" = :streamSlug')
             .andWhere('"DataBatchEntity"."schematitle" = :schemaTitle')
             .addRelations(ALIAS, relations)
-            .setParameter("majorVersion", streamIdentifier.majorVersion)  
+            .setParameter("majorVersion", streamIdentifier.majorVersion)
             .setParameter("sourceType", streamIdentifier.sourceType)
             .setParameter("sourceSlug", streamIdentifier.sourceSlug)
-            .setParameter("streamSetSlug", streamIdentifier.streamSetSlug) 
+            .setParameter("streamSetSlug", streamIdentifier.streamSetSlug)
             .setParameter("streamSlug", streamIdentifier.streamSlug)
             .setParameter("schemaTitle", streamIdentifier.schemaTitle)
             .orderBy({
@@ -292,8 +310,9 @@ export class DataBatchRepository {
     ): Promise<DataBatchEntity[]> {
         const ALIAS = "versionsByPackageId";
 
-
-        let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier: streamIdentifier });
+        const packageEntity = await this.manager
+            .getCustomRepository(PackageRepository)
+            .findOrFail({ identifier: streamIdentifier });
 
         const batches = await this.manager
             .getRepository(DataBatchEntity)
@@ -306,9 +325,9 @@ export class DataBatchRepository {
             .andWhere('"DataBatchEntity"."streamslug" = :streamSlug')
             .andWhere('"DataBatchEntity"."schematitle" = :schemaTitle')
             .addRelations(ALIAS, relations)
-            .setParameter("majorVersion", streamIdentifier.majorVersion)   
+            .setParameter("majorVersion", streamIdentifier.majorVersion)
             .setParameter("sourceType", streamIdentifier.sourceType)
-            .setParameter("streamSetSlug", streamIdentifier.streamSetSlug) 
+            .setParameter("streamSetSlug", streamIdentifier.streamSetSlug)
             .setParameter("streamSlug", streamIdentifier.streamSlug)
             .setParameter("schemaTitle", streamIdentifier.schemaTitle)
             .offset(offset)
@@ -322,7 +341,7 @@ export class DataBatchRepository {
     }
 
     async deleteBatches(batches: DataBatchEntity[]): Promise<void> {
-        if (batches.length == 0) return;
+        if (batches.length === 0) return;
 
         for (const batch of batches) {
             try {

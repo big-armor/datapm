@@ -1,4 +1,4 @@
-import { Connection, EntityManager, EntityRepository, In, Repository } from "typeorm";
+import { Connection, DeepPartial, EntityManager, EntityRepository, In, Repository } from "typeorm";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
@@ -26,11 +26,14 @@ export interface ActivityLogTemp {
     removedItemName?: string;
     removedItemId?: number;
     permissions?: Permission[];
-    additionalProperties?: { [key: string]: any };
+    additionalProperties?: { [key: string]: unknown };
 }
 
 /** Creates a new ActivityLog entry in the database, and logs it */
-export async function createActivityLog(connection: EntityManager | Connection, activityLogTemp: ActivityLogTemp) {
+export async function createActivityLog(
+    connection: EntityManager | Connection,
+    activityLogTemp: ActivityLogTemp
+): Promise<void> {
     const activityLog = new ActivityLogEntity();
     activityLog.eventType = activityLogTemp.eventType;
     activityLog.changeType = activityLogTemp.changeType;
@@ -124,7 +127,9 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
         }
 
         return this.manager.nestedTransaction(async (transaction) => {
-            const entity = transaction.create(ActivityLogEntity, activityLog);
+            const entity = await transaction
+                .getRepository(ActivityLogEntity)
+                .save(activityLog as DeepPartial<ActivityLogEntity>);
             if (
                 activityLog.eventType !== ActivityLogEventType.PACKAGE_DELETED &&
                 activityLog.eventType !== ActivityLogEventType.PACKAGE_ISSUE_DELETED &&

@@ -18,12 +18,15 @@ export async function superCreateConnection(): Promise<Connection> {
     } catch (error) {
         console.log("Database creation error : " + JSON.stringify(error));
 
-        if (error.code == "3F000") {
+        if (error.code === "3F000") {
+            if (ormOpts.schema == null) {
+                throw new Error("No schema provided");
+            }
             console.log("Starting database creation)");
             // Database doesn't exist.
             // PG error code ref: https://docstore.mik.ua/manuals/sql/postgresql-8.2.6/errcodes-appendix.html
             await createDatabase(
-                { databaseName: ormOpts.schema!, errorIfExist: false },
+                { databaseName: ormOpts.schema, errorIfExist: false },
                 {
                     user: ormOpts.username,
                     port: ormOpts.port,

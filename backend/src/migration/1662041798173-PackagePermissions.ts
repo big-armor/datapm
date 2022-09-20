@@ -12,5 +12,7 @@ export class PackagePermissions1662041798173 implements MigrationInterface {
         await queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

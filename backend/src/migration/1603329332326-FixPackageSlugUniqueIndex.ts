@@ -11,5 +11,7 @@ export class FixPackageSlugUniqueIndex1603329332326 implements MigrationInterfac
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

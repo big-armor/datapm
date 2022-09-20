@@ -37,7 +37,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         collectionId: number;
         userId: number;
         relations?: string[];
-    }) {
+    }): Promise<UserCollectionPermissionEntity | undefined> {
         const ALIAS = "userCollectionPermission";
         return this.manager
             .getRepository(UserCollectionPermissionEntity)
@@ -67,7 +67,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
     }
 
     public async hasPermission(userId: number, collection: CollectionEntity, permission: Permission): Promise<boolean> {
-        if (permission == Permission.VIEW && collection.isPublic) {
+        if (permission === Permission.VIEW && collection.isPublic) {
             return true;
         }
 
@@ -126,20 +126,20 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
 
-            if (user.id == collectionEntity.creatorId) throw new Error(`CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS`);
+            if (user.id === collectionEntity.creatorId) throw new Error(`CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS`);
 
             const permissions = await this.findByUserAndCollectionId(user.id, collectionEntity.id);
 
             // If permission input is not empty
-            if (value.permissions!.length > 0) {
+            if (value.permissions.length > 0) {
                 // If user does not exist in collection permissions, it creates new record
-                if (permissions == undefined) {
+                if (permissions === undefined) {
                     try {
                         const collectionPermissionEntry = transaction.create(UserCollectionPermissionEntity);
                         collectionPermissionEntry.userId = user.id;
                         collectionPermissionEntry.collectionId = collectionEntity.id;
                         collectionPermissionEntry.permissions = value.permissions;
-                        return await transaction.save(collectionPermissionEntry);
+                        await transaction.save(collectionPermissionEntry);
                     } catch (e) {
                         console.log(e);
                     }
@@ -147,7 +147,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 // If user does exists in collection permissions, it updates the record found
                 else {
                     try {
-                        return await transaction
+                        await transaction
                             .createQueryBuilder()
                             .update(UserCollectionPermissionEntity)
                             .set({ permissions: value.permissions })
@@ -161,9 +161,9 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
             // If the permissions input is empty, it will delete the row in collection permissions
             else {
                 // If the permissions row exists in the table delete it
-                if (permissions != undefined) {
+                if (permissions != null) {
                     try {
-                        return await transaction
+                        await transaction
                             .createQueryBuilder()
                             .delete()
                             .from(UserCollectionPermissionEntity)
@@ -174,7 +174,6 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                     }
                 }
             }
-            return;
         });
     }
 
@@ -191,7 +190,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
 
-            if (collectionEntity.creatorId == user.id) {
+            if (collectionEntity.creatorId === user.id) {
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
 

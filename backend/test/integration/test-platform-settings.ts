@@ -11,9 +11,7 @@ import { AdminHolder } from "./admin-holder";
 describe("Platform Settings Tests", async () => {
     let adminUserClient: ApolloClient<NormalizedCacheObject>;
     let normalUserClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousUserClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousUserClient = createAnonymousClient();
 
     it("Initialize user clients", async function () {
         adminUserClient = AdminHolder.adminClient;
@@ -24,8 +22,8 @@ describe("Platform Settings Tests", async () => {
             "testB-platform-settings@test.datapm.io",
             "passwordB!"
         );
-        expect(adminUserClient).to.exist;
-        expect(normalUserClient).to.exist;
+        expect(adminUserClient).to.not.equal(undefined);
+        expect(normalUserClient).to.not.equal(undefined);
     });
 
     it("Should allow admin to save platform settings", async function () {
@@ -40,10 +38,10 @@ describe("Platform Settings Tests", async () => {
             }
         });
 
-        expect(response.data).to.exist;
-        expect(response.errors).to.be.undefined;
+        expect(response.data).to.not.equal(undefined);
+        expect(response.errors).to.equal(undefined);
         if (response.data) {
-            expect(response.data.savePlatformSettings).to.not.be.undefined;
+            expect(response.data.savePlatformSettings).to.not.equal(undefined);
         }
     });
 
@@ -59,7 +57,7 @@ describe("Platform Settings Tests", async () => {
             }
         });
 
-        expect(response.errors).to.not.be.undefined;
+        expect(response.errors).to.not.equal(undefined);
         if (response.errors) {
             expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -81,10 +79,10 @@ describe("Platform Settings Tests", async () => {
             query: PlatformSettingsDocument
         });
 
-        expect(settingsResponse.data).to.exist;
-        expect(settingsResponse.errors).to.be.undefined;
+        expect(settingsResponse.data).to.not.equal(undefined);
+        expect(settingsResponse.errors).to.equal(undefined);
         if (settingsResponse.data) {
-            expect(settingsResponse.data.platformSettings).to.not.be.undefined;
+            expect(settingsResponse.data.platformSettings).to.not.equal(undefined);
         }
     });
 
@@ -104,7 +102,7 @@ describe("Platform Settings Tests", async () => {
             query: PlatformSettingsDocument
         });
 
-        expect(settingsResponse.errors).to.not.be.undefined;
+        expect(settingsResponse.errors).to.not.equal(undefined);
         if (settingsResponse.errors) {
             expect(settingsResponse.errors[0].message).to.equal("NOT_AUTHORIZED");
         }
@@ -129,10 +127,10 @@ describe("Platform Settings Tests", async () => {
             }
         });
 
-        expect(settingsResponse.data).to.exist;
-        expect(settingsResponse.errors).to.be.undefined;
+        expect(settingsResponse.data).to.not.equal(undefined);
+        expect(settingsResponse.errors).to.equal(undefined);
         if (settingsResponse.data) {
-            expect(settingsResponse.data.publicPlatformSettingsByKey).to.not.be.undefined;
+            expect(settingsResponse.data.publicPlatformSettingsByKey).to.not.equal(undefined);
         }
 
         const anonymousUserSettingsResponse = await anonymousUserClient.query({
@@ -142,10 +140,10 @@ describe("Platform Settings Tests", async () => {
             }
         });
 
-        expect(anonymousUserSettingsResponse.data).to.exist;
-        expect(anonymousUserSettingsResponse.errors).to.be.undefined;
+        expect(anonymousUserSettingsResponse.data).to.not.equal(undefined);
+        expect(anonymousUserSettingsResponse.errors).to.equal(undefined);
         if (anonymousUserSettingsResponse.data) {
-            expect(anonymousUserSettingsResponse.data.publicPlatformSettingsByKey).to.not.be.undefined;
+            expect(anonymousUserSettingsResponse.data.publicPlatformSettingsByKey).to.not.equal(undefined);
         }
     });
 
@@ -167,8 +165,8 @@ describe("Platform Settings Tests", async () => {
                 key: "my-settings"
             }
         });
-        expect(settingsResponse.data).to.be.null;
-        expect(settingsResponse.errors).to.not.be.undefined;
+        expect(settingsResponse.data).to.equal(null);
+        expect(settingsResponse.errors).to.not.equal(undefined);
         if (settingsResponse.errors) {
             expect(settingsResponse.errors[0].message).to.equal("PLATFORM_SETTINGS_NOT_FOUND");
         }
@@ -180,8 +178,8 @@ describe("Platform Settings Tests", async () => {
             }
         });
 
-        expect(anonymousUserSettingsResponse.data).to.be.null;
-        expect(anonymousUserSettingsResponse.errors).to.not.be.undefined;
+        expect(anonymousUserSettingsResponse.data).to.equal(null);
+        expect(anonymousUserSettingsResponse.errors).to.not.equal(undefined);
         if (anonymousUserSettingsResponse.errors) {
             expect(anonymousUserSettingsResponse.errors[0].message).to.equal("PLATFORM_SETTINGS_NOT_FOUND");
         }

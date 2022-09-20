@@ -8,7 +8,7 @@ import { hashPassword } from "./PasswordUtil";
 import atob from "atob";
 import { AuthenticationError } from "apollo-server";
 
-export async function getMeFromAPIKey(apiKey:string, entityManager: EntityManager): Promise<UserEntity> {
+export async function getMeFromAPIKey(apiKey: string, entityManager: EntityManager): Promise<UserEntity> {
     return await entityManager.nestedTransaction(async (transaction) => {
         const decodedKey = atob(apiKey);
 
@@ -44,14 +44,12 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
     if (req.header("X-API-Key") != null) {
         return getMeFromAPIKey(req.header("X-API-Key") as string, manager);
     } else if (req.header("Authorization") != null) {
-        return new Promise<UserEntity | undefined>(async (success, error) => {
-            try {
-                success(getMeJwt(await getJwtFromRequest(req), manager));
-            } catch (err) {
-                if (err.name == "NoAuthenticationError") return success(undefined);
-                else error(err);
-            }
-        });
+        try {
+            return getMeJwt(await getJwtFromRequest(req), manager);
+        } catch (err) {
+            if (err.name === "NoAuthenticationError") return undefined;
+            throw err;
+        }
     } else {
         return Promise.resolve(undefined);
     }
@@ -60,8 +58,8 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
 // get Me object based on user sub
 // used for testing and development
 // Note: Jwt object is not complete
-export async function getMeSub(sub: string, manager: EntityManager) {
-    const jwt: any = { sub };
+export async function getMeSub(sub: string, manager: EntityManager): Promise<UserEntity | undefined> {
+    const jwt: Jwt = { sub, decoded: { iss: "", sub: "", aud: [], iat: 0, exp: 0, azp: "", scope: "" }, token: "" };
     return getMeJwt(jwt, manager);
 }
 

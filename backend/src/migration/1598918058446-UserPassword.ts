@@ -10,5 +10,7 @@ export class UserPassword1598918058446 implements MigrationInterface {
         queryRunner.manager.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

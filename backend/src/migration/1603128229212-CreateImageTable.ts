@@ -20,5 +20,7 @@ export class CreateImageTable1603128229212 implements MigrationInterface {
         return queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }

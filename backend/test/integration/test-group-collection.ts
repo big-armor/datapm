@@ -30,7 +30,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 describe("Group Collection Access", () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
+    const anonymousClient = createAnonymousClient();
 
     before(async () => {
         userAClient = await createUser(
@@ -47,12 +47,12 @@ describe("Group Collection Access", () => {
             "testB-group-collection@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Should allow user to create a package", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -65,16 +65,16 @@ describe("Group Collection Access", () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-group-collection");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-group-collection");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.createPackage.latestVersion).to.equal(null);
+        expect(response.data?.createPackage.catalog?.displayName).to.equal("testA-group-collection");
+        expect(response.data?.createPackage.description).to.equal("Test upload of congressional legislators");
+        expect(response.data?.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.createPackage.identifier.catalogSlug).to.equal("testA-group-collection");
+        expect(response.data?.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data?.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -97,10 +97,10 @@ describe("Group Collection Access", () => {
             return;
         }
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author?.username).equal("testA-group-collection");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(response.data?.createVersion.author?.username).equal("testA-group-collection");
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+        const responsePackageFileContents = response.data?.createVersion.packageFile;
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -142,7 +142,7 @@ describe("Group Collection Access", () => {
     });
 
     it("Collection should not be available anonymously", async function () {
-        let response = await anonymousClient.query({
+        const response = await anonymousClient.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -153,13 +153,13 @@ describe("Group Collection Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHENTICATED") != null,
             "should have not authenticated error"
         ).equal(true);
     });
 
     it("package should not be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
@@ -171,7 +171,7 @@ describe("Group Collection Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorization error"
         ).equal(true);
     });
@@ -232,7 +232,7 @@ describe("Group Collection Access", () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.package.displayName).to.equal("Congressional Legislators");
+        expect(response.data?.package.displayName).to.equal("Congressional Legislators");
     });
 
     it("UserB should not be able to view collection", async () => {
@@ -245,8 +245,9 @@ describe("Group Collection Access", () => {
             }
         });
 
+        if (response.errors == null) throw new Error("Should have errors");
         expect(response.errors != null, "should have errors").to.equal(true);
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("Grant group edit access to view collection", async () => {
@@ -279,7 +280,9 @@ describe("Group Collection Access", () => {
         expect(response.data.groupsByCollection[0].group?.slug).equal("test-group-collection");
 
         expect(response.data.groupsByCollection[0].permissions?.length).equal(1);
-        expect(response.data.groupsByCollection[0].permissions![0]).equal(Permission.VIEW);
+
+        if (response.data.groupsByCollection[0].permissions == null) throw new Error("Should have permissions");
+        expect(response.data.groupsByCollection[0].permissions[0]).equal(Permission.VIEW);
     });
 
     it("UserB should not be able to view collection", async () => {
@@ -294,7 +297,7 @@ describe("Group Collection Access", () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
 
-        expect(response.data!.collection.name).to.equal("Test Collection");
+        expect(response.data?.collection.name).to.equal("Test Collection");
     });
 
     it("UserB should no be able to edit collection", async () => {
@@ -355,9 +358,12 @@ describe("Group Collection Access", () => {
             }
         });
 
+        if (response.data?.searchCollections.collections == null) {
+            throw new Error("Should have collections");
+        }
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.searchCollections.collections?.length).to.equal(1);
-        expect(response.data!.searchCollections.collections![0].name).to.equal("Test Collection2");
+        expect(response.data?.searchCollections.collections?.length).to.equal(1);
+        expect(response.data?.searchCollections.collections[0].name).to.equal("Test Collection2");
     });
 
     it("UserB should not be able to remove a group", async () => {
@@ -371,8 +377,9 @@ describe("Group Collection Access", () => {
             }
         });
 
+        if (response.errors == null) throw new Error("Should have errors");
         expect(response.errors != null, "should have errors").to.equal(true);
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("UserA should be able to remove a group", async () => {
@@ -390,7 +397,7 @@ describe("Group Collection Access", () => {
     });
 
     it("Collection should not be available to user B", async function () {
-        let response = await userBClient.query({
+        const response = await userBClient.query({
             query: CollectionDocument,
             variables: {
                 identifier: {
@@ -401,7 +408,7 @@ describe("Group Collection Access", () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            response.errors?.find((e) => e.message === "NOT_AUTHORIZED") != null,
             "should have not authorization error"
         ).equal(true);
     });

@@ -4,10 +4,6 @@ import { UserEntity } from "../entity/UserEntity";
 
 @EntityRepository(GroupEntity)
 export class GroupRepository extends Repository<GroupEntity> {
-    constructor() {
-        super();
-    }
-
     async searchWithNoRestrictions({
         value,
         limit,

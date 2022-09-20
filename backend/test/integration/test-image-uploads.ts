@@ -2,7 +2,6 @@ import { createAnonymousClient, createUser } from "./test-utils";
 import { expect } from "chai";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import * as fs from "fs";
-import request = require("superagent");
 import {
     SetMyAvatarImageDocument,
     SetMyCoverImageDocument,
@@ -20,13 +19,13 @@ import {
     DeleteCatalogAvatarImageDocument
 } from "./registry-client";
 import * as crypto from "crypto";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require("superagent");
 
 describe("Image Upload Tests", async () => {
     const anonymousUser = createAnonymousClient();
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-
-    before(async () => {});
 
     it("Create user", async () => {
         userAClient = await createUser(
@@ -43,7 +42,7 @@ describe("Image Upload Tests", async () => {
             "second-user@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
     });
 
     it("setMyAvatarImage_WithValidImage_UploadsImageAndStoresMetadataInDbAndIsPublic", async () => {
@@ -56,9 +55,9 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(uploadResult).to.exist;
-        expect(uploadResult.errors).to.not.exist;
-        expect(uploadResult.data).to.exist;
+        expect(uploadResult).to.not.equal(undefined);
+        expect(uploadResult.errors).to.equal(undefined);
+        expect(uploadResult.data).to.not.equal(undefined);
 
         const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
 
@@ -74,21 +73,21 @@ describe("Image Upload Tests", async () => {
             errorFound = true;
         }
 
-        expect(errorFound).to.be.true;
+        expect(errorFound).to.equal(true);
 
         const imageWithData = await request
             .get("http://localhost:4000/images/user/first-user-username/avatar")
             .buffer(true)
             .parse(request.parse.image);
 
-        let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        const hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
         expect(hash).equal("72ad6af0bfc6c6091e6104b45388e1fa431d5696059ebbd31e5f50eca336a081");
     });
 
     it("Download user avatar image", async function () {
         const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
 
-        expect(imageServingResult.body).to.exist;
+        expect(imageServingResult.body).to.not.equal(undefined);
         expect(imageServingResult.type).to.equal("image/jpeg");
     });
 
@@ -101,9 +100,9 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-        expect(uploadResult).to.exist;
-        expect(uploadResult.errors).to.not.exist;
-        expect(uploadResult.data).to.exist;
+        expect(uploadResult).to.not.equal(undefined);
+        expect(uploadResult.errors).to.equal(undefined);
+        expect(uploadResult.data).to.not.equal(undefined);
 
         const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
 
@@ -111,9 +110,9 @@ describe("Image Upload Tests", async () => {
     });
 
     it("Download user cover image", async function () {
-        let imageServingResult = await request.get("http://localhost:4000/images/user/first-user-username/cover");
+        const imageServingResult = await request.get("http://localhost:4000/images/user/first-user-username/cover");
 
-        expect(imageServingResult.body).to.exist;
+        expect(imageServingResult.body).to.not.equal(undefined);
         expect(imageServingResult.type).to.equal("image/jpeg");
 
         const imageWithData = await request
@@ -121,7 +120,7 @@ describe("Image Upload Tests", async () => {
             .buffer(true)
             .parse(request.parse.image);
 
-        let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        const hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
         expect(hash).equal("af7835de83d877afeda68a13f8497205cf666ea045ca421ab811095732493b8b");
     });
 
@@ -134,11 +133,11 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-        expect(uploadResult).to.exist;
-        expect(uploadResult.errors).to.exist;
+        expect(uploadResult).to.not.equal(undefined);
+        expect(uploadResult.errors).to.not.equal(undefined);
         expect(uploadResult.errors).length(1);
         if (uploadResult.errors) {
-            expect(uploadResult.errors[0]).to.exist;
+            expect(uploadResult.errors[0]).to.not.equal(undefined);
             expect(uploadResult.errors[0].message).to.equal("IMAGE_FORMAT_NOT_SUPPORTED");
         }
     });
@@ -161,17 +160,17 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(uploadResult).to.exist;
-        expect(uploadResult.errors).to.exist;
+        expect(uploadResult).to.not.equal(undefined);
+        expect(uploadResult.errors).to.not.equal(undefined);
         expect(uploadResult.errors).length(1);
         if (uploadResult.errors) {
-            expect(uploadResult.errors[0]).to.exist;
+            expect(uploadResult.errors[0]).to.not.equal(undefined);
             expect(uploadResult.errors[0].message).to.equal("IMAGE_TOO_LARGE");
         }
     }).timeout(10000);
 
     it("should allow user to create a package and set an image", async () => {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -183,11 +182,11 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        let imageResponse = await userAClient.mutate({
+        const imageResponse = await userAClient.mutate({
             mutation: SetPackageCoverImageDocument,
             variables: {
                 identifier: {
@@ -198,7 +197,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors == null).true;
+        expect(imageResponse.errors == null).equal(true);
 
         const imageServingResult = await request.get(
             "localhost:4000/images/package/first-user-username/image-test-package/cover"
@@ -208,7 +207,7 @@ describe("Image Upload Tests", async () => {
     });
 
     it("should should remove package cover image when deleted", async () => {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: DeletePackageDocument,
             variables: {
                 identifier: {
@@ -218,7 +217,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
         let errorFound = false;
         try {
@@ -226,14 +225,14 @@ describe("Image Upload Tests", async () => {
                 "localhost:4000/images/package/first-user-username/image-test-package/cover"
             );
         } catch (error) {
-            if (error.message == "Not Found") errorFound = true;
+            if (error.message === "Not Found") errorFound = true;
         }
 
         expect(errorFound).equal(true);
     });
 
     it("should allow user to create a collection and set an image", async () => {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
@@ -244,11 +243,11 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        let imageResponse = await userAClient.mutate({
+        const imageResponse = await userAClient.mutate({
             mutation: SetCollectionCoverImageDocument,
             variables: {
                 identifier: {
@@ -258,7 +257,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors == null).true;
+        expect(imageResponse.errors == null).equal(true);
 
         const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
         expect(imageServingResult.status).equal(200);
@@ -267,7 +266,7 @@ describe("Image Upload Tests", async () => {
     it("should not allow user B to set cover image on collection", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        let imageResponse = await userBClient.mutate({
+        const imageResponse = await userBClient.mutate({
             mutation: SetCollectionCoverImageDocument,
             variables: {
                 identifier: {
@@ -277,11 +276,11 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors!.find((e) => e.message.includes("NOT_AUTHORIZED")) != null).equal(true);
+        expect(imageResponse.errors?.find((e) => e.message.includes("NOT_AUTHORIZED")) != null).equal(true);
     });
 
     it("should remove collection cover and avatar image when deleted", async () => {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: DeleteCollectionDocument,
             variables: {
                 identifier: {
@@ -290,7 +289,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(response.errors == null, "no errors").true;
+        expect(response.errors == null, "no errors").equal(true);
 
         let avatarImageErrorFound = false;
         let coverImageErrorFound = false;
@@ -317,7 +316,7 @@ describe("Image Upload Tests", async () => {
     it("should allow user to set a catalog cover image", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        let imageResponse = await userAClient.mutate({
+        const imageResponse = await userAClient.mutate({
             mutation: SetCatalogCoverImageDocument,
             variables: {
                 identifier: {
@@ -327,7 +326,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors == null).true;
+        expect(imageResponse.errors == null).equal(true);
 
         const imageServingResult = await request.get("localhost:4000/images/catalog/first-user-username/cover");
 
@@ -359,7 +358,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors == null).true;
+        expect(imageResponse.errors == null).equal(true);
 
         const imageServingResult = await request.get("localhost:4000/images/catalog/user-image-catalog/avatar");
 
@@ -391,7 +390,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(setImageResponse.errors == null).true;
+        expect(setImageResponse.errors == null).equal(true);
 
         const deleteImageResponse = await userAClient.mutate({
             mutation: DeleteCatalogAvatarImageDocument,
@@ -402,7 +401,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(deleteImageResponse.errors == null).true;
+        expect(deleteImageResponse.errors == null).equal(true);
 
         let imageNotFound = false;
         try {
@@ -455,7 +454,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors == null).true;
+        expect(imageResponse.errors == null).equal(true);
 
         const imageServingResult = await request.get("localhost:4000/images/catalog/new-image-username/cover");
 
@@ -484,6 +483,6 @@ describe("Image Upload Tests", async () => {
             mutation: DeleteMeDocument
         });
 
-        expect(response.errors == null).true;
+        expect(response.errors == null).equal(true);
     });
 });

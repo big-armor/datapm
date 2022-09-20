@@ -7,6 +7,7 @@ import { PackageEntity } from "../entity/PackageEntity";
 import { HeadlessJobContext } from "../job/HeadlessJobContext";
 import { PackageRepository } from "../repository/PackageRepository";
 import { SessionCache } from "../session-cache";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 let databaseConnection: Connection | null;
 
@@ -18,20 +19,23 @@ const packageUpdateCron = new CronJob(
     "America/New_York"
 );
 
-export function startPackageUpdateService(connection: Connection) {
+export function startPackageUpdateService(connection: Connection): void {
     databaseConnection = connection;
     packageUpdateCron.start();
 }
 
-export async function stopPackageUpdateService() {
+export function stopPackageUpdateService(): void {
     packageUpdateCron.stop();
 }
 
-async function packageUpdateSchedulingCronHandler() {
-    packageUpdateScheduling(databaseConnection!);
+function packageUpdateSchedulingCronHandler(): void {
+    if (!databaseConnection) {
+        throw new Error("Database connection not initialized");
+    }
+    packageUpdateScheduling(databaseConnection);
 }
 
-export async function packageUpdateScheduling(connection: Connection) {
+export async function packageUpdateScheduling(connection: Connection): Promise<void> {
     const beforeDate = new Date(new Date().getTime() - 1000 * 60 * 60 * 24);
 
     // Find the package that was updated the longest in the past
@@ -60,7 +64,7 @@ export async function packageUpdateScheduling(connection: Connection) {
             reference: {
                 catalogSlug: packageEntity.catalog.slug,
                 packageSlug: packageEntity.slug,
-                registryURL: process.env["REGISTRY_URL"] as string
+                registryURL: getEnvVariable("REGISTRY_URL") as string
             }
         });
 

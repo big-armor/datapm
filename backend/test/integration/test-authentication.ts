@@ -6,16 +6,16 @@ import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
 
 describe("Authentication Tests", async () => {
-    let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
+    const anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {
-        expect(anonymousClient).to.exist;
+        expect(anonymousClient).to.not.equal(undefined);
     });
 
     it("Login for incorrect user should fail", async () => {
-        let result = await anonymousClient.mutate({
+        const result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "test",
@@ -23,9 +23,8 @@ describe("Authentication Tests", async () => {
             }
         });
 
-        expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
+            result.errors?.find((e) => e.message === AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });
@@ -34,12 +33,13 @@ describe("Authentication Tests", async () => {
         let errorFound = false;
         await createUser("Password", "TooShort", "willFail", "fail@fail.com", "abcdefg")
             .catch((error: ErrorResponse) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
-                            e.extensions.exception.stacktrace.find((s) => s == "ValidationError: PASSWORD_TOO_SHORT") !=
-                            null
+                            e.extensions.exception.stacktrace.find(
+                                (s) => s === "ValidationError: PASSWORD_TOO_SHORT"
+                            ) != null
                     ) != null
                 )
                     errorFound = true;
@@ -59,11 +59,11 @@ describe("Authentication Tests", async () => {
             "abcasdfasdfasdfasdfadsfasdfasdfasdfasdfwadsfasdfasdfasdfasdfasdfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
         )
             .catch((error) => {
-                let fetchResult = error.networkError as ServerError;
+                const fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
-                            e.extensions.exception.stacktrace.find((s) => s == "ValidationError: PASSWORD_TOO_LONG") !=
+                            e.extensions.exception.stacktrace.find((s) => s === "ValidationError: PASSWORD_TOO_LONG") !=
                             null
                     ) != null
                 )
@@ -89,12 +89,12 @@ describe("Authentication Tests", async () => {
             "testB-authentication@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("Login user A with username", async () => {
-        let result = await anonymousClient.mutate({
+        const result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication",
@@ -103,11 +103,11 @@ describe("Authentication Tests", async () => {
         });
 
         expect(result.errors === undefined, "no errors").equal(true);
-        expect(result.data!.login != null, "should have login key value").equal(true);
+        expect(result.data?.login != null, "should have login key value").equal(true);
     });
 
     it("Login user A with email", async () => {
-        let result = await anonymousClient.mutate({
+        const result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication@test.datapm.io",
@@ -116,11 +116,11 @@ describe("Authentication Tests", async () => {
         });
 
         expect(result.errors === undefined, "no errors").equal(true);
-        expect(result.data!.login != null, "should have login key value").equal(true);
+        expect(result.data?.login != null, "should have login key value").equal(true);
     });
 
     it("Change User A password", async function () {
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: UpdateMyPasswordDocument,
             variables: {
                 value: {
@@ -134,7 +134,7 @@ describe("Authentication Tests", async () => {
     });
 
     it("Login user A with new password", async () => {
-        let result = await anonymousClient.mutate({
+        const result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication",
@@ -143,11 +143,11 @@ describe("Authentication Tests", async () => {
         });
 
         expect(result.errors === undefined, "no errors").equal(true);
-        expect(result.data!.login != null, "should have jwt value").equal(true);
+        expect(result.data?.login != null, "should have jwt value").equal(true);
     });
 
     it("Login user A with new old password should fail", async () => {
-        let result = await anonymousClient.mutate({
+        const result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication",
@@ -155,9 +155,8 @@ describe("Authentication Tests", async () => {
             }
         });
 
-        expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
+            result.errors?.find((e) => e.message === AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });

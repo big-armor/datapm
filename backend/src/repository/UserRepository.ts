@@ -47,7 +47,7 @@ export async function getUserByUserName({
     relations?: string[];
 }): Promise<UserEntity | null> {
     const ALIAS = "users";
-    let query = manager
+    const query = manager
         .getRepository(UserEntity)
         .createQueryBuilder(ALIAS)
         .where(`LOWER(username) = :username`)
@@ -116,23 +116,19 @@ function addUserToMixpanel(user: UserEntity, invitedByUserEmail: string) {
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
-    constructor() {
-        super();
-    }
-
     public async isAtLeastOneUserRegistered(): Promise<boolean> {
         return (await this.createQueryBuilder().getOne()) != null;
     }
 
-    getUserByUsername(username: string) {
+    async getUserByUsername(username: string): Promise<UserEntity | null> {
         const ALIAS = "getUsername";
 
-        const user = getUserByUserName({ username, manager: this.manager });
+        const user = await getUserByUserName({ username, manager: this.manager });
 
         return user;
     }
 
-    getUserByUsernameOrEmailAddress(username: string) {
+    async getUserByUsernameOrEmailAddress(username: string): Promise<UserEntity | undefined> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS)
@@ -144,7 +140,7 @@ export class UserRepository extends Repository<UserEntity> {
         return user;
     }
 
-    findByEmailValidationToken(token: String) {
+    findByEmailValidationToken(token: string): Promise<UserEntity | undefined> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS)
@@ -154,7 +150,7 @@ export class UserRepository extends Repository<UserEntity> {
         return user;
     }
 
-    getUserByEmail(emailAddress: string) {
+    getUserByEmail(emailAddress: string): Promise<UserEntity | undefined> {
         const ALIAS = "getByEmailAddress";
 
         const user = this.createQueryBuilder(ALIAS)
@@ -164,7 +160,7 @@ export class UserRepository extends Repository<UserEntity> {
         return user;
     }
 
-    getUserByLogin(username: string, relations: string[] = []) {
+    getUserByLogin(username: string, relations: string[] = []): Promise<UserEntity | undefined> {
         const ALIAS = "getByLogin";
 
         const user = this.createQueryBuilder(ALIAS)
@@ -176,14 +172,21 @@ export class UserRepository extends Repository<UserEntity> {
         return user;
     }
 
-    findMe({ id, relations = [] }: { id: number; relations?: string[] }) {
+    findMe({ id, relations = [] }: { id: number; relations?: string[] }): Promise<UserEntity | undefined> {
         return this.findOneOrFail({
             where: { id: id },
             relations: relations
         });
     }
 
-    async findUser({ username, relations = [] }: { username: string; catalogId?: number; relations?: string[] }) {
+    async findUser({
+        username,
+        relations = []
+    }: {
+        username: string;
+        catalogId?: number;
+        relations?: string[];
+    }): Promise<UserEntity> {
         return getUserOrFail({
             username: username,
             manager: this.manager,
@@ -191,7 +194,13 @@ export class UserRepository extends Repository<UserEntity> {
         });
     }
 
-    findUserByUserName({ username, relations = [] }: { username: string; relations?: string[] }) {
+    findUserByUserName({
+        username,
+        relations = []
+    }: {
+        username: string;
+        relations?: string[];
+    }): Promise<UserEntity | undefined> {
         return getUserByUsernameOrFail({
             username: username,
             manager: this.manager,
@@ -199,14 +208,34 @@ export class UserRepository extends Repository<UserEntity> {
         });
     }
 
-    async findUserByRecoveryPasswordToken(token: String) {
+    findUserByUserNameOrFail({
+        username,
+        relations = []
+    }: {
+        username: string;
+        relations?: string[];
+    }): Promise<UserEntity> {
+        const user = getUserByUsernameOrFail({
+            username: username,
+            manager: this.manager,
+            relations
+        });
+
+        if (user == null) {
+            throw new Error(`USER_NOT_FOUND - ${username}`);
+        }
+
+        return user;
+    }
+
+    async findUserByRecoveryPasswordToken(token: string): Promise<UserEntity | undefined> {
         const ALIAS = "getUserByRecoveryPasswordToken";
         const user = await this.createQueryBuilder(ALIAS).where({ passwordRecoveryToken: token }).getOne();
 
         return user;
     }
 
-    findUsers({ relations = [] }: { relations?: string[] }) {
+    findUsers({ relations = [] }: { relations?: string[] }): Promise<UserEntity[]> {
         const ALIAS = "users";
         return this.manager
             .getRepository(UserEntity)
@@ -215,7 +244,7 @@ export class UserRepository extends Repository<UserEntity> {
             .getMany();
     }
 
-    findAllUsers(relations: string[] = []) {
+    findAllUsers(relations: string[] = []): Promise<UserEntity[]> {
         const ALIAS = "users";
         return this.manager
             .getRepository(UserEntity)
@@ -312,7 +341,7 @@ export class UserRepository extends Repository<UserEntity> {
 
     createInviteUser(emailAddress: string): Promise<UserEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
-            let user = transaction.create(UserEntity);
+            const user = transaction.create(UserEntity);
             user.emailAddress = emailAddress.trim().toLowerCase();
             user.verifyEmailToken = uuid();
             user.verifyEmailTokenDate = new Date();
@@ -340,6 +369,7 @@ export class UserRepository extends Repository<UserEntity> {
         value: CreateUserInput;
         relations?: string[];
     }): Promise<UserEntity> {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
             return (input as CreateUserInputAdmin) !== undefined;
@@ -446,7 +476,7 @@ export class UserRepository extends Repository<UserEntity> {
             const dbUser = await this.findUserByRecoveryPasswordToken(value.token);
 
             // // return error if current user token is not the same as input token
-            if (dbUser?.passwordRecoveryToken != value.token) throw new UserInputError("TOKEN_NOT_VALID");
+            if (dbUser?.passwordRecoveryToken !== value.token) throw new UserInputError("TOKEN_NOT_VALID");
 
             // return error if token is more than 4 hours expired
             if (dbUser.passwordRecoveryToken && dbUser.passwordRecoveryTokenDate) {

@@ -23,17 +23,15 @@ describe("Package Issues and Comments Tests", async () => {
     const ORIGINAL_SOURCE_SLUG = "https://theunitedstates.io/congress-legislators/legislators-current.csv";
     const URL_ENCODED_SOURCE_SLUG = "https%3A%2F%2Ftheunitedstates.io%2Fcongress-legislators%2Flegislators-current.csv";
 
-    let userAToken: string = "Bearer ";
-    let userAPassword: string = "passwordA!";
+    let userAToken = "Bearer ";
+    const userAPassword = "passwordA!";
 
     const userAUsername = "test-a-move";
     const userBUsername = "test-b-move";
 
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
-    let anonymousClient = createAnonymousClient();
-
-    before(async () => {});
+    const anonymousClient = createAnonymousClient();
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -50,8 +48,8 @@ describe("Package Issues and Comments Tests", async () => {
             userBUsername + "@test.datapm.io",
             "passwordB!"
         );
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
 
         const userALogin = await anonymousClient.mutate({
             mutation: LoginDocument,
@@ -534,7 +532,7 @@ describe("Package Issues and Comments Tests", async () => {
             }
         });
 
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
         await userAClient.mutate({

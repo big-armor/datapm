@@ -15,8 +15,6 @@ describe("Catalog Permissions", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
-    before(async () => {});
-
     it("Create users A & B", async function () {
         userAClient = await createUser(
             "Tom",
@@ -33,8 +31,8 @@ describe("Catalog Permissions", async () => {
             "catPassword4!"
         );
 
-        expect(userAClient).to.exist;
-        expect(userBClient).to.exist;
+        expect(userAClient).to.not.equal(undefined);
+        expect(userBClient).to.not.equal(undefined);
     });
 
     it("user attempting to grant permissions to a catalog on which they do not have the MANAGE permission", async function () {
@@ -65,7 +63,7 @@ describe("Catalog Permissions", async () => {
 
         const newPermissions = [Permission.VIEW];
 
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -82,13 +80,17 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors[0].message).to.equal("NOT_AUTHORIZED");
     });
 
     it("attempting to grant permissions to a user that does not exist", async function () {
         const newPermissions = [Permission.VIEW];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -105,13 +107,17 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user202");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors[0].message).to.equal("USER_NOT_FOUND - my-test-user202");
     });
 
     it("successfully setting permissions for authorized use case", async function () {
-        let newPermissions: Permission[] = [Permission.VIEW, Permission.EDIT];
+        const newPermissions: Permission[] = [Permission.VIEW, Permission.EDIT];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -128,13 +134,13 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("updating user permissions by changing the permissions list", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -151,7 +157,7 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("Validate that the target user has the permission granted to view a catalog that they did not previously", async function () {
@@ -217,7 +223,11 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(beforeGrantedViewOnUserB.errors![0].message).to.equal("NOT_AUTHORIZED");
+        if (beforeGrantedViewOnUserB.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(beforeGrantedViewOnUserB.errors[0].message).to.equal("NOT_AUTHORIZED");
         expect(beforeGrantedViewOnUserB.data).to.equal(null);
         expect(afterGrantedViewOnUserB.data?.catalog.displayName).to.equal("User A catalog v2");
         expect(afterGrantedViewOnUserB.data?.catalog.description).to.equal("This is an integration test User A v2");
@@ -237,9 +247,9 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        let newPermissions: Permission[] = [];
+        const newPermissions: Permission[] = [];
 
-        let response = await userAClient.mutate({
+        const response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
@@ -256,7 +266,7 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors! == null).true;
+        expect(response.errors == null).equal(true);
     });
 
     it("user with EDIT but without MANAGE permission trying to set the public value", async function () {
@@ -304,7 +314,7 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        let response = await userBClient.mutate({
+        const response = await userBClient.mutate({
             mutation: UpdateCatalogDocument,
             variables: {
                 identifier: {
@@ -316,6 +326,10 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).includes("NOT_AUTHORIZED");
+        if (response.errors == null) {
+            throw new Error("Expected error");
+        }
+
+        expect(response.errors[0].message).includes("NOT_AUTHORIZED");
     });
 });

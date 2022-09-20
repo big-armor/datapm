@@ -25,5 +25,7 @@ export class CreatePackageVersionsDiffTables1616091117502 implements MigrationIn
         return queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // no-op
+    }
 }
