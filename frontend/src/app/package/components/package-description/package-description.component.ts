@@ -5,6 +5,14 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Collection, Package, PackageCollectionsGQL, PackageIdentifierInput, Permission } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
+
+enum State {
+    LOADING,
+    SAVING,
+    LOADED,
+    ERROR_LOADING_PACKAGE
+}
+
 @Component({
     selector: "package-description",
     templateUrl: "./package-description.component.html",
@@ -13,6 +21,9 @@ import { PackageService, PackageResponse } from "../../services/package.service"
 export class PackageDescriptionComponent {
     private readonly SHOW_MORE_CHARACTER_LIMIT = 300;
     private readonly unsubscribe$ = new Subject();
+
+    State = State;
+    public state = State.LOADING;
 
     public package: Package;
     public packageFile: PackageFile;
@@ -86,6 +97,14 @@ export class PackageDescriptionComponent {
                         this.selectedSchema = this.schemas[0];
                     }
                 }
+            }
+
+            this.state = State.LOADED;
+        });
+
+        this.packageService.packageError.pipe(takeUntil(this.unsubscribe$)).subscribe((error) => {
+            if (error) {
+                this.state = State.ERROR_LOADING_PACKAGE;
             }
         });
     }

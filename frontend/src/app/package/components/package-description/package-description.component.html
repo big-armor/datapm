@@ -1,4 +1,4 @@
-<ng-container *ngIf="packageFile; else noPackageFileTemplate">
+<ng-container *ngIf="state === State.LOADED">
     <div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
         <div class="text-dark-gray" *ngIf="canEdit()">
             <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
@@ -57,38 +57,47 @@
             <schema [package]="package" [schema]="selectedSchema" [packageFile]="packageFile"></schema>
         </div>
     </ng-container>
+
+
+    <ng-container *ngIf="collections?.length">
+        <div class="related-data-div mt-5">
+            <div class="text-main-title mt-4 pt-2 mb-2">Related Collections</div>
+            <div class="text-dark-gray">Other collections related to this package</div>
+            <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+
+            <div *ngIf="relatedPackages.length">
+                <div class="text-main-title text-left no-pd-mobile">Related Packages</div>
+                <div class="text-dark-gray">Other data packages related to this package</div>
+                <div *ngFor="let package of relatedPackages">
+                    <app-package-item [item]="package"></app-package-item>
+                </div>
+
+                <div *ngIf="hasMorePackages" class="container text-center">
+                    <button
+                        class="app-outlined-button ctaButton"
+                        [class.disabled]="loadingPackages"
+                        (click)="requestMorePackages()"
+                    >
+                        Show More
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
 </ng-container>
 
-<ng-template #noPackageFileTemplate>
+<ng-container  *ngIf="state === State.LOADING">
+    <div >
+        <mat-spinner class="loading" [diameter]="60"></mat-spinner>
+    </div>
+    
+</ng-container>
+
+<ng-container *ngIf="state === State.ERROR_LOADING_PACKAGE">
     <p class="text-dark-gray">There was an error finding the package file.</p>
     <p class="text-dark-gray">
         Please <a href="/contact">contact support</a
         ><span *ngIf="hasEditPackagePermissions"> or publish a new package file</span>.
-    </p></ng-template
->
-
-<ng-container *ngIf="collections?.length">
-    <div class="related-data-div mt-5">
-        <div class="text-main-title mt-4 pt-2 mb-2">Related Collections</div>
-        <div class="text-dark-gray">Other collections related to this package</div>
-        <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
-
-        <div *ngIf="relatedPackages.length">
-            <div class="text-main-title text-left no-pd-mobile">Related Packages</div>
-            <div class="text-dark-gray">Other data packages related to this package</div>
-            <div *ngFor="let package of relatedPackages">
-                <app-package-item [item]="package"></app-package-item>
-            </div>
-
-            <div *ngIf="hasMorePackages" class="container text-center">
-                <button
-                    class="app-outlined-button ctaButton"
-                    [class.disabled]="loadingPackages"
-                    (click)="requestMorePackages()"
-                >
-                    Show More
-                </button>
-            </div>
-        </div>
-    </div>
+    </p>
 </ng-container>
