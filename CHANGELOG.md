@@ -1,3 +1,9 @@
+#### 0.32.12 (2022-09-21)
+
+##### Bug Fixes
+
+*  Record counts for streams that do not end were incorrect ([#524](https://github.com/big-armor/datapm/pull/524)) ([b1421d8c](https://github.com/big-armor/datapm/commit/b1421d8ca41d3b7ecb1af386e58092a09dbc9d3e))
+
 #### 0.32.11 (2022-09-20)
 
 #### 0.32.10 (2022-09-14)
