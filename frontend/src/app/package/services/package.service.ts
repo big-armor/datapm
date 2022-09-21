@@ -12,6 +12,7 @@ export interface PackageResponse {
 })
 export class PackageService {
     package = new BehaviorSubject<PackageResponse>(null);
+    packageError = new BehaviorSubject<Error>(null);
     constructor(private packageGQL: PackageGQL) {}
     getPackage(catalogSlug: string, packageSlug: string) {
         this.packageGQL
@@ -36,6 +37,7 @@ export class PackageService {
                         package: null,
                         response: null
                     });
+                    this.packageError.next(error);
                 }
             );
     }

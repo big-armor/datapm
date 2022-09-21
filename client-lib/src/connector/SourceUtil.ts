@@ -246,12 +246,15 @@ export async function generateSchemasFromSourceStreams(
         completed = true;
         const currentTime = Date.now();
 
+        const inspectedCount = completedStreamsInspectedRecordCount + (reachedEnd ? 0 : currentStreamInspectedCount);
+        const recordCount = completedStreamsRecordCount + (reachedEnd ? 0 : currentStreamRecordCount);
+
         streamStatusContext.onComplete({
             msRemaining: 0,
             bytesProcessed: bytesReceived,
-            recordsInspectedCount: completedStreamsInspectedRecordCount,
-            recordCount: completedStreamsRecordCount,
-            recordsPerSecond: completedStreamsRecordCount / ((currentTime - startTime) / 1000),
+            recordsInspectedCount: inspectedCount,
+            recordCount,
+            recordsPerSecond: recordCount / ((currentTime - startTime) / 1000),
             final: true
         });
 
@@ -285,10 +288,10 @@ export async function generateSchemasFromSourceStreams(
         }
 
         const streamStats: StreamStats = {
-            inspectedCount: completedStreamsInspectedRecordCount,
+            inspectedCount,
             byteCount: byteCount > 0 ? byteCount : undefined,
             byteCountPrecision: byteCount > 0 ? byteCountPrecision : undefined,
-            recordCount: completedStreamsRecordCount,
+            recordCount,
             recordCountPrecision
         };
 
