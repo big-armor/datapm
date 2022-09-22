@@ -34,6 +34,7 @@ query Package($identifier: PackageIdentifierInput!) {
             packageFile
             canonicalPackageFile
             createdAt
+            updatedAt
         }
         versions {
             identifier {

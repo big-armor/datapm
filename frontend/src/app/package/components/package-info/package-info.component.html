@@ -76,7 +76,7 @@
             <div class="col-6 mb-3">
                 <p class="text-light-gray">last refreshed</p>
                 <p class="text-dark-gray">
-                    {{ package?.latestVersion?.createdAt | timeAgo }}
+                    {{ package?.latestVersion?.updatedAt | timeAgo }}
                 </p>
             </div>
             <div class="col-6 mb-3" *ngIf="packageSizeBytes > 0">
