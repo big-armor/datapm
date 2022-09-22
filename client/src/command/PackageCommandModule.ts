@@ -77,6 +77,8 @@ export async function generatePackage(args: PackageCommandArguments): Promise<vo
         exit(1);
     }
 
+    console.log(" ");
+
     await checkDataPMVersion(oraRef);
 
     process.exit(0);

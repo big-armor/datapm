@@ -54,5 +54,7 @@ export async function viewCatalogs(): Promise<void> {
         }
     });
 
+    console.log(" ");
+
     await checkDataPMVersion(oraRef);
 }
