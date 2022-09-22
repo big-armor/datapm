@@ -1,3 +1,9 @@
+#### 0.32.13 (2022-09-22)
+
+##### Bug Fixes
+
+*  Package last refreshed date not correct ([634ab404](https://github.com/big-armor/datapm/commit/634ab4046e26b9735f684bc585c9aad9a3efa737))
+
 #### 0.32.12 (2022-09-21)
 
 ##### Bug Fixes
