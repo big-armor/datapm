@@ -33,6 +33,8 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             process.exit(0);
         }
 
+        console.log(" ");
+
         await checkDataPMVersion(oraRef);
 
         process.exit(0);

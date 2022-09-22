@@ -37,6 +37,7 @@ export async function editPackage(argv: EditArguments): Promise<void> {
             console.log(
                 chalk.green(`datapm publish ${packageFileWithContext.packageReference.replace("file://", "")}`)
             );
+            console.log("");
             process.exit(0);
         }
 

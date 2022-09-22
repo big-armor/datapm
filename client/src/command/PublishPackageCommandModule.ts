@@ -64,13 +64,18 @@ export class PublishPackageCommandModule {
                 )
             );
             urls.forEach((url) => {
-                console.log(chalk.green(`datapm fetch ${url}`));
+                jobContext.print("NONE", chalk.green(`datapm fetch ${url}`));
             });
 
             jobContext.print("NONE", "");
             jobContext.print("NONE", chalk.yellow("You can update the package file schema with the following command"));
-            jobContext.print("NONE", chalk.green(`datapm update ${argv.reference}`));
+            urls.forEach((url) => {
+                jobContext.print("NONE", chalk.green(`datapm update ${url}`));
+            });
+            jobContext.print("NONE", "");
         }
+
+        console.log(" ");
 
         await checkDataPMVersion(oraRef);
 

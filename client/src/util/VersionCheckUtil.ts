@@ -7,7 +7,6 @@ import { createRegistryClient } from "./RegistryClient";
 
 export async function checkDataPMVersion(oraRef: Ora): Promise<void> {
     try {
-        console.log(" ");
         await _checkDataPMVersion(oraRef);
     } catch (error) {
         oraRef.info("There was a problem checking for DataPM updates. " + error.message);
@@ -33,13 +32,13 @@ async function _checkDataPMVersion(oraRef: Ora): Promise<boolean> {
     const serverSemVer = new SemVer(status.version);
 
     if (localSemVer.compare(serverSemVer) < 0) {
+        console.log(" ");
         oraRef.warn(
             chalk.yellow(
                 `There is a new version (${status.version}) of DataPM available. You are using ${localSemVer.format()}.`
             )
         );
         console.log(chalk.green("https://datapm.io/downloads"));
-        console.log(" ");
 
         return true;
     }
