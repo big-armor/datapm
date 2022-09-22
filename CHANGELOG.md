@@ -1,3 +1,9 @@
+#### 0.32.14 (2022-09-22)
+
+##### Bug Fixes
+
+*  Added empty line to most commands ([#525](https://github.com/big-armor/datapm/pull/525)) ([2cd253be](https://github.com/big-armor/datapm/commit/2cd253be1558fbdd03b6ad4a243279b0a419f016))
+
 #### 0.32.13 (2022-09-22)
 
 ##### Bug Fixes
