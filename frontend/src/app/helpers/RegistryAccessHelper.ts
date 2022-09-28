@@ -1,4 +1,3 @@
-import { environment } from "../../environments/environment";
 import * as URLParse from "url-parse";
 
 export function getRegistryURL(): string {

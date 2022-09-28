@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <div *ngIf="state == State.LOADED">
+    <div *ngIf="state == State.LOADED || state == State.ERROR_PACKAGE_FILE_NOT_FOUND">
         <div class="container-fluid px-0">
             <div class="row" id="packagePage">
                 <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
@@ -143,6 +143,11 @@
                                         [package]="package"
                                         [packageFile]="packageFile"
                                     ></app-package-info>
+
+                                    <div class="alert-warning alert" *ngIf="state == State.ERROR_PACKAGE_FILE_NOT_FOUND">
+                                        There was a problem loading loading the package file. Please re-publish the package file or contact support.
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="row mt-2" *ngIf="package?.latestVersion?.identifier == null">

@@ -64,4 +64,8 @@ export class AuthenticationService {
             })
         );
     }
+
+    public getAuthorizationHeader() {
+        return localStorage.getItem("jwt");
+    }
 }

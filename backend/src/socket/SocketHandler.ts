@@ -92,7 +92,7 @@ export class SocketConnectionHandler {
             await handler.start(callback);
         } catch (error) {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
     };
 
@@ -118,7 +118,7 @@ export class SocketConnectionHandler {
             await handler.start(callback);
         } catch (error) {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
     };
 
@@ -134,7 +134,7 @@ export class SocketConnectionHandler {
             await dataFetchHandler.start(callback);
         } catch (error) {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
     };
 
@@ -159,7 +159,7 @@ export class SocketConnectionHandler {
             await uploadRequestHandler.start(callback);
         } catch (error) {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
     };
 
@@ -227,7 +227,7 @@ export class SocketConnectionHandler {
             await handler.start(callback);
         } catch (error) {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
     };
 }
@@ -252,7 +252,7 @@ export async function checkCatalogPermission(
             callback(new ErrorResponse("PACKAGE_OR_CATALOG_NOT_FOUND", SocketError.NOT_FOUND));
         } else {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
         return false;
     }
@@ -294,7 +294,7 @@ export async function checkPackagePermission(
             callback(new ErrorResponse("PACKAGE_OR_CATALOG_NOT_FOUND", SocketError.NOT_FOUND));
         } else {
             console.error(error);
-            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
         }
         return false;
     }

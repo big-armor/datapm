@@ -949,7 +949,7 @@ export async function validatePackageFileInBrowser(packageFile: PackageFile): Pr
 
     const schemaVersion = getSchemaVersionFromPackageFile(packageFile);
 
-    const response = await fetch("/docs/datapm-package-file-schema-v" + schemaVersion.format() + ".json");
+    const response = await fetch("/static/datapm-package-file-schema-v" + schemaVersion.format() + ".json");
 
     if (response.status > 199 && response.status < 300) {
         packageSchemaFile = await response.text();
@@ -983,7 +983,7 @@ export function getSchemaVersionFromPackageFile(packageFileObject: any): SemVer 
     let packageFileSchemaUrl = packageFileObject.$schema as string;
 
     if (packageFileSchemaUrl == null)
-        packageFileSchemaUrl = "https://datapm.io/docs/datapm-package-file-schema-v0.1.0.json";
+        packageFileSchemaUrl = "https://datapm.io/static/datapm-package-file-schema-v0.1.0.json";
 
     const schemaVersion = packageFileSchemaUrl.match(/v(.*)\.json/i);
 
