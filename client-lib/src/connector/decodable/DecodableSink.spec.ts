@@ -62,7 +62,7 @@ describe("Decodable Sink Unit Tests", () => {
             }
         };
         const timestampArray = getDecodableType(properties.timestampArray.types);
-        expect(timestampArray).equal("ARRAY<TIMESTAMP(3)>");
+        expect(timestampArray).equal("ARRAY<TIMESTAMP_LTZ(3)>");
 
         const stringArray = getDecodableType(properties.stringArray.types);
         expect(stringArray).equal("ARRAY<STRING>");
