@@ -255,10 +255,7 @@ export class DecodableSink implements Sink {
                     const events = records.map((r) => {
                         const record = r.recordContext.record;
                         if (configuration["event-time-" + schema.title] === RECIEVE_TIME) {
-                            record[RECIEVE_TIME] = r.recordContext.receivedDate
-                                .toISOString()
-                                .replace(/[T]/g, " ")
-                                .replace("Z", "");
+                            record[RECIEVE_TIME] = r.recordContext.receivedDate.toISOString();
                         }
 
                         return record;
@@ -286,10 +283,10 @@ export class DecodableSink implements Sink {
                     );
 
                     if (response.status !== 202) {
+                        const jsonText = await response.json();
+
                         callback(
-                            new Error(
-                                `Unexpected response status ${response.status} body ${JSON.stringify(response.json())}`
-                            )
+                            new Error(`Unexpected response status ${response.status} body ${JSON.stringify(jsonText)}`)
                         );
                         return;
                     }
@@ -598,7 +595,7 @@ export class DecodableSink implements Sink {
         if (configuration["event-time-" + schema.title] === RECIEVE_TIME) {
             decodableSchema.push({
                 name: RECIEVE_TIME,
-                type: "TIMESTAMP(3)"
+                type: "TIMESTAMP_LTZ(3)"
             });
         }
 
@@ -655,7 +652,15 @@ function makeDecodableSafeObjects(properties: Properties, object: DPMRecord): vo
             const value = object[property.title];
             const momentValue = moment(value as MomentInput);
 
-            object[property.title] = momentValue.toISOString().replace(/[T]/g, " ").replace("Z", "");
+            object[property.title] = momentValue.toISOString();
+        }
+
+        if (type === "date") {
+            // YYYY-MM-DD
+            const value = object[property.title];
+            const momentValue = moment(value as MomentInput);
+
+            object[property.title] = momentValue.format(moment.HTML5_FMT.DATE);
         }
     }
 }
@@ -704,10 +709,10 @@ export function getDecodableType(types: ValueTypes): string {
     }
 
     if (type === "date-time") {
-        // Currently sets to TIMESTAMP(3) because
+        // Currently sets to TIMESTAMP_LTZ(3) because
         // upstream processing converts to javascript Date
         // object, which automatically truncates to 3 digits
-        return "TIMESTAMP(3)";
+        return "TIMESTAMP_LTZ(3)";
     }
 
     if (type === "array") {
