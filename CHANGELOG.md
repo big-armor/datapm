@@ -1,3 +1,9 @@
+#### 0.32.16 (2022-09-29)
+
+##### Other Changes
+
+*  Added refresh package data option in web ([#526](https://github.com/big-armor/datapm/pull/526)) ([dbf2c20b](https://github.com/big-armor/datapm/commit/dbf2c20b193da590ed54424f46df82d94564d50c))
+
 #### 0.32.15 (2022-09-29)
 
 ##### Bug Fixes
