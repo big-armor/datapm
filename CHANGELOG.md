@@ -1,3 +1,9 @@
+#### 0.32.15 (2022-09-29)
+
+##### Bug Fixes
+
+*  Correctly format decodable timestamps ([#528](https://github.com/big-armor/datapm/pull/528)) ([b2420dfe](https://github.com/big-armor/datapm/commit/b2420dfec514f7ba87b8bc7ba3a0e0107f3d8a5f))
+
 #### 0.32.14 (2022-09-22)
 
 ##### Bug Fixes
