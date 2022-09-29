@@ -164,6 +164,11 @@ export async function updateRepository(argv: RepositoryUpdateArguments): Promise
 
     const result = await job.execute();
 
+    if (result.exitCode !== 0) {
+        oraRef.fail(result.errorMessage);
+        process.exit(result.exitCode);
+    }
+
     console.log("\n");
     console.log(chalk.grey("Updated " + argv.repositoryIdentifier + " to " + result.result?.newRepositoryIdentifier));
     console.log(
@@ -191,6 +196,11 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
     const job = new AddRepositoryJob(jobContext, argv);
 
     const result = await job.execute();
+
+    if (result.exitCode !== 0) {
+        oraRef.fail(result.errorMessage);
+        process.exit(result.exitCode);
+    }
 
     console.log("\n");
     console.log(chalk.grey("You can update this repository with the following command."));
@@ -221,6 +231,7 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         const result = await job.execute();
 
         if (result.exitCode !== 0) {
+            oraRef.fail(result.errorMessage);
             process.exit(result.exitCode);
         }
 

@@ -16,7 +16,12 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
 
     const jobContext = new CLIJobContext(oraRef, argv);
     const job = new SearchJob(jobContext, argv);
-    await job.execute();
+    const jobResults = await job.execute();
+
+    if (jobResults.exitCode !== 0) {
+        oraRef.fail(jobResults.errorMessage);
+        process.exit(jobResults.exitCode);
+    }
 
     console.log(" ");
 

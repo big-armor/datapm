@@ -22,6 +22,7 @@ export async function editPackage(argv: EditArguments): Promise<void> {
         const results = await editJob.execute();
 
         if (results.exitCode !== 0) {
+            oraRef.fail(chalk.red(results.errorMessage));
             process.exit(results.exitCode);
         }
 
