@@ -89,6 +89,7 @@ h3 {
 
 .cdk-overlay-dark-backdrop {
     background: var(--cdk-overlay-background);
+    backdrop-filter: blur(2px);
 }
 
 table.gray-table {
@@ -1575,4 +1576,15 @@ blockquote {
     color: transparent !important;
     height: 0px !important;
     border: 0;
+}
+
+
+.command-modal .mat-dialog-container {
+    padding-left: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 0px;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: saturate(0.5) blur(10px);
 }

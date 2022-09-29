@@ -28,6 +28,7 @@ import { AvatarComponent } from "./avatar/avatar.component";
 import { UsernamePipe } from "./pipes/username.pipe";
 import { CoverComponent } from "./cover/cover.component";
 import { PercentPipe } from "./pipes/percent.pipe";
+import { SanitizeWithStylePipe } from "./pipes/sanitize-with-style.pipe";
 import { ValuesPipe } from "./pipes/values.pipe";
 import { KeysPipe } from "./pipes/keys.pipe";
 import { EntriesPipe } from "./pipes/entries.pipe";
@@ -84,6 +85,7 @@ import { UserItemComponent } from "../shared/user-item/user-item.component";
 import { PackageAutocompleteComponent } from "./package-autocomplete/package-autocomplete.component";
 import { CatalogAutocompleteComponent } from "./catalog-autocomplete/catalog-autocomplete.component";
 import { CollectionAutocompleteComponent } from "./collection-autocomplete/collection-autocomplete.component";
+import { CommandModalComponent } from './command-modal/command-modal.component';
 
 @NgModule({
     declarations: [
@@ -102,6 +104,7 @@ import { CollectionAutocompleteComponent } from "./collection-autocomplete/colle
         UsernamePipe,
         CoverComponent,
         PercentPipe,
+        SanitizeWithStylePipe,
         ValuesPipe,
         KeysPipe,
         EntriesPipe,
@@ -146,7 +149,8 @@ import { CollectionAutocompleteComponent } from "./collection-autocomplete/colle
         UpdateMethodPipe,
         PackageAutocompleteComponent,
         CatalogAutocompleteComponent,
-        CollectionAutocompleteComponent
+        CollectionAutocompleteComponent,
+        CommandModalComponent
     ],
     imports: [
         CommonModule,

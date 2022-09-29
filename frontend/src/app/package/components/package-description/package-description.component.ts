@@ -99,7 +99,10 @@ export class PackageDescriptionComponent {
                 }
             }
 
-            this.state = State.LOADED;
+            if(p.response.errors) {
+                this.state = State.ERROR_LOADING_PACKAGE;
+            } else 
+                this.state = State.LOADED;
         });
 
         this.packageService.packageError.pipe(takeUntil(this.unsubscribe$)).subscribe((error) => {

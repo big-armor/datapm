@@ -28,6 +28,7 @@ export class PublishPackageCommandModule {
         const publishJobResult = await publishJob.execute();
 
         if (publishJobResult.exitCode !== 0) {
+            oraRef.fail(chalk.red(publishJobResult.errorMessage));
             exit(publishJobResult.exitCode);
         }
 

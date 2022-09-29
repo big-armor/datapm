@@ -104,6 +104,7 @@ export interface Source {
 }
 
 export interface InspectProgress {
+    currentStreamName: string;
     msRemaining: number;
     recordCount: number;
     recordsInspectedCount: number;

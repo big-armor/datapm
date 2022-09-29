@@ -1,4 +1,3 @@
-import { I } from "@angular/cdk/keycodes";
 import { formatNumber } from "@angular/common";
 import { Component, Input, OnChanges, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
@@ -9,8 +8,10 @@ import { AddPackageComponent } from "src/app/collection-details/add-package/add-
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
+import { CommandModalComponent } from "src/app/shared/command-modal/command-modal.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
-import { CurrentUser, Package, User } from "src/generated/graphql";
+import { CurrentUser, Package, Permission } from "src/generated/graphql";
+import { PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
@@ -22,6 +23,8 @@ import { EditWebsiteDialogComponent } from "./edit-website-dialog/edit-website-d
     styleUrls: ["./package-info.component.scss"]
 })
 export class PackageInfoComponent implements OnInit, OnChanges {
+    Permission = Permission;
+
     @Input()
     public package: Package;
 
@@ -38,7 +41,8 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     constructor(
         private snackBarService: SnackBarService,
         private dialog: MatDialog,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private packageService: PackageService
     ) {}
 
     public ngOnInit(): void {
@@ -165,6 +169,24 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         } else {
             return false;
         }
+    }
+
+    public refreshData() {
+        const dialogRef = this.dialog
+            .open(CommandModalComponent, {
+                data: {
+                    targetPackage: this.package.identifier,
+                    command: "update"
+                },
+                width: "90vw",
+                maxWidth: "800px",
+                height: "90vh",
+                maxHeight: "600px",
+                disableClose: true,
+                panelClass: "command-modal"
+            })
+            .afterClosed()
+            .subscribe(() => {});
     }
 
     addToCollection(packageObject: Package) {

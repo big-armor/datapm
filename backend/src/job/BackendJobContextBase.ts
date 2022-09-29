@@ -308,16 +308,41 @@ export abstract class BackendJobContextBase extends JobContext {
             packageFile: latestPackageFile,
             permitsSaving: true,
             save: async (packageFile: PackageFile): Promise<void> => {
-                await hasPackagePermissionOrFail(Permission.EDIT, this.context, identifier);
+                const task = await this.startTask("Checking package permissions...");
 
-                await createOrUpdateVersion(
-                    this.context as AuthenticatedContext,
-                    identifier,
-                    {
-                        packageFile
-                    },
-                    []
-                );
+                try {
+                    await hasPackagePermissionOrFail(Permission.EDIT, this.context, identifier);
+                } catch (error) {
+                    task.end("ERROR", "You do not have permission to edit this package");
+                    throw error;
+                }
+
+                task.end("SUCCESS", "Edit permission granted");
+
+                const task2 = await this.startTask("Saving package file...");
+
+                try {
+                    const version = await createOrUpdateVersion(
+                        this.context as AuthenticatedContext,
+                        identifier,
+                        {
+                            packageFile
+                        },
+                        []
+                    );
+
+                    const versionString =
+                        version.identifier.versionMajor +
+                        "." +
+                        version.identifier.versionMinor +
+                        "." +
+                        version.identifier.versionPatch;
+
+                    task2.end("SUCCESS", "Saved version " + versionString);
+                } catch (error) {
+                    task2.end("ERROR", "Failed to save package file: " + error.message);
+                    throw error;
+                }
             },
             licenseFileUrl:
                 getEnvVariable("REGISTRY_URL") +

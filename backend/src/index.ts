@@ -9,7 +9,7 @@ import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
 import { AuthenticatedHTTPContext, AuthenticatedSocketContext, HTTPContext, SocketContext } from "./context";
-import { getMeFromAPIKey, getMeRequest } from "./util/me";
+import { getMeFromAPIKey, getMeJwt, getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable } from "./util/secrets";
@@ -41,6 +41,7 @@ import {
 import * as SegfaultHandler from "segfault-raub";
 import { GroupRepository } from "./repository/GroupRepository";
 import { getEnvVariable } from "./util/getEnvVariable";
+import { parseJwt } from "./util/jwt";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -201,17 +202,17 @@ async function main() {
         })
     );
 
-    app.use("/docs/schema.gql", function (req, res, next) {
+    app.use("/static/schema.gql", function (req, res, next) {
         res.set("content-type", "application/graphql");
         res.send(fs.readFileSync("node_modules/datapm-lib/schema.gql"));
     });
 
-    app.use("/docs/datapm-package-file-schema-v1.json", function (req, res, next) {
+    app.use("/static/datapm-package-file-schema-v1.json", function (req, res, next) {
         res.set("content-type", "application/json");
         res.send(fs.readFileSync("node_modules/datapm-lib/packageFileSchema-v0.1.0.json"));
     });
 
-    app.use("/docs/datapm-package-file-schema-current.json", function (req, res, next) {
+    app.use("/static/datapm-package-file-schema-current.json", function (req, res, next) {
         res.set("content-type", "application/json");
 
         const files = fs.readdirSync("node_modules/datapm-lib/");
@@ -220,8 +221,8 @@ async function main() {
         res.send(fs.readFileSync("node_modules/datapm-lib/" + packageFiles[packageFiles.length - 1]));
     });
 
-    app.use("/docs/datapm-package-file-schema-*", function (req, res, next) {
-        const version = req.baseUrl.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
+    app.use("/static/datapm-package-file-schema-*", function (req, res, next) {
+        const version = req.baseUrl.match(/^\/static\/datapm-package-file-schema-v(.*)\.json$/i);
         if (version == null) {
             res.sendStatus(404);
             return;
@@ -578,6 +579,22 @@ async function main() {
             const token = socket.handshake.auth.token;
 
             const user = await getMeFromAPIKey(token, connection.manager);
+
+            (contextObject as AuthenticatedSocketContext).me = user;
+        } else if (socket.handshake.auth.bearer != null) {
+            if (Array.isArray(socket.handshake.auth.bearer)) {
+                throw new Error("BEARER_MUST_BE_SINGLE_VALUE");
+            }
+
+            const bearer = socket.handshake.auth.bearer;
+
+            const jwt = await parseJwt(bearer);
+
+            const user = await getMeJwt(jwt, connection.manager);
+
+            if (user == null) {
+                throw new Error("JWT_INVALID");
+            }
 
             (contextObject as AuthenticatedSocketContext).me = user;
         }

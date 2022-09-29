@@ -36,10 +36,18 @@ export abstract class Job<T> {
 
     async execute(): Promise<JobResult<T>> {
         this.state = "RUNNING";
-        const taskResult = await this._execute();
 
-        this.updateState(taskResult);
-        return taskResult;
+        try {
+            const taskResult = await this._execute();
+
+            this.updateState(taskResult);
+            return taskResult;
+        } catch (e) {
+            return {
+                exitCode: 1,
+                errorMessage: e.message
+            };
+        }
     }
 
     private updateState(taskResult: JobResult<T>): void {

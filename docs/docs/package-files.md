@@ -22,11 +22,11 @@ Here are a few example DataPM package files for your reference.
 
 ## File Format
 
-A DataPM package file is stored in JSON format, and adheres to the published [DataPM Package File JSON Schema spec](/docs/datapm-package-file-schema-current.json) - which is itself a restricting extension of the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
+A DataPM package file is stored in JSON format, and adheres to the published [DataPM Package File JSON Schema spec](/static/datapm-package-file-schema-current.json) - which is itself a restricting extension of the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
 
 ### Validating Package File Formats
 
-[https://jsonschema.dev](https://jsonschema.dev) is the official JSON Schema validator. You can copy the contents of [datapm-package-file-schema-current.json](/docs/datapm-package-file-schema-current.json) into the "JSON Schema" field, and your package file into the "JSON instance" to validate.
+[https://jsonschema.dev](https://jsonschema.dev) is the official JSON Schema validator. You can copy the contents of [datapm-package-file-schema-current.json](/static/datapm-package-file-schema-current.json) into the "JSON Schema" field, and your package file into the "JSON instance" to validate.
 
 ### Command Line Validation
 
@@ -38,7 +38,7 @@ A DataPM package file is stored in JSON format, and adheres to the published [Da
 npm install -g ajv-cli
 
 # Get the package file schema
-curl https://datapm.io/docs/datapm-package-file-schema-current.json -o datapm-package-file-schema-current.json
+curl https://datapm.io/static/datapm-package-file-schema-current.json -o datapm-package-file-schema-current.json
 
 # Validate the package file against the schema
 ajv validate -s  datapm-package-file-schema-current.json -d my-package-file.datapm.json

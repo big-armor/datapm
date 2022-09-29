@@ -1,0 +1,19 @@
+<div class="content">
+    <div class="title-bar">
+        <div class="mat-dialog-title">{{ title }}</div>
+        <button mat-button mat-dialog-close class="dialog-close">close</button>
+    </div>
+
+
+    <div class="content-scroll">
+        <span *ngIf="state === State.STARTING"> <mat-spinner [diameter]="15" class="spinner"></mat-spinner>Connecting...</span>
+        <span [innerHTML]="printLog | sanitizeWithStyle"></span>
+        <div class="task-content">
+            <mat-spinner [diameter]="15" class="spinner" *ngIf="state === State.CONNECTED"></mat-spinner>
+            <span [innerHTML]="taskContent2 | sanitizeWithStyle"></span>
+        </div>
+    </div>
+    
+
+
+</div>

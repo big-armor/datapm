@@ -78,6 +78,7 @@
                 <p class="text-dark-gray">
                     {{ package?.latestVersion?.updatedAt | timeAgo }}
                 </p>
+                <a class="doc-link" (click)="refreshData()" *ngIf="package?.myPermissions.includes(Permission.EDIT)">refresh data</a>
             </div>
             <div class="col-6 mb-3" *ngIf="packageSizeBytes > 0">
                 <p class="text-light-gray">unpacked size</p>

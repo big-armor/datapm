@@ -51,7 +51,7 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         }
 
         if (!(await this.createLock())) {
-            return;
+            throw new Error("COULD_NOT_CREATE_PACKAGE_UPDATE_LOCK");
         }
 
         const packageEntity = await this.socketContext.connection
@@ -80,6 +80,10 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         });
 
         this.socket.on(this.channelName, this.handleChannelEvents);
+
+        this.socket.on("disconnect", () => {
+            this.stop("disconnect");
+        });
 
         callback(new StartPackageUpdateResponse(this.channelName));
     }
@@ -143,11 +147,11 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
 
         this.socket.emit(this.channelName, exitMessage);
 
-        this.stop("server");
+        return this.stop("server");
     }
 
     async createLock(): Promise<boolean> {
-        const lock = this.distributedLockingService.lock(this.getLockKey());
+        const lock = await this.distributedLockingService.lock(this.getLockKey());
 
         if (!lock) {
             this.socket.emit(this.channelName, SocketError.STREAM_LOCKED, {
@@ -167,7 +171,7 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     }
 
     async removeLock(): Promise<void> {
-        this.distributedLockingService.unlock(this.getLockKey());
+        return this.distributedLockingService.unlock(this.getLockKey());
     }
 
     getLockKey(): string {

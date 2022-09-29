@@ -421,7 +421,7 @@ export async function inspectStreamSet(
 
     const task = await jobContext.startTask("Inspecting stream set...");
     const progressText = function (progress: InspectProgress) {
-        let text = "Inspecting records...\n";
+        let text = `Inspecting ${progress.currentStreamName}\n`;
         const recordsCountedString = numeral(progress.recordCount).format("0,0a");
         const recordsPerSecondString = numeral(progress.recordsPerSecond).format("0,0a");
         const recordsInspectedString = numeral(progress.recordsInspectedCount).format("0,0a");

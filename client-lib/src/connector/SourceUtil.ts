@@ -99,6 +99,10 @@ export async function generateSchemasFromSourceStreams(
 
     const timeoutMs = inspectionSeconds * 1000;
 
+    // Holds the next stream that will be opened
+    let nextStreamIndex = 0;
+    let currentStreamSummary: StreamSummary | null = null;
+
     const interval = setInterval(() => {
         if (completed || error) {
             clearInterval(interval);
@@ -108,6 +112,7 @@ export async function generateSchemasFromSourceStreams(
         const recordsInspectedCount = completedStreamsInspectedRecordCount + currentStreamInspectedCount;
         const currentTime = Date.now();
         streamStatusContext.onProgress({
+            currentStreamName: currentStreamSummary?.name || "",
             msRemaining: timeoutMs - (currentTime - startTime),
             bytesProcessed: bytesReceived,
             recordsInspectedCount: recordsInspectedCount,
@@ -126,10 +131,6 @@ export async function generateSchemasFromSourceStreams(
         returnPromiseReject = reject;
         returnPromiseResolve = resolve;
     });
-
-    // Holds the next stream that will be opened
-    let nextStreamIndex = 0;
-    let currentStreamSummary: StreamSummary | null = null;
 
     const moveToNextStream = async function () {
         completedStreamsRecordCount += currentStreamRecordCount;
@@ -250,6 +251,7 @@ export async function generateSchemasFromSourceStreams(
         const recordCount = completedStreamsRecordCount + (reachedEnd ? 0 : currentStreamRecordCount);
 
         streamStatusContext.onComplete({
+            currentStreamName: currentStreamSummary?.name || "",
             msRemaining: 0,
             bytesProcessed: bytesReceived,
             recordsInspectedCount: inspectedCount,

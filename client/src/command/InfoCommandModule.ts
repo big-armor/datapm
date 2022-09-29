@@ -4,6 +4,7 @@ import { InfoArguments } from "./InfoCommand";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { InfoJob } from "datapm-client-lib";
 import { checkDataPMVersion } from "../util/VersionCheckUtil";
+import chalk from "chalk";
 
 export async function getInfo(argv: InfoArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -23,6 +24,11 @@ export async function getInfo(argv: InfoArguments): Promise<void> {
     const job = new InfoJob(jobContext, argv);
 
     const result = await job.execute();
+
+    if (result.exitCode !== 0) {
+        oraRef.fail(chalk.red(result.errorMessage));
+        process.exit(result.exitCode);
+    }
 
     console.log(" ");
 

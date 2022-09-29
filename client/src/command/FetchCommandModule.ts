@@ -36,6 +36,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     const jobResult = await job.execute();
 
     if (jobResult.exitCode !== 0) {
+        oraRef.fail(chalk.red(jobResult.errorMessage));
         exit(jobResult.exitCode);
     }
 

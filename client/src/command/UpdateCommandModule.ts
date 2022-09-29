@@ -19,6 +19,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
         const taskResult = await job.execute();
 
         if (taskResult.exitCode !== 0) {
+            oraRef.fail(taskResult.errorMessage);
             process.exit(taskResult.exitCode);
         }
 
