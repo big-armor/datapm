@@ -1,3 +1,9 @@
+#### 0.32.17 (2022-09-30)
+
+##### Bug Fixes
+
+*  Added 'self' to several content-security-policies ([ac8062bc](https://github.com/big-armor/datapm/commit/ac8062bc599933d97040849074c05cc08e21e6ba))
+
 #### 0.32.16 (2022-09-29)
 
 ##### Other Changes
