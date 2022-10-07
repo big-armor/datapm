@@ -76,10 +76,13 @@ export function getLocalPackageLatestVersionPath(packageSlug: string): string {
         .filter((d) => d.isFile())
         .filter((f) => f.name.toLowerCase().endsWith(".datapm.json"))
         .filter((f) => {
+            const filePath = path.join(basePath, f.name);
+
             try {
-                loadPackageFileFromDisk(path.join(basePath, f.name));
+                loadPackageFileFromDisk(filePath);
                 return true;
             } catch (e) {
+                console.error("Error reading package file " + filePath + ": " + e.message);
                 return false;
             }
         })

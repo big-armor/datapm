@@ -6,6 +6,7 @@ import {
     packageSlugValid,
     Properties,
     Schema,
+    Source,
     ParameterAnswer,
     ParameterType,
     Parameter
@@ -399,6 +400,7 @@ export async function inspectSource(
 }
 
 export async function inspectStreamSet(
+    source: Source,
     streamSetPreview: StreamSetPreview,
     jobContext: JobContext,
     sourceConfiguration: DPMConfiguration,
@@ -438,6 +440,8 @@ export async function inspectStreamSet(
 
         if (!progress.final) {
             text += chalk.gray(`${secondsRemaining} seconds remaining\n`);
+
+            // TODO Make this context specific
             text += chalk.gray("Press Ctrl+C to stop inspecting");
         }
 
@@ -446,6 +450,7 @@ export async function inspectStreamSet(
 
     try {
         const inspectionResults = await generateSchemasFromSourceStreams(
+            source,
             streamSetPreview,
             {
                 onStart: (streamName: string) => {

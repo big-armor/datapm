@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from "chai";
-import { ContentLabel, RecordContext } from "datapm-lib";
+import { ContentLabel, RecordContext, RecordStreamContext, UpdateMethod } from "datapm-lib";
 import { test } from "mocha";
 import moment from "moment";
 import { Writable } from "stream";
@@ -43,7 +43,18 @@ describe("Stats transform", () => {
             }
         ];
 
-        statsTransform.write(recordContexts);
+        const recordStreamContexts: RecordStreamContext[] = recordContexts.map((r) => {
+            return {
+                recordContext: r,
+                sourceType: "test",
+                sourceSlug: "test",
+                streamSetSlug: "test",
+                streamSlug: "test",
+                updateMethod: UpdateMethod.BATCH_FULL_SET
+            };
+        });
+
+        statsTransform.write(recordStreamContexts);
 
         const writable = new Writable({
             objectMode: true,
@@ -96,7 +107,18 @@ describe("Stats transform", () => {
             }
         ];
 
-        statsTransform.write(recordContexts);
+        const recordStreamContexts: RecordStreamContext[] = recordContexts.map((r) => {
+            return {
+                recordContext: r,
+                sourceType: "test",
+                sourceSlug: "test",
+                streamSetSlug: "test",
+                streamSlug: "test",
+                updateMethod: UpdateMethod.BATCH_FULL_SET
+            };
+        });
+
+        statsTransform.write(recordStreamContexts);
 
         const writable = new Writable({
             objectMode: true,
@@ -176,7 +198,18 @@ describe("Stats transform", () => {
             }
         ];
 
-        statsTransform.write(recordContexts);
+        const recordStreamContexts: RecordStreamContext[] = recordContexts.map((r) => {
+            return {
+                recordContext: r,
+                sourceType: "test",
+                sourceSlug: "test",
+                streamSetSlug: "test",
+                streamSlug: "test",
+                updateMethod: UpdateMethod.BATCH_FULL_SET
+            };
+        });
+
+        statsTransform.write(recordStreamContexts);
 
         const writable = new Writable({
             objectMode: true,
@@ -264,7 +297,18 @@ describe("Stats transform", () => {
             }
         ];
 
-        statsTransform.write(recordContexts);
+        const recordStreamContexts: RecordStreamContext[] = recordContexts.map((r) => {
+            return {
+                recordContext: r,
+                sourceType: "test",
+                sourceSlug: "test",
+                streamSetSlug: "test",
+                streamSlug: "test",
+                updateMethod: UpdateMethod.BATCH_FULL_SET
+            };
+        });
+
+        statsTransform.write(recordStreamContexts);
 
         const writable = new Writable({
             objectMode: true,

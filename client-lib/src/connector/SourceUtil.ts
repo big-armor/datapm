@@ -1,15 +1,12 @@
 import {
     CountPrecision,
     DPMConfiguration,
-    DPMPropertyTypes,
     DPMRecord,
     DPMRecordValue,
-    Properties,
-    Property,
     Schema,
+    Source,
     StreamStats,
-    UpdateMethod,
-    ValueTypes
+    UpdateMethod
 } from "datapm-lib";
 import { Writable } from "stream";
 import { clearInterval } from "timers";
@@ -28,6 +25,7 @@ import { ConnectorDescription } from "./Connector";
 import { EXTENDED_CONNECTORS } from "./ConnectorUtil";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { TimeOrDeathTransform } from "../transforms/TimeOrDeathTransform";
+import { RecordStreamContextTransform } from "../transforms/RecordStreamContextTransform";
 
 export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
     const returnValue: SourceDescription[] = [];
@@ -76,6 +74,7 @@ export async function findRepositoryForSourceUri(uri: string): Promise<Connector
 }
 
 export async function generateSchemasFromSourceStreams(
+    source: Source,
     streamSetPreview: StreamSetPreview,
     streamStatusContext: StreamStatusContext,
     _configuration: DPMConfiguration,
@@ -212,6 +211,10 @@ export async function generateSchemasFromSourceStreams(
 
         lastTransform = lastTransform.pipe(new BatchingTransform(1000, 100));
 
+        lastTransform = lastTransform.pipe(
+            new RecordStreamContextTransform(source, streamSetPreview, currentStreamSummary)
+        );
+
         lastTransform = lastTransform.pipe(statsTransform);
 
         lastTransform = lastTransform.pipe(
@@ -300,7 +303,8 @@ export async function generateSchemasFromSourceStreams(
         returnPromiseResolve({
             schemas: Object.values(schemas),
             streamStats,
-            updateMethods
+            updateMethods,
+            endReached: reachedEnd
         });
     };
 
@@ -310,8 +314,6 @@ export async function generateSchemasFromSourceStreams(
 }
 
 function finalizeSchema(reachedEnd: boolean, schema: Schema): void {
-    const properties = schema.properties as Properties;
-
     let recordCountPrecision = CountPrecision.EXACT;
 
     if (!reachedEnd) {

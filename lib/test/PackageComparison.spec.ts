@@ -379,7 +379,8 @@ describe("Checking VersionUtil", () => {
                     streamStats: {
                         inspectedCount: 0
                     },
-                    updateMethods: []
+                    updateMethods: [],
+                    endReached: false
                 }
             ]
         };
@@ -397,7 +398,8 @@ describe("Checking VersionUtil", () => {
                     streamStats: {
                         inspectedCount: 0
                     },
-                    updateMethods: []
+                    updateMethods: [],
+                    endReached: false
                 }
             ]
         };
@@ -439,7 +441,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 0
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -459,7 +462,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 0
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -492,7 +496,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 0
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -512,7 +517,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 0
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -539,7 +545,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 0
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -559,7 +566,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -595,7 +603,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -618,7 +627,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -647,7 +657,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -668,7 +679,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -696,7 +708,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -719,7 +732,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: []
+                        updateMethods: [],
+                        endReached: false
                     }
                 ]
             }
@@ -747,7 +761,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: [UpdateMethod.BATCH_FULL_SET]
+                        updateMethods: [UpdateMethod.BATCH_FULL_SET],
+                        endReached: false
                     }
                 ]
             }
@@ -767,7 +782,8 @@ describe("Checking VersionUtil", () => {
                         streamStats: {
                             inspectedCount: 1
                         },
-                        updateMethods: [UpdateMethod.APPEND_ONLY_LOG]
+                        updateMethods: [UpdateMethod.APPEND_ONLY_LOG],
+                        endReached: false
                     }
                 ]
             }

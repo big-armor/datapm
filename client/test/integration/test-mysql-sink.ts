@@ -75,8 +75,8 @@ describe("MySQL Sink Test", function () {
         removePackageFiles(["legislators"]);
         removePackageFiles(["covid-02-01-2020"]);
 
-        knexClient.destroy();
-        await mysqlContainer.stop();
+        knexClient?.destroy();
+        await mysqlContainer?.stop();
     });
 
     it("Can't connect to invalid URI", async function () {

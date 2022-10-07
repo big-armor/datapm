@@ -28,6 +28,7 @@ import {
     Property
 } from "./PackageFile-v0.32.1";
 import { DATAPM_VERSION } from "./DataPMVersion";
+import { UpdateMethod } from "./DataHandlingUtil";
 
 export type DPMPropertyTypes =
     | "string"
@@ -85,6 +86,9 @@ export interface RecordStreamContext {
 
     /** The wrapped recordContext - which comes from the Source */
     recordContext: RecordContext;
+
+    /** The update method defined by the stream at the time of producing the record */
+    updateMethod: UpdateMethod;
 }
 
 export enum Compability {

@@ -23,7 +23,8 @@ import {
     TestResults,
     PromptInput,
     KEYS,
-    loadTestPackageFile
+    loadTestPackageFile,
+    writeTestPackageFile
 } from "./test-utils";
 import { getLocalPackageLatestVersionPath } from "../../src/util/GetPackageUtil";
 import path from "path";
@@ -210,6 +211,29 @@ describe("Update Package Command Tests", async () => {
         expect(properties["Increasing series integer"].unit).equals(undefined);
     });
 
+    it("Should manually update package file descriptors for testing", async () => {
+        const packageFile = loadTestPackageFile(packageAReference);
+        packageFile.description = "Updated description";
+        packageFile.displayName = "Updated display name";
+
+        packageFile.schemas[0].derivedFrom = [
+            {
+                displayName: "test",
+                schemaIdentifier: {
+                    packageSlug: "test",
+                    catalogSlug: "default",
+                    majorVersion: 1,
+                    registryUrl: `http://localhost:${registryServerPort}`,
+                    schemaTitle: "test"
+                }
+            }
+        ];
+        packageFile.schemas[0].derivedFromDescription = "Updated derived from description";
+        packageFile.schemas[0].unit = "monkeys";
+
+        writeTestPackageFile(packageFile, packageAReference);
+    });
+
     it("Should update the package file based on the updated source file", async () => {
         updateSourceFile("test.csv");
 
@@ -234,14 +258,17 @@ describe("Update Package Command Tests", async () => {
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
-        expect(newPackageFile.displayName).be.string("test");
+        expect(newPackageFile.displayName).be.string("Updated display name");
+        expect(newPackageFile.description).equals("Updated description");
+        expect(newPackageFile.schemas[0].derivedFrom).not.equals(null);
+        expect(newPackageFile.schemas[0].derivedFromDescription).equals("Updated derived from description");
+        expect(newPackageFile.schemas[0].unit).equals("monkeys");
         expect(newPackageFile.packageSlug).be.string("test");
         expect(newPackageFile.version).be.string("2.0.0");
-        expect(newPackageFile.description).be.string("Generated from file://./test.csv");
         expect(newPackageFile.website).be.string("");
         expect(newPackageFile.schemas[0].sampleRecords?.length).equals(100);
         expect(newPackageFile.schemas[0].recordCount).equals(200);
-        expect(newPackageFile.schemas[0].unit).equals(undefined);
+        expect(newPackageFile.schemas[0].unit).equals("monkeys");
     });
 
     it("Should prompt for and save missing configuration parameters", async () => {

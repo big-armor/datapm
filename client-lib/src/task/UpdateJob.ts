@@ -6,7 +6,8 @@ import {
     PackageFile,
     Schema,
     StreamSet,
-    ParameterType
+    ParameterType,
+    UpdateMethod
 } from "datapm-lib";
 import { PackageIdentifier } from "../generated/graphql";
 import { PackageFileWithContext, cantSaveReasonToString, CantSaveReasons } from "../util/PackageContext";
@@ -20,6 +21,7 @@ import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { differenceToString } from "../util/PackageUtil";
 import { SemVer } from "semver";
 import { filterBadSchemaProperties, inspectSource, inspectStreamSet } from "./PackageJob";
+import { combineSchema, combineSchemas } from "../util/SchemaUtil";
 
 export class UpdateArguments {
     reference?: string | PackageIdentifier;
@@ -248,19 +250,22 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             const streamSets: StreamSet[] = [];
             for (const streamSet of uriInspectionResults.streamSetPreviews) {
                 const streamInspectionResult = await inspectStreamSet(
+                    sourceObject,
                     streamSet,
                     this.jobContext,
                     sourceConfiguration,
                     this.argv.inspectionSeconds || 30
                 );
 
-                newPackageFile.schemas = [...newPackageFile.schemas, ...streamInspectionResult.schemas];
+                newPackageFile.schemas = combineSchemas(newPackageFile.schemas, streamInspectionResult.schemas);
+
                 streamSets.push({
                     schemaTitles: streamInspectionResult.schemas.map((s: Schema) => s.title as string),
                     slug: streamSet.slug,
                     streamStats: streamInspectionResult.streamStats,
                     lastUpdateHash: streamSet.updateHash,
-                    updateMethods: streamInspectionResult.updateMethods
+                    updateMethods: streamInspectionResult.updateMethods,
+                    endReached: streamInspectionResult.endReached
                 });
             }
 
@@ -279,24 +284,32 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
             newSchema.properties = filterBadSchemaProperties(newSchema);
         }
 
-        // Apply attribute names to new schemas
+        // Apply user defined attributes to new schemas
+        const finalSchemas: Schema[] = [];
+
         for (const oldSchema of oldPackageFile.schemas) {
             const newSchema = newPackageFile.schemas.find((s) => s.title === oldSchema.title);
 
-            if (newSchema == null || newSchema.properties == null) continue;
+            if (newSchema == null) {
+                continue;
 
-            newSchema.unit = oldSchema.unit;
+                // TODO This means schemas not seen during inspection will be dropped
+                // and this is a breaking change to the schema.
+                // There may be sources that don't always produce every schema every time
+                // But how to control for that?
+            }
 
-            for (const oldAttributeName in oldSchema.properties) {
-                const oldProperty = oldSchema.properties[oldAttributeName];
+            if (newSchema.updateMethods?.includes(UpdateMethod.CONTINUOUS)) {
+                const combinedSchema = combineSchema(oldSchema, newSchema);
 
-                const newProperty = newSchema.properties[oldAttributeName];
-
-                if (newProperty == null) continue;
-
-                newProperty.title = oldProperty.title;
-                newProperty.unit = oldProperty.unit;
-                newProperty.hidden = oldProperty.hidden;
+                finalSchemas.push(combinedSchema);
+            } else {
+                newSchema.hidden = oldSchema.hidden;
+                newSchema.description = oldSchema.description;
+                newSchema.unit = oldSchema.unit;
+                newSchema.derivedFrom = oldSchema.derivedFrom;
+                newSchema.derivedFromDescription = oldSchema.derivedFromDescription;
+                finalSchemas.push(newSchema);
             }
         }
 

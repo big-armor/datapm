@@ -191,7 +191,7 @@
                                     "oneOf": [
                                         {
                                             "required": [
-                                                "packageIdentifier"
+                                                "schemaIdentifier"
                                             ]
                                         },
                                         {
@@ -211,7 +211,7 @@
                                                 "registryUrl",
                                                 "catalogSlug",
                                                 "packageSlug",
-                                                "version"
+                                                "majorVersion"
                                             ],
                                             "description": "Optionally, The identifier for the upstream schema.",
                                             "properties": {
@@ -236,14 +236,11 @@
                                                     "default": "",
                                                     "pattern": "^[a-zA-Z0-9]+(?:(?:(?:[._]|__|[-]*)[a-zA-Z0-9]+)+)?$"
                                                 },
-                                                "version": {
-                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/version",
-                                                    "type": "string",
-                                                    "maxLength": 128,
-                                                    "title": "Version",
-                                                    "description": "In the semantic versioning format of major.minor.patch",
-                                                    "default": "1.0.0",
-                                                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                                                "majorVersion": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/majorVersion",
+                                                    "type": "number",
+                                                    "title": "Major Version",
+                                                    "description": "The major version of the referenced package"
                                                 },
                                                 "schemaTitle": {
                                                     "$id": "#/schemas/derivedFrom/packageIdentifier/schemaTitle",
@@ -299,7 +296,7 @@
                                 "$id": "#/schemas/unit",
                                 "type": "string",
                                 "title": "Unit",
-                                "description": "What schema or a property in the data represents. Example: Country, Person, Location and Time, etc",
+                                "description": "What a schema or a property in the data represents. Example: Country, Person, Location and Time, etc",
                                 "maxLength": 128
                             },
                             "samples": {
@@ -544,6 +541,18 @@
                                 },
                                 "unit": {
                                     "type": "string"
+                                },
+                                "firstSeen": {
+                                    "type": "string",
+                                    "maxLength": 128,
+                                    "format": "date-time",
+                                    "description": "The first time a non-null value was observed in this property."
+                                },
+                                "lastSeen": {
+                                    "type": "string",
+                                    "maxLength": 128,
+                                    "format": "date-time",
+                                    "description": "The laste time a non-null value was observed in this property."                                    
                                 },
                                 "title": {
                                     "type": "string",

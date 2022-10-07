@@ -6,13 +6,12 @@ import {
     ValueTypeStatistics,
     DPMPropertyTypes,
     Property,
-    ValueTypes
+    ValueTypes,
+    RecordStreamContext
 } from "datapm-lib";
 import { Transform, TransformCallback, TransformOptions } from "stream";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
-import { convertValueByValueType, discoverValueType } from "../util/SchemaUtil";
-
-const SAMPLE_RECORD_COUNT_MAX = 100;
+import { convertValueByValueType, discoverValueType, SAMPLE_RECORD_COUNT_MAX } from "../util/SchemaUtil";
 
 export class StatsTransform extends Transform {
     recordCount = 0;
@@ -34,24 +33,32 @@ export class StatsTransform extends Transform {
     }
 
     async _transform(
-        recordContexts: RecordContext[],
+        recordStreamContexts: RecordStreamContext[],
         _encoding: BufferEncoding,
         callback: TransformCallback
     ): Promise<void> {
-        this.recordCount += recordContexts.length;
+        this.recordCount += recordStreamContexts.length;
 
-        for (const recordContext of recordContexts) {
+        for (const recordStreamContext of recordStreamContexts) {
+            const recordContext = recordStreamContext.recordContext;
             if (!Object.keys(this.schemas).includes(recordContext.schemaSlug)) {
                 this.schemas[recordContext.schemaSlug] = {
                     title: recordContext.schemaSlug,
                     properties: {},
                     recordsInspectedCount: 0,
                     recordCount: 0,
-                    sampleRecords: []
+                    sampleRecords: [],
+                    updateMethods: []
                 };
             }
 
             const schema = this.schemas[recordContext.schemaSlug] as Schema;
+
+            if (schema.updateMethods == null) schema.updateMethods = [];
+
+            if (!schema.updateMethods.includes(recordStreamContext.updateMethod)) {
+                schema.updateMethods.push(recordStreamContext.updateMethod);
+            }
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             schema.recordCount!++;
@@ -77,7 +84,7 @@ export class StatsTransform extends Transform {
             this.recordsInspected++;
         }
 
-        callback(null, recordContexts);
+        callback(null, recordStreamContexts);
     }
 
     _final(callback: (error?: Error | null) => void): void {
@@ -256,6 +263,11 @@ export function inspectObject(
         const value = record[title];
 
         if (property.types == null) return;
+
+        if (value != null) {
+            if (property.firstSeen == null) property.firstSeen = new Date();
+            property.lastSeen = new Date();
+        }
 
         const typeConvertedValue = inspectValue(title, value, property.types, contentLabelDetector, interationDepth);
 
