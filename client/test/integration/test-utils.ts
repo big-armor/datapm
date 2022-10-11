@@ -518,6 +518,13 @@ export function loadTestPackageFile(packageName: string): PackageFile {
     return loadPackageFileFromDisk(packagePath);
 }
 
+export function writeTestPackageFile(packageFile: PackageFile, packageName: string): void {
+    if (packageName.startsWith("local/")) packageName = packageName.replace("local/", "");
+    const packagePath = getLocalPackageLatestVersionPath(packageName);
+    const packageFileJSON = JSON.stringify(packageFile, null, 2);
+    fs.writeFileSync(packagePath, packageFileJSON);
+}
+
 export function removePackageFiles(packageNames: string[]): void {
     packageNames.forEach((packageName) => {
         const packagePath = path.join(getDataPMHomePath(), "local", packageName);

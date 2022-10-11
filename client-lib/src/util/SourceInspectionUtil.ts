@@ -102,9 +102,19 @@ export async function configureSource(
         "Connecting to " + (await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration))
     );
 
+    const sourceObject: Source = {
+        slug: source.sourceType(),
+        streamSets,
+        type: source.sourceType(),
+        connectionConfiguration,
+        configuration: sourceConfiguration,
+        credentialsIdentifier: credentialsConfigurationResults.credentialsIdentifier
+    };
+
     for (const streamSetPreview of sourceInspectionResults.streamSetPreviews) {
         const task = await jobContext.startTask("Inspecting Stream Set " + streamSetPreview.slug);
         const sourceStreamInspectionResults = await inspectStreamSet(
+            sourceObject,
             streamSetPreview,
             jobContext,
             sourceConfiguration,
@@ -130,20 +140,12 @@ export async function configureSource(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             schemaTitles: sourceStreamInspectionResults.schemas.map((s) => s.title!),
             streamStats: sourceStreamInspectionResults.streamStats,
-            updateMethods: sourceStreamInspectionResults.updateMethods
+            updateMethods: sourceStreamInspectionResults.updateMethods,
+            endReached: sourceStreamInspectionResults.endReached
         };
 
         streamSets.push(streamSet);
     }
-
-    const sourceObject: Source = {
-        slug: source.sourceType(),
-        streamSets,
-        type: source.sourceType(),
-        connectionConfiguration,
-        configuration: sourceConfiguration,
-        credentialsIdentifier: credentialsConfigurationResults.credentialsIdentifier
-    };
 
     if (Object.keys(schemas).length === 0) {
         jobContext.print("ERROR", "No schemas found");

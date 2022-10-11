@@ -73,6 +73,8 @@ export interface StreamSet {
 
     /** The types of update methods present in the streams of the stream sets */
     updateMethods: UpdateMethod[];
+
+    endReached?: boolean;
 }
 
 /** Describes where the data resides, and how to access one or more logical sets of streams. For example, how to
@@ -238,6 +240,11 @@ export interface Schema {
 
     /** What each record represents */
     unit?: string;
+
+    /** The update methods involved in obtaining the records for this schema. UpdateMethod is defined by the source, and set here as a label
+     * for convienence when determining how to handle schema updates.
+     */
+    updateMethods?: UpdateMethod[];
 }
 
 export interface Property {
@@ -255,6 +262,12 @@ export interface Property {
 
     /** An object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the values of the property. */
     types: ValueTypes;
+
+    /** The date-time on which the property with a non-null value was first seen */
+    firstSeen?: Date;
+
+    /** The date-time on which the property with a non null value was last seen. */
+    lastSeen?: Date;
 }
 
 export class PackageFile {

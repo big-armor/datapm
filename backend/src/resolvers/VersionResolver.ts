@@ -19,11 +19,7 @@ import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
 import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
-import {
-    getPackageFromCacheOrDbById,
-    getPackageFromCacheOrDbByIdOrFail,
-    packageEntityToGraphqlObject
-} from "./PackageResolver";
+import { getPackageFromCacheOrDbByIdOrFail, packageEntityToGraphqlObject } from "./PackageResolver";
 import { Connection, EntityManager } from "typeorm";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
@@ -188,6 +184,7 @@ export const modifiedPackageFile = async (
                     {
                         schemaTitles: [schema.title],
                         slug: schema.title,
+                        endReached: undefined,
                         configuration: {
                             schemaSlug: schema.title
                         },

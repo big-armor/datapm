@@ -127,4 +127,7 @@ export interface SourceStreamsInspectionResult {
     streamStats: StreamStats;
 
     updateMethods: UpdateMethod[];
+
+    /** Wether the end of all streams in the set was reached */
+    endReached: boolean;
 }
