@@ -6,10 +6,6 @@ sidebar_label: Private Registry
 
 You can host your own DataPM registry for private or public use. Be sure to read the [DataPM Software License](license.md) page to learn about allowed and not allowed uses of DataPM software.
 
-## Beta Software Notice
-
-DataPM is currently software that is in beta preview. You are welcome to use it within the constraints of the [license](license.md) - but you should be very careful about using it in production.
-
 ## How To Deploy DataPM Registry?
 
 DataPM registry server is a simple NodeJS application that can be deployed in most modern architectures. Below are some detailed deployment options.
