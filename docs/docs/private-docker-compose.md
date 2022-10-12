@@ -7,7 +7,6 @@ sidebar_label: Docker Compose
 You can host your own DataPM registry for private or public use. Be sure to understand the following:
 
 -   Read the [DataPM License](license.md)
--   DataPM is currently [Beta software](beta-notice.md).
 
 ## Hosting via Docker Compose
 

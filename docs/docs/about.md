@@ -35,8 +35,6 @@ In the future we may offer paid tools that help you better understand the conten
 
 ## Is DataPM secure?
 
-DataPM is in an [open beta release](beta-notice.md). This means that it is not yet production ready.
-
 DataPM is based on open source tools, and itself will be open source in the future. DataPM is specifically architected to be simple, and therefore easy to secure and maintain. And DataPM is flexible - allowing for a wide variety of use cases.
 
 While DataPM's core focus is the proliferation of high quality data packages, it can also be used to track and inventory your own datasets. Implementing DataPM in your organization will give you visibility into who has access to each of your data sets - without making copies of your data, and without changing your existing architecture. Think more visibility, more control.
