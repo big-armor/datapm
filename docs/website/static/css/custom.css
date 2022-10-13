@@ -391,7 +391,7 @@ table tr:nth-child(even) {
 }
 
 .fixedHeaderContainer {
-    padding: 25px 0px 0px;
+    padding: 25px 0px 10px;
     background-color: var(--body-background);
     background: var(--body-background);
     box-shadow: none;
@@ -404,6 +404,7 @@ table tr:nth-child(even) {
     font-style: normal;
     font-weight: 400;
     line-height: 46px;
+    letter-spacing: 0.4px;
     color: var(--gray-1-color);
     cursor: pointer;
 }
