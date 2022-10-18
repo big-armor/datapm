@@ -1,29 +1,24 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { PackageIdentifierInput } from 'src/generated/graphql';
 import { io, Socket } from "socket.io-client";
 import {
+    JobMessageType,
+    SocketEvent,
+    TimeoutPromise,
+    TaskStatus,
+    StartJobResponse,
+    Request,
     ErrorResponse,
+    SocketResponseType,
     JobMessageRequest,
     JobMessageResponse,
-    JobMessageType,
     JobRequestType,
-    SocketEvent,
-    SocketResponseType,
-    StartPackageUpdateRequest,
-    StartPackageUpdateResponse,
-    TimeoutPromise,
-    TaskStatus
+    ParameterAnswer,
+    Parameter,
+    ParameterType
 } from "datapm-lib";
 import { getRegistryURL } from 'src/app/helpers/RegistryAccessHelper';
-import { DomSanitizer } from '@angular/platform-browser'
-
-export type CommandModalData = {
-    command: "update";
-    targetPackage: PackageIdentifierInput;
-    
-}
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 export enum State {
     STARTING,
@@ -32,57 +27,144 @@ export enum State {
     AWAITING_INPUT,
     SUCCESS
 }
-
 @Component({
-    selector: "app-command-modal",
+    selector: "app-command",
     templateUrl: "./command-modal.component.html",
     styleUrls: ["./command-modal.component.scss"]
 })
-export class CommandModalComponent implements OnInit, OnDestroy {
+export class CommandModalComponent {
     State = State;
+    ParameterType = ParameterType;
+
+    @Input() startCommand: () => Promise<void>;
 
     public state: State = State.STARTING;
 
     public printLog: string = "";
     public taskContent2: string = "";
-    public title:string = "Update Package";
+    public title: string = "Update Package";
 
     socket: Socket | null = null;
+    public parameters: Parameter<string>[];
+    currentParameterIndex: number;
+    public currentParameter: Parameter;
+    answers?: ParameterAnswer<string>;
+    promptResponseCallback?: (response: ParameterAnswer<string>) => void;
 
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public data: CommandModalData,
-        public dialogRef: MatDialogRef<CommandModalComponent>,
-        private authenticationService: AuthenticationService,
-        private domSantiizer: DomSanitizer
-    ) {}
+    @ViewChild("textControl") public texstControl: ElementRef;
+    public stringParameterError?: string;
+
+    public selectForm: FormGroup;
+    public selectParameterError?: string;
+
+    constructor(protected authenticationService: AuthenticationService) {}
 
     ngOnInit(): void {
-        this.runCommand();
+        this.selectForm = new FormGroup({
+            selectControl: new FormControl()
+        });
     }
 
     ngOnDestroy(): void {
         this.disconnectWebsocket();
     }
 
-    async runCommand() {
-        if (this.data.command === "update") {
-            this.runPackageUpdateCommand();
+    async connectWebsocket(): Promise<Socket> {
+        const socket = io(getRegistryURL(), {
+            path: "/ws/",
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"],
+            auth: {
+                bearer: this.authenticationService.getAuthorizationHeader()
+            }
+        });
+
+        return new TimeoutPromise<Socket>(5000, (resolve) => {
+            socket.once("connect", async () => {
+                socket.once(SocketEvent.READY.toString(), () => {
+                    this.socket = socket;
+                    resolve(socket);
+                });
+            });
+        });
+    }
+
+    disconnectWebsocket() {
+        if (!this.socket) return;
+
+        this.socket.disconnect();
+    }
+
+    processText(text: string): string {
+        const lines = text.split(/\r?\n/);
+
+        const processedLines = [];
+
+        for (const line of lines) {
+            processedLines.push(this.processLine(line));
+        }
+
+        return processedLines.join("<br/>");
+    }
+
+    processLine(line: string): string {
+        const colorCodes: { [key: string]: string } = {
+            "90": "grey",
+            "35": "purple",
+            "33": "yellow",
+            "37": "grey"
+        };
+
+        for (const key in colorCodes) {
+            const colorCode = colorCodes[key];
+            line = line.replace(new RegExp(`\x1b\\[${key}m`, "g"), `<span style="color: ${colorCode}">`);
+            line = line.replace(new RegExp(`\x1b\\[39m`, "g"), "</span>");
+        }
+
+        return line;
+    }
+
+    addPrintLineMessage(message: { message?: string; messageType?: JobMessageType }) {
+        const processedMessage = this.processText(message.message || "");
+
+        let prefix = this.getPrefix(message.messageType);
+
+        this.printLog += (prefix ? prefix : "") + processedMessage + "<br/>";
+    }
+
+    updateTaskMessage(message: { message?: string; messageType?: JobMessageType; taskStatus?: TaskStatus }) {
+        const processedMessage = this.processText(message.message || "");
+
+        this.taskContent2 = processedMessage;
+    }
+
+    getPrefix(messageType?: JobMessageType | TaskStatus): string {
+        switch (messageType) {
+            case "ERROR":
+                return "&#x2753; ";
+            case "FAIL":
+                return "&#x274C; ";
+            case "WARN":
+                return "&#x26A0; ";
+            case "INFO":
+                return "&#x2139; ";
+            case "SUCCESS":
+                return "&#x2705; ";
+            case "RUNNING":
+                return "spinner here";
+            case "NONE":
+            default:
+                return;
         }
     }
 
-    async runPackageUpdateCommand() {
-        this.socket = await this.connectWebsocket();
+    public async runCommand(request: Request) {
+        if (!this.socket) await this.connectWebsocket();
 
-        this.title = "Refresh " + this.data.targetPackage.catalogSlug + "/" + this.data.targetPackage.packageSlug;
-
-        const response = await new Promise<StartPackageUpdateResponse | ErrorResponse>((resolve, reject) => {
-            this.socket.emit(
-                SocketEvent.START_PACKAGE_UPDATE,
-                new StartPackageUpdateRequest(this.data.targetPackage),
-                (response: StartPackageUpdateResponse) => {
-                    resolve(response);
-                }
-            );
+        const response = await new Promise<StartJobResponse | ErrorResponse>((resolve, reject) => {
+            this.socket.emit(SocketEvent.START_PACKAGE_UPDATE, request, (response: StartJobResponse) => {
+                resolve(response);
+            });
         });
 
         if (response.responseType === SocketResponseType.ERROR) {
@@ -93,9 +175,9 @@ export class CommandModalComponent implements OnInit, OnDestroy {
             return;
         }
 
-        const startPackageUpdateResponse: StartPackageUpdateResponse = response as StartPackageUpdateResponse;
+        const startJobResponse: StartJobResponse = response as StartJobResponse;
 
-        const channelName = startPackageUpdateResponse.channelName;
+        const channelName = startJobResponse.channelName;
         this.socket.on(
             channelName,
             (message: JobMessageRequest, responseCallback?: (response: JobMessageResponse) => void) => {
@@ -145,6 +227,14 @@ export class CommandModalComponent implements OnInit, OnDestroy {
                     return;
                 }
 
+                if (message.requestType === JobRequestType.PROMPT) {
+                    this.addPrintLineMessage(message);
+
+                    this.state = State.AWAITING_INPUT;
+                    this.promptUser(message.prompts, responseCallback);
+                    return;
+                }
+
                 console.error("Unknown request type: " + message.requestType);
             }
         );
@@ -174,90 +264,93 @@ export class CommandModalComponent implements OnInit, OnDestroy {
         );
     }
 
-    async connectWebsocket(): Promise<Socket> {
-        const socket = io(getRegistryURL(), {
-            path: "/ws/",
-            parser: require("socket.io-msgpack-parser"),
-            transports: ["polling", "websocket"],
-            auth: {
-                bearer: this.authenticationService.getAuthorizationHeader()
-            }
-        });
+    public promptUser(parameters: Parameter[], responseCallBack: (response: JobMessageResponse) => void) {
+        this.parameters = parameters;
+        this.answers = {};
+        this.currentParameterIndex = 0;
+        this.currentParameter = parameters[this.currentParameterIndex];
 
-        return new TimeoutPromise<Socket>(5000, (resolve) => {
-            socket.once("connect", async () => {
-                socket.once(SocketEvent.READY.toString(), () => {
-                    resolve(socket);
-                });
-            });
-        });
+        this.state = State.AWAITING_INPUT;
+
+        this.promptResponseCallback = responseCallBack;
+
+        this.initParameter();
     }
 
-    disconnectWebsocket() {
-        if (!this.socket) return;
+    public selectValidateAndNext() {
+        const currentParameter = this.parameters[this.currentParameterIndex];
 
-        this.socket.disconnect();
-    }
+        const value = this.selectForm.value["selectControl"];
 
-    processText(text: string): string {
-        const lines = text.split(/\r?\n/);
-
-        const processedLines = [];
-
-        for (const line of lines) {
-            processedLines.push(this.processLine(line));
+        if (value == null) {
+            this.selectParameterError = "Must select a value";
+            return;
         }
 
-        return processedLines.join("<br/>");
+        delete this.selectParameterError;
+        this.answers[currentParameter.name] = value;
+        this.nextParameter();
     }
 
-    processLine(line: string): string {
-        const colorCodes: { [key: string]: string } = {
-            "90": "grey",
-            "35": "purple",
-            "33": "yellow"
-        };
+    public stringValidateAndNext() {
+        const currentParameter = this.parameters[this.currentParameterIndex];
 
-        for (const key in colorCodes) {
-            const colorCode = colorCodes[key];
-            line = line.replace(new RegExp(`\x1b\\[${key}m`, "g"), `<span style="color: ${colorCode}">`);
-            line = line.replace(new RegExp(`\x1b\\[39m`, "g"), "</span>");
+        // get the form value
+        const value = this.texstControl.nativeElement.value;
+
+        if (value == null || value == "") {
+            this.stringParameterError = "This field is required";
+            return;
+        } else if (value.length > currentParameter.stringMaximumLength || Number.MAX_SAFE_INTEGER) {
+            this.stringParameterError = "Must be shorter than " + currentParameter.stringMaximumLength + " characters";
+            return;
+        } else if (value.length < currentParameter.stringMinimumLength || Number.MIN_SAFE_INTEGER) {
+            this.stringParameterError = "Must be longer than " + currentParameter.stringMinimumLength + " characters";
+            return;
+        } else if (currentParameter.stringRegExp && !value.match(currentParameter.stringRegExp)) {
+            this.stringParameterError = "Must match regular expression: " + currentParameter.stringRegExp;
+            return;
         }
 
-        return line;
+        delete this.stringParameterError;
+
+        this.answers[currentParameter.name] = value;
+
+        this.nextParameter();
     }
 
-    addPrintLineMessage(message: { message?: string; messageType?: JobMessageType }) {
-        const processedMessage = this.processText(message.message || "");
+    public initParameter() {
+        const newParameter = this.parameters[this.currentParameterIndex];
 
-        let prefix = this.getPrefix(message.messageType);
-
-        this.printLog += (prefix ? prefix : "") + processedMessage + "<br/>";
-    }
-
-    updateTaskMessage(message: { message?: string; messageType?: JobMessageType; taskStatus?: TaskStatus }) {
-        const processedMessage = this.processText(message.message || "");
-
-        this.taskContent2 = processedMessage;
-    }
-
-    getPrefix(messageType?: JobMessageType | TaskStatus): string {
-        switch (messageType) {
-            case "ERROR":
-                return "&#x2753; ";
-            case "FAIL":
-                return "&#x274C; ";
-            case "WARN":
-                return "&#x26A0; ";
-            case "INFO":
-                return "&#x2139; ";
-            case "SUCCESS":
-                return "&#x2705; ";
-            case "RUNNING":
-                return "spinner here";
-            case "NONE":
-            default:
-                return;
+        if (newParameter.type === ParameterType.Text) {
+            this.texstControl.nativeElement.value = newParameter.defaultValue || "";
+            delete this.stringParameterError;
+        } else if (newParameter.type === ParameterType.Select) {
+            this.selectForm.setValue({ selectControl: newParameter.defaultValue || newParameter.options[0].value });
         }
+    }
+
+    public nextParameter() {
+        if (this.parameters.length - 1 >= this.currentParameterIndex) {
+            this.sendPromptResponse();
+            return;
+        } else {
+            this.currentParameterIndex++;
+            this.currentParameter = this.parameters[this.currentParameterIndex];
+        }
+
+        this.initParameter();
+    }
+
+    public sendPromptResponse() {
+        const response = new JobMessageResponse(JobRequestType.PROMPT);
+        response.answers = this.answers;
+
+        this.state = State.CONNECTED;
+
+        this.promptResponseCallback(response);
+
+        delete this.answers;
+        delete this.promptResponseCallback;
     }
 }

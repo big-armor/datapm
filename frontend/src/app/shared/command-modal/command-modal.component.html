@@ -13,6 +13,29 @@
             <span [innerHTML]="taskContent2 | sanitizeWithStyle"></span>
         </div>
     </div>
+    <div class="prompt" *ngIf="state === State.AWAITING_INPUT">
+
+        <div>{{currentParameter.message }} </div>
+
+        <span *ngIf="currentParameter.type == ParameterType.Text">
+            <input type="text" #textControl (keyup.enter)="onInput(input.value)" />
+            <button mat-button (click)="onInput(input.value)">Send</button>
+        </span>
+
+        <span *ngIf="currentParameter.type == ParameterType.Select">
+
+            <form [formGroup]="selectForm">
+                <mat-form-field>
+                    <mat-select formControlName="selectControl" (selectionChange)="onInput(selectForm.value.selectControl)">
+                        <mat-option *ngFor="let option of currentParameter.options" [value]="option.value">{{option.title}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button class="ml-2 modal-submit-btn" (click)="selectValidateAndNext()">Submit</button>
+
+            </form>
+        </span>
+
+    </div>
     
 
 

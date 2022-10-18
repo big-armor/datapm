@@ -1,17 +1,17 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
-import { takeUntil, startWith, map, filter, debounceTime, switchMap } from "rxjs/operators";
-import { Subject, Observable, BehaviorSubject } from "rxjs";
+import { takeUntil, debounceTime, switchMap } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
 import { DialogService } from "../../services/dialog/dialog.service";
-import { AutoCompleteGQL, AutoCompleteResult, CurrentUser, User } from "src/generated/graphql";
+import { AutoCompleteGQL, AutoCompleteResult, CurrentUser } from "src/generated/graphql";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
 import { ForgotPasswordDialogComponent } from "./forgot-password-dialog/forgot-password-dialog.component";
-
+import { PackageModalComponent } from "../command-modal/package/package-modal.component";
 enum State {
     INIT,
     LOADING,
@@ -159,4 +159,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.searchControl.setValue("");
         this.autoCompleteResult = null;
     }
+
+    public async publishClicked(): Promise<void> {
+        if (!this.currentUser) this.dialog.openLoginDialog();
+
+        // TODO would be better to return an observable that allows us to open the
+        // publish dialog after successful login
+
+        const dialogRef = this.matDialog
+            .open(PackageModalComponent, {
+                data: {},
+                width: "90vw",
+                maxWidth: "800px",
+                height: "90vh",
+                maxHeight: "600px",
+                disableClose: true,
+                panelClass: "command-modal"
+            })
+            .afterClosed()
+            .subscribe(() => {});
+    }
+
+
 }

@@ -14,6 +14,8 @@ import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
+import { validatePackageSlug } from "../directive/ValidPackageSlugDirective";
+import { validateCatalogSlug } from "../directive/ValidCatalogSlugDirective";
 
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `

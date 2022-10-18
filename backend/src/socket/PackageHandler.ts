@@ -6,23 +6,22 @@ import {
     JobMessageResponse,
     Response,
     SocketError,
-    StartPackageUpdateRequest,
-    StartPackageUpdateResponse,
     StartPackageRequest,
     StartPackageResponse
 } from "datapm-lib";
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
-import { checkCatalogPermission, checkPackagePermission, RequestHandler } from "./SocketHandler";
+import { checkCatalogPermission, RequestHandler } from "./SocketHandler";
 import SocketIO from "socket.io";
 import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
-import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { PackageJob, UpdatePackageJob } from "datapm-client-lib";
+import { PackageJob } from "datapm-client-lib";
+import { validateCatalogSlug } from "../directive/ValidCatalogSlugDirective";
+import { validatePackageSlug } from "../directive/ValidPackageSlugDirective";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
@@ -57,6 +56,10 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
         ) {
             return;
         }
+
+        validateCatalogSlug(this.request.catalogSlug);
+        validatePackageSlug(this.request.packageSlug);
+        // TODO Validate package title and description
 
         // check if package exists
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackage({

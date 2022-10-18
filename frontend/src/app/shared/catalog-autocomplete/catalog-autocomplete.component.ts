@@ -27,7 +27,7 @@ export class CatalogAutocompleteComponent implements OnInit {
             .pipe(
                 debounceTime(500),
                 switchMap((value) => {
-                    if (value.catalogSlug.length < 2) {
+                    if (value.catalogSlug == null || value.catalogSlug.length < 2) {
                         this.autoCompleteResult = null;
                         return [];
                     }

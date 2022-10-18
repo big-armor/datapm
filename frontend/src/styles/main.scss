@@ -1140,18 +1140,20 @@ button:disabled {
     }
 }
 
+mat-select {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $text-font;
+    border: 1px solid var(--gray-9-color);
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    color: var(--gray-2-color);
+    padding: 10px;
+}
+
 .permission-div {
-    mat-select {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: $weight-400;
-        font-size: $text-font;
-        border: 1px solid var(--gray-9-color);
-        letter-spacing: 0.5px;
-        border-radius: 4px;
-        color: var(--gray-2-color);
-        padding: 10px;
-    }
+    
 
     .mat-form-field-underline {
         display: none;
@@ -1519,7 +1521,6 @@ blockquote {
 }
 
 .mat-form-field-flex {
-    background-color: var(--custom-secondary-color);
     border-radius: 4px;
 }
 

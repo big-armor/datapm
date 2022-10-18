@@ -85,8 +85,9 @@ import { UserItemComponent } from "../shared/user-item/user-item.component";
 import { PackageAutocompleteComponent } from "./package-autocomplete/package-autocomplete.component";
 import { CatalogAutocompleteComponent } from "./catalog-autocomplete/catalog-autocomplete.component";
 import { CollectionAutocompleteComponent } from "./collection-autocomplete/collection-autocomplete.component";
-import { CommandModalComponent } from './command-modal/command-modal.component';
-
+import { UpdateModalComponent } from "./command-modal/update/update-modal.component";
+import { PackageModalComponent } from "./command-modal/package/package-modal.component";
+import { CommandModalComponent } from "./command-modal/command-modal.component";
 @NgModule({
     declarations: [
         HeaderComponent,
@@ -150,6 +151,8 @@ import { CommandModalComponent } from './command-modal/command-modal.component';
         PackageAutocompleteComponent,
         CatalogAutocompleteComponent,
         CollectionAutocompleteComponent,
+        UpdateModalComponent,
+        PackageModalComponent,
         CommandModalComponent
     ],
     imports: [

@@ -77,6 +77,12 @@ export interface Response {
     responseType: SocketResponseType;
 }
 
+export type StartJobRequest = Request;
+
+export interface StartJobResponse extends Response {
+    channelName: string;
+}
+
 /** Error handling */
 export class ErrorResponse implements Response {
     responseType = SocketResponseType.ERROR;
@@ -170,7 +176,7 @@ export interface UploadResponse {
 }
 
 /** This is sent on the SocketEvent.UPLOAD_DATA channel */
-export class StartUploadRequest implements Request {
+export class StartUploadRequest implements StartJobRequest {
     requestType = SocketEvent.START_DATA_UPLOAD;
 
     // eslint-disable-next-line no-useless-constructor
@@ -182,7 +188,7 @@ export class StartUploadRequest implements Request {
 }
 
 /** This is sent by the server in response to the StreamUploadRequest */
-export class StartUploadResponse implements Response {
+export class StartUploadResponse implements StartJobResponse {
     responseType = SocketResponseType.START_DATA_UPLOAD_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
@@ -217,7 +223,7 @@ export class UploadStopResponse implements UploadResponse {
  */
 
 /** This is sent on the SocketEvent.OPEN_FETCH_CHANNEL channel */
-export class OpenFetchChannelRequest implements Request {
+export class OpenFetchChannelRequest implements StartJobRequest {
     requestType = SocketEvent.OPEN_FETCH_CHANNEL;
 
     // eslint-disable-next-line no-useless-constructor
@@ -225,7 +231,7 @@ export class OpenFetchChannelRequest implements Request {
 }
 
 /** This is sent by the server in response to the OpenFetchChannelRequest */
-export class OpenFetchChannelResponse implements Response {
+export class OpenFetchChannelResponse implements StartJobResponse {
     responseType = SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
@@ -290,7 +296,7 @@ export class DataStopAcknowledge implements FetchResponse {
 }
 
 /** Sent by a client requesting that a package job be started */
-export class StartPackageRequest implements Request {
+export class StartPackageRequest implements StartJobRequest {
     requestType = SocketEvent.START_PACKAGE;
     catalogSlug: string;
     packageSlug: string;
@@ -305,7 +311,7 @@ export class StartPackageRequest implements Request {
     }
 }
 
-export class StartPackageResponse implements Response {
+export class StartPackageResponse implements StartJobResponse {
     responseType = SocketResponseType.START_PACKAGE_RESPONSE;
     public channelName: string;
 
@@ -315,7 +321,7 @@ export class StartPackageResponse implements Response {
 }
 
 /** Sent by a client requesting that the schema contents of a package be updated.  */
-export class StartPackageUpdateRequest implements Request {
+export class StartPackageUpdateRequest implements StartJobRequest {
     requestType: SocketEvent = SocketEvent.START_PACKAGE_UPDATE;
 
     // eslint-disable-next-line no-useless-constructor
@@ -327,7 +333,7 @@ export class StartPackageUpdateRequest implements Request {
     ) {}
 }
 
-export class StartPackageUpdateResponse implements Response {
+export class StartPackageUpdateResponse implements StartJobResponse {
     responseType: SocketResponseType = SocketResponseType.START_PACKAGE_UPDATE_RESPONSE;
     channelName: string;
 
