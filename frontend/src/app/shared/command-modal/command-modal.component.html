@@ -5,38 +5,104 @@
     </div>
 
 
-    <div class="content-scroll">
+    <div #scrollContent class="content-scroll pb-3">
         <span *ngIf="state === State.STARTING"> <mat-spinner [diameter]="15" class="spinner"></mat-spinner>Connecting...</span>
         <span [innerHTML]="printLog | sanitizeWithStyle"></span>
         <div class="task-content">
             <mat-spinner [diameter]="15" class="spinner" *ngIf="state === State.CONNECTED"></mat-spinner>
             <span [innerHTML]="taskContent2 | sanitizeWithStyle"></span>
         </div>
+        <div class="prompt mt-3 mb-3" *ngIf="state === State.AWAITING_INPUT">
+
+            <div>{{currentParameter.message }} </div>
+
+            <span *ngIf="[ParameterType.Text, ParameterType.Password, ParameterType.Number].includes(currentParameter.type)">
+                
+                <form [formGroup]="textForm" class="pr-3">
+                    <app-input
+                        placeholder=""
+                        [group]="textForm"
+                        class="rounded-input mb-3"
+                        [inputType]="currentParameter.type === ParameterType.Password ? 'password' : 'text'"
+                        controlName="textControl"
+                        [error]="textForm | inputError: 'textControl' | async"
+                    >
+                    </app-input>
+                    <button class="modal-submit-btn mt-3" (click)="textValidateAndNext()">Submit</button>
+                </form>
+
+            </span>
+            
+
+            <span *ngIf="[ParameterType.Select, ParameterType.AutoComplete].includes(currentParameter.type)">
+
+                <form [formGroup]="selectForm">
+                    <mat-form-field>
+                        <mat-select formControlName="selectControl">
+                            <mat-option *ngFor="let option of currentParameter.options" [value]="option.value">{{option.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button class="ml-2 modal-submit-btn" (click)="selectValidateAndNext()">Submit</button>
+                </form>
+
+            </span>
+
+            <span *ngIf="[ParameterType.AutoCompleteMultiSelect, ParameterType.MultiSelect].includes(currentParameter.type)">
+
+                <form [formGroup]="selectForm">
+                    <mat-form-field>
+                        <mat-select formControlName="selectControl" multiple>
+                            <mat-option *ngFor="let option of currentParameter.options" [value]="option.value">{{option.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button class="ml-2 modal-submit-btn" (click)="selectValidateAndNext()">Submit</button>
+                </form>
+
+            </span>
+
+            <span *ngIf="currentParameter.type == ParameterType.Confirm">
+
+                <button class="ml-2" (click)="confirm(true)">Yes</button>
+                <button class="ml-2" (click)="confirm(false)">No</button>
+            
+            </span>
+
+            <span *ngIf="false && currentParameter.type == ParameterType.Autocomplete">
+                <app-input
+                    placeholder=""
+                    [group]="autoCompleteForm"
+                    class="flat-input px-0"
+                    controlName="autoCompleteInput"
+                    inputStyle="flat"
+                    [matAutocomplete]="auto"
+                    (keydown)="catalogInputKeyDown()"
+                    [error]="autoCompleteForm | inputError: 'autoCompleteInput' | async"
+                ></app-input>
+                <mat-autocomplete #auto="matAutocomplete" class="search-autocomplete">
+                    <mat-option *ngIf="autocompleteKeyDownHasHappened && !autoCompleteResult && autoCompleteForm.value.length > 1">
+                        <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
+                    </mat-option>
+                    <ng-container *ngIf="autoCompleteResult">
+                        <mat-option *ngFor="let option of autoCompleteResult.options" [value]="option.value">
+                            <div class="d-flex">
+                                <div>
+                                    <app-avatar class="align-top user-img" [catalog]="option" [size]="40"> </app-avatar>
+                                </div>
+
+                                <div class="autocomplete-contents">
+                                    <div class="autocomplete-title">
+                                        {{ option.title }}
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-option>
+                    </ng-container>
+                </mat-autocomplete>
+            </span>
+
+        </div>
     </div>
-    <div class="prompt" *ngIf="state === State.AWAITING_INPUT">
 
-        <div>{{currentParameter.message }} </div>
-
-        <span *ngIf="currentParameter.type == ParameterType.Text">
-            <input type="text" #textControl (keyup.enter)="onInput(input.value)" />
-            <button mat-button (click)="onInput(input.value)">Send</button>
-        </span>
-
-        <span *ngIf="currentParameter.type == ParameterType.Select">
-
-            <form [formGroup]="selectForm">
-                <mat-form-field>
-                    <mat-select formControlName="selectControl" (selectionChange)="onInput(selectForm.value.selectControl)">
-                        <mat-option *ngFor="let option of currentParameter.options" [value]="option.value">{{option.title}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <button class="ml-2 modal-submit-btn" (click)="selectValidateAndNext()">Submit</button>
-
-            </form>
-        </span>
-
-    </div>
-    
 
 
 </div>

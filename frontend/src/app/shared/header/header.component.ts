@@ -11,7 +11,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
 import { ForgotPasswordDialogComponent } from "./forgot-password-dialog/forgot-password-dialog.component";
-import { PackageModalComponent } from "../command-modal/package/package-modal.component";
+import { CreatePackageModalComponent } from "../command-modal/package/create-package-modal.component";
 enum State {
     INIT,
     LOADING,
@@ -167,14 +167,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
         // publish dialog after successful login
 
         const dialogRef = this.matDialog
-            .open(PackageModalComponent, {
-                data: {},
-                width: "90vw",
-                maxWidth: "800px",
-                height: "90vh",
-                maxHeight: "600px",
-                disableClose: true,
-                panelClass: "command-modal"
+            .open(CreatePackageModalComponent, {
+                data: {
+                    targetCatalogSlug: this.currentUser.user.username
+                },
+                disableClose: true
             })
             .afterClosed()
             .subscribe(() => {});

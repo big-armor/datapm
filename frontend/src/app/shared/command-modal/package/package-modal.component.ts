@@ -2,15 +2,17 @@ import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild } from "
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Socket } from "socket.io-client";
 import { CommandModalComponent } from "../command-modal.component";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { nameToSlug } from "datapm-lib";
+import { FormGroup } from "@angular/forms";
+import { StartPackageRequest } from "datapm-lib";
 
 export type PackageModalData = {
-    targetCatalogSlug?: string;
+    catalogSlug: string;
+    packageSlug?: string;
+    packageName?: string;
+    packageDescription?: string;
 };
 
 enum State { 
-    INITIAL_PARAMETERS,
     RUNNING
 }
 
@@ -21,7 +23,7 @@ enum State {
 })
 export class PackageModalComponent implements AfterViewInit, OnInit, OnDestroy {
     State = State;
-    public state: State = State.INITIAL_PARAMETERS;
+    public state: State = State.RUNNING;
 
     @ViewChild("command") command: CommandModalComponent;
 
@@ -33,16 +35,13 @@ export class PackageModalComponent implements AfterViewInit, OnInit, OnDestroy {
         @Inject(MAT_DIALOG_DATA) public data: PackageModalData,
         public dialogRef: MatDialogRef<PackageModalComponent>
     ) {
-        this.form = new FormGroup({
-            catalogSlug: new FormControl(this.data.targetCatalogSlug, [Validators.required]),
-            packageSlug: new FormControl("", [Validators.required]),
-            packageName: new FormControl("", [Validators.required]),
-            packageDescription: new FormControl("", [Validators.required])
-        });
     }
 
-    ngOnInit(): void {}
-    ngAfterViewInit(): void {}
+    ngOnInit(): void {
+    }
+    ngAfterViewInit(): void {
+        this.runPackagePackageCommand();
+    }
 
     ngOnDestroy(): void {
         this.command.disconnectWebsocket();
@@ -51,13 +50,15 @@ export class PackageModalComponent implements AfterViewInit, OnInit, OnDestroy {
     async runPackagePackageCommand() {
         this.socket = await this.command.connectWebsocket();
 
-        this.command.title = "Create New Package ";
+        this.command.title = "Publish A Data Package ";
 
-        // this.command.runCommand(new StartPackageRequest(this.data.targetPackage));
-    }
-
-    packageNameKeyUp() {
-        const slug = nameToSlug(this.form.get("packageName").value);
-        this.form.controls.packageSlug.setValue(slug);
+        this.command.runCommand(
+            new StartPackageRequest(
+                this.data.catalogSlug,
+                this.data.packageSlug,
+                this.data.packageName,
+                this.data.packageDescription
+            )
+        );
     }
 }

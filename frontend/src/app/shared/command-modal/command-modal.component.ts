@@ -14,8 +14,7 @@ import {
     JobRequestType,
     ParameterAnswer,
     Parameter,
-    ParameterType
-} from "datapm-lib";
+    ParameterType} from "datapm-lib";
 import { getRegistryURL } from 'src/app/helpers/RegistryAccessHelper';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -36,13 +35,16 @@ export class CommandModalComponent {
     State = State;
     ParameterType = ParameterType;
 
+    public state: State = State.STARTING;
+
+
     @Input() startCommand: () => Promise<void>;
 
-    public state: State = State.STARTING;
+    @ViewChild("scrollContent") scrollContent: ElementRef;
 
     public printLog: string = "";
     public taskContent2: string = "";
-    public title: string = "Update Package";
+    public title: string = "Starting...";
 
     socket: Socket | null = null;
     public parameters: Parameter<string>[];
@@ -51,17 +53,23 @@ export class CommandModalComponent {
     answers?: ParameterAnswer<string>;
     promptResponseCallback?: (response: ParameterAnswer<string>) => void;
 
-    @ViewChild("textControl") public texstControl: ElementRef;
-    public stringParameterError?: string;
+    public textForm: FormGroup;
+    public textParameterError?: string;
 
     public selectForm: FormGroup;
     public selectParameterError?: string;
+
+    public confirmFormError?: string;
 
     constructor(protected authenticationService: AuthenticationService) {}
 
     ngOnInit(): void {
         this.selectForm = new FormGroup({
             selectControl: new FormControl()
+        });
+
+        this.textForm = new FormGroup({
+            textControl: new FormControl()
         });
     }
 
@@ -96,6 +104,9 @@ export class CommandModalComponent {
     }
 
     processText(text: string): string {
+
+        if(text == "") return "";
+        
         const lines = text.split(/\r?\n/);
 
         const processedLines = [];
@@ -110,9 +121,11 @@ export class CommandModalComponent {
     processLine(line: string): string {
         const colorCodes: { [key: string]: string } = {
             "90": "grey",
-            "35": "purple",
+            "35": "#d757d7",
             "33": "yellow",
             "37": "grey"
+
+            NEED RED FOR ERRORS
         };
 
         for (const key in colorCodes) {
@@ -130,6 +143,8 @@ export class CommandModalComponent {
         let prefix = this.getPrefix(message.messageType);
 
         this.printLog += (prefix ? prefix : "") + processedMessage + "<br/>";
+
+        this.scrollContent.nativeElement.scrollTop = this.scrollContent.nativeElement.scrollHeight;
     }
 
     updateTaskMessage(message: { message?: string; messageType?: JobMessageType; taskStatus?: TaskStatus }) {
@@ -162,7 +177,7 @@ export class CommandModalComponent {
         if (!this.socket) await this.connectWebsocket();
 
         const response = await new Promise<StartJobResponse | ErrorResponse>((resolve, reject) => {
-            this.socket.emit(SocketEvent.START_PACKAGE_UPDATE, request, (response: StartJobResponse) => {
+            this.socket.emit(request.requestType, request, (response: StartJobResponse) => {
                 resolve(response);
             });
         });
@@ -228,7 +243,6 @@ export class CommandModalComponent {
                 }
 
                 if (message.requestType === JobRequestType.PROMPT) {
-                    this.addPrintLineMessage(message);
 
                     this.state = State.AWAITING_INPUT;
                     this.promptUser(message.prompts, responseCallback);
@@ -289,32 +303,42 @@ export class CommandModalComponent {
 
         delete this.selectParameterError;
         this.answers[currentParameter.name] = value;
+
+        this.addPrintLineMessage({
+            messageType: "SUCCESS",
+            message: this.currentParameter.message + " " + value
+        });
+
+
         this.nextParameter();
     }
 
-    public stringValidateAndNext() {
+    public confirm(answer: boolean) {
+        this.answers[this.currentParameter.name] = answer;
+
+        this.addPrintLineMessage({
+            messageType: "SUCCESS",
+            message: this.currentParameter.message + " " + answer
+        });
+
+        this.nextParameter();
+    }
+
+    public textValidateAndNext() {
         const currentParameter = this.parameters[this.currentParameterIndex];
 
         // get the form value
-        const value = this.texstControl.nativeElement.value;
+        const value = this.textForm.value["textControl"];
 
-        if (value == null || value == "") {
-            this.stringParameterError = "This field is required";
-            return;
-        } else if (value.length > currentParameter.stringMaximumLength || Number.MAX_SAFE_INTEGER) {
-            this.stringParameterError = "Must be shorter than " + currentParameter.stringMaximumLength + " characters";
-            return;
-        } else if (value.length < currentParameter.stringMinimumLength || Number.MIN_SAFE_INTEGER) {
-            this.stringParameterError = "Must be longer than " + currentParameter.stringMinimumLength + " characters";
-            return;
-        } else if (currentParameter.stringRegExp && !value.match(currentParameter.stringRegExp)) {
-            this.stringParameterError = "Must match regular expression: " + currentParameter.stringRegExp;
-            return;
-        }
-
-        delete this.stringParameterError;
+        
+        delete this.textParameterError;
 
         this.answers[currentParameter.name] = value;
+
+        this.addPrintLineMessage({
+            messageType: "SUCCESS",
+            message: currentParameter.message + " " + value
+        });
 
         this.nextParameter();
     }
@@ -323,11 +347,35 @@ export class CommandModalComponent {
         const newParameter = this.parameters[this.currentParameterIndex];
 
         if (newParameter.type === ParameterType.Text) {
-            this.texstControl.nativeElement.value = newParameter.defaultValue || "";
-            delete this.stringParameterError;
-        } else if (newParameter.type === ParameterType.Select) {
+            this.textForm.setValue({ textControl: newParameter.defaultValue || "" });
+            delete this.textParameterError;
+        } else if (
+            [
+                ParameterType.Select,
+                ParameterType.AutoComplete,
+                ParameterType.AutoCompleteMultiSelect,
+                ParameterType.MultiSelect
+            ].includes(newParameter.type)
+        ) {
             this.selectForm.setValue({ selectControl: newParameter.defaultValue || newParameter.options[0].value });
+            delete this.selectParameterError;
+        } else if (newParameter.type === ParameterType.Confirm) {
+            delete this.confirmFormError;
+        } else if (newParameter.type === ParameterType.Number) {
+            this.textForm.setValue({ textControl: newParameter.defaultValue || 0 });
+            delete this.textParameterError;
+        } else if (newParameter.type === ParameterType.Password) {
+            this.textForm.setValue({ textControl: newParameter.defaultValue || "" });
+            delete this.textParameterError;
+        } else {
+            console.error("Unknown parameter type: " + newParameter.type);
+            this.state = State.ERROR;
         }
+
+        setTimeout(() => {
+            this.scrollContent.nativeElement.scrollTop = this.scrollContent.nativeElement.scrollHeight;
+        }, 50)
+
     }
 
     public nextParameter() {

@@ -22,6 +22,8 @@ export * from "./util/PackageUtil";
 export * from "./util/RegistryReferenceUtil";
 export * from "./util/ParsePackageIdentifierUtil";
 
+export * from "./util/parameters/ParameterValidationUtils";
+
 /** Configuration interfaces */
 export * from "./config/Config";
 

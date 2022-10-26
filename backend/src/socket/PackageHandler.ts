@@ -58,28 +58,6 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
         }
 
         validateCatalogSlug(this.request.catalogSlug);
-        validatePackageSlug(this.request.packageSlug);
-        // TODO Validate package title and description
-
-        // check if package exists
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackage({
-            identifier: {
-                catalogSlug: this.request.catalogSlug,
-                packageSlug: this.request.packageSlug
-            }
-        });
-
-        if (!packageEntity) {
-            this.socketContext.connection.getCustomRepository(PackageRepository).createPackage({
-                packageInput: {
-                    catalogSlug: this.request.catalogSlug,
-                    packageSlug: this.request.packageSlug,
-                    displayName: this.request.packageTitle,
-                    description: this.request.packageDescription
-                },
-                userId: this.socketContext.me.id
-            });
-        }
 
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
@@ -132,8 +110,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
 
         const job = new PackageJob(context, {
             catalogSlug: this.request.catalogSlug,
-            packageSlug: this.request.packageSlug,
-            defaults: true
+            defaults: false
         });
 
         const jobResult = await job.execute();

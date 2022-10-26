@@ -88,6 +88,8 @@ import { CollectionAutocompleteComponent } from "./collection-autocomplete/colle
 import { UpdateModalComponent } from "./command-modal/update/update-modal.component";
 import { PackageModalComponent } from "./command-modal/package/package-modal.component";
 import { CommandModalComponent } from "./command-modal/command-modal.component";
+import { CreatePackageModalComponent } from "./command-modal/package/create-package-modal.component";
+
 @NgModule({
     declarations: [
         HeaderComponent,
@@ -153,6 +155,7 @@ import { CommandModalComponent } from "./command-modal/command-modal.component";
         CollectionAutocompleteComponent,
         UpdateModalComponent,
         PackageModalComponent,
+        CreatePackageModalComponent,
         CommandModalComponent
     ],
     imports: [

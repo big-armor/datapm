@@ -1,0 +1,14 @@
+#contentTitle {
+        display: flex;
+        justify-content: space-between;
+        overflow: visible;
+}
+
+.dialog-close-wrapper {
+    position: static;
+    display: inline-block
+}
+
+form {
+    max-width: 300px;
+}

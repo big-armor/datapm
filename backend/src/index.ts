@@ -588,15 +588,22 @@ async function main() {
 
             const bearer = socket.handshake.auth.bearer;
 
-            const jwt = await parseJwt(bearer);
+            try {
+                const jwt = await parseJwt(bearer);
 
-            const user = await getMeJwt(jwt, connection.manager);
+                const user = await getMeJwt(jwt, connection.manager);
 
-            if (user == null) {
-                throw new Error("JWT_INVALID");
+                if (user == null) {
+                    socket.disconnect();
+                    return;
+                }
+
+                (contextObject as AuthenticatedSocketContext).me = user;
+            } catch (error) {
+                console.error(error.message);
+                socket.disconnect();
+                return;
             }
-
-            (contextObject as AuthenticatedSocketContext).me = user;
         }
 
         // TODO handle server shutdowns by disconnecting sockets
