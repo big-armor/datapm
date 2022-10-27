@@ -18,8 +18,8 @@
                     </mat-checkbox>
                 </div>
 
-                <ng-container *ngIf="canFollowPackageContent()">
-                    <p class="text-dark-gray">Change type</p>
+                <div class="mt-3" *ngIf="canFollowPackageContent()">
+                    <p class="text-dark-gray">Change Type</p>
                     <mat-form-field appearance="fill" floatLabel="never">
                         <mat-select [disabled]="!followAllPackages" [(value)]="selectedChangeType">
                             <mat-option *ngFor="let changeType of PACKAGE_CHANGE_TYPES" [value]="changeType">
@@ -27,9 +27,9 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                </ng-container>
+                </div>
 
-                <div *ngIf="canFollowPackageContent()">
+                <div class="mt-3" *ngIf="canFollowPackageContent()">
                     <mat-checkbox
                         [disabled]="!followAllPackages"
                         class="example-margin"

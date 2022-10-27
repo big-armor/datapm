@@ -124,8 +124,6 @@ export class CommandModalComponent {
             "35": "#d757d7",
             "33": "yellow",
             "37": "grey"
-
-            NEED RED FOR ERRORS
         };
 
         for (const key in colorCodes) {
