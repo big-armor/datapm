@@ -14,9 +14,10 @@ import {
     JobRequestType,
     ParameterAnswer,
     Parameter,
-    ParameterType} from "datapm-lib";
+    ParameterType,
+    JobResult} from "datapm-lib";
 import { getRegistryURL } from 'src/app/helpers/RegistryAccessHelper';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
 export enum State {
@@ -39,6 +40,7 @@ export class CommandModalComponent {
 
 
     @Input() startCommand: () => Promise<void>;
+    @Output() results = new EventEmitter<JobResult<unknown>>();
 
     @ViewChild("scrollContent") scrollContent: ElementRef;
 
@@ -231,12 +233,20 @@ export class CommandModalComponent {
 
                 if (message.requestType === JobRequestType.EXIT) {
                     this.addPrintLineMessage(message);
-                    if (message.taskStatus === "SUCCESS") {
+
+                    if (message.jobResult.exitCode === 0) {
                         this.state = State.SUCCESS;
+                        this.addPrintLineMessage({messageType: "SUCCESS", message: "Job finished successfully"});
                     } else {
                         this.state = State.ERROR;
+                        this.addPrintLineMessage({messageType: "ERROR", message: "Job finished with error code: " + message.jobResult.exitCode});
+
                     }
                     responseCallback && responseCallback(new JobMessageResponse(JobRequestType.EXIT));
+
+                    if(message.jobResult)
+                        this.results.emit(message.jobResult);
+    
                     return;
                 }
 
@@ -247,7 +257,7 @@ export class CommandModalComponent {
                     return;
                 }
 
-                console.error("Unknown request type: " + message.requestType);
+                console.warn("Unknown request type: " + message.requestType);
             }
         );
 

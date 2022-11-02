@@ -28,6 +28,7 @@
                         [error]="textForm | inputError: 'textControl' | async"
                     >
                     </app-input>
+                    <br/>
                     <button class="modal-submit-btn mt-3" (click)="textValidateAndNext()">Submit</button>
                 </form>
 
@@ -42,6 +43,7 @@
                             <mat-option *ngFor="let option of currentParameter.options" [value]="option.value">{{option.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
+                    <br/>
                     <button class="ml-2 modal-submit-btn" (click)="selectValidateAndNext()">Submit</button>
                 </form>
 

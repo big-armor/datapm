@@ -382,6 +382,12 @@ export type JobMessageType = "NONE" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "SUC
 /** For certain JobMessages, they need a task status. This is a copy of the TaskStatus from datpam-client-lib */
 export type TaskStatus = "RUNNING" | "ERROR" | "SUCCESS";
 
+export class JobResult<T> {
+    exitCode: number;
+    errorMessage?: string;
+    result?: T | undefined;
+}
+
 /** Sent by the client or the server during a job */
 export class JobMessageRequest {
     constructor(requestType: JobRequestType) {
@@ -391,7 +397,8 @@ export class JobMessageRequest {
     requestType: JobRequestType;
     message?: string;
     messageType?: JobMessageType;
-    exitCode?: number;
+    jobResult?: JobResult<unknown>;
+    exitResult?: unknown;
     taskStatus?: TaskStatus;
     taskId?: string;
     steps?: string[];

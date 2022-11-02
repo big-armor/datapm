@@ -1,3 +1,8 @@
+:host {
+    height: 200px;
+    flex: 1;
+}
+
 .content {
     height: 100%;
     display: flex;
@@ -52,4 +57,8 @@
 
 .prompt {
     white-space: initial;
+}
+
+mat-form-field, ::ng-deep input {
+    width: 50% !important;
 }
