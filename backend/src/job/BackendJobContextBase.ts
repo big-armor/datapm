@@ -13,6 +13,7 @@ import {
 import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { AuthenticatedContext } from "../context";
+import { hasCatalogPermissionOrFail } from "../directive/hasCatalogPermissionDirective";
 import { hasPackagePermissionOrFail, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
 import { CredentialRepository } from "../repository/CredentialRepository";
@@ -230,7 +231,27 @@ export abstract class BackendJobContextBase extends JobContext {
             packageSlug: packageFile.packageSlug
         };
 
-        await hasPackagePermissionOrFail(Permission.VIEW, this.context, identifier);
+        const packageEntity = await this.context.connection
+            .getCustomRepository(PackageRepository)
+            .findPackage({ identifier });
+
+        if (!packageEntity) {
+            await hasCatalogPermissionOrFail(Permission.EDIT, this.context, identifier);
+
+            const newPackageEntity = await this.context.connection
+                .getCustomRepository(PackageRepository)
+                .createPackage({
+                    userId: this.context.me.id,
+                    packageInput: {
+                        catalogSlug: identifier.catalogSlug,
+                        packageSlug: identifier.packageSlug,
+                        displayName: packageFile.displayName,
+                        description: packageFile.description
+                    }
+                });
+        } else {
+            await hasPackagePermissionOrFail(Permission.EDIT, this.context, identifier);
+        }
 
         const version = await createOrUpdateVersion(
             this.context,

@@ -26,6 +26,7 @@ export class HeadlessJobContext extends BackendJobContextBase {
             }
 
             answers[parameter.name] = parameter.defaultValue;
+            parameter.configuration[parameter.name] = parameter.defaultValue;
         }
 
         return answers;

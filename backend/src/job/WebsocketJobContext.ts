@@ -61,6 +61,7 @@ export class WebsocketJobContext extends BackendJobContextBase {
             }
 
             validAnswers[currentParameter.name] = answer;
+            currentParameter.configuration[currentParameter.name] = answer;
             currentParameter = parameters[currentIndex++];
         }
 

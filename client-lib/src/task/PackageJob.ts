@@ -365,6 +365,8 @@ export class PackageJob extends Job<PackageJobResult> {
             packageFile
         );
 
+        this.jobContext.print("SUCCESS", "Package file saved to " + packageFileWithContext.packageReference);
+
         return {
             exitCode: 0,
 
