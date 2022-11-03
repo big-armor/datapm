@@ -217,7 +217,7 @@ describe("Package Job With Authentication Tests", async () => {
 
         const promptResponses: {
             name: string;
-            response: string | string[] | boolean;
+            response: string | string[] | number | boolean;
         }[] = [
             {
                 name: "source",
@@ -274,6 +274,14 @@ describe("Package Job With Authentication Tests", async () => {
             {
                 name: "columnUnit",
                 response: "test-unit2"
+            },
+            {
+                name: "website",
+                response: "https://datapm.io"
+            },
+            {
+                name: "sampleRecordCount",
+                response: 10
             }
         ];
 
@@ -314,7 +322,7 @@ describe("Package Job With Authentication Tests", async () => {
             }
         );
 
-        expect(jobExitMessage.exitCode).equal(0);
+        expect(jobExitMessage.jobResult?.exitCode).equal(0);
     });
 
     it("Modify database schema", async () => {
@@ -358,7 +366,7 @@ describe("Package Job With Authentication Tests", async () => {
 
         const jobExitMessage = await handleJobMessages(userAStreamingClient, channelName);
 
-        expect(jobExitMessage.exitCode).equal(0);
+        expect(jobExitMessage.jobResult?.exitCode).equal(0);
     });
 
     it("Package should be updated", async function () {
@@ -418,10 +426,17 @@ async function handleJobMessages(
     const jobExitPromise = new Promise<JobMessageRequest>((resolve, reject) => {
         exitCallback = (message: JobMessageRequest) => {
             if (message.requestType === JobRequestType.EXIT) {
-                if (message.exitCode === 0) {
+                if (message.jobResult?.exitCode === 0) {
                     resolve(message);
                 } else {
-                    reject(new Error("Failed with exitCode: " + message.exitCode + " message: " + message.message));
+                    reject(
+                        new Error(
+                            "Failed with exitCode: " +
+                                message.jobResult?.exitCode +
+                                " message: " +
+                                message.jobResult?.errorMessage
+                        )
+                    );
                 }
             }
         };

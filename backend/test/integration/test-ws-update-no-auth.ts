@@ -225,10 +225,14 @@ describe("Package Tests", async () => {
         const jobExitPromise = new Promise<void>((resolve, reject) => {
             messageCallback = (message: JobMessageRequest) => {
                 if (message.requestType === JobRequestType.EXIT) {
-                    if (message.exitCode === 0) {
+                    if (message.jobResult?.exitCode === 0) {
                         resolve();
                     } else {
-                        reject(new Error("Failed with exitCode: " + message.exitCode + " message: " + message.message));
+                        reject(
+                            new Error(
+                                "Failed with exitCode: " + message.jobResult?.exitCode + " message: " + message.message
+                            )
+                        );
                     }
                 }
             };

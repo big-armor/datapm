@@ -12,16 +12,16 @@ import {
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
-import { checkCatalogPermission, RequestHandler } from "./SocketHandler";
+import { checkCatalogPermission, checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from "socket.io";
 import { ActivityLogEventType, Permission } from "../generated/graphql";
-import { PackageRepository } from "../repository/PackageRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageJob } from "datapm-client-lib";
 import { validateCatalogSlug } from "../directive/ValidCatalogSlugDirective";
 import { validatePackageSlug } from "../directive/ValidPackageSlugDirective";
+import { PackageRepository } from "../repository/PackageRepository";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
@@ -45,20 +45,53 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
             .findCatalogBySlugOrFail(this.request.catalogSlug);
         this.catalogId = catalogEntity.id;
 
-        if (
-            !(await checkCatalogPermission(
-                this.socket,
-                this.socketContext,
-                callback,
-                { catalogSlug: this.request.catalogSlug },
-                Permission.EDIT
-            ))
-        ) {
-            return;
-        }
-
         validateCatalogSlug(this.request.catalogSlug);
+        validatePackageSlug(this.request.packageSlug);
+        // TODO Validate package title and description
 
+        // check if package exists
+        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackage({
+            identifier: {
+                catalogSlug: this.request.catalogSlug,
+                packageSlug: this.request.packageSlug
+            }
+        });
+
+        if (!packageEntity) {
+            if (
+                !(await checkCatalogPermission(
+                    this.socket,
+                    this.socketContext,
+                    callback,
+                    { catalogSlug: this.request.catalogSlug },
+                    Permission.EDIT
+                ))
+            ) {
+                return;
+            }
+
+            this.socketContext.connection.getCustomRepository(PackageRepository).createPackage({
+                packageInput: {
+                    catalogSlug: this.request.catalogSlug,
+                    packageSlug: this.request.packageSlug,
+                    displayName: this.request.packageTitle,
+                    description: this.request.packageDescription
+                },
+                userId: this.socketContext.me.id
+            });
+        } else {
+            if (
+                !(await checkPackagePermission(
+                    this.socket,
+                    this.socketContext,
+                    callback,
+                    { catalogSlug: this.request.catalogSlug, packageSlug: this.request.packageSlug },
+                    Permission.EDIT
+                ))
+            ) {
+                return;
+            }
+        }
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
             eventType: ActivityLogEventType.PACKAGE_JOB_STARTED,
@@ -110,6 +143,10 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
 
         const job = new PackageJob(context, {
             catalogSlug: this.request.catalogSlug,
+            packageSlug: this.request.packageSlug,
+            packageTitle: this.request.packageTitle,
+            description: this.request.packageDescription,
+            version: "1.0.0",
             defaults: false
         });
 

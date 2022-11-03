@@ -299,11 +299,11 @@ export class DataStopAcknowledge implements FetchResponse {
 export class StartPackageRequest implements StartJobRequest {
     requestType = SocketEvent.START_PACKAGE;
     catalogSlug: string;
-    packageSlug?: string;
-    packageTitle?: string;
-    packageDescription?: string;
+    packageSlug: string;
+    packageTitle: string;
+    packageDescription: string;
 
-    constructor(catalogSlug: string, packageSlug?: string, packageTitle?: string, packageDescription?: string) {
+    constructor(catalogSlug: string, packageSlug: string, packageTitle: string, packageDescription: string) {
         this.catalogSlug = catalogSlug;
         this.packageSlug = packageSlug;
         this.packageTitle = packageTitle;

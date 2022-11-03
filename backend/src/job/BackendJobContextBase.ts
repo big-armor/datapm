@@ -32,9 +32,11 @@ export abstract class BackendJobContextBase extends JobContext {
     abstract useDefaults(): boolean;
 
     async getRepositoryConfigsByType(
-        relatedPackage: PackageIdentifierInput,
+        relatedPackage: PackageIdentifierInput | undefined,
         connectorType: string
     ): Promise<RepositoryConfig[]> {
+        if (relatedPackage === undefined) return [];
+
         await hasPackagePermissionOrFail(Permission.VIEW, this.context, relatedPackage);
 
         const repositoryEntities = await this.context.connection
@@ -178,15 +180,14 @@ export abstract class BackendJobContextBase extends JobContext {
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
-    ): Promise<DPMConfiguration> {
-        if (packageIdentifier === undefined)
-            throw new Error("Backend does not support retrieving credentials when packageIdentifier is undefined");
+    ): Promise<DPMConfiguration | undefined> {
+        if (packageIdentifier === undefined) return undefined;
 
         const credentialEntity = await this.context.connection
             .getCustomRepository(CredentialRepository)
             .findCredential(packageIdentifier, connectorType, repositoryIdentifier, credentialsIdentifier);
 
-        if (credentialEntity == null) throw new Error("Credential not found");
+        if (credentialEntity == null) return undefined;
 
         const decryptedValue = decryptValue(credentialEntity.encryptedCredentials);
 
