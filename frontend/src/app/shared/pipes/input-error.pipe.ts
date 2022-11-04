@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { AbstractControl } from "@angular/forms";
 import { merge } from "rxjs";
 import { map } from "rxjs/operators";
+import { PACKAGE_SLUG_MAX_LENGTH } from "datapm-lib";
 
 const defaultMessages = {
     required: (errors: any) => "Required field",
@@ -18,7 +19,10 @@ const defaultMessages = {
     INVALID_EMAIL_ADDRESS_FORMAT: (errors: any) => "Not a valid email address",
     TOO_LONG: (errors: any) => "Too long",
     RESERVED_KEYWORD: (errors: any) => "This is a reserved keyword. Please choose a different word",
-    PASSWORDS_DONT_MATCH: (errors: any) => "The entered passwords must match."
+    PASSWORDS_DONT_MATCH: (errors: any) => "The entered passwords must match.",
+    PACKAGE_SLUG_INVALID: (errors: any) =>
+        "Must include only lowercase letters, numbers, and dashes. Must start with a letter and not end with a dash.",
+    PACKAGE_SLUG_TOO_LONG: (errors: any) => "Must be less than " + PACKAGE_SLUG_MAX_LENGTH + " characters"
 };
 
 const errorKeys = [
@@ -36,7 +40,9 @@ const errorKeys = [
     "INVALID_EMAIL_ADDRESS_FORMAT",
     "TOO_LONG",
     "RESERVED_KEYWORD",
-    "PASSWORDS_DONT_MATCH"
+    "PASSWORDS_DONT_MATCH",
+    "PACKAGE_SLUG_INVALID",
+    "PACKAGE_SLUG_TOO_LONG"
 ];
 
 @Pipe({

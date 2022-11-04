@@ -4,14 +4,13 @@ import { Socket } from "socket.io-client";
 import { CommandModalComponent } from "../command-modal.component";
 import { FormGroup } from "@angular/forms";
 import { JobResult, StartPackageRequest } from "datapm-lib";
-import { I } from "@angular/cdk/keycodes";
 import { Router } from "@angular/router";
 
 export type PackageModalData = {
     catalogSlug: string;
-    packageSlug?: string;
-    packageName?: string;
-    packageDescription?: string;
+    packageSlug: string;
+    packageName: string;
+    packageDescription: string;
 };
 
 enum State { 

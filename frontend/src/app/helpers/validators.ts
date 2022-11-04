@@ -1,6 +1,7 @@
 import { ChangeDetectorRef } from "@angular/core";
 import { EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { AbstractControl, AsyncValidatorFn, ValidationErrors } from "@angular/forms";
+import { catalogSlugValid, collectionSlugValid, packageSlugValid, passwordValid, validPackageDescription, validPackageDisplayName } from "datapm-lib";
 
 export function usernameValidator(
     usernameAvailableGQL: UsernameAvailableGQL,
@@ -80,37 +81,30 @@ export function emailAddressValidator(
 export function newPasswordValidator() {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
         return new Promise<ValidationErrors | null>((success, error) => {
-            const regex = /[0-9@#$%!]/;
-
             if (control.value == "" || control.value == null) {
                 success({
                     REQUIRED: true
                 });
                 return;
             }
-            if (control.value.length > 99) {
-                success({
-                    PASSWORD_TOO_LONG: true
-                });
+
+            const validSlug = passwordValid(control.value);
+
+            if (validSlug !== true) {
+                const responseObject = {};
+                responseObject[validSlug] = true;
+                success(responseObject);
+                return;
             }
-            if (control.value.length < 8) {
-                success({
-                    PASSWORD_TOO_SHORT: true
-                });
-            }
-            if (control.value.length < 16 && control.value.match(regex) == null) {
-                success({
-                    INVALID_CHARACTERS: true
-                });
-            }
+
+            success(null);
         });
     };
 }
 
-export function slugValidator() {
+export function catalogSlugValidator() {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
         return new Promise<ValidationErrors | null>((success, error) => {
-            const regex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/;
 
             if (control.value == "" || control.value == null) {
                 success({
@@ -118,15 +112,98 @@ export function slugValidator() {
                 });
                 return;
             }
-            if (control.value.length > 40) {
-                success({
-                    SLUG_TOO_LONG: true
-                });
+
+            const validSlug = catalogSlugValid(control.value);
+
+            if(validSlug !== true) {
+                const responseObject = {};
+                responseObject[validSlug] = true;
+                success(responseObject);
+                return;
             }
-            if (!regex.test(control.value)) {
+
+            success(null);
+        });
+    };
+}
+
+export function packageSlugValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+        if (control.value == "" || control.value == null) {
+            return {
+                REQUIRED: true
+            };
+        }
+
+        const validSlug = packageSlugValid(control.value);
+
+        if (validSlug !== true) {
+            const responseObject = {};
+            responseObject[validSlug] = { value: control.value };
+            return responseObject;
+        }
+
+        return null;
+    };
+}
+
+export function packageDisplayNameValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+        if (control.value == "" || control.value == null) {
+            return {
+                REQUIRED: true
+            };
+        }
+
+        const valid = validPackageDisplayName(control.value);
+
+        if (valid !== true) {
+            const responseObject = {};
+            responseObject[valid] = { value: control.value };
+            return responseObject;
+        }
+
+        return null;
+    };
+}
+
+export function packageDescriptionValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+        if (control.value == "" || control.value == null) {
+            return {
+                REQUIRED: true
+            };
+        }
+
+        const valid = validPackageDescription(control.value);
+
+        if (valid !== true) {
+            const responseObject = {};
+            responseObject[valid] = { value: control.value };
+            return responseObject;
+        }
+
+        return null;
+    };
+}
+
+export function collectionSlugValidator() {
+    return (control: AbstractControl): Promise<ValidationErrors | null> => {
+        return new Promise<ValidationErrors | null>((success, error) => {
+            if (control.value == "" || control.value == null) {
                 success({
-                    INVALID_CHARACTERS: true
+                    REQUIRED: true
                 });
+                return;
+            }
+
+            const validSlug = collectionSlugValid(control.value);
+
+            if (validSlug !== true) {
+                const responseObject = {};
+                responseObject[validSlug] = true;
+                success(responseObject);
+                return;
             }
 
             success(null);

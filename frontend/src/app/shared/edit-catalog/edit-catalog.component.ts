@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { slugValidator } from "src/app/helpers/validators";
+import { catalogSlugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import {
     Catalog,
@@ -9,9 +9,7 @@ import {
     Permission,
     SetCatalogAvatarImageGQL,
     SetCatalogCoverImageGQL,
-    UpdateCatalogGQL,
-    User
-} from "src/generated/graphql";
+    UpdateCatalogGQL} from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageService } from "../../services/image.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
@@ -62,7 +60,7 @@ export class EditCatalogComponent {
                 validators: [Validators.required]
             }),
             newSlug: new FormControl(data.identifier.catalogSlug, {
-                asyncValidators: [slugValidator()]
+                asyncValidators: [catalogSlugValidator()]
             }),
             description: new FormControl(data.description)
         });

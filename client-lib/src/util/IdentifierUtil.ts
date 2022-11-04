@@ -1,3 +1,4 @@
+import { PACKAGE_DESCRIPTION_MAX_LENGTH, PACKAGE_DESCRIPTION_MIN_LENGTH, validPackageDescription } from "datapm-lib";
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 
 export function validVersion(value: string[] | string | number | boolean): true | string {
@@ -25,11 +26,14 @@ export function validPackageDisplayName(value: string[] | string | number | bool
         return "Must be a string";
     }
 
-    if (value.length < 3) return "Must be longer than 3 characters";
+    const valid = validPackageDisplayName(value);
 
-    if (!value.match(/^[\w _-]+$/)) return "Must be a valid name";
+    if (valid === "TOO_SHORT") return "Must be longer than " + PACKAGE_DESCRIPTION_MIN_LENGTH + " characters";
 
-    if (value.length > 128) return "Must be shorter than 128 characters";
+    if (value === "TOO_LONG") return "Must be less than " + PACKAGE_DESCRIPTION_MAX_LENGTH + " characters";
+
+    if (valid === "INVALID_CHARACTERS")
+        return "Must contain only letters, numbers, spaces, and the following characters: - _";
 
     return true;
 }
@@ -39,9 +43,11 @@ export function validShortPackageDescription(value: string[] | string | number |
 
     if (typeof value !== "string") return "Must be a string";
 
-    if (value.length < 3) return "Must be longer than 3 characters";
+    const valid = validPackageDescription(value);
 
-    if (value.length > 256) return "Must be less than 256 characters";
+    if (valid === "TOO_SHORT") return "Must be longer than " + PACKAGE_DESCRIPTION_MIN_LENGTH + " characters";
+
+    if (value === "TOO_LONG") return "Must be less than " + PACKAGE_DESCRIPTION_MAX_LENGTH + " characters";
 
     return true;
 }
