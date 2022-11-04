@@ -2,7 +2,7 @@ export const PACKAGE_SLUG_REGEX = /^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?
 export const COLLECTION_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 export const CATALOG_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
-export const PACKAGE_SLUG_MAX_LENGTH = 30;
+export const PACKAGE_SLUG_MAX_LENGTH = 38;
 export const CATALOG_SLUG_MAX_LENGTH = 38;
 
 export const PACKAGE_DESCRIPTION_MAX_LENGTH = 256;
