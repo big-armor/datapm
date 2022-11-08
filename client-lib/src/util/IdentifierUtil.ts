@@ -1,4 +1,9 @@
-import { PACKAGE_DESCRIPTION_MAX_LENGTH, PACKAGE_DESCRIPTION_MIN_LENGTH, validPackageDescription } from "datapm-lib";
+import {
+    PACKAGE_DESCRIPTION_MAX_LENGTH,
+    PACKAGE_DESCRIPTION_MIN_LENGTH,
+    validPackageDescription,
+    validPackageDisplayName as validPackageDisplayName2
+} from "datapm-lib";
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 
 export function validVersion(value: string[] | string | number | boolean): true | string {
@@ -26,7 +31,7 @@ export function validPackageDisplayName(value: string[] | string | number | bool
         return "Must be a string";
     }
 
-    const valid = validPackageDisplayName(value);
+    const valid = validPackageDisplayName2(value);
 
     if (valid === "TOO_SHORT") return "Must be longer than " + PACKAGE_DESCRIPTION_MIN_LENGTH + " characters";
 
