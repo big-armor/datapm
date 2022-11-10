@@ -1,0 +1,4 @@
+<app-command #command (results)="onResult($event)"></app-command>
+<div class="mb-3 mt-3" *ngIf="state === State.SUCCESS">
+    <button class="app-raised-button" (click)="viewPackage()">View Package</button>
+</div>

@@ -111,6 +111,7 @@ export class PackageJob extends Job<PackageJobResult> {
                     type: ParameterType.AutoComplete,
                     name: "source",
                     configuration: {},
+                    defaultValue: "http",
                     message: "Source?",
                     options: (await getSourcesDescriptions())
                         .sort((a, b) => a.sourceType().localeCompare(b.sourceType()))
@@ -363,6 +364,8 @@ export class PackageJob extends Job<PackageJobResult> {
             this.args.catalogSlug,
             packageFile
         );
+
+        this.jobContext.print("SUCCESS", "Package file saved to " + packageFileWithContext.packageReference);
 
         return {
             exitCode: 0,

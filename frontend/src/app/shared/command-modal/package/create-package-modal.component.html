@@ -1,0 +1,178 @@
+<div mat-dialog-content id="contentBorder">
+    <div class="progress mb-3">
+        <div
+            class="progress-bar"
+            role="progressbar"
+            (click)="move(0)"
+            [style.width]="'25%'"
+            style="background-color: #828282a8"
+            [class.active-bar]="currentPage == 0"
+            aria-valuenow="50"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            Catalog
+        </div>
+        <div
+            class="progress-bar"
+            role="progressbar"
+            (click)="move(1)"
+            [style.width]="'25%'"
+            style="background-color: #828282a8"
+            [class.active-bar]="currentPage == 1"
+            aria-valuenow="75"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            Name
+        </div>
+        <div
+            class="progress-bar"
+            role="progressbar"
+            (click)="move(2)"
+            [style.width]="'25%'"
+            style="background-color: #828282a8"
+            [class.active-bar]="currentPage == 2"
+            aria-valuenow="100"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            Describe
+        </div>
+        <div
+            class="progress-bar"
+            role="progressbar"
+            (click)="move(3)"
+            [style.width]="'25%'"
+            style="background-color: #828282a8"
+            [class.active-bar]="currentPage == 3"
+            aria-valuenow="100"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+            Package
+        </div>
+    </div>
+    <mat-horizontal-stepper labelPosition="bottom" #stepper >
+        <mat-step>
+            <ng-template matStepLabel>Catalog</ng-template>
+            <div class="mat-content">
+                <p class="stepper-title">Select a Target Catalog</p>
+                <div>
+                    Select the catalog into which the data package will be published. Then click the "Next" button below. 
+                </div>
+                
+
+                <label class="mt-3 pl-1">Catalog</label>
+                <app-catalog-autocomplete [form]="catalogForm"></app-catalog-autocomplete>
+
+                <div class="bd-highlight w-100">
+                    <div class="text-danger mt-3" *ngIf="state === State.ERROR">
+                        <ng-container [ngSwitch]="error">
+                            <ng-container *ngSwitchCase="'CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS'">
+                                You can not change the permissions of the collection owner.
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'GROUP_NOT_FOUND'">
+                                There is no group with that name on this registry.
+                            </ng-container>
+                            <ng-container *ngSwitchDefault> Error occured while adding a group permission </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Name</ng-template>
+            <div class="mat-content">
+                <form [formGroup]="nameForm" (ngSubmit)="next()">
+
+                    <p class="stepper-title">Name Your Package</p>
+                    <div class="mb-2">
+                        Enter a name for your data package. And check the short name. Then click the "Next" button below. 
+                    </div>
+                    <label class="mt-3 pl-1">Package Name</label>
+                    <app-input
+                        #packageNameInput
+                        [group]="nameForm"
+                        controlName="packageName"
+                        class="flat-input-parent"
+                        placeholder="Package Name"
+                        (inputChange)="packageNameChanged($event)"
+                        (keyUp)="packageNameChanged($event)"
+                        (keyEnter)="next()"
+                        [error]="nameForm | inputError: 'packageName' | async"
+
+                    ></app-input>
+
+                    <label class="mt-3 pl-1">Short Name</label>
+
+                    <app-input
+                        [group]="nameForm"
+                        controlName="packageShortName"
+                        class="flat-input-parent"
+                        placeholder="short-name"
+                        (keyEnter)="next()"
+                        [error]="nameForm | inputError: 'packageShortName' | async"
+                    ></app-input>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Describe</ng-template>
+            <div class="mat-content">
+                <p class="stepper-title">Describe Your Package</p>
+                <div class="mb-3">
+                    In a short scentence or two, describe the contents of this package. Then click "Next". 
+                </div>
+                <form [formGroup]="descriptionForm" (ngSubmit)="next()">
+                    <app-input
+                        #packageDescriptionInput
+                        [group]="descriptionForm"
+                        controlName="packageDescription"
+                        class="flat-input-parent"
+                        inputType="text"
+                        placeholder="My really awesome data about stuff."
+                        [error]="descriptionForm | inputError: 'packageDescription' | async"
+
+                    ></app-input>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step>
+            <ng-template matStepLabel>Package</ng-template>
+            <div class="mat-content">
+                <p class="stepper-title">Packaging</p>
+                <div>
+                    Next you will be guided through a series of steps to define the contents of your package. This will include defining source(s), inspecting data, and providing descriptions.
+                </div>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>
+<div mat-dialog-actions class="d-flex justify-content-end">
+    <button
+        class="modal-close-btn mr-2"
+        *ngIf="currentPage == undefined || currentPage == 0"
+        mat-dialog-close
+    >
+        <span> Close</span>
+    </button>
+    <button *ngIf="currentPage != 0" class="modal-close-btn mr-2" (click)="previous()">
+        <span>Back</span>
+    </button>
+    <button
+        class="modal-submit-btn"
+        *ngIf="(currentPage < 3)"
+        (click)="next()"
+    >
+        <span> Next</span>
+    </button>
+    <button
+        class="modal-submit-btn"
+        *ngIf="(currentPage === 3 )"
+        mat-dialog-close
+        (click)="submit()"
+    >
+        <span>Start Packaging</span>
+    </button>
+</div>

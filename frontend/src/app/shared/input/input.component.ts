@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatAutocomplete } from "@angular/material/autocomplete";
 
@@ -27,13 +27,17 @@ export class InputComponent implements OnChanges {
     @Input() matAutocomplete: MatAutocomplete;
     @Output() inputChange: EventEmitter<string>;
     @Output() keyEnter: EventEmitter<void>;
+    @Output() keyUp: EventEmitter<string>;
     @Output() focus: EventEmitter<any>;
     @Output() blur: EventEmitter<any>;
+
+    @ViewChild("input") input: ElementRef;
 
     formControl: FormControl;
 
     constructor() {
         this.inputChange = new EventEmitter<string>();
+        this.keyUp = new EventEmitter<string>();
         this.keyEnter = new EventEmitter<void>();
         this.focus = new EventEmitter<any>();
         this.blur = new EventEmitter<any>();
@@ -50,9 +54,16 @@ export class InputComponent implements OnChanges {
         this.inputChange.emit(ev?.target?.value || "");
     }
 
-    handleKeyUp(ev: any) {
+    handleKeyUp(ev: KeyboardEvent) {
         if (ev.keyCode === 13) {
             this.keyEnter.emit();
         }
+        this.keyUp.emit(ev.key);
+    }
+
+    takeFocus() {
+        setTimeout(() => {
+            this.input.nativeElement.focus();
+        }, 25);
     }
 }

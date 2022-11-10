@@ -9,6 +9,7 @@ import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { CommandModalComponent } from "src/app/shared/command-modal/command-modal.component";
+import { UpdateModalComponent } from "src/app/shared/command-modal/update/update-modal.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { CurrentUser, Package, Permission } from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
@@ -173,7 +174,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
 
     public refreshData() {
         const dialogRef = this.dialog
-            .open(CommandModalComponent, {
+            .open(UpdateModalComponent, {
                 data: {
                     targetPackage: this.package.identifier,
                     command: "update"

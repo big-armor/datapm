@@ -152,7 +152,7 @@ describe("Package Command Tests", async () => {
             prompts,
             async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 // console.log(line);
-                if (line.includes("Must be a valid name")) {
+                if (line.includes("Must contain only ")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
                 }

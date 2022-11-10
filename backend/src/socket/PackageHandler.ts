@@ -6,8 +6,6 @@ import {
     JobMessageResponse,
     Response,
     SocketError,
-    StartPackageUpdateRequest,
-    StartPackageUpdateResponse,
     StartPackageRequest,
     StartPackageResponse
 } from "datapm-lib";
@@ -17,12 +15,13 @@ import { DistributedLockingService } from "../service/distributed-locking-servic
 import { checkCatalogPermission, checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from "socket.io";
 import { ActivityLogEventType, Permission } from "../generated/graphql";
-import { PackageRepository } from "../repository/PackageRepository";
-import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { PackageJob, UpdatePackageJob } from "datapm-client-lib";
+import { PackageJob } from "datapm-client-lib";
+import { validateCatalogSlug } from "../directive/ValidCatalogSlugDirective";
+import { validatePackageSlug } from "../directive/ValidPackageSlugDirective";
+import { PackageRepository } from "../repository/PackageRepository";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
@@ -46,17 +45,9 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
             .findCatalogBySlugOrFail(this.request.catalogSlug);
         this.catalogId = catalogEntity.id;
 
-        if (
-            !(await checkCatalogPermission(
-                this.socket,
-                this.socketContext,
-                callback,
-                { catalogSlug: this.request.catalogSlug },
-                Permission.EDIT
-            ))
-        ) {
-            return;
-        }
+        validateCatalogSlug(this.request.catalogSlug);
+        validatePackageSlug(this.request.packageSlug);
+        // TODO Validate package title and description
 
         // check if package exists
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackage({
@@ -67,6 +58,18 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
         });
 
         if (!packageEntity) {
+            if (
+                !(await checkCatalogPermission(
+                    this.socket,
+                    this.socketContext,
+                    callback,
+                    { catalogSlug: this.request.catalogSlug },
+                    Permission.EDIT
+                ))
+            ) {
+                return;
+            }
+
             this.socketContext.connection.getCustomRepository(PackageRepository).createPackage({
                 packageInput: {
                     catalogSlug: this.request.catalogSlug,
@@ -76,8 +79,19 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
                 },
                 userId: this.socketContext.me.id
             });
+        } else {
+            if (
+                !(await checkPackagePermission(
+                    this.socket,
+                    this.socketContext,
+                    callback,
+                    { catalogSlug: this.request.catalogSlug, packageSlug: this.request.packageSlug },
+                    Permission.EDIT
+                ))
+            ) {
+                return;
+            }
         }
-
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
             eventType: ActivityLogEventType.PACKAGE_JOB_STARTED,
@@ -130,14 +144,16 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
         const job = new PackageJob(context, {
             catalogSlug: this.request.catalogSlug,
             packageSlug: this.request.packageSlug,
-            defaults: true
+            packageTitle: this.request.packageTitle,
+            description: this.request.packageDescription,
+            version: "1.0.0",
+            defaults: false
         });
 
         const jobResult = await job.execute();
 
         const exitMessage = new JobMessageRequest(JobRequestType.EXIT);
-        exitMessage.exitCode = jobResult.exitCode;
-        exitMessage.message = jobResult.errorMessage;
+        exitMessage.jobResult = jobResult;
 
         this.socket.emit(this.channelName, exitMessage);
 

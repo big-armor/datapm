@@ -49,7 +49,7 @@ export class FileStorage implements DPMStorage {
         const path = this.buildPath(namespace, itemId);
 
         if (!fs.existsSync(path)) {
-            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
+            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST + ": " + path);
         }
 
         const readStream = fs.createReadStream(path);

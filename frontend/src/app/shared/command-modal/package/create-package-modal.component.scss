@@ -1,0 +1,90 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/colors";
+
+.dialog-close-wrapper {
+    position: static;
+    display: inline-block
+}
+
+#contentBorder {
+    max-width: 600px;
+}
+
+.stepper-title {
+    font-family: $family-roboto;
+    font-weight: $weight-500;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.mat-content {
+    display: block;
+}
+
+a {
+    color: var(--info-color);
+    line-height: 24px;
+    font-size: ($text-font - 1);
+    cursor: pointer;
+    font-weight: $weight-400;
+}
+
+.stepper-content {
+    p {
+        margin-bottom: 0px !important;
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: ($text-font - 1);
+        line-height: 18px;
+        letter-spacing: 0.4px;
+        color: var(--gray-3-color);
+    }
+}
+
+::ng-deep.progress {
+    font-size: $xsmall-font;
+    font-weight: $weight-300;
+
+    .active-bar {
+        background-color: var(--info-color) !important;
+    }
+
+    .inactive-bar {
+        background-color: #82828280 !important;
+    }
+
+    .progress-bar {
+        cursor: pointer;
+        color: var(--secondary-color);
+        border-right: 1px solid rgb(255 255 255 / 25%) !important;
+    }
+}
+
+::ng-deep .mat-horizontal-stepper-header-container {
+    display: none !important;
+}
+
+::ng-deep.mat-horizontal-content-container {
+    padding: 0px;
+}
+
+::ng-deep.mat-dialog-actions {
+    border-top: 1px solid var(--gray-9-color);
+}
+
+#contentBorder {
+    border: 0px;
+    padding: 0px;
+}
+
+
+@media (max-width: 768px) {
+    .stepper-title {
+        margin-top: 0px;
+        font-size: 16px;
+    }
+
+    .mat-content {
+    }
+}

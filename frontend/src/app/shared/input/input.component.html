@@ -13,6 +13,7 @@
     *ngIf="autoFocus && !multiline && !matAutocomplete"
 />
 <input
+    #input
     [ngClass]="'dpm-input-' + inputStyle"
     [type]="inputType"
     autocomplete="off"

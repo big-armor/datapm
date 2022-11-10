@@ -2,6 +2,15 @@ export const PACKAGE_SLUG_REGEX = /^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?
 export const COLLECTION_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 export const CATALOG_SLUG_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
+export const PACKAGE_SLUG_MAX_LENGTH = 38;
+export const CATALOG_SLUG_MAX_LENGTH = 38;
+
+export const PACKAGE_DESCRIPTION_MAX_LENGTH = 256;
+export const PACKAGE_DESCRIPTION_MIN_LENGTH = 3;
+
+export const PACKAGE_DISPLAY_NAME_MIN_LENGTH = 3;
+export const PACKAGE_DISPLAY_NAME_MAX_LENGTH = 128;
+
 export function usernameValid(
     username: string | undefined
 ): "USERNAME_REQUIRED" | "USERNAME_TOO_LONG" | "INVALID_CHARACTERS" | true {
@@ -33,7 +42,7 @@ export function catalogSlugValid(
 
     if (slug.length === 0) return `CATALOG_SLUG_REQUIRED`;
 
-    if (slug.length > 38) return `CATALOG_SLUG_TOO_LONG`;
+    if (slug.length > CATALOG_SLUG_MAX_LENGTH) return `CATALOG_SLUG_TOO_LONG`;
 
     if (!slug.match(CATALOG_SLUG_REGEX)) return `CATALOG_SLUG_INVALID`;
 
@@ -48,7 +57,7 @@ export function packageSlugValid(
 
     if (slug.length === 0) return `PACKAGE_SLUG_REQUIRED`;
 
-    if (slug.length > 38) return `PACKAGE_SLUG_TOO_LONG`;
+    if (slug.length > PACKAGE_SLUG_MAX_LENGTH) return `PACKAGE_SLUG_TOO_LONG`;
 
     if (!slug.match(PACKAGE_SLUG_REGEX)) return "PACKAGE_SLUG_INVALID";
 
@@ -123,4 +132,34 @@ export function validateUsernameOrEmail(
     } else {
         return usernameValid(value);
     }
+}
+
+export function validPackageDescription(
+    value: string
+): true | "REQUIRED" | "MUST_BE_STRING" | "TOO_LONG" | "TOO_SHORT" {
+    if (value == null) return "REQUIRED";
+
+    if (typeof value !== "string") return "MUST_BE_STRING";
+
+    if (value.length < PACKAGE_DESCRIPTION_MIN_LENGTH) return "TOO_SHORT";
+
+    if (value.length > PACKAGE_DESCRIPTION_MAX_LENGTH) return "TOO_LONG";
+
+    return true;
+}
+
+export function validPackageDisplayName(
+    value: string
+): true | "REQUIRED" | "INVALID_CHARACTERS" | "MUST_BE_STRING" | "TOO_LONG" | "TOO_SHORT" {
+    if (value == null) return "REQUIRED";
+
+    if (typeof value !== "string") return "MUST_BE_STRING";
+
+    if (!value.match(/^[\w _-]+$/)) return "INVALID_CHARACTERS";
+
+    if (value.length < PACKAGE_DISPLAY_NAME_MIN_LENGTH) return "TOO_SHORT";
+
+    if (value.length > PACKAGE_DISPLAY_NAME_MAX_LENGTH) return "TOO_LONG";
+
+    return true;
 }

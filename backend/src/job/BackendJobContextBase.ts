@@ -13,6 +13,7 @@ import {
 import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { AuthenticatedContext } from "../context";
+import { hasCatalogPermissionOrFail } from "../directive/hasCatalogPermissionDirective";
 import { hasPackagePermissionOrFail, resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIdentifierInput, Permission } from "../generated/graphql";
 import { CredentialRepository } from "../repository/CredentialRepository";
@@ -31,9 +32,11 @@ export abstract class BackendJobContextBase extends JobContext {
     abstract useDefaults(): boolean;
 
     async getRepositoryConfigsByType(
-        relatedPackage: PackageIdentifierInput,
+        relatedPackage: PackageIdentifierInput | undefined,
         connectorType: string
     ): Promise<RepositoryConfig[]> {
+        if (relatedPackage === undefined) return [];
+
         await hasPackagePermissionOrFail(Permission.VIEW, this.context, relatedPackage);
 
         const repositoryEntities = await this.context.connection
@@ -177,15 +180,14 @@ export abstract class BackendJobContextBase extends JobContext {
         connectorType: string,
         repositoryIdentifier: string,
         credentialsIdentifier: string
-    ): Promise<DPMConfiguration> {
-        if (packageIdentifier === undefined)
-            throw new Error("Backend does not support retrieving credentials when packageIdentifier is undefined");
+    ): Promise<DPMConfiguration | undefined> {
+        if (packageIdentifier === undefined) return undefined;
 
         const credentialEntity = await this.context.connection
             .getCustomRepository(CredentialRepository)
             .findCredential(packageIdentifier, connectorType, repositoryIdentifier, credentialsIdentifier);
 
-        if (credentialEntity == null) throw new Error("Credential not found");
+        if (credentialEntity == null) return undefined;
 
         const decryptedValue = decryptValue(credentialEntity.encryptedCredentials);
 
@@ -230,7 +232,27 @@ export abstract class BackendJobContextBase extends JobContext {
             packageSlug: packageFile.packageSlug
         };
 
-        await hasPackagePermissionOrFail(Permission.VIEW, this.context, identifier);
+        const packageEntity = await this.context.connection
+            .getCustomRepository(PackageRepository)
+            .findPackage({ identifier });
+
+        if (!packageEntity) {
+            await hasCatalogPermissionOrFail(Permission.EDIT, this.context, identifier);
+
+            const newPackageEntity = await this.context.connection
+                .getCustomRepository(PackageRepository)
+                .createPackage({
+                    userId: this.context.me.id,
+                    packageInput: {
+                        catalogSlug: identifier.catalogSlug,
+                        packageSlug: identifier.packageSlug,
+                        displayName: packageFile.displayName,
+                        description: packageFile.description
+                    }
+                });
+        } else {
+            await hasPackagePermissionOrFail(Permission.EDIT, this.context, identifier);
+        }
 
         const version = await createOrUpdateVersion(
             this.context,

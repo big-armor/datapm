@@ -1,4 +1,4 @@
-import { DPMConfiguration, Parameter } from "datapm-lib";
+import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
 import { JobContext } from "../../task/JobContext";
 
 /** Continuously calls the call back until it returns no parameters. Returns the number of prompts completed */

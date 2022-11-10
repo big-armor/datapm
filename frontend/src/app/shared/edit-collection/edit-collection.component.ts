@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { slugValidator } from "src/app/helpers/validators";
+import { collectionSlugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import { Collection, Permission, SetCollectionCoverImageGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
@@ -46,7 +46,7 @@ export class EditCollectionComponent {
                 validators: [Validators.required]
             }),
             newCollectionSlug: new FormControl(data.identifier.collectionSlug, {
-                asyncValidators: [slugValidator()]
+                asyncValidators: [collectionSlugValidator()]
             }),
             description: new FormControl(data.description)
         });

@@ -1,6 +1,13 @@
-import { Task, MessageType, TaskStatus } from "datapm-client-lib";
-import { JobMessageRequest, JobMessageResponse, JobRequestType, Parameter, ParameterAnswer } from "datapm-lib";
-import { AuthenticatedContext, SocketContext } from "../context";
+import { Task, MessageType, TaskStatus, validatePromptResponse } from "datapm-client-lib";
+import {
+    JobMessageRequest,
+    JobMessageResponse,
+    JobRequestType,
+    Parameter,
+    ParameterAnswer,
+    ParameterType
+} from "datapm-lib";
+import { AuthenticatedContext } from "../context";
 import SocketIO from "socket.io";
 import { BackendJobContextBase } from "./BackendJobContextBase";
 
@@ -18,31 +25,47 @@ export class WebsocketJobContext extends BackendJobContextBase {
         return false; // TODO make this optional?
     }
 
-    _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
+    async _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {
         this.parameterCount += parameters.length;
 
-        const request = new JobMessageRequest(JobRequestType.PROMPT);
-        request.prompts = parameters;
+        const validAnswers: ParameterAnswer<string> = {};
 
-        return new Promise<ParameterAnswer<T>>((resolve, reject) => {
-            this.socket.emit(this.channelName, request, (response: JobMessageResponse) => {
-                if (response.responseType === JobRequestType.ERROR) {
-                    reject(response.message);
-                } else {
-                    if (!response.answers) {
-                        throw new Error("No answers received");
+        let currentIndex = 0;
+        let currentParameter: Parameter | undefined = parameters[currentIndex++];
+
+        while (currentParameter) {
+            const request = new JobMessageRequest(JobRequestType.PROMPT);
+            request.prompts = [currentParameter];
+
+            const response = await new Promise<JobMessageResponse>((resolve, reject) => {
+                this.socket.emit(this.channelName, request, (response: JobMessageResponse) => {
+                    if (response.responseType === JobRequestType.ERROR) {
+                        reject(response.message);
+                    } else {
+                        resolve(response);
                     }
-
-                    for (const key of Object.keys(response.answers)) {
-                        const parameter = parameters.find((p) => p.name === key);
-                        if (parameter == null) continue;
-                        parameter.configuration[key] = response.answers[key];
-                    }
-
-                    resolve(response.answers);
-                }
+                });
             });
-        });
+
+            if (response.answers === undefined) continue;
+
+            const answer = response.answers[currentParameter.name];
+            const validateResult = validatePromptResponse(answer, currentParameter);
+            if (validateResult !== true) {
+                const request = new JobMessageRequest(JobRequestType.PRINT);
+                request.message = validateResult;
+                request.messageType = "ERROR";
+
+                this.socket.emit(this.channelName, request);
+                continue;
+            }
+
+            validAnswers[currentParameter.name] = answer;
+            currentParameter.configuration[currentParameter.name] = answer;
+            currentParameter = parameters[currentIndex++];
+        }
+
+        return validAnswers;
     }
 
     updateSteps(steps: string[]): void {

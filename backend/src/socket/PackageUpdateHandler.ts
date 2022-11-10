@@ -143,7 +143,7 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
         const jobResult = await job.execute();
 
         const exitMessage = new JobMessageRequest(JobRequestType.EXIT);
-        exitMessage.exitCode = jobResult.exitCode;
+        exitMessage.jobResult = jobResult;
 
         this.socket.emit(this.channelName, exitMessage);
 
