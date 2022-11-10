@@ -23,13 +23,10 @@ export class TimeplusConnector implements Connector {
     }
 
     async getRepositoryIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string> {
-        if (typeof connectionConfiguration.host !== "string") {
-            throw new Error("Timeplus host not set");
+        if (typeof connectionConfiguration.base !== "string") {
+            throw new Error("Timeplus base URL not set");
         }
-        if (typeof connectionConfiguration.tenant !== "string") {
-            throw new Error("Timeplus tenant not set");
-        }
-        return connectionConfiguration.host + "#" + connectionConfiguration.tenant;
+        return connectionConfiguration.base;
     }
 
     async getCredentialsIdentifierFromConfiguration(
@@ -48,23 +45,14 @@ export class TimeplusConnector implements Connector {
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 
-        if (connectionConfiguration.host == null) {
+        if (connectionConfiguration.base == null) {
             parameters.push({
-                name: "host",
+                name: "base",
                 type: ParameterType.Text,
                 stringMinimumLength: 1,
                 configuration: connectionConfiguration,
-                defaultValue: "beta.timeplus.cloud",
-                message: "Host Name?"
-            });
-        }
-        if (connectionConfiguration.tenant == null) {
-            parameters.push({
-                name: "tenant",
-                type: ParameterType.Text,
-                stringMinimumLength: 1,
-                configuration: connectionConfiguration,
-                message: "Tenant ID(e.g. datapm)?"
+                defaultValue: "https://beta.timeplus.cloud/workspace-id",
+                message: "Base URL?"
             });
         }
 
@@ -102,7 +90,7 @@ export class TimeplusConnector implements Connector {
         credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
         const apiKey = getApiKey(credentialsConfiguration);
-        const url = `https://${connectionConfiguration.host}/${connectionConfiguration.tenant}/api/v1beta1/streams`;
+        const url = `${connectionConfiguration.base}/api/v1beta1/streams`;
 
         const resp = await fetch(url, {
             headers: {
