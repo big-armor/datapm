@@ -32,8 +32,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     constructor(
         private request: StartPackageRequest,
         private socket: SocketIO.Socket,
-        private socketContext: AuthenticatedSocketContext,
-        private distributedLockingService: DistributedLockingService
+        private socketContext: AuthenticatedSocketContext
     ) {
         super();
         this.channelName = randomUUID();
@@ -147,7 +146,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
             packageTitle: this.request.packageTitle,
             description: this.request.packageDescription,
             version: "1.0.0",
-            defaults: false
+            defaults: this.request.defaults
         });
 
         const jobResult = await job.execute();

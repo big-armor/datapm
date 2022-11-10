@@ -302,12 +302,20 @@ export class StartPackageRequest implements StartJobRequest {
     packageSlug: string;
     packageTitle: string;
     packageDescription: string;
+    defaults: boolean;
 
-    constructor(catalogSlug: string, packageSlug: string, packageTitle: string, packageDescription: string) {
+    constructor(
+        catalogSlug: string,
+        packageSlug: string,
+        packageTitle: string,
+        packageDescription: string,
+        defaults: boolean
+    ) {
         this.catalogSlug = catalogSlug;
         this.packageSlug = packageSlug;
         this.packageTitle = packageTitle;
         this.packageDescription = packageDescription;
+        this.defaults = defaults;
     }
 }
 

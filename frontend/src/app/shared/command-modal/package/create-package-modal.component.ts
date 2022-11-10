@@ -47,6 +47,10 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         packageDescription: new FormControl("", Validators.required)
     });
 
+    public optionsForm = new FormGroup({
+        defaults: new FormControl(false)
+    });
+
     hasErrors = false;
 
     catalogForm = new FormGroup({
@@ -82,6 +86,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         const packageSlug = this.nameForm.get("packageShortName")?.value;
         const packageName = this.nameForm.get("packageName")?.value;
         const packageDescription = this.descriptionForm.get("packageDescription")?.value;
+        const defaults = this.optionsForm.get("defaults")?.value;
 
         this.state = State.SUCCESS;
         this.dialogRef.close();
@@ -90,7 +95,8 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
             catalogSlug,
             packageDescription,
             packageName,
-            packageSlug
+            packageSlug,
+            defaults
         });
     }
 

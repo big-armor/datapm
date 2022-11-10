@@ -11,6 +11,7 @@ export type PackageModalData = {
     packageSlug: string;
     packageName: string;
     packageDescription: string;
+    defaults: boolean;
 };
 
 enum State { 
@@ -75,7 +76,8 @@ export class PackageModalComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.data.catalogSlug,
                 this.data.packageSlug,
                 this.data.packageName,
-                this.data.packageDescription
+                this.data.packageDescription,
+                this.data.defaults
             )
         );
     }

@@ -17,6 +17,18 @@
     font-size: 18px;
 }
 
+::ng-deep .mat-form-field-underline {
+    display: none;
+
+    &::before {
+        height: 0px;
+    }
+}
+
+label {
+    font-weight: 500;
+}
+
 .mat-content {
     display: block;
 }

@@ -143,7 +143,17 @@
             <div class="mat-content">
                 <p class="stepper-title">Packaging</p>
                 <div>
-                    Next you will be guided through a series of steps to define the contents of your package. This will include defining source(s), inspecting data, and providing descriptions.
+                    Select whether to use basic or advanced packaging below, and then click "Start Packaging".
+
+                    <form [formGroup]="optionsForm" (ngSubmit)="submit()">
+                        <label class="mt-3 pl-1">Basic or Advanced Questions?</label>
+                        <mat-form-field class="w-100">
+                            <mat-select formControlName="defaults" [value]="true">
+                                <mat-option [value]="true">Basic</mat-option>
+                                <mat-option [value]="false">Advanced</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </form>
                 </div>
             </div>
         </mat-step>
