@@ -100,32 +100,35 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         });
     }
 
-    public move(index: number) {
+    public move(index: number, checkCurrentPageState = true) {
 
-        if(this.currentPage === 0) {
-            if (this.catalogForm.invalid) {
-                return;
+        if(checkCurrentPageState) {
+
+            if(this.currentPage === 0) {
+                if (this.catalogForm.invalid) {
+                    return;
+                }
             }
-        }
 
-        if (this.currentPage == 1) {
-            
-            this.nameForm.markAllAsTouched();
-            this.nameForm.markAsDirty();
-            this.nameForm.updateValueAndValidity();
-            if (this.nameForm.invalid) {
-                this.hasErrors = true;
-                return;
+            if (this.currentPage == 1) {
+                
+                this.nameForm.markAllAsTouched();
+                this.nameForm.markAsDirty();
+                this.nameForm.updateValueAndValidity();
+                if (this.nameForm.invalid) {
+                    this.hasErrors = true;
+                    return;
+                }
             }
-        }
 
-        if (this.currentPage == 2) {
-            this.descriptionForm.markAllAsTouched();
-            this.descriptionForm.markAsDirty();
-            this.descriptionForm.updateValueAndValidity();
-            if (this.descriptionForm.invalid) {
-                this.hasErrors = true;
-                return;
+            if (this.currentPage == 2) {
+                this.descriptionForm.markAllAsTouched();
+                this.descriptionForm.markAsDirty();
+                this.descriptionForm.updateValueAndValidity();
+                if (this.descriptionForm.invalid) {
+                    this.hasErrors = true;
+                    return;
+                }
             }
         }
 
@@ -149,7 +152,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
     }
 
     public previous() {
-        this.move(this.currentPage - 1);
+        this.move(this.currentPage - 1, false);
     }
 
     public packageNameChanged(value: string) {

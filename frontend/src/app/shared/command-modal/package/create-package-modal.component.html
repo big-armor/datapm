@@ -159,30 +159,27 @@
         </mat-step>
     </mat-horizontal-stepper>
 </div>
-<div mat-dialog-actions class="d-flex justify-content-end">
-    <button
-        class="modal-close-btn mr-2"
-        *ngIf="currentPage == undefined || currentPage == 0"
-        mat-dialog-close
-    >
-        <span> Close</span>
-    </button>
-    <button *ngIf="currentPage != 0" class="modal-close-btn mr-2" (click)="previous()">
-        <span>Back</span>
-    </button>
-    <button
-        class="modal-submit-btn"
-        *ngIf="(currentPage < 3)"
-        (click)="next()"
-    >
-        <span> Next</span>
-    </button>
-    <button
-        class="modal-submit-btn"
-        *ngIf="(currentPage === 3 )"
-        mat-dialog-close
-        (click)="submit()"
-    >
-        <span>Start Packaging</span>
-    </button>
+<div mat-dialog-actions class="d-flex justify-content-between">
+    <button class="modal-close-btn mr-2" mat-dialog-close>Cancel</button>
+    <div>
+        <button *ngIf="currentPage != 0" class="modal-close-btn mr-2" (click)="previous()">
+            <span>Back</span>
+        </button>
+        <button
+            class="modal-submit-btn"
+            *ngIf="(currentPage < 3)"
+            (click)="next()"
+        >
+            <span> Next</span>
+        </button>
+        <button
+            class="modal-submit-btn"
+            *ngIf="(currentPage === 3 )"
+            mat-dialog-close
+            (click)="submit()"
+        >
+            <span>Start Packaging</span>
+        </button>
+    </div>
+   
 </div>
