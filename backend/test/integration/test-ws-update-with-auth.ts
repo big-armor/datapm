@@ -447,4 +447,22 @@ describe("Package Job With Authentication Tests", async () => {
 
         expect(jobExitMessage.jobResult?.exitCode).equal(0);
     });
+
+    it("Package should be updated after packaging", async function () {
+        const response = await userAClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-ws-update-postgres",
+                    packageSlug: "test-postgres"
+                }
+            }
+        });
+
+        // console.log(JSON.stringify(JSON.parse(response.data.package.latestVersion?.packageFile),null,2));
+
+        expect(response.data.package.latestVersion?.identifier.versionMajor).to.equal(3);
+        expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(0);
+        expect(response.data.package.latestVersion?.identifier.versionPatch).to.equal(0);
+    });
 });
