@@ -48,7 +48,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
     });
 
     public optionsForm = new FormGroup({
-        defaults: new FormControl(false)
+        defaults: new FormControl(true)
     });
 
     hasErrors = false;
