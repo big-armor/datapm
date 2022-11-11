@@ -109,6 +109,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         }
 
         if (this.currentPage == 1) {
+            
             this.nameForm.markAllAsTouched();
             this.nameForm.markAsDirty();
             this.nameForm.updateValueAndValidity();

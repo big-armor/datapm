@@ -337,7 +337,8 @@ export class StartPackageUpdateRequest implements StartJobRequest {
         public packageIdentifier: {
             catalogSlug: string;
             packageSlug: string;
-        }
+        },
+        public defaults: boolean
     ) {}
 }
 

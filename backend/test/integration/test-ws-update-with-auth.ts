@@ -15,21 +15,19 @@ import {
     StartPackageUpdateRequest,
     SocketResponseType,
     SocketEvent,
-    JobMessageResponse,
-    JobMessageRequest,
-    JobRequestType,
     StartPackageResponse,
     StartPackageRequest,
-    ParameterAnswer
+    UpdateMethod
 } from "datapm-lib";
 import { describe, it } from "mocha";
 import { Socket } from "socket.io-client";
-import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
+import { ActivityLogLine, dataServerPort, findActivityLogLine, serverLogLines } from "./setup";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { Client } from "pg";
 import fs from "fs";
 import path from "path";
+import { PromptResponse, handleJobMessages } from "./test-ws-util";
 
 /** Tests when the registry is used as a proxy for a published data package */
 describe("Package Job With Authentication Tests", async () => {
@@ -191,7 +189,8 @@ describe("Package Job With Authentication Tests", async () => {
                     "testA-ws-update-postgres",
                     "test-postgres",
                     "Test package for updates",
-                    "Test package description"
+                    "Test package description",
+                    false
                 ),
                 (response: StartPackageResponse) => {
                     resolve(response);
@@ -215,10 +214,7 @@ describe("Package Job With Authentication Tests", async () => {
 
         const successResponse = response as StartPackageResponse;
 
-        const promptResponses: {
-            name: string;
-            response: string | string[] | number | boolean;
-        }[] = [
+        const promptResponses: PromptResponse[] = [
             {
                 name: "source",
                 response: "postgres"
@@ -285,41 +281,10 @@ describe("Package Job With Authentication Tests", async () => {
             }
         ];
 
-        let currentPromptIndex = 0;
-
         const jobExitMessage = await handleJobMessages(
             userAStreamingClient,
             successResponse.channelName,
-            (message: JobMessageRequest) => {
-                if (message.requestType === JobRequestType.PRINT) {
-                    // console.log(message.message);
-                } else if (message.requestType === JobRequestType.ERROR) {
-                    console.log("Error: " + message.message);
-                } else if (message.requestType === JobRequestType.PROMPT) {
-                    const responses: ParameterAnswer<string> = {};
-
-                    if (message.prompts == null) throw new Error("No prompts found");
-
-                    if (currentPromptIndex + message.prompts.length > promptResponses.length)
-                        throw new Error("Not enough prompt responses: " + message.prompts[0].name);
-
-                    for (const prompt of message.prompts) {
-                        // console.log(prompt.message);
-
-                        const currentPrompt = promptResponses[currentPromptIndex++];
-
-                        if (prompt.name === currentPrompt.name) responses[prompt.name] = currentPrompt.response;
-                        else throw new Error("Unexpected prompt " + prompt.name);
-                    }
-
-                    const response = new JobMessageResponse(JobRequestType.PROMPT);
-                    response.answers = responses;
-
-                    return response;
-                }
-
-                return undefined;
-            }
+            promptResponses
         );
 
         expect(jobExitMessage.jobResult?.exitCode).equal(0);
@@ -334,10 +299,13 @@ describe("Package Job With Authentication Tests", async () => {
         const response = await new Promise<StartPackageUpdateResponse | ErrorResponse>((resolve, reject) => {
             userAStreamingClient.emit(
                 SocketEvent.START_PACKAGE_UPDATE,
-                new StartPackageUpdateRequest({
-                    catalogSlug: "testA-ws-update-postgres",
-                    packageSlug: "test-postgres"
-                }),
+                new StartPackageUpdateRequest(
+                    {
+                        catalogSlug: "testA-ws-update-postgres",
+                        packageSlug: "test-postgres"
+                    },
+                    false
+                ),
                 (response: StartPackageUpdateResponse) => {
                     resolve(response);
                 }
@@ -364,7 +332,7 @@ describe("Package Job With Authentication Tests", async () => {
             )
         ).to.not.equal(undefined);
 
-        const jobExitMessage = await handleJobMessages(userAStreamingClient, channelName);
+        const jobExitMessage = await handleJobMessages(userAStreamingClient, channelName, []);
 
         expect(jobExitMessage.jobResult?.exitCode).equal(0);
     });
@@ -386,81 +354,97 @@ describe("Package Job With Authentication Tests", async () => {
         expect(response.data.package.latestVersion?.identifier.versionMinor).to.equal(0);
         expect(response.data.package.latestVersion?.identifier.versionPatch).to.equal(0);
     });
-});
 
-async function handleJobMessages(
-    client: Socket,
-    channelName: string,
-    messageHandler?: (message: JobMessageRequest) => JobMessageResponse | undefined
-): Promise<JobMessageRequest> {
-    let exitCallback: (message: JobMessageRequest) => void | undefined;
-    let disconnectCallBack: () => void | undefined;
-    let errorCallback: (error: Error) => void | undefined;
-
-    const disconnectPromise = new Promise<JobMessageRequest>((resolve, reject) => {
-        disconnectCallBack = reject;
-    });
-
-    client.on(channelName, (message: JobMessageRequest, responseCallback: (response: JobMessageResponse) => void) => {
-        exitCallback(message);
-        // console.log(JSON.stringify(message));
-
-        if (message.requestType === JobRequestType.END_TASK) {
-            responseCallback(new JobMessageResponse(JobRequestType.END_TASK));
-        } else if (messageHandler) {
-            try {
-                const response = messageHandler(message);
-                if (response) {
-                    responseCallback(response);
+    it("Should re-run package job without error", async () => {
+        const response = await new Promise<StartPackageResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(
+                SocketEvent.START_PACKAGE,
+                new StartPackageRequest(
+                    "testA-ws-update-postgres",
+                    "test-postgres",
+                    "Test package for updates",
+                    "Test package description",
+                    false
+                ),
+                (response: StartPackageResponse) => {
+                    resolve(response);
                 }
-            } catch (error) {
-                errorCallback(error);
-            }
-        }
-    });
+            );
+        });
 
-    client.on("disconnect", () => {
-        disconnectCallBack();
-    });
+        expect(response.responseType).equal(SocketResponseType.START_PACKAGE_RESPONSE);
 
-    const jobExitPromise = new Promise<JobMessageRequest>((resolve, reject) => {
-        exitCallback = (message: JobMessageRequest) => {
-            if (message.requestType === JobRequestType.EXIT) {
-                if (message.jobResult?.exitCode === 0) {
-                    resolve(message);
-                } else {
-                    reject(
-                        new Error(
-                            "Failed with exitCode: " +
-                                message.jobResult?.exitCode +
-                                " message: " +
-                                message.jobResult?.errorMessage
-                        )
+        expect(
+            serverLogLines.find((l: string) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType === ActivityLogEventType.PACKAGE_JOB_STARTED &&
+                        activityLogLine.username === "testA-ws-update-postgres" &&
+                        activityLogLine.targetCatalogSlug === "testA-ws-update-postgres"
                     );
-                }
+                })
+            )
+        ).to.not.equal(undefined);
+
+        const successResponse = response as StartPackageResponse;
+
+        const promptResponses: PromptResponse[] = [
+            {
+                name: "source",
+                response: "http"
+            },
+            {
+                name: "uri",
+                response: "http://localhost:" + dataServerPort + "/state-codes.csv"
+            },
+            {
+                name: "addAnother",
+                response: false
+            },
+            {
+                name: "hasHeaderRow",
+                response: "true"
+            },
+            {
+                name: "headerRowNumber",
+                response: 1
+            },
+            {
+                name: "updateMethod",
+                response: UpdateMethod.BATCH_FULL_SET
+            },
+            {
+                name: "excludeProperties",
+                response: false
+            },
+            {
+                name: "renameAttributes",
+                response: false
+            },
+            {
+                name: "wasDerived",
+                response: false
+            },
+            {
+                name: "recordUnit",
+                response: "test"
+            },
+            {
+                name: "website",
+                response: "https://datapm.io"
+            },
+            {
+                name: "sampleRecordCount",
+                response: 10
             }
-        };
+        ];
 
-        errorCallback = (error: Error) => {
-            reject(error);
-        };
-    });
-
-    const startResponse = await new Promise<JobMessageResponse>((resolve, reject) => {
-        client.emit(
-            channelName,
-            new JobMessageRequest(JobRequestType.START_JOB),
-            (response: JobMessageResponse | ErrorResponse) => {
-                if (response.responseType === SocketResponseType.ERROR) {
-                    reject(new Error((response as ErrorResponse).message));
-                }
-
-                resolve(response as JobMessageResponse);
-            }
+        const jobExitMessage = await handleJobMessages(
+            userAStreamingClient,
+            successResponse.channelName,
+            promptResponses
         );
+
+        expect(jobExitMessage.jobResult?.exitCode).equal(0);
     });
-
-    expect(startResponse.responseType).equal(JobRequestType.START_JOB);
-
-    return Promise.race([disconnectPromise, jobExitPromise]);
-}
+});

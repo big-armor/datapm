@@ -126,7 +126,13 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     async startJob(): Promise<void> {
         const jobId = "user-package-update-" + randomUUID();
 
-        const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
+        const context = new WebsocketJobContext(
+            jobId,
+            this.socketContext,
+            this.socket,
+            this.channelName,
+            this.request.defaults
+        );
 
         if (getEnvVariable("REGISTRY_URL") == null) {
             throw new Error("REGISTRY_URL is not defined");

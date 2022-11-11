@@ -16,13 +16,14 @@ export class WebsocketJobContext extends BackendJobContextBase {
         public jobId: string,
         private socketContext: AuthenticatedContext,
         private socket: SocketIO.Socket,
-        private channelName: string
+        private channelName: string,
+        private defaults: boolean
     ) {
         super(jobId, socketContext);
     }
 
     useDefaults(): boolean {
-        return false; // TODO make this optional?
+        return this.defaults;
     }
 
     async _parameterPrompt<T extends string = string>(parameters: Parameter<T>[]): Promise<ParameterAnswer<T>> {

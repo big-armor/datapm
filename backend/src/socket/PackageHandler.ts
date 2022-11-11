@@ -138,7 +138,13 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     async startJob(): Promise<void> {
         const jobId = "user-package-" + randomUUID();
 
-        const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
+        const context = new WebsocketJobContext(
+            jobId,
+            this.socketContext,
+            this.socket,
+            this.channelName,
+            this.request.defaults
+        );
 
         const job = new PackageJob(context, {
             catalogSlug: this.request.catalogSlug,
