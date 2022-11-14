@@ -57,8 +57,8 @@ DataPM supports reading and writing records for the following databases.
 | :---------------- | :-------------: | :--------------: |
 | Google Big Query  |      Read       |      Write       |
 | PostgreSQL        |      Read       |      Write       |
-| MariaDB           | Read (untested) | Write (untested) |
-| MySQL             |      Read       |      Write       |
+| MariaDB           |    (future)     | Write (untested) |
+| MySQL             |    (future)     |      Write       |
 | MongoDB           |    (future)     |      Write       |
 | Oracle            |    (future)     |     (future)     |
 | GCP Cloud Spanner |    (future)     |     (future)     |

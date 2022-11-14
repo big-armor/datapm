@@ -510,6 +510,8 @@ export function diffCompatibility(diffs: Difference[]): Compability {
 
             case DifferenceType.CHANGE_SOURCE:
             case DifferenceType.CHANGE_SOURCE_CONFIGURATION:
+            case DifferenceType.CHANGE_SOURCE_CONNECTION:
+            case DifferenceType.CHANGE_SOURCE_CREDENTIALS:
             case DifferenceType.REMOVE_HIDDEN_PROPERTY:
             case DifferenceType.REMOVE_HIDDEN_SCHEMA:
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
@@ -533,7 +535,6 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
             case DifferenceType.CHANGE_STREAM_UPDATE_METHOD:
-            case DifferenceType.CHANGE_SOURCE_CREDENTIALS:
                 // nothing to do
                 break;
 

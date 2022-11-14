@@ -239,10 +239,12 @@ export class CommandModalComponent {
                         this.addPrintLineMessage({messageType: "SUCCESS", message: "Job finished successfully"});
                     } else {
                         this.state = State.ERROR;
-                        this.addPrintLineMessage({messageType: "ERROR", message: "Job finished with error code: " + message.jobResult.exitCode});
+                        this.addPrintLineMessage({messageType: "ERROR", message: "Job error message: " + message.jobResult.errorMessage});
+                        this.addPrintLineMessage({messageType: "ERROR", message: "Job error code: " + message.jobResult.exitCode});
 
                     }
                     responseCallback && responseCallback(new JobMessageResponse(JobRequestType.EXIT));
+                    this.disconnectWebsocket();
 
                     if(message.jobResult)
                         this.results.emit(message.jobResult);

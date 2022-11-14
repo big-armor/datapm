@@ -41,6 +41,6 @@ export class UpdateModalComponent implements AfterViewInit, OnDestroy {
         this.command.title =
             "Refresh " + this.data.targetPackage.catalogSlug + "/" + this.data.targetPackage.packageSlug;
 
-        this.command.runCommand(new StartPackageUpdateRequest(this.data.targetPackage));
+        this.command.runCommand(new StartPackageUpdateRequest(this.data.targetPackage, false));
     }
 }

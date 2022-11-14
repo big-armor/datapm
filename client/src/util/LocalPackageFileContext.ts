@@ -151,11 +151,6 @@ export class LocalPackageFileContext implements PackageFileWithContext {
     }
 
     async writeReadmeFile(packageFile: PackageFile): Promise<string> {
-        const contents =
-            packageFile.readmeMarkdown != null
-                ? packageFile.readmeMarkdown
-                : `# ${packageFile.displayName}\n \n ${packageFile.description}`;
-
         const basePath = this.basePath();
 
         if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
@@ -163,20 +158,17 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         const readmeFileName = packageFile.readmeFile ? packageFile.readmeFile : packageFile.packageSlug + ".README.md";
         const readmeFileLocation = path.join(basePath, readmeFileName);
 
-        fs.writeFileSync(readmeFileLocation, contents);
+        if (packageFile.readmeMarkdown) {
+            fs.writeFileSync(readmeFileLocation, packageFile.readmeMarkdown);
 
-        delete packageFile.readmeMarkdown;
-        packageFile.readmeFile = readmeFileName;
+            delete packageFile.readmeMarkdown;
+            packageFile.readmeFile = readmeFileName;
+        }
 
         return readmeFileLocation;
     }
 
     async writeLicenseFile(packageFile: PackageFile): Promise<string> {
-        const contents =
-            typeof packageFile.licenseMarkdown === "string"
-                ? (packageFile.licenseMarkdown as string)
-                : "# License\n\nLicense not defined. Contact author.";
-
         const basePath = this.basePath();
 
         if (!fs.existsSync(basePath)) fs.mkdirSync(basePath, { recursive: true });
@@ -184,10 +176,12 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         const licenseFile = packageFile.licenseFile ? packageFile.licenseFile : packageFile.packageSlug + ".LICENSE.md";
         const licenseFileLocation = path.join(basePath, licenseFile);
 
-        fs.writeFileSync(licenseFileLocation, contents);
+        if (packageFile.licenseMarkdown) {
+            fs.writeFileSync(licenseFileLocation, packageFile.licenseMarkdown);
 
-        delete packageFile.licenseMarkdown;
-        packageFile.licenseFile = licenseFile;
+            delete packageFile.licenseMarkdown;
+            packageFile.licenseFile = licenseFile;
+        }
 
         return licenseFileLocation;
     }

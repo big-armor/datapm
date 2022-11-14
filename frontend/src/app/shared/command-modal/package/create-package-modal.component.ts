@@ -47,6 +47,10 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         packageDescription: new FormControl("", Validators.required)
     });
 
+    public optionsForm = new FormGroup({
+        defaults: new FormControl(true)
+    });
+
     hasErrors = false;
 
     catalogForm = new FormGroup({
@@ -82,6 +86,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
         const packageSlug = this.nameForm.get("packageShortName")?.value;
         const packageName = this.nameForm.get("packageName")?.value;
         const packageDescription = this.descriptionForm.get("packageDescription")?.value;
+        const defaults = this.optionsForm.get("defaults")?.value;
 
         this.state = State.SUCCESS;
         this.dialogRef.close();
@@ -90,35 +95,40 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
             catalogSlug,
             packageDescription,
             packageName,
-            packageSlug
+            packageSlug,
+            defaults
         });
     }
 
-    public move(index: number) {
+    public move(index: number, checkCurrentPageState = true) {
 
-        if(this.currentPage === 0) {
-            if (this.catalogForm.invalid) {
-                return;
+        if(checkCurrentPageState) {
+
+            if(this.currentPage === 0) {
+                if (this.catalogForm.invalid) {
+                    return;
+                }
             }
-        }
 
-        if (this.currentPage == 1) {
-            this.nameForm.markAllAsTouched();
-            this.nameForm.markAsDirty();
-            this.nameForm.updateValueAndValidity();
-            if (this.nameForm.invalid) {
-                this.hasErrors = true;
-                return;
+            if (this.currentPage == 1) {
+                
+                this.nameForm.markAllAsTouched();
+                this.nameForm.markAsDirty();
+                this.nameForm.updateValueAndValidity();
+                if (this.nameForm.invalid) {
+                    this.hasErrors = true;
+                    return;
+                }
             }
-        }
 
-        if (this.currentPage == 2) {
-            this.descriptionForm.markAllAsTouched();
-            this.descriptionForm.markAsDirty();
-            this.descriptionForm.updateValueAndValidity();
-            if (this.descriptionForm.invalid) {
-                this.hasErrors = true;
-                return;
+            if (this.currentPage == 2) {
+                this.descriptionForm.markAllAsTouched();
+                this.descriptionForm.markAsDirty();
+                this.descriptionForm.updateValueAndValidity();
+                if (this.descriptionForm.invalid) {
+                    this.hasErrors = true;
+                    return;
+                }
             }
         }
 
@@ -142,7 +152,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
     }
 
     public previous() {
-        this.move(this.currentPage - 1);
+        this.move(this.currentPage - 1, false);
     }
 
     public packageNameChanged(value: string) {

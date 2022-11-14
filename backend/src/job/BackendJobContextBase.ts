@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server";
 import {
     CantSaveReasons,
     JobContext,
@@ -8,9 +9,10 @@ import {
     RegistryConfig,
     RepositoryConfig,
     Task,
-    RepositoryCredentialsConfig
+    RepositoryCredentialsConfig,
+    VersionConflict
 } from "datapm-client-lib";
-import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile } from "datapm-lib";
+import { DPMConfiguration, Parameter, ParameterAnswer, PackageFile, comparePackages } from "datapm-lib";
 import { createOrUpdateVersion } from "../business/CreateVersion";
 import { AuthenticatedContext } from "../context";
 import { hasCatalogPermissionOrFail } from "../directive/hasCatalogPermissionDirective";
@@ -254,14 +256,30 @@ export abstract class BackendJobContextBase extends JobContext {
             await hasPackagePermissionOrFail(Permission.EDIT, this.context, identifier);
         }
 
-        const version = await createOrUpdateVersion(
-            this.context,
-            identifier,
-            {
-                packageFile
-            },
-            []
-        );
+        try {
+            await createOrUpdateVersion(
+                this.context,
+                identifier,
+                {
+                    packageFile
+                },
+                []
+            );
+        } catch (e) {
+            const appolloError = e as ApolloError;
+            if (appolloError.extensions.code === VersionConflict.HIGHER_VERSION_REQUIRED) {
+                packageFile.version = appolloError.extensions.minNextVersion;
+
+                await createOrUpdateVersion(
+                    this.context,
+                    identifier,
+                    {
+                        packageFile
+                    },
+                    []
+                );
+            } else throw e;
+        }
 
         const registryUrl = getEnvVariable("REGISTRY_URL");
 

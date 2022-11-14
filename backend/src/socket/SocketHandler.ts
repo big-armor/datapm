@@ -82,12 +82,7 @@ export class SocketConnectionHandler {
         }
 
         try {
-            const handler = new PackageHandler(
-                request,
-                this.socket,
-                this.socketContext as AuthenticatedSocketContext,
-                this.distributedLockingService
-            );
+            const handler = new PackageHandler(request, this.socket, this.socketContext as AuthenticatedSocketContext);
             this.addRequestHandler(handler);
             await handler.start(callback);
         } catch (error) {

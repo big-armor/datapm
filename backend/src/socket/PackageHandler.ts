@@ -32,8 +32,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     constructor(
         private request: StartPackageRequest,
         private socket: SocketIO.Socket,
-        private socketContext: AuthenticatedSocketContext,
-        private distributedLockingService: DistributedLockingService
+        private socketContext: AuthenticatedSocketContext
     ) {
         super();
         this.channelName = randomUUID();
@@ -139,7 +138,13 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     async startJob(): Promise<void> {
         const jobId = "user-package-" + randomUUID();
 
-        const context = new WebsocketJobContext(jobId, this.socketContext, this.socket, this.channelName);
+        const context = new WebsocketJobContext(
+            jobId,
+            this.socketContext,
+            this.socket,
+            this.channelName,
+            this.request.defaults
+        );
 
         const job = new PackageJob(context, {
             catalogSlug: this.request.catalogSlug,
@@ -147,7 +152,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
             packageTitle: this.request.packageTitle,
             description: this.request.packageDescription,
             version: "1.0.0",
-            defaults: false
+            defaults: this.request.defaults
         });
 
         const jobResult = await job.execute();

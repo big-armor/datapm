@@ -353,8 +353,8 @@ export class PackageJob extends Job<PackageJobResult> {
             packageSlug: responses.packageSlug,
             version: responses.version,
             description: responses.description,
-            readmeFile: `${responses.packageSlug}.README.md`,
-            licenseFile: `${responses.packageSlug}.LICENSE.md`,
+            readmeMarkdown: `# ${displayNameResponse.displayName}\n \n ${responses.description}`,
+            licenseMarkdown: "# License\n\nLicense not defined. Contact author.",
             website: responses.website,
             schemas: Object.values(schemas)
         };
@@ -365,7 +365,13 @@ export class PackageJob extends Job<PackageJobResult> {
             packageFile
         );
 
-        this.jobContext.print("SUCCESS", "Package file saved to " + packageFileWithContext.packageReference);
+        this.jobContext.print(
+            "SUCCESS",
+            "Package " +
+                packageFileWithContext.packageFile.version +
+                " saved to " +
+                packageFileWithContext.packageReference
+        );
 
         return {
             exitCode: 0,

@@ -178,10 +178,13 @@ describe("Package Tests", async () => {
         const response = await new Promise<StartPackageUpdateResponse | ErrorResponse>((resolve, reject) => {
             userAStreamingClient.emit(
                 SocketEvent.START_PACKAGE_UPDATE,
-                new StartPackageUpdateRequest({
-                    catalogSlug: "testA-ws-update",
-                    packageSlug: "test-update"
-                }),
+                new StartPackageUpdateRequest(
+                    {
+                        catalogSlug: "testA-ws-update",
+                        packageSlug: "test-update"
+                    },
+                    false
+                ),
                 (response: StartPackageUpdateResponse) => {
                     resolve(response);
                 }
