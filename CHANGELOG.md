@@ -1,3 +1,9 @@
+#### 0.32.23 (2022-11-14)
+
+##### Build System / Dependencies
+
+* **deps:**  bump loader-utils from 1.4.0 to 1.4.1 in /backend ([#541](https://github.com/big-armor/datapm/pull/541)) ([f017620b](https://github.com/big-armor/datapm/commit/f017620b9817c6902fc0a27cb4e3c5761ad159e6))
+
 #### 0.32.22 (2022-11-14)
 
 #### 0.32.21 (2022-11-10)
