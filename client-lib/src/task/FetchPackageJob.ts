@@ -62,7 +62,7 @@ export interface FetchPackageJobResult {
 
 export class FetchArguments {
     reference?: string;
-    sink?: string;
+    sinkType?: string;
     defaults?: boolean;
     sinkConfig?: string;
     sinkRepository?: string;
@@ -472,8 +472,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         // Getting sink
         let sinkType: string;
 
-        if (this.args.sink) {
-            sinkType = this.args.sink;
+        if (this.args.sinkType) {
+            sinkType = this.args.sinkType;
         } else if (this.args.defaults) {
             sinkType = "file";
         } else {
@@ -598,7 +598,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             };
         }
 
-        if (this.args.sink || this.args.defaults) {
+        if (this.args.sinkType || this.args.defaults) {
             this.jobContext.print("SUCCESS", `Found the ${sinkDescription.getDisplayName()} sink`);
         }
 

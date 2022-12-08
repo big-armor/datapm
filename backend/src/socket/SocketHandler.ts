@@ -6,10 +6,11 @@ import {
     StartUploadRequest,
     PackageStreamsRequest,
     SetStreamActiveBatchesRequest,
-    OpenFetchChannelRequest,
+    OpenFetchProxyChannelRequest,
     PackageSinkStateRequest,
     StartPackageUpdateRequest,
-    StartPackageRequest
+    StartPackageRequest,
+    StartFetchRequest
 } from "datapm-lib";
 import EventEmitter from "events";
 import SocketIO from "socket.io";
@@ -28,6 +29,7 @@ import { PackageUpdateHandler } from "./PackageUpdateHandler";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageHandler } from "./PackageHandler";
+import { FetchHandler } from "./FetchHandler";
 import { hasPackagePermission } from "../directive/hasPackagePermissionDirective";
 import { hasCatalogPermission } from "../directive/hasCatalogPermissionDirective";
 
@@ -60,9 +62,14 @@ export class SocketConnectionHandler {
         socket.on(SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(), this.onSetStreamActiveBatches);
         socket.on(SocketEvent.START_PACKAGE_UPDATE.toString(), this.onStartPackageUpdate);
         socket.on(SocketEvent.START_PACKAGE.toString(), this.onStartPackage);
+        socket.on(SocketEvent.START_FETCH.toString(), this.onStartFetch);
 
         socket.on("disconnect", this.onDisconnect);
         socket.on("error", () => console.log("Error"));
+
+        socket.onAny((event) => {
+            console.log("Unhandled event: " + event);
+        });
 
         socket.emit(SocketEvent.READY.toString());
     }
@@ -71,6 +78,24 @@ export class SocketConnectionHandler {
         this.socket.on(SocketEvent.OPEN_FETCH_CHANNEL.toString(), this.openFetchChannelHandler);
         this.socket.on(SocketEvent.START_DATA_UPLOAD.toString(), this.onUploadData);
         this.socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
+    };
+
+    onStartFetch = async (request: StartFetchRequest, callback: (response: Response) => void): Promise<void> => {
+        this.socketContext.cache.clear();
+
+        if (!isAuthenticatedContext(this.socketContext)) {
+            callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
+            return;
+        }
+
+        try {
+            const handler = new FetchHandler(request, this.socket, this.socketContext as AuthenticatedSocketContext);
+            this.addRequestHandler(handler);
+            await handler.start(callback);
+        } catch (error) {
+            console.error(error);
+            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
+        }
     };
 
     onStartPackage = async (request: StartPackageRequest, callback: (response: Response) => void): Promise<void> => {
@@ -118,7 +143,7 @@ export class SocketConnectionHandler {
     };
 
     openFetchChannelHandler = async (
-        data: OpenFetchChannelRequest,
+        data: OpenFetchProxyChannelRequest,
         callback: (response: Response) => void
     ): Promise<void> => {
         this.socketContext.cache.clear();

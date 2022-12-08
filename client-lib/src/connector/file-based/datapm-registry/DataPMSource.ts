@@ -5,16 +5,16 @@ import {
     DataStopAcknowledge,
     DPMConfiguration,
     ErrorResponse,
-    FetchRequestType,
-    FetchResponse,
-    OpenFetchChannelRequest,
-    OpenFetchChannelResponse,
+    ProxyFetchRequestType,
+    ProxyFetchResponse,
+    OpenFetchProxyChannelRequest,
+    OpenFetchProxyChannelResponse,
     PackageStreamsRequest,
     PackageStreamsResponse,
     RecordContext,
     SocketEvent,
     SocketResponseType,
-    StartFetchRequest,
+    StartProxyFetchRequest,
     StreamState,
     TimeoutPromise,
     UpdateMethod
@@ -104,22 +104,21 @@ export class DataPMSource implements Source {
                                             credentialsConfiguration
                                         );
 
-                                        const openChannelResponse = await new TimeoutPromise<OpenFetchChannelResponse>(
-                                            5000,
-                                            async (resolve, reject) => {
-                                                socket.emit(
-                                                    SocketEvent.OPEN_FETCH_CHANNEL,
-                                                    new OpenFetchChannelRequest(batch.batchIdentifier),
-                                                    (response: OpenFetchChannelResponse | ErrorResponse) => {
-                                                        if (response.responseType === SocketResponseType.ERROR) {
-                                                            reject(response);
-                                                        } else {
-                                                            resolve(response as OpenFetchChannelResponse);
-                                                        }
+                                        const openChannelResponse = await new TimeoutPromise<
+                                            OpenFetchProxyChannelResponse
+                                        >(5000, async (resolve, reject) => {
+                                            socket.emit(
+                                                SocketEvent.OPEN_FETCH_CHANNEL,
+                                                new OpenFetchProxyChannelRequest(batch.batchIdentifier),
+                                                (response: OpenFetchProxyChannelResponse | ErrorResponse) => {
+                                                    if (response.responseType === SocketResponseType.ERROR) {
+                                                        reject(response);
+                                                    } else {
+                                                        resolve(response as OpenFetchProxyChannelResponse);
                                                     }
-                                                );
-                                            }
-                                        );
+                                                }
+                                            );
+                                        });
 
                                         const duplex = new PassThrough({
                                             objectMode: true
@@ -129,7 +128,7 @@ export class DataPMSource implements Source {
                                             openChannelResponse.channelName,
                                             async (
                                                 dataOrError: DataSend | DataStop | ErrorResponse,
-                                                callback?: (response: FetchResponse | ErrorResponse) => void
+                                                callback?: (response: ProxyFetchResponse | ErrorResponse) => void
                                             ) => {
                                                 if (
                                                     (dataOrError as ErrorResponse).responseType ===
@@ -141,7 +140,7 @@ export class DataPMSource implements Source {
 
                                                 const data = dataOrError as DataSend | DataStop;
 
-                                                if (data.requestType === FetchRequestType.STOP) {
+                                                if (data.requestType === ProxyFetchRequestType.STOP) {
                                                     duplex.end();
                                                     socket.off(openChannelResponse.channelName);
                                                     callback && callback(new DataStopAcknowledge());
@@ -178,7 +177,10 @@ export class DataPMSource implements Source {
                                                 offSet = schemaState.lastOffset;
                                             }
                                         }
-                                        socket.emit(openChannelResponse.channelName, new StartFetchRequest(offSet));
+                                        socket.emit(
+                                            openChannelResponse.channelName,
+                                            new StartProxyFetchRequest(offSet)
+                                        );
 
                                         return {
                                             stream: duplex

@@ -28,61 +28,44 @@
                                     <div class="row">
                                         <div class="col-12 mt-2 mb-2">
                                             <span>
-                                                The DataPM command line client can download this data directly to the
-                                                following databases and file systems. Click any option below to learn
-                                                how to quickly load and use this data in your work flows.
+                                                Load data directly into these databases and cloud tools. 
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="stepper-content">Database Options</div>
                                     <div class="row">
-                                        <div class="col-md-6 mb-2" *ngFor="let source of databaseSources">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                        <div class="col-md-6 mb-2" *ngFor="let connector of connectors">
+                                            <button class="download-btn w-100" (click)="connectorSelected(connector)">
                                                 <a
-                                                    ><img
-                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
-                                                        alt="{{ source.slug }} img"
+                                                    >
+                                                    <!-- <img
+                                                        src="../../../../../assets/images/sources/{{ connector.connectorType }}.svg"
+                                                        alt="{{ connector.displayName }} img"
                                                         style="width: 20px; height: 20px"
-                                                /></a>
-                                                {{ source.name }}
+                                                /> --></a>
+                                                {{ connector.displayName }}
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="format-category">
-                                    <div class="stepper-content">File Repository Options</div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2" *ngFor="let source of fileRepositorySources">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
-                                                        alt="{{ source.slug }} img"
-                                                        style="width: 20px; height: 20px"
-                                                /></a>
-                                                {{ source.name }}
-                                            </button>
+                                <!--
+                                    <div class="format-category">
+                                        <div class="stepper-content">File Format Options</div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2" *ngFor="let source of fileSources">
+                                                <button class="download-btn w-100" (click)="openClientWizard()">
+                                                    <a
+                                                        ><img
+                                                            src="../../../../../assets/images/sources/{{ source.slug }}.svg"
+                                                            alt="{{ source.slug }} img"
+                                                            style="width: 20px; height: 20px"
+                                                    /></a>
+                                                    {{ source.name }}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="format-category">
-                                    <div class="stepper-content">File Format Options</div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2" *ngFor="let source of fileSources">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
-                                                        alt="{{ source.slug }} img"
-                                                        style="width: 20px; height: 20px"
-                                                /></a>
-                                                {{ source.name }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                -->
                             </div>
                         </mat-step>
                         <mat-step optional>
@@ -94,6 +77,24 @@
                                             {{ uri }}
                                         </a>
                                     </div>
+                                </div>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <div class="mat-content">
+                                <div class="stepper-content">
+                                   
+                                    <p class="mb-3">You can load this data directly into {{ selectedConnector?.displayName }} either by using the <a href="/docs/command-line-client/">DataPM Command Line tool</a>, or by using this website - which requires entering credentials into this website.</p>
+
+                                    <button class="app-outlined-button mb-3" (click)="openClientWizard()">
+                                        Download with Command Line Tool
+                                    </button>
+
+                                    <button class="app-raised-button btn-default mb-3" (click)="openFetchModal(selectedConnector.connectorType)">
+                                        Load Directly From This Website
+                                    </button>
+
+
                                 </div>
                             </div>
                         </mat-step>

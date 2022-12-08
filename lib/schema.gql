@@ -137,6 +137,8 @@ enum ActivityLogEventType {
     PACKAGE_UPDATE_JOB_ENDED
     PACKAGE_JOB_STARTED
     PACKAGE_JOB_ENDED
+    FETCH_JOB_STARTED
+    FETCH_JOB_ENDED
 
     VERSION_CREATED
     VERSION_UPDATED
@@ -1114,6 +1116,16 @@ input PlatformSettingsInput {
     isPublic: Boolean!
 }
 
+"""
+Defines the a connector and it's properties
+"""
+type ConnectorDescription {
+    connectorType: String!
+    displayName: String
+    hasSource: Boolean
+    hasSink: Boolean
+}
+
 type Query {
     """
     Whether the specified username is available for sign up
@@ -1512,6 +1524,12 @@ type Query {
     """
     listRepositories(identifier: PackageIdentifierInput!, limit: Int!, offset: Int!): RepositoriesResult!
         @hasPackagePermission(permission: EDIT)
+
+    """
+    Lists the connectors available to use via the web server
+    """
+    listConnectors: [ConnectorDescription!]! @isAuthenticated
+
 }
 
 type Mutation {
