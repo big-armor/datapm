@@ -6,8 +6,8 @@ import {
     JobMessageResponse,
     Response,
     SocketError,
-    StartPackageRequest,
-    StartPackageResponse
+    StartPackageResponse,
+    StartFetchRequest
 } from "datapm-lib";
 import EventEmitter from "events";
 import { AuthenticatedSocketContext } from "../context";
@@ -17,19 +17,18 @@ import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { WebsocketJobContext } from "../job/WebsocketJobContext";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { PackageJob } from "datapm-client-lib";
+import { FetchPackageJob } from "datapm-client-lib";
 import { validateCatalogSlug } from "../directive/ValidCatalogSlugDirective";
 import { validatePackageSlug } from "../directive/ValidPackageSlugDirective";
 import { PackageRepository } from "../repository/PackageRepository";
 
-const PACKAGE_LOCK_PREFIX = "package";
-
-export class PackageHandler extends EventEmitter implements RequestHandler {
+export class FetchHandler extends EventEmitter implements RequestHandler {
     private channelName: string;
     private catalogId: number;
+    private packageId: number;
 
     constructor(
-        private request: StartPackageRequest,
+        private request: StartFetchRequest,
         private socket: SocketIO.Socket,
         private socketContext: AuthenticatedSocketContext
     ) {
@@ -38,62 +37,47 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     }
 
     async start(callback: (response: Response) => void): Promise<void> {
+        validateCatalogSlug(this.request.catalogSlug);
+        validatePackageSlug(this.request.packageSlug);
+
+        await checkCatalogPermission(
+            this.socket,
+            this.socketContext,
+            callback,
+            { catalogSlug: this.request.catalogSlug },
+            Permission.EDIT
+        );
+
+        await checkPackagePermission(
+            this.socket,
+            this.socketContext,
+            callback,
+            { catalogSlug: this.request.catalogSlug, packageSlug: this.request.packageSlug },
+            Permission.EDIT
+        );
+
         const catalogEntity = await this.socketContext.connection
             .getCustomRepository(CatalogRepository)
             .findCatalogBySlugOrFail(this.request.catalogSlug);
+
         this.catalogId = catalogEntity.id;
 
-        validateCatalogSlug(this.request.catalogSlug);
-        validatePackageSlug(this.request.packageSlug);
-        // TODO Validate package title and description
-
-        // check if package exists
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackage({
-            identifier: {
-                catalogSlug: this.request.catalogSlug,
-                packageSlug: this.request.packageSlug
-            }
-        });
-
-        if (!packageEntity) {
-            if (
-                !(await checkCatalogPermission(
-                    this.socket,
-                    this.socketContext,
-                    callback,
-                    { catalogSlug: this.request.catalogSlug },
-                    Permission.EDIT
-                ))
-            ) {
-                return;
-            }
-
-            this.socketContext.connection.getCustomRepository(PackageRepository).createPackage({
-                packageInput: {
+        const packageEntity = await this.socketContext.connection
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({
+                identifier: {
                     catalogSlug: this.request.catalogSlug,
-                    packageSlug: this.request.packageSlug,
-                    displayName: this.request.packageTitle,
-                    description: this.request.packageDescription
-                },
-                userId: this.socketContext.me.id
+                    packageSlug: this.request.packageSlug
+                }
             });
-        } else {
-            if (
-                !(await checkPackagePermission(
-                    this.socket,
-                    this.socketContext,
-                    callback,
-                    { catalogSlug: this.request.catalogSlug, packageSlug: this.request.packageSlug },
-                    Permission.EDIT
-                ))
-            ) {
-                return;
-            }
-        }
+
+        this.packageId = packageEntity.id;
+
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
-            eventType: ActivityLogEventType.PACKAGE_JOB_STARTED,
-            targetCatalogId: this.catalogId
+            eventType: ActivityLogEventType.FETCH_JOB_STARTED,
+            targetCatalogId: catalogEntity.id,
+            targetPackageId: packageEntity.id
         });
 
         this.socket.on(this.channelName, this.handleChannelEvents);
@@ -135,7 +119,7 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
     };
 
     async startJob(): Promise<void> {
-        const jobId = "user-package-" + randomUUID();
+        const jobId = "user-fetch-" + randomUUID();
 
         const context = new WebsocketJobContext(
             jobId,
@@ -145,12 +129,9 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
             this.request.defaults
         );
 
-        const job = new PackageJob(context, {
-            catalogSlug: this.request.catalogSlug,
-            packageSlug: this.request.packageSlug,
-            packageTitle: this.request.packageTitle,
-            description: this.request.packageDescription,
-            version: "1.0.0",
+        const job = new FetchPackageJob(context, {
+            reference: this.request.catalogSlug + "/" + this.request.packageSlug,
+            sinkType: this.request.sinkType,
             defaults: this.request.defaults
         });
 
@@ -163,8 +144,9 @@ export class PackageHandler extends EventEmitter implements RequestHandler {
 
         await createActivityLog(this.socketContext.connection, {
             userId: this.socketContext.me.id,
-            eventType: ActivityLogEventType.PACKAGE_JOB_ENDED,
-            targetCatalogId: this.catalogId
+            eventType: ActivityLogEventType.FETCH_JOB_ENDED,
+            targetCatalogId: this.catalogId,
+            targetPackageId: this.packageId
         });
 
         this.stop("server");

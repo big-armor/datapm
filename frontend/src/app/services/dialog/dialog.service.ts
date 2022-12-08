@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable, Subject } from "rxjs";
+import { FetchModalComponent, FetchModalData } from "src/app/shared/command-modal/fetch/fetch-modal.component";
 import { PackageModalComponent, PackageModalData } from "src/app/shared/command-modal/package/package-modal.component";
 import { ConfirmationDialogService } from "./confirmation-dialog.service";
 import { DialogConfig } from "./dialog-config";
@@ -31,7 +32,6 @@ export class DialogService {
     }
 
     openPackageCommandDialog(data: PackageModalData) {
-    
         this.matDialog.open(PackageModalComponent, {
             data,
             width: "90vw",
@@ -41,7 +41,18 @@ export class DialogService {
             disableClose: true,
             panelClass: "command-modal"
         });
+    }
 
+    openFetchCommandDialog(data: FetchModalData) {
+        this.matDialog.open(FetchModalComponent, {
+            data,
+            width: "90vw",
+            maxWidth: "800px",
+            height: "90vh",
+            maxHeight: "600px",
+            disableClose: true,
+            panelClass: "command-modal"
+        });
     }
 
     public openPackageVisibilityChangeConfirmationDialog(isPublic: boolean): Observable<boolean> {

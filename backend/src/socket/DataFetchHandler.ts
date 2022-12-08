@@ -10,17 +10,17 @@ import {
     DataStop,
     DataStopAcknowledge,
     ErrorResponse,
-    FetchRequest,
-    FetchRequestType,
-    FetchResponse,
-    OpenFetchChannelRequest,
-    OpenFetchChannelResponse,
+    ProxyFetchRequest,
+    ProxyFetchRequestType,
+    ProxyFetchResponse,
+    OpenFetchProxyChannelRequest,
+    OpenFetchProxyChannelResponse,
     RecordContext,
     Request,
     Response,
     SocketError,
     SocketEvent,
-    StartFetchRequest,
+    StartProxyFetchRequest,
     DPMRecord,
     DataRecordContext,
     SocketResponseType
@@ -66,7 +66,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
     private channelName: string;
 
     constructor(
-        private openChannelRequest: OpenFetchChannelRequest,
+        private openChannelRequest: OpenFetchProxyChannelRequest,
         private socket: SocketIO.Socket,
         private socketContext: SocketContext
     ) {
@@ -109,23 +109,23 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
         this.socket.on(this.channelName, this.handleChannelEvents);
 
-        callback(new OpenFetchChannelResponse(this.channelName, this.openChannelRequest.batchIdentifier));
+        callback(new OpenFetchProxyChannelResponse(this.channelName, this.openChannelRequest.batchIdentifier));
     }
 
     handleChannelEvents = async (
-        fetchRequest: FetchRequest,
-        callback: (response: FetchResponse | ErrorResponse) => void
+        fetchRequest: ProxyFetchRequest,
+        callback: (response: ProxyFetchResponse | ErrorResponse) => void
     ): Promise<void> => {
-        if (fetchRequest.requestType === FetchRequestType.START) {
-            this.handleStartRequest(fetchRequest as StartFetchRequest, callback);
-        } else if (fetchRequest.requestType === FetchRequestType.STOP) {
+        if (fetchRequest.requestType === ProxyFetchRequestType.START) {
+            this.handleStartRequest(fetchRequest as StartProxyFetchRequest, callback);
+        } else if (fetchRequest.requestType === ProxyFetchRequestType.STOP) {
             this.handleStopRequest(callback);
         }
     };
 
     async handleStartRequest(
-        fetchRequest: StartFetchRequest,
-        callback: (response: FetchResponse | ErrorResponse) => void
+        fetchRequest: StartProxyFetchRequest,
+        callback: (response: ProxyFetchResponse | ErrorResponse) => void
     ): Promise<void> {
         this.batchEntity = await this.socketContext.connection
             .getCustomRepository(DataBatchRepository)
@@ -163,7 +163,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         setTimeout(() => this.startSendingWrapper(fetchRequest, this.batchEntity.id), 1);
     }
 
-    async handleStopRequest(callback: (response: FetchResponse) => void): Promise<void> {
+    async handleStopRequest(callback: (response: ProxyFetchResponse) => void): Promise<void> {
         this.stop("client");
         callback(new DataStopAcknowledge());
     }
@@ -189,7 +189,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         }
     }
 
-    async startSendingWrapper(startRequest: StartFetchRequest, batchId: number): Promise<void> {
+    async startSendingWrapper(startRequest: StartProxyFetchRequest, batchId: number): Promise<void> {
         try {
             await this.startSending(startRequest, batchId);
         } catch (error) {
@@ -202,7 +202,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         }
     }
 
-    async startSending(startRequest: StartFetchRequest, batchId: number): Promise<void> {
+    async startSending(startRequest: StartProxyFetchRequest, batchId: number): Promise<void> {
         const iterableDataStreams = await this.dataStorageService.readDataBatch(batchId, startRequest.offset);
 
         while (this.activeSending) {

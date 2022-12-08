@@ -89,6 +89,7 @@ import { UpdateModalComponent } from "./command-modal/update/update-modal.compon
 import { PackageModalComponent } from "./command-modal/package/package-modal.component";
 import { CommandModalComponent } from "./command-modal/command-modal.component";
 import { CreatePackageModalComponent } from "./command-modal/package/create-package-modal.component";
+import { FetchModalComponent } from "./command-modal/fetch/fetch-modal.component";
 
 @NgModule({
     declarations: [
@@ -155,6 +156,7 @@ import { CreatePackageModalComponent } from "./command-modal/package/create-pack
         CollectionAutocompleteComponent,
         UpdateModalComponent,
         PackageModalComponent,
+        FetchModalComponent,
         CreatePackageModalComponent,
         CommandModalComponent
     ],

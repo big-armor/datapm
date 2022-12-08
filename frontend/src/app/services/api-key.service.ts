@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { APIKey, MyAPIKeysGQL } from "../../generated/graphql";
-import { CapabilitiesServiceImpl } from "./capabilities-impl.service";
 
 @Injectable({
     providedIn: "root"
@@ -9,7 +8,7 @@ import { CapabilitiesServiceImpl } from "./capabilities-impl.service";
 export class ApiKeyService {
     private apiKeys = new BehaviorSubject<APIKey[]>(null);
 
-    constructor(public myAPIKeysGQL: MyAPIKeysGQL, private cap: CapabilitiesServiceImpl) {}
+    constructor(public myAPIKeysGQL: MyAPIKeysGQL) {}
 
     public getMyApiKeys(reload?: boolean): Observable<APIKey[]> {
         if (reload || this.apiKeys.value == null) {
