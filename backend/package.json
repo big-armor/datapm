@@ -59,7 +59,7 @@
         "graphql-type-json": "^0.3.2",
         "graphql-upload": "^11.0.0",
         "helmet": "^3.23.3",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.0",
         "jwks-rsa": "^1.8.1",
         "mkdirp": "^1.0.4",
         "moment": "^2.29.4",
