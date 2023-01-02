@@ -11,7 +11,7 @@
         "rename-version": "docusaurus-rename-version"
     },
     "devDependencies": {
-        "docusaurus": "^1.14.6",
+        "docusaurus": "^1.14.7",
         "gulp": "^4.0.2"
     }
 }
