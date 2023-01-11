@@ -1,5 +1,5 @@
 import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType, UpdateMethod } from "datapm-lib";
-import Knex, { Ref, Transaction } from "knex";
+import knex, { Knex } from "knex";
 import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { DISPLAY_NAME, TYPE } from "./MySqlConnectorDescription";
@@ -16,7 +16,7 @@ export class MySqlSink extends KnexSink implements Sink {
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration
     ): Promise<Knex> {
-        return Knex({
+        return knex({
             client: "mysql",
             connection: {
                 host: connectionConfiguration.host,
@@ -79,16 +79,16 @@ export class MySqlSink extends KnexSink implements Sink {
         return parameters;
     }
 
-    getTableRef(tx: Transaction | Knex): Ref<string, { [x: string]: string }> {
+    getTableRef(tx: Knex.Transaction | Knex): Knex.Ref<string, { [x: string]: string }> {
         const tableName = this.tableExists ? `${this.tableName}_new` : this.tableName;
         return tx.ref(tableName);
     }
 
-    getStateTableRef(tx: Transaction | Knex): Ref<string, { [x: string]: string }> {
+    getStateTableRef(tx: Knex.Transaction | Knex): Knex.Ref<string, { [x: string]: string }> {
         return tx.ref(this.stateTableName);
     }
 
-    getSchemaBuilder(tx: Transaction | Knex): Knex.SchemaBuilder {
+    getSchemaBuilder(tx: Knex.Transaction | Knex): Knex.SchemaBuilder {
         return tx.schema;
     }
 

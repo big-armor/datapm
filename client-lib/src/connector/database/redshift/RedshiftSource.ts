@@ -1,6 +1,6 @@
 import { Redshift, S3 } from "aws-sdk";
 import { DPMConfiguration, Parameter, ParameterType } from "datapm-lib";
-import Knex from "knex";
+import knex, { Knex } from "knex";
 import mime from "mime-types";
 import { FileOpenStreamContext, FileStreamContext } from "../../file-based/parser/Parser";
 import { createS3Bucket, getRedshiftClusterConfiguration, getStreamFromS3 } from "../../../util/AwsUtil";
@@ -83,7 +83,7 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
             );
         }
 
-        return Knex({
+        return knex({
             client: "pg",
             connection: {
                 host: configuration.host,
