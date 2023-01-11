@@ -386,7 +386,7 @@ describe("Postgres Sink Test", function () {
             [packageBFilePath, "--sink", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
-                // -console.log(line);
+                // console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
