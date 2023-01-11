@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Properties } from "datapm-lib";
-import Knex from "knex";
+import knex, { Knex } from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { SourceErrors } from "datapm-client-lib";
@@ -62,7 +62,7 @@ describe("Postgres Source Test", function () {
         postgresHost = postgresContainer.getContainerIpAddress();
         postgresPort = postgresContainer.getMappedPort(5432);
 
-        knexClient = Knex({
+        knexClient = knex({
             client: "pg",
             connection: {
                 host: postgresHost,

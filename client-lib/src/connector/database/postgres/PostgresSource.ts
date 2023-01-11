@@ -1,5 +1,5 @@
 import { DPMConfiguration, UpdateMethod, RecordContext, Parameter, ParameterType } from "datapm-lib";
-import Knex from "knex";
+import knex, { Knex } from "knex";
 import { StreamSetPreview, SourceErrors, InspectionResults, Source } from "../../Source";
 import { Transform } from "stream";
 import { table } from "console";
@@ -193,7 +193,7 @@ export class PostgresSource implements Source {
         configuration: DPMConfiguration
     ): Knex {
         // Open a connection to the database
-        return Knex({
+        return knex({
             client: "pg",
             connection: {
                 host: connectionConfiguration.host,

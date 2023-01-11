@@ -10,7 +10,7 @@ import {
     UpdateMethod
 } from "datapm-lib";
 import fs from "fs";
-import Knex, { Ref, Transaction } from "knex";
+import knex, { Knex } from "knex";
 import moment from "moment";
 import { Transform } from "stream";
 import {
@@ -167,7 +167,7 @@ export class RedshiftSink extends KnexSink {
             );
         }
 
-        return Knex({
+        return knex({
             client: "pg",
             connection: {
                 host: configuration.host,
@@ -184,15 +184,18 @@ export class RedshiftSink extends KnexSink {
         //
     }
 
-    getSchemaBuilder(tx: Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder {
+    getSchemaBuilder(tx: Knex.Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder {
         return tx.schema.withSchema(configuration.schema as string);
     }
 
-    getStateTableRef(tx: Transaction | Knex, configuration: DPMConfiguration): Ref<string, { [x: string]: string }> {
+    getStateTableRef(
+        tx: Knex.Transaction | Knex,
+        configuration: DPMConfiguration
+    ): Knex.Ref<string, { [x: string]: string }> {
         return tx.ref(this.stateTableName).withSchema(configuration.schema as string);
     }
 
-    getTableRef(tx: Transaction | Knex): Ref<string, { [x: string]: string }> {
+    getTableRef(tx: Knex.Transaction | Knex): Knex.Ref<string, { [x: string]: string }> {
         const tableName = this.getSafeTableName(this.schema.title as string);
         return tx.ref(tableName).withSchema(this.configuration.schema as string);
     }

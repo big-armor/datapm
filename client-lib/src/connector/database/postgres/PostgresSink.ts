@@ -1,5 +1,5 @@
 import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType, UpdateMethod } from "datapm-lib";
-import Knex, { Ref, Transaction } from "knex";
+import knex, { Knex } from "knex";
 import { SemVer } from "semver";
 import { KnexSink } from "../KnexSink";
 import { SinkErrors, WritableWithContext } from "../../Sink";
@@ -14,7 +14,7 @@ export class PostgresSink extends KnexSink {
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration
     ): Promise<Knex> {
-        return Knex({
+        return knex({
             client: "pg",
             connection: {
                 host: connectionConfiguration.host,
@@ -105,17 +105,20 @@ export class PostgresSink extends KnexSink {
         return parameters;
     }
 
-    getTableRef(tx: Transaction | Knex): Ref<string, { [x: string]: string }> {
+    getTableRef(tx: Knex.Transaction | Knex): Knex.Ref<string, { [x: string]: string }> {
         let tableName = this.getSafeTableName(this.schema.title as string);
         tableName = this.tableExists ? `${tableName}_new` : tableName;
         return tx.ref(tableName).withSchema(this.configuration.schema as string);
     }
 
-    getStateTableRef(tx: Transaction | Knex, configuration: DPMConfiguration): Ref<string, { [x: string]: string }> {
+    getStateTableRef(
+        tx: Knex.Transaction | Knex,
+        configuration: DPMConfiguration
+    ): Knex.Ref<string, { [x: string]: string }> {
         return tx.ref(this.stateTableName).withSchema(configuration.schema as string);
     }
 
-    getSchemaBuilder(tx: Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder {
+    getSchemaBuilder(tx: Knex.Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder {
         return tx.schema.withSchema(configuration.schema as string);
     }
 
@@ -209,7 +212,7 @@ export class PostgresSink extends KnexSink {
     }
 
     async createDatabase(configuration: DPMConfiguration): Promise<void> {
-        const client = Knex({
+        const client = knex({
             client: "pg",
             connection: {
                 host: configuration.host,

@@ -9,7 +9,7 @@ import {
     RecordStreamContext,
     Parameter
 } from "datapm-lib";
-import Knex, { CreateTableBuilder, Ref, Transaction } from "knex";
+import knex, { Knex } from "knex";
 import { Transform } from "stream";
 import { Maybe } from "../../util/Maybe";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
@@ -50,14 +50,14 @@ export abstract class KnexSink implements Sink {
         jobContext: JobContext
     ): Promise<Parameter[]>;
 
-    abstract getSchemaBuilder(tx: Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder;
+    abstract getSchemaBuilder(tx: Knex.Transaction | Knex, configuration: DPMConfiguration): Knex.SchemaBuilder;
 
-    abstract getTableRef(tx: Transaction | Knex): Ref<string, { [x: string]: string }>;
+    abstract getTableRef(tx: Knex.Transaction | Knex): Knex.Ref<string, { [x: string]: string }>;
 
     abstract getStateTableRef(
-        tx: Transaction | Knex,
+        tx: Knex.Transaction | Knex,
         configuration: DPMConfiguration
-    ): Ref<string, { [x: string]: string }>;
+    ): Knex.Ref<string, { [x: string]: string }>;
 
     abstract getOutputLocationString(
         schema: Schema,
@@ -72,7 +72,7 @@ export abstract class KnexSink implements Sink {
         configuration: DPMConfiguration
     ): Promise<Knex>;
 
-    abstract checkDBExistence(client: Transaction | Knex, configuration: DPMConfiguration): Promise<void>;
+    abstract checkDBExistence(client: Knex.Transaction | Knex, configuration: DPMConfiguration): Promise<void>;
 
     isStronglyTyped(_configuration: DPMConfiguration): boolean {
         return true;
@@ -206,7 +206,7 @@ export abstract class KnexSink implements Sink {
         return name.replace(/\./g, "-");
     }
 
-    buildTableFromSchema(tableBuilder: CreateTableBuilder, schema: Schema): void {
+    buildTableFromSchema(tableBuilder: Knex.CreateTableBuilder, schema: Schema): void {
         if (schema.properties == null) throw new Error("Schema properties are required for " + tableBuilder);
 
         const propertyKeys = Object.keys(schema.properties);
@@ -254,6 +254,8 @@ export abstract class KnexSink implements Sink {
     async flushPendingInserts(transform: Transform): Promise<void> {
         const tableName = this.getTableRef(this.client);
 
+        if (this.pendingInserts.length === 0) return;
+
         const response = await this.client.table(tableName).insert(this.pendingInserts.map((p) => p.insertRecord));
 
         if (this.pendingInserts.length > 0)
@@ -283,7 +285,7 @@ export abstract class KnexSink implements Sink {
         });
     }
 
-    async checkStateTableExists(tx: Transaction | Knex, configuration: DPMConfiguration): Promise<boolean> {
+    async checkStateTableExists(tx: Knex.Transaction | Knex, configuration: DPMConfiguration): Promise<boolean> {
         const schemaBuilder = this.getSchemaBuilder(tx, configuration);
         const tableExists = await schemaBuilder.hasTable(this.stateTableName);
         return tableExists;
