@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import Knex from "knex";
+import knex, { Knex } from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { SinkErrors } from "datapm-client-lib";
 import { resetConfiguration } from "../../src/util/ConfigUtil";
@@ -52,7 +52,7 @@ describe("MySQL Sink Test", function () {
         mysqlHost = mysqlContainer.getContainerIpAddress();
         mysqlPort = mysqlContainer.getMappedPort(3306);
 
-        knexClient = Knex({
+        knexClient = knex({
             client: "mysql",
             connection: {
                 host: mysqlHost,
@@ -60,7 +60,7 @@ describe("MySQL Sink Test", function () {
                 user: "root",
                 password: "",
                 database: "datapm"
-            } as Knex.MySqlConnectionConfig
+            } as Knex.PgConnectionConfig
         });
 
         console.log("Mysql port: " + mysqlPort);

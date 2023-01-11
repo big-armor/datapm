@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import Knex from "knex";
+import knex, { Knex } from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { SinkErrors } from "datapm-client-lib";
@@ -71,7 +71,7 @@ describe("Postgres Sink Test", function () {
         postgresHost = postgresContainer.getContainerIpAddress();
         postgresPort = postgresContainer.getMappedPort(5432);
 
-        knexClient = Knex({
+        knexClient = knex({
             client: "pg",
             connection: {
                 host: postgresHost,
@@ -386,6 +386,7 @@ describe("Postgres Sink Test", function () {
             [packageBFilePath, "--sink", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
+                // console.log(line);
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
