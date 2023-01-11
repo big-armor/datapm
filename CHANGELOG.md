@@ -1,3 +1,9 @@
+#### 0.32.25 (2023-01-11)
+
+##### Build System / Dependencies
+
+* **deps:**  bump engine.io and socket.io in /frontend ([#544](https://github.com/big-armor/datapm/pull/544)) ([036f7c9a](https://github.com/big-armor/datapm/commit/036f7c9ae60d7a60b6e0fc1362a92c4d74339e75))
+
 #### 0.32.24 (2023-01-11)
 
 #### 0.32.23 (2022-11-14)
