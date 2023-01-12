@@ -1,3 +1,9 @@
+#### 0.32.26 (2023-01-12)
+
+##### Build System / Dependencies
+
+* **deps:**  bump lodash from 2.4.2 to 4.17.21 in /backend ([#579](https://github.com/big-armor/datapm/pull/579)) ([15760129](https://github.com/big-armor/datapm/commit/15760129a7668ad8e62f2e09af153554f8a2d819))
+
 #### 0.32.25 (2023-01-11)
 
 ##### Build System / Dependencies
