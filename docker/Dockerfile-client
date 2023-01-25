@@ -1,0 +1,12 @@
+# To build, run the following command from the root of the repository:
+# docker buildx build --platform linux/amd64 -t datapm/client:latest -f Dockerfile-client .
+
+FROM debian:bullseye-slim
+
+COPY client-installers/datapm-client*.deb /usr/src/app/client-installers/
+
+WORKDIR /usr/src/app/client-installers/
+
+RUN dpkg -i *.deb
+
+CMD [ "datapm" ]
