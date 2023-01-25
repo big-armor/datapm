@@ -478,6 +478,9 @@ jobs:
             - name: Build Registry Docker Container
               run: npm run build:registryDockerImage
 
+            - name: Build Client Docker Container
+              run: npm run build:clientDockerImage
+
             - name: Smoke Test Registry Docker Image
               run: npm run test
 

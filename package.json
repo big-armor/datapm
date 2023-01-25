@@ -15,6 +15,7 @@
         "build": "npx gulp",
         "build:parallel": "npx gulp buildParallel",
         "build:registryDockerImage": "npx gulp buildRegistryDockerImage",
+        "build:clientDockerImage": "npx gulp buildClientDockerImage",
         "dev:frontend": "cd frontend && npm start",
         "dev:backend": "cd backend && npm start",
         "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\"",

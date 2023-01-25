@@ -1,4 +1,5 @@
 dist
+dist-client
 build
 node_modules/
 **/src/generated/
