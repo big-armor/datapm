@@ -1,6 +1,6 @@
 {
     "name": "datapm-lib",
-    "version": "0.32.28",
+    "version": "0.32.29",
     "description": "Definitions and utilities for managing datapm package files.",
     "main": "src/main.ts",
     "repository": {
