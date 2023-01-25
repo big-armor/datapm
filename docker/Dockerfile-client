@@ -11,4 +11,4 @@ RUN dpkg -i *.deb
 
 RUN rm -rf /usr/src/app/client-installers/
 
-CMD [ "datapm" ]
+ENTRYPOINT [ "datapm" ]
