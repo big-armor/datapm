@@ -232,7 +232,7 @@ function showGitDiff() {
  * is the "dist-client" directory in the root project folder.
  */
 function prepareClientDockerBuildAssets() {
-    const task1 = src(["client-installers/datapm-client*.deb"]).pipe(
+    const task1 = src(["dist/client-installers/datapm-client*.deb"]).pipe(
         dest(path.join("dist-client", "client-installers"))
     );
 
