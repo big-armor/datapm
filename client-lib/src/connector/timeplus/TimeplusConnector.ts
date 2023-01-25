@@ -51,7 +51,7 @@ export class TimeplusConnector implements Connector {
                 type: ParameterType.Text,
                 stringMinimumLength: 1,
                 configuration: connectionConfiguration,
-                defaultValue: "https://beta.timeplus.cloud/workspace-id",
+                defaultValue: "https://us.timeplus.cloud/workspace-id",
                 message: "Base URL?"
             });
         }
