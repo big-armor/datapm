@@ -55,6 +55,9 @@ export class FetchCommand implements Command {
                     .option("packageSourceCredentialsConfig", {
                         type: "string"
                     })
+                    .option("packageSourceCredentialsIdentifiers", {
+                        type: "string"
+                    })
                     .option("packageSourceConfig", {
                         type: "string"
                     })
@@ -96,7 +99,7 @@ export async function fetchPackage(args: FetchArguments): Promise<void> {
         await fetchCommand.fetchPackage({
             ...args,
             sinkRepository: args.sinkRepository,
-            credentialsIdentifier: args.sinkAccount
+            sinkCredentialsIdentifier: args.sinkAccount
         });
     } catch (e) {
         console.error(e);

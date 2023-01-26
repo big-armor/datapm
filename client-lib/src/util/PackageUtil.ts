@@ -241,6 +241,7 @@ async function publishData(
                 packageSlug: packageFile.packageSlug
             },
             source,
+            undefined,
             false,
             true
         );
