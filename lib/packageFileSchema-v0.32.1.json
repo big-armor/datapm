@@ -52,7 +52,7 @@
             "title": "User Friendly Name",
             "description": "The name shown in UI's for user ease of understanding.",
             "default": "",
-            "pattern": "^[\\w _-]+$"
+            "pattern": "^[a-zA-Z][a-zA-z0-9 _\\-%*\\\\+]+$"
         },
         "packageSlug": {
             "$id": "#/packageSlug",

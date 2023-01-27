@@ -6,7 +6,7 @@ import { nameToSlug } from "datapm-lib";
 import { CreatePackageGQL } from "src/generated/graphql";
 import { DialogService } from "src/app/services/dialog/dialog.service";
 import { MatStepper } from "@angular/material/stepper";
-import { packageSlugValidator } from "src/app/helpers/validators";
+import { packageDisplayNameValidator, packageSlugValidator } from "src/app/helpers/validators";
 import { InputComponent } from "../../input/input.component";
 
 export type CreatePackageModalData = {
@@ -39,7 +39,7 @@ export class CreatePackageModalComponent implements AfterViewInit, OnInit, OnDes
     @ViewChild("packageDescriptionInput") descriptionInput: InputComponent;
 
     public nameForm = new FormGroup({
-        packageName: new FormControl("", Validators.required),
+        packageName: new FormControl("", [Validators.required, packageDisplayNameValidator()]),
         packageShortName: new FormControl("", [Validators.required, packageSlugValidator()])
     });
 
