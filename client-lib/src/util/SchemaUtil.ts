@@ -84,6 +84,7 @@ export async function inspectSourceConnection(
     jobContext: JobContext,
     relatedPackage: PackageIdentifierInput | undefined,
     source: Source,
+    credentialsConfiguration: undefined | DPMConfiguration,
     defaults: boolean | undefined,
     useSourceCredentialIdentifier: boolean | undefined
 ): Promise<InternalSourceInspectionResults> {
@@ -124,8 +125,6 @@ export async function inspectSourceConnection(
         source.connectionConfiguration
     );
 
-    let credentialsConfiguration = {};
-
     if ((defaults || useSourceCredentialIdentifier) && source.credentialsIdentifier) {
         try {
             credentialsConfiguration =
@@ -139,6 +138,8 @@ export async function inspectSourceConnection(
             jobContext.print("WARN", "The credential " + source.credentialsIdentifier + " could not be found or read.");
         }
     }
+
+    if (credentialsConfiguration == null) credentialsConfiguration = {};
 
     const userCredentialsResponse = await obtainCredentialsConfiguration(
         jobContext,
