@@ -1,3 +1,9 @@
+#### 0.32.31 (2023-01-27)
+
+##### Build System / Dependencies
+
+* **deps:**  bump ua-parser-js and karma in /frontend ([#585](https://github.com/big-armor/datapm/pull/585)) ([fd50a734](https://github.com/big-armor/datapm/commit/fd50a734573369fd1d11ce2856606731b187d8cd))
+
 #### 0.32.30 (2023-01-26)
 
 #### 0.32.29 (2023-01-25)
