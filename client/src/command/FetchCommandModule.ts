@@ -83,10 +83,10 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
         if (
             jobResult.result.sourceCredentialsIdentifier == null &&
-            Object.values(jobResult.result.packageSourceCredentialsConfiguration).length > 0
+            Object.values(jobResult.result.packageSourceCredentialsIdentifiers).length > 0
         ) {
-            command += `--packageSourceCredentialsConfig '${JSON.stringify(
-                jobResult.result.packageSourceCredentialsConfiguration
+            command += `--packageSourceCredentialsIdentifiers '${JSON.stringify(
+                jobResult.result.packageSourceCredentialsIdentifiers
             )}' `;
         }
 

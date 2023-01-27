@@ -53,7 +53,7 @@ export interface FetchPackageJobResult {
     // For fetching from a package that requires additional
     // source configuration
     packageSourceConnectionConfiguration: { [sourceSlug: string]: DPMConfiguration };
-    packageSourceCredentialsConfiguration: { [sourceSlug: string]: string };
+    packageSourceCredentialsIdentifiers: { [sourceSlug: string]: string };
     packageSourceConfiguration: { [sourceSlug: string]: DPMConfiguration };
 
     excludedSchemaProperties: { [key: string]: string[] };
@@ -66,13 +66,14 @@ export class FetchArguments {
     defaults?: boolean;
     sinkConfig?: string;
     sinkRepository?: string;
-    credentialsIdentifier?: string;
+    sinkCredentialsIdentifier?: string;
     sinkConnectionConfig?: string;
     sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
 
     packageSourceConnectionConfig?: string;
+    packageSourceCredentialsIdentifiers?: string;
     packageSourceCredentialsConfig?: string;
     packageSourceConfig?: string;
 
@@ -96,8 +97,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             throw new Error("Cannot specify both sinkRepository and sinkConnectionConfig");
         }
 
-        if (this.args.credentialsIdentifier != null && this.args.sinkCredentialsConfig != null) {
-            throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
+        if (this.args.sinkCredentialsIdentifier != null && this.args.sinkCredentialsConfig != null) {
+            throw new Error("Cannot specify both sinkCredentialsIdentifier and sinkCredentialsConfig");
         }
 
         let excludedSchemaProperties: { [key: string]: string[] } = {};
@@ -272,7 +273,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     );
 
                     if (this.args.sourceCredentialsIdentifier)
-                        this.args.packageSourceCredentialsConfig = JSON.stringify({
+                        this.args.packageSourceCredentialsIdentifiers = JSON.stringify({
                             [sourceConector.getType()]: this.args.sourceCredentialsIdentifier
                         });
                 }
@@ -417,7 +418,12 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         );
 
         // Map of source slugs to credential identifier strings
-        const packageSourceCredentialConfig: { [sourceSlug: string]: string } = JSON.parse(
+        const packageSourceCredentialIdentifiers: { [sourceSlug: string]: string } = JSON.parse(
+            this.args.packageSourceCredentialsIdentifiers ?? "{}"
+        );
+
+        // Map of source slugs to credential configuration objects
+        const packageSourceCredentialConfigs: { [sourceSlug: string]: DPMConfiguration } = JSON.parse(
             this.args.packageSourceCredentialsConfig ?? "{}"
         );
 
@@ -432,9 +438,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 };
             }
 
-            if (packageSourceCredentialConfig[source.slug] != null) {
-                source.credentialsIdentifier = packageSourceCredentialConfig[source.slug];
+            if (packageSourceCredentialIdentifiers[source.slug] != null) {
+                source.credentialsIdentifier = packageSourceCredentialIdentifiers[source.slug];
             }
+
+            const sourceCredentials: undefined | DPMConfiguration = packageSourceCredentialConfigs[source.slug];
 
             const inspectionResult = await inspectSourceConnection(
                 this.jobContext,
@@ -445,8 +453,9 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                       }
                     : undefined,
                 source,
+                sourceCredentials,
                 this.args.defaults,
-                packageSourceCredentialConfig[source.slug] != null
+                packageSourceCredentialIdentifiers[source.slug] != null
             );
 
             if (Object.keys(inspectionResult.additionalConnectionConfiguration).length > 0) {
@@ -454,7 +463,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             }
 
             if (inspectionResult.credentialsIdentifier) {
-                packageSourceCredentialConfig[source.slug] = inspectionResult.credentialsIdentifier;
+                packageSourceCredentialIdentifiers[source.slug] = inspectionResult.credentialsIdentifier;
             }
 
             if (Object.keys(inspectionResult.additionalConfiguration).length > 0) {
@@ -576,7 +585,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             sinkConnectionConfiguration,
             sinkCredentialsConfiguration,
             false,
-            this.args.credentialsIdentifier,
+            this.args.sinkCredentialsIdentifier,
             this.args.defaults
         );
 
@@ -703,7 +712,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 renamedSchemaProperties,
 
                 packageSourceConnectionConfiguration: packageSourceConnectionConfig,
-                packageSourceCredentialsConfiguration: packageSourceCredentialConfig,
+                packageSourceCredentialsIdentifiers: packageSourceCredentialIdentifiers,
                 packageSourceConfiguration: packageSourceConfig
             }
         };
