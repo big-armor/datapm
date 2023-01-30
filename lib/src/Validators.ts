@@ -155,7 +155,7 @@ export function validPackageDisplayName(
 
     if (typeof value !== "string") return "MUST_BE_STRING";
 
-    if (!value.match(/^[\w _-]+$/)) return "INVALID_CHARACTERS";
+    if (!value.match(/^[a-zA-Z][a-zA-z0-9 _\-%*\\+]+$/)) return "INVALID_CHARACTERS";
 
     if (value.length < PACKAGE_DISPLAY_NAME_MIN_LENGTH) return "TOO_SHORT";
 
