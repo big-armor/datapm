@@ -1,0 +1,5561 @@
+{
+ "$schema": "https://datapm.io/docs/package-file-schema-v0.32.1.json",
+ "canonical": true,
+ "sources": [
+  {
+   "slug": "twitter",
+   "streamSets": [
+    {
+     "slug": "tweetStream",
+     "schemaTitles": [
+      "tweets"
+     ],
+     "streamStats": {
+      "inspectedCount": 1095,
+      "recordCount": 1096,
+      "recordCountPrecision": "GREATER_THAN"
+     },
+     "updateMethods": [
+      "CONTINUOUS"
+     ],
+     "endReached": false
+    }
+   ],
+   "type": "twitter",
+   "connectionConfiguration": {},
+   "configuration": {
+    "streamType": "sample"
+   },
+   "credentialsIdentifier": "AAAAA...jOaUl"
+  }
+ ],
+ "generatedBy": "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",
+ "updatedDate": "2023-01-30T21:36:55.832Z",
+ "displayName": "twitter-sample",
+ "packageSlug": "twitter-sample",
+ "version": "1.0.0",
+ "description": "Twitter 1% streaming sample",
+ "website": "",
+ "schemas": [
+  {
+   "title": "tweets",
+   "properties": {
+    "author_id": {
+     "title": "author_id",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringMaxLength": 19,
+       "stringMinLength": 8
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.108Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "conversation_id": {
+     "title": "conversation_id",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringMaxLength": 19,
+       "stringMinLength": 19
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.112Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "created_at": {
+     "title": "created_at",
+     "types": {
+      "date-time": {
+       "recordCount": 1100,
+       "dateMaxValue": "2023-01-30T21:36:28.000Z",
+       "dateMinValue": "2023-01-30T21:36:01.000Z",
+       "dateMaxMillsecondsPrecision": 0
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.115Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "edit_history_tweet_ids": {
+     "title": "edit_history_tweet_ids",
+     "types": {
+      "array": {
+       "recordCount": 1100,
+       "arrayTypes": {
+        "string": {
+         "recordCount": 1100,
+         "stringMaxLength": 19,
+         "stringMinLength": 19
+        }
+       },
+       "arrayMaxLength": 1,
+       "arrayMinLength": 1
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.116Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "entities": {
+     "title": "entities",
+     "types": {
+      "object": {
+       "recordCount": 1100,
+       "objectProperties": {
+        "mentions": {
+         "title": "mentions",
+         "types": {
+          "array": {
+           "recordCount": 866,
+           "arrayTypes": {
+            "object": {
+             "recordCount": 1347,
+             "objectProperties": {
+              "start": {
+               "title": "start",
+               "types": {
+                "integer": {
+                 "recordCount": 1347,
+                 "numberMaxValue": 608,
+                 "numberMinValue": 0,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.116Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "end": {
+               "title": "end",
+               "types": {
+                "integer": {
+                 "recordCount": 1347,
+                 "numberMaxValue": 618,
+                 "numberMinValue": 2,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.116Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "username": {
+               "title": "username",
+               "types": {
+                "string": {
+                 "recordCount": 1347,
+                 "stringMaxLength": 15,
+                 "stringMinLength": 1
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.116Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "id": {
+               "title": "id",
+               "types": {
+                "string": {
+                 "recordCount": 1347,
+                 "stringMaxLength": 19,
+                 "stringMinLength": 5
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.117Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              }
+             }
+            }
+           },
+           "arrayMaxLength": 49,
+           "arrayMinLength": 2
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.116Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "annotations": {
+         "title": "annotations",
+         "types": {
+          "array": {
+           "recordCount": 126,
+           "arrayTypes": {
+            "object": {
+             "recordCount": 230,
+             "objectProperties": {
+              "start": {
+               "title": "start",
+               "types": {
+                "integer": {
+                 "recordCount": 230,
+                 "numberMaxValue": 204,
+                 "numberMinValue": 0,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.172Z",
+               "lastSeen": "2023-01-30T21:36:34.224Z"
+              },
+              "end": {
+               "title": "end",
+               "types": {
+                "integer": {
+                 "recordCount": 230,
+                 "numberMaxValue": 214,
+                 "numberMinValue": 2,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.172Z",
+               "lastSeen": "2023-01-30T21:36:34.224Z"
+              },
+              "probability": {
+               "title": "probability",
+               "types": {
+                "number": {
+                 "recordCount": 230,
+                 "numberMaxValue": 0.9874,
+                 "numberMinValue": 0.2662,
+                 "numberMaxPrecision": 5,
+                 "numberMaxScale": 4
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.172Z",
+               "lastSeen": "2023-01-30T21:36:34.224Z"
+              },
+              "type": {
+               "title": "type",
+               "types": {
+                "string": {
+                 "recordCount": 230,
+                 "stringOptions": {
+                  "Person": 87,
+                  "Organization": 25,
+                  "Other": 84,
+                  "Place": 34
+                 },
+                 "stringMaxLength": 12,
+                 "stringMinLength": 5
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.172Z",
+               "lastSeen": "2023-01-30T21:36:34.224Z"
+              },
+              "normalized_text": {
+               "title": "normalized_text",
+               "types": {
+                "string": {
+                 "recordCount": 230,
+                 "stringMaxLength": 35,
+                 "stringMinLength": 2
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.172Z",
+               "lastSeen": "2023-01-30T21:36:34.224Z"
+              }
+             }
+            }
+           },
+           "arrayMaxLength": 6,
+           "arrayMinLength": 2
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.172Z",
+         "lastSeen": "2023-01-30T21:36:34.224Z"
+        },
+        "urls": {
+         "title": "urls",
+         "types": {
+          "array": {
+           "recordCount": 380,
+           "arrayTypes": {
+            "object": {
+             "recordCount": 445,
+             "objectProperties": {
+              "start": {
+               "title": "start",
+               "types": {
+                "integer": {
+                 "recordCount": 445,
+                 "numberMaxValue": 277,
+                 "numberMinValue": 0,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.189Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "end": {
+               "title": "end",
+               "types": {
+                "integer": {
+                 "recordCount": 445,
+                 "numberMaxValue": 300,
+                 "numberMinValue": 23,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.189Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "url": {
+               "title": "url",
+               "types": {
+                "string": {
+                 "recordCount": 445,
+                 "stringMaxLength": 23,
+                 "stringMinLength": 23
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.189Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "expanded_url": {
+               "title": "expanded_url",
+               "types": {
+                "string": {
+                 "recordCount": 445,
+                 "stringMaxLength": 178,
+                 "stringMinLength": 19
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.190Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "display_url": {
+               "title": "display_url",
+               "types": {
+                "string": {
+                 "recordCount": 445,
+                 "stringMaxLength": 41,
+                 "stringMinLength": 12
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.192Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "media_key": {
+               "title": "media_key",
+               "types": {
+                "string": {
+                 "recordCount": 313,
+                 "stringMaxLength": 22,
+                 "stringMinLength": 20
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.192Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "status": {
+               "title": "status",
+               "types": {
+                "integer": {
+                 "recordCount": 80,
+                 "stringOptions": {
+                  "200": 80
+                 },
+                 "numberMaxValue": 200,
+                 "numberMinValue": 200,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.211Z",
+               "lastSeen": "2023-01-30T21:36:33.985Z"
+              },
+              "title": {
+               "title": "title",
+               "types": {
+                "string": {
+                 "recordCount": 78,
+                 "stringMaxLength": 186,
+                 "stringMinLength": 5
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.211Z",
+               "lastSeen": "2023-01-30T21:36:33.985Z"
+              },
+              "description": {
+               "title": "description",
+               "types": {
+                "string": {
+                 "recordCount": 75,
+                 "stringMaxLength": 770,
+                 "stringMinLength": 7
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.212Z",
+               "lastSeen": "2023-01-30T21:36:33.985Z"
+              },
+              "unwound_url": {
+               "title": "unwound_url",
+               "types": {
+                "string": {
+                 "recordCount": 81,
+                 "stringMaxLength": 470,
+                 "stringMinLength": 24
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.215Z",
+               "lastSeen": "2023-01-30T21:36:33.995Z"
+              },
+              "images": {
+               "title": "images",
+               "types": {
+                "array": {
+                 "recordCount": 60,
+                 "arrayTypes": {
+                  "object": {
+                   "recordCount": 120,
+                   "objectProperties": {
+                    "url": {
+                     "title": "url",
+                     "types": {
+                      "string": {
+                       "recordCount": 120,
+                       "stringMaxLength": 83,
+                       "stringMinLength": 80
+                      }
+                     },
+                     "firstSeen": "2023-01-30T21:36:08.909Z",
+                     "lastSeen": "2023-01-30T21:36:33.630Z"
+                    },
+                    "width": {
+                     "title": "width",
+                     "types": {
+                      "integer": {
+                       "recordCount": 120,
+                       "stringOptions": {
+                        "107": 4,
+                        "150": 58,
+                        "225": 1,
+                        "320": 2,
+                        "500": 3,
+                        "512": 1,
+                        "600": 1,
+                        "640": 4,
+                        "696": 1,
+                        "800": 5,
+                        "960": 2,
+                        "1000": 2,
+                        "1020": 1,
+                        "1024": 1,
+                        "1080": 2,
+                        "1140": 1,
+                        "1200": 15,
+                        "1280": 7,
+                        "1300": 1,
+                        "1559": 1,
+                        "1600": 1,
+                        "1696": 2,
+                        "1825": 1,
+                        "1920": 1,
+                        "1993": 1,
+                        "2048": 1
+                       },
+                       "numberMaxValue": 2048,
+                       "numberMinValue": 107,
+                       "numberMaxPrecision": 4,
+                       "numberMaxScale": 0
+                      }
+                     },
+                     "firstSeen": "2023-01-30T21:36:08.911Z",
+                     "lastSeen": "2023-01-30T21:36:33.630Z"
+                    },
+                    "height": {
+                     "title": "height",
+                     "types": {
+                      "integer": {
+                       "recordCount": 120,
+                       "stringOptions": {
+                        "107": 2,
+                        "116": 2,
+                        "150": 58,
+                        "160": 1,
+                        "230": 1,
+                        "320": 1,
+                        "480": 1,
+                        "500": 2,
+                        "504": 1,
+                        "512": 1,
+                        "533": 1,
+                        "536": 1,
+                        "540": 2,
+                        "600": 3,
+                        "608": 1,
+                        "620": 1,
+                        "627": 1,
+                        "628": 1,
+                        "630": 10,
+                        "631": 1,
+                        "640": 3,
+                        "670": 1,
+                        "720": 6,
+                        "729": 1,
+                        "731": 1,
+                        "734": 1,
+                        "792": 2,
+                        "800": 2,
+                        "900": 1,
+                        "1024": 1,
+                        "1080": 3,
+                        "1152": 1,
+                        "1200": 1,
+                        "1421": 1,
+                        "1497": 1,
+                        "1536": 1,
+                        "2532": 1
+                       },
+                       "numberMaxValue": 2532,
+                       "numberMinValue": 107,
+                       "numberMaxPrecision": 4,
+                       "numberMaxScale": 0
+                      }
+                     },
+                     "firstSeen": "2023-01-30T21:36:08.911Z",
+                     "lastSeen": "2023-01-30T21:36:33.630Z"
+                    }
+                   }
+                  }
+                 },
+                 "arrayMaxLength": 2,
+                 "arrayMinLength": 2
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.909Z",
+               "lastSeen": "2023-01-30T21:36:33.630Z"
+              }
+             }
+            }
+           },
+           "arrayMaxLength": 4,
+           "arrayMinLength": 1
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.189Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "hashtags": {
+         "title": "hashtags",
+         "types": {
+          "array": {
+           "recordCount": 183,
+           "arrayTypes": {
+            "object": {
+             "recordCount": 411,
+             "objectProperties": {
+              "start": {
+               "title": "start",
+               "types": {
+                "integer": {
+                 "recordCount": 411,
+                 "numberMaxValue": 304,
+                 "numberMinValue": 0,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.203Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "end": {
+               "title": "end",
+               "types": {
+                "integer": {
+                 "recordCount": 411,
+                 "numberMaxValue": 308,
+                 "numberMinValue": 5,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.203Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              },
+              "tag": {
+               "title": "tag",
+               "types": {
+                "string": {
+                 "recordCount": 411,
+                 "stringMaxLength": 33,
+                 "stringMinLength": 2
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:08.203Z",
+               "lastSeen": "2023-01-30T21:36:34.806Z"
+              }
+             }
+            }
+           },
+           "arrayMaxLength": 22,
+           "arrayMinLength": 1
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.203Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "cashtags": {
+         "title": "cashtags",
+         "types": {
+          "array": {
+           "recordCount": 1,
+           "arrayTypes": {
+            "object": {
+             "recordCount": 2,
+             "objectProperties": {
+              "start": {
+               "title": "start",
+               "types": {
+                "integer": {
+                 "recordCount": 2,
+                 "stringOptions": {
+                  "16": 1,
+                  "107": 1
+                 },
+                 "numberMaxValue": 107,
+                 "numberMinValue": 16,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:23.047Z",
+               "lastSeen": "2023-01-30T21:36:23.047Z"
+              },
+              "end": {
+               "title": "end",
+               "types": {
+                "integer": {
+                 "recordCount": 2,
+                 "stringOptions": {
+                  "20": 1,
+                  "111": 1
+                 },
+                 "numberMaxValue": 111,
+                 "numberMinValue": 20,
+                 "numberMaxPrecision": 3,
+                 "numberMaxScale": 0
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:23.047Z",
+               "lastSeen": "2023-01-30T21:36:23.047Z"
+              },
+              "tag": {
+               "title": "tag",
+               "types": {
+                "string": {
+                 "recordCount": 2,
+                 "stringOptions": {
+                  "BOO": 2
+                 },
+                 "stringMaxLength": 3,
+                 "stringMinLength": 3
+                }
+               },
+               "firstSeen": "2023-01-30T21:36:23.047Z",
+               "lastSeen": "2023-01-30T21:36:23.047Z"
+              }
+             }
+            }
+           },
+           "arrayMaxLength": 2,
+           "arrayMinLength": 2
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:23.047Z",
+         "lastSeen": "2023-01-30T21:36:23.047Z"
+        }
+       }
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.116Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "id": {
+     "title": "id",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringMaxLength": 19,
+       "stringMinLength": 19
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.119Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "lang": {
+     "title": "lang",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringOptions": {
+        "en": 358,
+        "ja": 116,
+        "es": 128,
+        "qme": 22,
+        "ar": 58,
+        "sr": 1,
+        "und": 42,
+        "ht": 3,
+        "zxx": 30,
+        "fr": 26,
+        "zh": 3,
+        "pt": 66,
+        "tr": 132,
+        "el": 1,
+        "ko": 13,
+        "hi": 5,
+        "it": 7,
+        "th": 10,
+        "nl": 3,
+        "ur": 5,
+        "fa": 15,
+        "in": 10,
+        "tl": 3,
+        "pl": 8,
+        "qst": 2,
+        "qam": 2,
+        "de": 2,
+        "bn": 6,
+        "is": 2,
+        "lt": 2,
+        "cs": 2,
+        "vi": 1,
+        "ca": 2,
+        "qht": 2,
+        "fi": 1,
+        "gu": 2,
+        "art": 1,
+        "ro": 1,
+        "et": 1,
+        "uk": 1,
+        "iw": 1,
+        "no": 2,
+        "ru": 1,
+        "eu": 1
+       },
+       "stringMaxLength": 3,
+       "stringMinLength": 2
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.119Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "public_metrics": {
+     "title": "public_metrics",
+     "types": {
+      "object": {
+       "recordCount": 1100,
+       "objectProperties": {
+        "retweet_count": {
+         "title": "retweet_count",
+         "types": {
+          "integer": {
+           "recordCount": 1100,
+           "numberMaxValue": 67933,
+           "numberMinValue": 0,
+           "numberMaxPrecision": 5,
+           "numberMaxScale": 0
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.120Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "reply_count": {
+         "title": "reply_count",
+         "types": {
+          "integer": {
+           "recordCount": 1100,
+           "stringOptions": {
+            "0": 1096,
+            "1": 3,
+            "4": 1
+           },
+           "numberMaxValue": 4,
+           "numberMinValue": 0,
+           "numberMaxPrecision": 1,
+           "numberMaxScale": 0
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.120Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "like_count": {
+         "title": "like_count",
+         "types": {
+          "integer": {
+           "recordCount": 1100,
+           "stringOptions": {
+            "0": 1096,
+            "1": 3,
+            "14": 1
+           },
+           "numberMaxValue": 14,
+           "numberMinValue": 0,
+           "numberMaxPrecision": 2,
+           "numberMaxScale": 0
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.120Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "quote_count": {
+         "title": "quote_count",
+         "types": {
+          "integer": {
+           "recordCount": 1100,
+           "stringOptions": {
+            "0": 1099,
+            "10": 1
+           },
+           "numberMaxValue": 10,
+           "numberMinValue": 0,
+           "numberMaxPrecision": 2,
+           "numberMaxScale": 0
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.120Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "impression_count": {
+         "title": "impression_count",
+         "types": {
+          "integer": {
+           "recordCount": 1100,
+           "stringOptions": {
+            "0": 1094,
+            "1": 5,
+            "2": 1
+           },
+           "numberMaxValue": 2,
+           "numberMinValue": 0,
+           "numberMaxPrecision": 1,
+           "numberMaxScale": 0
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.120Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        }
+       }
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.120Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "reply_settings": {
+     "title": "reply_settings",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringOptions": {
+        "everyone": 1087,
+        "mentionedUsers": 10,
+        "following": 3
+       },
+       "stringMaxLength": 14,
+       "stringMinLength": 8
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.120Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "text": {
+     "title": "text",
+     "types": {
+      "string": {
+       "recordCount": 1100,
+       "stringMaxLength": 669,
+       "stringMinLength": 4
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.121Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "author": {
+     "title": "author",
+     "types": {
+      "object": {
+       "recordCount": 1100,
+       "objectProperties": {
+        "id": {
+         "title": "id",
+         "types": {
+          "string": {
+           "recordCount": 1100,
+           "stringMaxLength": 19,
+           "stringMinLength": 8
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.137Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "name": {
+         "title": "name",
+         "types": {
+          "string": {
+           "recordCount": 1100,
+           "stringMaxLength": 50,
+           "stringMinLength": 1
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.137Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        },
+        "username": {
+         "title": "username",
+         "types": {
+          "string": {
+           "recordCount": 1100,
+           "stringMaxLength": 15,
+           "stringMinLength": 5
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:08.137Z",
+         "lastSeen": "2023-01-30T21:36:34.806Z"
+        }
+       }
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.137Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "in_reply_to_user_id": {
+     "title": "in_reply_to_user_id",
+     "types": {
+      "string": {
+       "recordCount": 322,
+       "stringMaxLength": 19,
+       "stringMinLength": 5
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:08.142Z",
+     "lastSeen": "2023-01-30T21:36:34.806Z"
+    },
+    "geo": {
+     "title": "geo",
+     "types": {
+      "object": {
+       "recordCount": 6,
+       "objectProperties": {
+        "place_id": {
+         "title": "place_id",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "17a83a55221b0671": 1,
+            "daa5fcec75a430ae": 1,
+            "009b4bcc18019797": 1,
+            "45e3bce63f2beeee": 1,
+            "01864a8a64df9dc4": 1,
+            "06f9f5a068aa411f": 1
+           },
+           "stringMaxLength": 16,
+           "stringMinLength": 16
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.103Z",
+         "lastSeen": "2023-01-30T21:36:33.743Z"
+        }
+       }
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:17.103Z",
+     "lastSeen": "2023-01-30T21:36:33.743Z"
+    },
+    "place": {
+     "title": "place",
+     "types": {
+      "object": {
+       "recordCount": 6,
+       "objectProperties": {
+        "country": {
+         "title": "country",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "United States": 2,
+            "Ghana": 1,
+            "Brazil": 1,
+            "Australia": 1,
+            "United Kingdom": 1
+           },
+           "stringMaxLength": 14,
+           "stringMinLength": 5
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.103Z",
+         "lastSeen": "2023-01-30T21:36:33.744Z"
+        },
+        "country_code": {
+         "title": "country_code",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "US": 2,
+            "GH": 1,
+            "BR": 1,
+            "AU": 1,
+            "GB": 1
+           },
+           "stringMaxLength": 2,
+           "stringMinLength": 2
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.104Z",
+         "lastSeen": "2023-01-30T21:36:33.744Z"
+        },
+        "full_name": {
+         "title": "full_name",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "Myrtle Beach, SC": 1,
+            "Porterville, CA": 1,
+            "Kumasi, Ghana": 1,
+            "Manaus, Brazil": 1,
+            "Melbourne, Victoria": 1,
+            "Corby, England": 1
+           },
+           "stringMaxLength": 19,
+           "stringMinLength": 13
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.104Z",
+         "lastSeen": "2023-01-30T21:36:33.744Z"
+        },
+        "id": {
+         "title": "id",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "17a83a55221b0671": 1,
+            "daa5fcec75a430ae": 1,
+            "009b4bcc18019797": 1,
+            "45e3bce63f2beeee": 1,
+            "01864a8a64df9dc4": 1,
+            "06f9f5a068aa411f": 1
+           },
+           "stringMaxLength": 16,
+           "stringMinLength": 16
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.104Z",
+         "lastSeen": "2023-01-30T21:36:33.744Z"
+        },
+        "name": {
+         "title": "name",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "Myrtle Beach": 1,
+            "Porterville": 1,
+            "Kumasi": 1,
+            "Manaus": 1,
+            "Melbourne": 1,
+            "Corby": 1
+           },
+           "stringMaxLength": 12,
+           "stringMinLength": 5
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.105Z",
+         "lastSeen": "2023-01-30T21:36:33.745Z"
+        },
+        "place_type": {
+         "title": "place_type",
+         "types": {
+          "string": {
+           "recordCount": 6,
+           "stringOptions": {
+            "city": 6
+           },
+           "stringMaxLength": 4,
+           "stringMinLength": 4
+          }
+         },
+         "firstSeen": "2023-01-30T21:36:17.105Z",
+         "lastSeen": "2023-01-30T21:36:33.745Z"
+        }
+       }
+      }
+     },
+     "firstSeen": "2023-01-30T21:36:17.103Z",
+     "lastSeen": "2023-01-30T21:36:33.744Z"
+    }
+   },
+   "recordsInspectedCount": 0,
+   "recordCount": 1100,
+   "sampleRecords": [
+    {
+     "author_id": "1524187054636244993",
+     "conversation_id": "1620174021085261827",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021085261827"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 19,
+        "username": "the_marcoli_boy",
+        "id": "1267067442884481027"
+       }
+      ]
+     },
+     "id": "1620174021085261827",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 80,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @the_marcoli_boy: Carlo about to repeat 2015 again lmao",
+     "author": {
+      "id": "1524187054636244993",
+      "name": "Baffour",
+      "username": "Amos3Kyei"
+     }
+    },
+    {
+     "author_id": "1594900003855556609",
+     "conversation_id": "1620056365355143168",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021089439748"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 12,
+        "username": "Kizunastar_",
+        "id": "1571493689935134722"
+       }
+      ]
+     },
+     "id": "1620174021089439748",
+     "in_reply_to_user_id": "1571493689935134722",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@Kizunastar_ なのでオマエヲケシマス",
+     "author": {
+      "id": "1594900003855556609",
+      "name": "エクレア",
+      "username": "Eclair_Gomamayo"
+     }
+    },
+    {
+     "author_id": "1175789065263820800",
+     "conversation_id": "1619938381731098626",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021081047043"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 13,
+        "username": "Cats_jungle_",
+        "id": "1239852735400476683"
+       },
+       {
+        "start": 14,
+        "end": 24,
+        "username": "suri_kong",
+        "id": "1329919464"
+       }
+      ]
+     },
+     "id": "1620174021081047043",
+     "in_reply_to_user_id": "1239852735400476683",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@Cats_jungle_ @suri_kong Va estupendo. 🥰",
+     "author": {
+      "id": "1175789065263820800",
+      "name": "Srta_Kyle",
+      "username": "KyleSrta"
+     }
+    },
+    {
+     "author_id": "1228863564393394177",
+     "conversation_id": "1620174021102039042",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021102039042"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 64,
+        "end": 70,
+        "probability": 0.6724,
+        "type": "Person",
+        "normalized_text": "chelsea"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "ghanayesu",
+        "id": "1376843447353610244"
+       }
+      ]
+     },
+     "id": "1620174021102039042",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 17,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @ghanayesu: Which team is going trophyless this season aside chelsea?",
+     "author": {
+      "id": "1228863564393394177",
+      "name": "Jay Madeit",
+      "username": "jay_madeit"
+     }
+    },
+    {
+     "author_id": "1477989265015517184",
+     "conversation_id": "1620174021085241347",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021085241347"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "brem0dels",
+        "id": "1539995059281592322"
+       },
+       {
+        "start": 15,
+        "end": 29,
+        "username": "jollyroger889",
+        "id": "1477989265015517184"
+       },
+       {
+        "start": 30,
+        "end": 43,
+        "username": "Violetta4you",
+        "id": "1616176530706546704"
+       }
+      ],
+      "urls": [
+       {
+        "start": 44,
+        "end": 67,
+        "url": "https://t.co/YhKYc5z1CJ",
+        "expanded_url": "https://twitter.com/brem0dels/status/1618394658417299457/photo/1",
+        "display_url": "pic.twitter.com/YhKYc5z1CJ",
+        "media_key": "3_1618394653803388931"
+       }
+      ]
+     },
+     "id": "1620174021085241347",
+     "lang": "qme",
+     "public_metrics": {
+      "retweet_count": 6,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @brem0dels: @jollyroger889 @Violetta4you https://t.co/YhKYc5z1CJ",
+     "author": {
+      "id": "1477989265015517184",
+      "name": "JollyRoger889 Promotions",
+      "username": "jollyroger889"
+     }
+    },
+    {
+     "author_id": "1588541488270639106",
+     "conversation_id": "1620174016878362630",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016878362630"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 99,
+        "end": 102,
+        "probability": 0.374,
+        "type": "Organization",
+        "normalized_text": "DKNY"
+       },
+       {
+        "start": 104,
+        "end": 110,
+        "probability": 0.5147,
+        "type": "Organization",
+        "normalized_text": "Tabitha"
+       }
+      ],
+      "hashtags": [
+       {
+        "start": 0,
+        "end": 6,
+        "tag": "shoes"
+       },
+       {
+        "start": 7,
+        "end": 13,
+        "tag": "boots"
+       },
+       {
+        "start": 14,
+        "end": 23,
+        "tag": "SNEAKERS"
+       },
+       {
+        "start": 26,
+        "end": 32,
+        "tag": "DRESS"
+       },
+       {
+        "start": 33,
+        "end": 41,
+        "tag": "JEWELRY"
+       },
+       {
+        "start": 42,
+        "end": 50,
+        "tag": "PERFUME"
+       },
+       {
+        "start": 51,
+        "end": 67,
+        "tag": "online_shopping"
+       },
+       {
+        "start": 68,
+        "end": 80,
+        "tag": "uk_shopping"
+       },
+       {
+        "start": 81,
+        "end": 90,
+        "tag": "shopping"
+       }
+      ],
+      "urls": [
+       {
+        "start": 145,
+        "end": 168,
+        "url": "https://t.co/fVUTkED6AB",
+        "expanded_url": "https://www.awin1.com/pclick.php?p=33264503329&a=1183052&m=4244",
+        "display_url": "awin1.com/pclick.php?p=3…",
+        "status": 200,
+        "title": "DKNY Tabitha Flip Flops",
+        "description": "- available at Tessuti, the luxury designer retailer for Men, Women and Children.",
+        "unwound_url": "https://www.tessuti.co.uk/product/black-dkny-tabitha-flip-flops/16486103/?source=aw&awc=4244_1675114561_eaf80e4790139943b0131723eb82545a&utm_source=affiliate1183052&utm_medium=Social+Traffic&utm_campaign=https%3a%2f%2ftwitter.com%2faleena_bano1"
+       },
+       {
+        "start": 169,
+        "end": 192,
+        "url": "https://t.co/avZUFFNb3D",
+        "expanded_url": "https://twitter.com/A_TO_Z_SHOPPING/status/1620174016878362630/photo/1",
+        "display_url": "pic.twitter.com/avZUFFNb3D",
+        "media_key": "3_1620174011966816258"
+       }
+      ]
+     },
+     "id": "1620174016878362630",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "#shoes #boots #SNEAKERS   #DRESS #JEWELRY #PERFUME #online_shopping #uk_shopping #shopping Women's DKNY Tabitha Flip Flops Black, Black GBP23.00 https://t.co/fVUTkED6AB https://t.co/avZUFFNb3D",
+     "author": {
+      "id": "1588541488270639106",
+      "name": "A_TO_Z_SHOPPING🛒",
+      "username": "A_TO_Z_SHOPPING"
+     }
+    },
+    {
+     "author_id": "586643101",
+     "conversation_id": "1620174021106241536",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106241536"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 13,
+        "end": 17,
+        "probability": 0.5789,
+        "type": "Person",
+        "normalized_text": "Kyzir"
+       }
+      ],
+      "urls": [
+       {
+        "start": 19,
+        "end": 42,
+        "url": "https://t.co/O0CjhfN36o",
+        "expanded_url": "https://twitter.com/KyzirWhite8/status/1619845251694497792",
+        "display_url": "twitter.com/KyzirWhite8/st…"
+       }
+      ]
+     },
+     "id": "1620174021106241536",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "That's right Kyzir https://t.co/O0CjhfN36o",
+     "author": {
+      "id": "586643101",
+      "name": "Alex Insdorf",
+      "username": "alexinsdorf99"
+     }
+    },
+    {
+     "author_id": "1527252696817885185",
+     "conversation_id": "1620171625386885123",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021093634048"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 9,
+        "username": "OzarkNFT",
+        "id": "1336752858536923137"
+       }
+      ]
+     },
+     "id": "1620174021093634048",
+     "in_reply_to_user_id": "1336752858536923137",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@OzarkNFT Never🫡",
+     "author": {
+      "id": "1527252696817885185",
+      "name": "RealBagFumbler (💙,🧡)",
+      "username": "_Bagfumbler"
+     }
+    },
+    {
+     "author_id": "737649496310620160",
+     "conversation_id": "1620174021106221065",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106221065"
+     ],
+     "entities": {},
+     "id": "1620174021106221065",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "I need to start looking for a table set 😩",
+     "author": {
+      "id": "737649496310620160",
+      "name": "R o x i e🤍",
+      "username": "RoxieMonet_"
+     }
+    },
+    {
+     "author_id": "1267194562415599616",
+     "conversation_id": "1620174021097840643",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097840643"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 25,
+        "end": 31,
+        "probability": 0.8695,
+        "type": "Other",
+        "normalized_text": "ChatGPT"
+       },
+       {
+        "start": 105,
+        "end": 112,
+        "probability": 0.8112,
+        "type": "Organization",
+        "normalized_text": "Athletic"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "oierfano",
+        "id": "208911269"
+       }
+      ]
+     },
+     "id": "1620174021097840643",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 19,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @oierfano: He probado ChatGPT y le he puesto a prueba sobre asuntos que conciernen a la filosofía del Athletic. \n\nA la inteligencia arti…",
+     "author": {
+      "id": "1267194562415599616",
+      "name": "Pablo Echeberria",
+      "username": "PabloEcheberri1"
+     }
+    },
+    {
+     "author_id": "1090309733041487872",
+     "conversation_id": "1620174016878362631",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016878362631"
+     ],
+     "entities": {
+      "urls": [
+       {
+        "start": 17,
+        "end": 40,
+        "url": "https://t.co/OQ0Z7rgX2g",
+        "expanded_url": "https://twitter.com/ChupitoDTekila/status/1620174016878362631/photo/1",
+        "display_url": "pic.twitter.com/OQ0Z7rgX2g",
+        "media_key": "16_1620174002953293830"
+       },
+       {
+        "start": 41,
+        "end": 64,
+        "url": "https://t.co/9yd6UyweHA",
+        "expanded_url": "https://twitter.com/joantubau/status/1620166022383960064",
+        "display_url": "twitter.com/joantubau/stat…"
+       }
+      ]
+     },
+     "id": "1620174016878362631",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "Adoro a este tío https://t.co/OQ0Z7rgX2g https://t.co/9yd6UyweHA",
+     "author": {
+      "id": "1090309733041487872",
+      "name": "ChupitoDTekila",
+      "username": "ChupitoDTekila"
+     }
+    },
+    {
+     "author_id": "1541846049098108928",
+     "conversation_id": "1620174016911917063",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016911917063"
+     ],
+     "entities": {
+      "urls": [
+       {
+        "start": 30,
+        "end": 53,
+        "url": "https://t.co/YvKkw2AF04",
+        "expanded_url": "https://twitter.com/bsmygod/status/1620174016911917063/photo/1",
+        "display_url": "pic.twitter.com/YvKkw2AF04",
+        "media_key": "3_1620173486470610944"
+       }
+      ]
+     },
+     "id": "1620174016911917063",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "lol why did they call it this https://t.co/YvKkw2AF04",
+     "author": {
+      "id": "1541846049098108928",
+      "name": "gal incognito",
+      "username": "bsmygod"
+     }
+    },
+    {
+     "author_id": "1165243400267993088",
+     "conversation_id": "1620174021097816067",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097816067"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "inst__55",
+        "id": "1217941965343535105"
+       }
+      ]
+     },
+     "id": "1620174021097816067",
+     "lang": "ar",
+     "public_metrics": {
+      "retweet_count": 134,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @inst__55: ممكن أكون أخترت غلط بس والله حبيت بجد.",
+     "author": {
+      "id": "1165243400267993088",
+      "name": "نُور الشهري.",
+      "username": "N5ile"
+     }
+    },
+    {
+     "author_id": "1392405911470235648",
+     "conversation_id": "1620142185453867009",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097848832"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 9,
+        "username": "BORO9999",
+        "id": "2834194739"
+       }
+      ]
+     },
+     "id": "1620174021097848832",
+     "in_reply_to_user_id": "2834194739",
+     "lang": "sr",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@BORO9999 Сега брзо ке видиме има или не",
+     "author": {
+      "id": "1392405911470235648",
+      "name": "Garfild Mackovski",
+      "username": "b_habba"
+     }
+    },
+    {
+     "author_id": "105509565",
+     "conversation_id": "1620174021072662528",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072662528"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 17,
+        "username": "TrollFootball",
+        "id": "571964518"
+       }
+      ],
+      "urls": [
+       {
+        "start": 38,
+        "end": 61,
+        "url": "https://t.co/SaX111MoPD",
+        "expanded_url": "https://twitter.com/TF_Video/status/1620160004283338752/video/1",
+        "display_url": "pic.twitter.com/SaX111MoPD",
+        "media_key": "7_1620159942366994435"
+       }
+      ]
+     },
+     "id": "1620174021072662528",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 172,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @TrollFootball: Cartoons in China\n\nhttps://t.co/SaX111MoPD",
+     "author": {
+      "id": "105509565",
+      "name": "ssekajugo antony",
+      "username": "kasfrek"
+     }
+    },
+    {
+     "author_id": "1101752804132048896",
+     "conversation_id": "1620174021097828352",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097828352"
+     ],
+     "entities": {},
+     "id": "1620174021097828352",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "黒鷲ルートまじ…しんどい…",
+     "author": {
+      "id": "1101752804132048896",
+      "name": "ｵﾀｯｯｯｯｯﾏ",
+      "username": "otamablackp8"
+     }
+    },
+    {
+     "author_id": "1425575053299785733",
+     "conversation_id": "1620071081720840194",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016895139854"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 9,
+        "username": "nefridio",
+        "id": "2805143260"
+       },
+       {
+        "start": 10,
+        "end": 25,
+        "username": "beatrizargimon",
+        "id": "220063494"
+       }
+      ],
+      "urls": [
+       {
+        "start": 43,
+        "end": 66,
+        "url": "https://t.co/QoyTXiBq9d",
+        "expanded_url": "https://twitter.com/lateja44/status/1620174016895139854/photo/1",
+        "display_url": "pic.twitter.com/QoyTXiBq9d",
+        "media_key": "3_1620174013288026112"
+       }
+      ]
+     },
+     "id": "1620174016895139854",
+     "in_reply_to_user_id": "2805143260",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@nefridio @beatrizargimon Impresentable... https://t.co/QoyTXiBq9d",
+     "author": {
+      "id": "1425575053299785733",
+      "name": "Ricardo Cáceres",
+      "username": "lateja44"
+     }
+    },
+    {
+     "author_id": "925566955116834817",
+     "conversation_id": "1620174021106241539",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106241539"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 50,
+        "end": 55,
+        "tag": "香取慎吾"
+       },
+       {
+        "start": 56,
+        "end": 73,
+        "tag": "香取慎吾46回目誕生祭_0131"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "min05_15",
+        "id": "1104002739225354240"
+       }
+      ],
+      "urls": [
+       {
+        "start": 74,
+        "end": 97,
+        "url": "https://t.co/abDufi5eD3",
+        "expanded_url": "https://twitter.com/min05_15/status/1620086797568217088/video/1",
+        "display_url": "pic.twitter.com/abDufi5eD3",
+        "media_key": "7_1620086779994054658"
+       }
+      ]
+     },
+     "id": "1620174021106241539",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 3,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @min05_15: 慎吾ちゃーん💚\n寝る前にもう一度😊✨\nお誕生日おめでとうございます♪\n\n#香取慎吾\n#香取慎吾46回目誕生祭_0131 https://t.co/abDufi5eD3",
+     "author": {
+      "id": "925566955116834817",
+      "name": "ゆるりん",
+      "username": "LgGw3DCSszikbgy"
+     }
+    },
+    {
+     "author_id": "1142233709610819585",
+     "conversation_id": "1620174021081051140",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021081051140"
+     ],
+     "entities": {
+      "urls": [
+       {
+        "start": 31,
+        "end": 54,
+        "url": "https://t.co/dQoqN4b8rd",
+        "expanded_url": "https://twitter.com/twihelp_pic/status/1549626702417997824/photo/1",
+        "display_url": "pic.twitter.com/dQoqN4b8rd",
+        "media_key": "3_1549626693920235521"
+       }
+      ]
+     },
+     "id": "1620174021081051140",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "6071461D :参戦ID\n参加者募集！\nLv120 ラー\nhttps://t.co/dQoqN4b8rd",
+     "author": {
+      "id": "1142233709610819585",
+      "name": "並木さん",
+      "username": "zagugugugu"
+     }
+    },
+    {
+     "author_id": "1236601008412917760",
+     "conversation_id": "1620174021076877316",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021076877316"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "hikoboshie",
+        "id": "816630304488050688"
+       }
+      ],
+      "urls": [
+       {
+        "start": 41,
+        "end": 64,
+        "url": "https://t.co/FGtvdFmxb8",
+        "expanded_url": "https://twitter.com/061313purple/status/1608839959993253888/video/1",
+        "display_url": "pic.twitter.com/FGtvdFmxb8",
+        "media_key": "7_1608839939076263936"
+       }
+      ]
+     },
+     "id": "1620174021076877316",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 296,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @hikoboshie: he's a natural comedian\n\nhttps://t.co/FGtvdFmxb8",
+     "author": {
+      "id": "1236601008412917760",
+      "name": "Inês B.",
+      "username": "inessbeatriz"
+     }
+    },
+    {
+     "author_id": "1327018555448184834",
+     "conversation_id": "1620174021093646338",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021093646338"
+     ],
+     "entities": {},
+     "id": "1620174021093646338",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "GOAL",
+     "author": {
+      "id": "1327018555448184834",
+      "name": "tomo",
+      "username": "tomo24267169"
+     }
+    },
+    {
+     "author_id": "1336464657780011013",
+     "conversation_id": "1620174021106212864",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106212864"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 98,
+        "end": 109,
+        "probability": 0.7973,
+        "type": "Other",
+        "normalized_text": "Spreenfanart"
+       }
+      ],
+      "hashtags": [
+       {
+        "start": 97,
+        "end": 110,
+        "tag": "Spreenfanart"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "Jally84982",
+        "id": "1038623414767046661"
+       },
+       {
+        "start": 44,
+        "end": 54,
+        "username": "SpreenDMC",
+        "id": "1004392807522553856"
+       },
+       {
+        "start": 55,
+        "end": 66,
+        "username": "Noniigamer",
+        "id": "3000442511"
+       },
+       {
+        "start": 67,
+        "end": 82,
+        "username": "ElAlexQuackity",
+        "id": "1415218313647382528"
+       },
+       {
+        "start": 83,
+        "end": 96,
+        "username": "samyriveratv",
+        "id": "1400156369248997380"
+       }
+      ],
+      "urls": [
+       {
+        "start": 111,
+        "end": 134,
+        "url": "https://t.co/vretEL5Cur",
+        "expanded_url": "https://twitter.com/Jally84982/status/1619942478970511362/photo/1",
+        "display_url": "pic.twitter.com/vretEL5Cur",
+        "media_key": "3_1619941780396412930"
+       }
+      ]
+     },
+     "id": "1620174021106212864",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 3990,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Jally84982: Los streamers revelación ♡\n\n@SpreenDMC @Noniigamer @ElAlexQuackity @samyriveratv #Spreenfanart https://t.co/vretEL5Cur",
+     "author": {
+      "id": "1336464657780011013",
+      "name": "ome",
+      "username": "omedww"
+     }
+    },
+    {
+     "author_id": "1570385878954160129",
+     "conversation_id": "1620174021072650240",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072650240"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 38,
+        "end": 43,
+        "probability": 0.5074,
+        "type": "Person",
+        "normalized_text": "アルノちゃん"
+       },
+       {
+        "start": 114,
+        "end": 119,
+        "probability": 0.3025,
+        "type": "Person",
+        "normalized_text": "なぎアルもる"
+       },
+       {
+        "start": 124,
+        "end": 127,
+        "probability": 0.7166,
+        "type": "Person",
+        "normalized_text": "久保アル"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 15,
+        "username": "cos70108566",
+        "id": "1534693638823092224"
+       }
+      ]
+     },
+     "id": "1620174021072650240",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 3,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @cos70108566: これでドッキリ無くて、\n本当に終わったら\nアルノちゃんまじで\n可哀想過ぎるでしょ…。\nそれだけはマジでまずいって…｡\n\nちょ、本当にシーズン2\nお願いします🙏\n\nドッキリであってくれよ…｡\n\nなぎアルもるなアル、久保アル\nまだ見れてないんだよ……",
+     "author": {
+      "id": "1570385878954160129",
+      "name": "綱岡裕城",
+      "username": "nogistar0722"
+     }
+    },
+    {
+     "author_id": "1200213055411499008",
+     "conversation_id": "1620174021102047232",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021102047232"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 11,
+        "username": "lindyli",
+        "id": "270132611"
+       }
+      ]
+     },
+     "id": "1620174021102047232",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 1072,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @lindyli: Trump invited right wing provocateur Rush Limbaugh to the State of the Union and awarded him the Presidential Medal of Freedom…",
+     "author": {
+      "id": "1200213055411499008",
+      "name": "Raul B",
+      "username": "RaulBeltranJr1"
+     }
+    },
+    {
+     "author_id": "1598723533315751937",
+     "conversation_id": "1620174016911917070",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016911917070"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 30,
+        "end": 64,
+        "tag": "AstsubaylarTazminatHakkınıİstiyor"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 15,
+        "username": "SonerAltug1",
+        "id": "1512905629584740361"
+       }
+      ]
+     },
+     "id": "1620174016911917070",
+     "lang": "und",
+     "public_metrics": {
+      "retweet_count": 34,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @SonerAltug1: Son 123 .... #AstsubaylarTazminatHakkınıİstiyor",
+     "author": {
+      "id": "1598723533315751937",
+      "name": "Hakan Toral",
+      "username": "hakantoral2"
+     }
+    },
+    {
+     "author_id": "1413212374425817091",
+     "conversation_id": "1620174021076860945",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021076860945"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 19,
+        "username": "captainredspade",
+        "id": "1420209390901207041"
+       }
+      ]
+     },
+     "id": "1620174021076860945",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 23,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @captainredspade: Just like one time I need Muncy to see Elliot Stabler and be like \"who's the muscular bald dude that keeps making eyes…",
+     "author": {
+      "id": "1413212374425817091",
+      "name": "J ♥️ EO is CANON era ♥️",
+      "username": "Benslerpics"
+     }
+    },
+    {
+     "author_id": "739008169",
+     "conversation_id": "1620093311452323840",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016886738944"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 11,
+        "username": "Lapeinetas",
+        "id": "2767887273"
+       },
+       {
+        "start": 12,
+        "end": 23,
+        "username": "eldiarioes",
+        "id": "535707261"
+       }
+      ]
+     },
+     "id": "1620174016886738944",
+     "in_reply_to_user_id": "2767887273",
+     "lang": "ht",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@Lapeinetas @eldiarioes Titi... dimitis ?",
+     "author": {
+      "id": "739008169",
+      "name": "Quebrantahuesos52",
+      "username": "Extremodouro52"
+     }
+    },
+    {
+     "author_id": "3765942683",
+     "conversation_id": "1620174021085249546",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021085249546"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 16,
+        "username": "iluminatibot",
+        "id": "3376321847"
+       }
+      ],
+      "urls": [
+       {
+        "start": 18,
+        "end": 41,
+        "url": "https://t.co/ocxDZKtlI0",
+        "expanded_url": "https://twitter.com/iluminatibot/status/1620172766657007627/video/1",
+        "display_url": "pic.twitter.com/ocxDZKtlI0",
+        "media_key": "7_1620172715482316808"
+       }
+      ]
+     },
+     "id": "1620174021085249546",
+     "lang": "zxx",
+     "public_metrics": {
+      "retweet_count": 14,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @iluminatibot: https://t.co/ocxDZKtlI0",
+     "author": {
+      "id": "3765942683",
+      "name": "Cheri Jordan",
+      "username": "CheriJo61301142"
+     }
+    },
+    {
+     "author_id": "1569827321850511362",
+     "conversation_id": "1620174021093621760",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021093621760"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "muhi1224",
+        "id": "1183356100596260864"
+       }
+      ],
+      "urls": [
+       {
+        "start": 26,
+        "end": 49,
+        "url": "https://t.co/FeFLh0x0k8",
+        "expanded_url": "https://twitter.com/muhi1224/status/1618075832718884864/photo/1",
+        "display_url": "pic.twitter.com/FeFLh0x0k8",
+        "media_key": "3_1618075824669995008"
+       }
+      ]
+     },
+     "id": "1620174021093621760",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 5161,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @muhi1224: まだ見ぬ世界に夢を見る https://t.co/FeFLh0x0k8",
+     "author": {
+      "id": "1569827321850511362",
+      "name": "波平の本体",
+      "username": "mzQj9rIcZhSysyo"
+     }
+    },
+    {
+     "author_id": "1516143915157667844",
+     "conversation_id": "1620155997619916800",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021081047041"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 9,
+        "username": "di_gu_ru",
+        "id": "1126974110557298688"
+       }
+      ]
+     },
+     "id": "1620174021081047041",
+     "in_reply_to_user_id": "1126974110557298688",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@di_gu_ru スマブラXが発売されたの15年前だった💕\nもうちょい新しいと思ってた✨\nスマブラXが15周年おめでとう🎉",
+     "author": {
+      "id": "1516143915157667844",
+      "name": "香里奈🍒",
+      "username": "Nintencherry"
+     }
+    },
+    {
+     "author_id": "2411445664",
+     "conversation_id": "1620174021068472322",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021068472322"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 31,
+        "end": 36,
+        "tag": "Fade"
+       },
+       {
+        "start": 42,
+        "end": 51,
+        "tag": "valorant"
+       },
+       {
+        "start": 52,
+        "end": 65,
+        "tag": "fadevalorant"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "greeniris_",
+        "id": "978225286792843264"
+       }
+      ],
+      "urls": [
+       {
+        "start": 66,
+        "end": 89,
+        "url": "https://t.co/pc77TRZOPn",
+        "expanded_url": "https://twitter.com/greeniris_/status/1527290039675170818/photo/1",
+        "display_url": "pic.twitter.com/pc77TRZOPn",
+        "media_key": "3_1527290034545643521"
+       }
+      ]
+     },
+     "id": "1620174021068472322",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 57,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @greeniris_: a good side of #Fade :] \n\n#valorant #fadevalorant https://t.co/pc77TRZOPn",
+     "author": {
+      "id": "2411445664",
+      "name": "Min in full worship of Fade",
+      "username": "Min_de_CuruMin"
+     }
+    },
+    {
+     "author_id": "1545052553255088128",
+     "conversation_id": "1618791330804629504",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016899325961"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 16,
+        "username": "ManuelAguilar67",
+        "id": "937476208291434496"
+       },
+       {
+        "start": 17,
+        "end": 28,
+        "username": "LoroHomero",
+        "id": "267271723"
+       },
+       {
+        "start": 192,
+        "end": 207,
+        "username": "teleamazonasec",
+        "id": "95217117"
+       },
+       {
+        "start": 208,
+        "end": 222,
+        "username": "DiarioExtraEc",
+        "id": "175447500"
+       }
+      ],
+      "urls": [
+       {
+        "start": 223,
+        "end": 246,
+        "url": "https://t.co/pzVto8Dr0O",
+        "expanded_url": "https://twitter.com/LaManabitaGu/status/1620174016899325961/video/1",
+        "display_url": "pic.twitter.com/pzVto8Dr0O",
+        "media_key": "7_1620173898208907265"
+       }
+      ]
+     },
+     "id": "1620174016899325961",
+     "in_reply_to_user_id": "937476208291434496",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@ManuelAguilar67 @LoroHomero No tiene un plan real de ciudad ni entiende de planificación, solo le interesa las ganancias que tiene de las cosas ilícitas que ha hecho y pronto pagará por eso  @teleamazonasec @DiarioExtraEc https://t.co/pzVto8Dr0O",
+     "author": {
+      "id": "1545052553255088128",
+      "name": "Sofía Guzmán",
+      "username": "LaManabitaGu"
+     }
+    },
+    {
+     "author_id": "2563011691",
+     "conversation_id": "1620096891487924225",
+     "created_at": "2023-01-30T21:36:01.000Z",
+     "edit_history_tweet_ids": [
+      "1620174016890949634"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 13,
+        "username": "CheapoCrappy",
+        "id": "1158800425325383682"
+       }
+      ]
+     },
+     "id": "1620174016890949634",
+     "in_reply_to_user_id": "1158800425325383682",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@CheapoCrappy What's wrong with it? I think it's nice looking 🥲",
+     "author": {
+      "id": "2563011691",
+      "name": "Michael🦎",
+      "username": "Guacamakis"
+     }
+    },
+    {
+     "author_id": "1577619212889104385",
+     "conversation_id": "1620174021072674816",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072674816"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "ActuFoot_",
+        "id": "771606164"
+       }
+      ],
+      "urls": [
+       {
+        "start": 74,
+        "end": 97,
+        "url": "https://t.co/azxdKr1SP1",
+        "expanded_url": "https://twitter.com/ActuFoot_/status/1620165477975695368/photo/1",
+        "display_url": "pic.twitter.com/azxdKr1SP1",
+        "media_key": "3_1620165469834551319"
+       },
+       {
+        "start": 74,
+        "end": 97,
+        "url": "https://t.co/azxdKr1SP1",
+        "expanded_url": "https://twitter.com/ActuFoot_/status/1620165477975695368/photo/1",
+        "display_url": "pic.twitter.com/azxdKr1SP1",
+        "media_key": "3_1620165469809385489"
+       },
+       {
+        "start": 74,
+        "end": 97,
+        "url": "https://t.co/azxdKr1SP1",
+        "expanded_url": "https://twitter.com/ActuFoot_/status/1620165477975695368/photo/1",
+        "display_url": "pic.twitter.com/azxdKr1SP1",
+        "media_key": "3_1620165469893271555"
+       },
+       {
+        "start": 74,
+        "end": 97,
+        "url": "https://t.co/azxdKr1SP1",
+        "expanded_url": "https://twitter.com/ActuFoot_/status/1620165477975695368/photo/1",
+        "display_url": "pic.twitter.com/azxdKr1SP1",
+        "media_key": "3_1620165469901561856"
+       }
+      ]
+     },
+     "id": "1620174021072674816",
+     "lang": "fr",
+     "public_metrics": {
+      "retweet_count": 109,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @ActuFoot_: 37 ans et toujours la même discipline. 💪\n\n📸 IG / cristiano https://t.co/azxdKr1SP1",
+     "author": {
+      "id": "1577619212889104385",
+      "name": "Zakaria 🇩🇿🇸🇦",
+      "username": "chktt_zakaria"
+     }
+    },
+    {
+     "author_id": "783663474425663488",
+     "conversation_id": "1620174021106204673",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106204673"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 17,
+        "username": "MorsacasPaeto",
+        "id": "1296087422804074498"
+       },
+       {
+        "start": 37,
+        "end": 52,
+        "username": "MissLittleMaru",
+        "id": "783663474425663488"
+       }
+      ],
+      "urls": [
+       {
+        "start": 73,
+        "end": 96,
+        "url": "https://t.co/rApcA7mtnJ",
+        "expanded_url": "https://twitter.com/MorsacasPaeto/status/1620160514163879936/photo/1",
+        "display_url": "pic.twitter.com/rApcA7mtnJ",
+        "media_key": "3_1620160428021006338"
+       }
+      ]
+     },
+     "id": "1620174021106204673",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 2,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @MorsacasPaeto: La frustración de @MissLittleMaru por un missclick... https://t.co/rApcA7mtnJ",
+     "author": {
+      "id": "783663474425663488",
+      "name": "Maru 🌟🌸 ʕ/•ᴥ•ʔ/",
+      "username": "MissLittleMaru"
+     }
+    },
+    {
+     "author_id": "1422609286312595460",
+     "conversation_id": "1620174021097824256",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097824256"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "dbezuqun",
+        "id": "1139579354583724032"
+       }
+      ]
+     },
+     "id": "1620174021097824256",
+     "lang": "zh",
+     "public_metrics": {
+      "retweet_count": 543,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @dbezuqun: 中共网宣又开始铺天盖地在抖音上发布“辉瑞制造散播病毒”的视频了，我就看不上它们这副猥琐相，有本事就官媒发，大大方方对着干，每次总找一波自媒体微公号暗搓搓带节奏。不就是欺负美国人不看抖音，中国人看不到外网，戳穿你们谎言的人发不了声吗？一群下流胚子。",
+     "author": {
+      "id": "1422609286312595460",
+      "name": "Li Xi",
+      "username": "michellekl350"
+     }
+    },
+    {
+     "author_id": "1377863030688604162",
+     "conversation_id": "1620109571569356801",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021097840641"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 11,
+        "username": "md42055313",
+        "id": "1591535551890554885"
+       },
+       {
+        "start": 12,
+        "end": 22,
+        "username": "Mdamasma5",
+        "id": "2726812217"
+       }
+      ]
+     },
+     "id": "1620174021097840641",
+     "in_reply_to_user_id": "1591535551890554885",
+     "lang": "ar",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@md42055313 @Mdamasma5 ممكن نتعرف",
+     "author": {
+      "id": "1377863030688604162",
+      "name": "Emad Ibrahim",
+      "username": "EmadIbr90559226"
+     }
+    },
+    {
+     "author_id": "1597678976448749573",
+     "conversation_id": "1620174021085261825",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021085261825"
+     ],
+     "entities": {},
+     "id": "1620174021085261825",
+     "lang": "pt",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "Amanhã é aniversário da minha filha, tô ficando biruta pra conseguir organizar a festa dela",
+     "author": {
+      "id": "1597678976448749573",
+      "name": "𝑁𝑎𝑛𝑎",
+      "username": "_blackk__cat"
+     }
+    },
+    {
+     "author_id": "1390453849161412610",
+     "conversation_id": "1619672914953125888",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072678914"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 14,
+        "username": "exclusivesude",
+        "id": "1582789979595571201"
+       },
+       {
+        "start": 15,
+        "end": 23,
+        "username": "O_kiz95",
+        "id": "1300710947867242496"
+       }
+      ]
+     },
+     "id": "1620174021072678914",
+     "in_reply_to_user_id": "1582789979595571201",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@exclusivesude @O_kiz95 ben de istemiyorum napicaz",
+     "author": {
+      "id": "1390453849161412610",
+      "name": "açelya",
+      "username": "turkishfdelight"
+     }
+    },
+    {
+     "author_id": "1609863519763136513",
+     "conversation_id": "1620172028832813063",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072674817"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 36,
+        "end": 47,
+        "tag": "UzmanÇavuş"
+       },
+       {
+        "start": 78,
+        "end": 101,
+        "tag": "ŞehadetEsasKadroHaktır"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 0,
+        "end": 13,
+        "username": "alitilkici38",
+        "id": "232342448"
+       }
+      ]
+     },
+     "id": "1620174021072674817",
+     "in_reply_to_user_id": "232342448",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@alitilkici38 Sicil yönetmeliği yok\n#UzmanÇavuş’ların sözleşme çilesi bitecek\n#ŞehadetEsasKadroHaktır",
+     "author": {
+      "id": "1609863519763136513",
+      "name": "Ferhat uzman",
+      "username": "AlibVelib"
+     }
+    },
+    {
+     "author_id": "18710341",
+     "conversation_id": "1620174021093638147",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021093638147"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 69,
+        "end": 85,
+        "username": "LuxuryColumnist",
+        "id": "2190512829"
+       }
+      ],
+      "urls": [
+       {
+        "start": 41,
+        "end": 64,
+        "url": "https://t.co/vecvRVflwJ",
+        "expanded_url": "http://trbr.io/qzVcu8u",
+        "display_url": "trbr.io/qzVcu8u",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1618388752405266433/NnyIAjWQ?format=jpg&name=orig",
+          "width": 800,
+          "height": 536
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1618388752405266433/NnyIAjWQ?format=jpg&name=150x150",
+          "width": 150,
+          "height": 150
+         }
+        ],
+        "status": 200,
+        "title": "11 Best Grand Cayman Excursions To Enjoy",
+        "description": "Grand Cayman is a beautiful island paradise that offers travelers a wealth of activities to enjoy. From snorkeling and scuba diving to sailing and kayaking, there is something for everyone to enjoy on Grand Cayman.",
+        "unwound_url": "https://luxurycolumnist.com/best-grand-cayman-excursions/"
+       },
+       {
+        "start": 86,
+        "end": 109,
+        "url": "https://t.co/aDlaHqxbWb",
+        "expanded_url": "https://twitter.com/DownshiftingPRO/status/1620174021093638147/photo/1",
+        "display_url": "pic.twitter.com/aDlaHqxbWb",
+        "media_key": "3_1620174019205992448"
+       }
+      ]
+     },
+     "id": "1620174021093638147",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "11 Best Grand Cayman Excursions To Enjoy https://t.co/vecvRVflwJ via @LuxuryColumnist https://t.co/aDlaHqxbWb",
+     "author": {
+      "id": "18710341",
+      "name": "Margarita Ibbott ~ @DownshiftingPRO",
+      "username": "DownshiftingPRO"
+     }
+    },
+    {
+     "author_id": "50970644",
+     "conversation_id": "1620166461053620225",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025266962432"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 8,
+        "username": "asadyyc",
+        "id": "142364043"
+       }
+      ],
+      "urls": [
+       {
+        "start": 21,
+        "end": 44,
+        "url": "https://t.co/25M8eZmFQn",
+        "expanded_url": "https://www.mtroyal.ca/ProgramsCourses/FacultiesSchoolsCentres/Arts/Departments/EconomicsJusticePolicyStudies/Faculty/DougKing.htm",
+        "display_url": "mtroyal.ca/ProgramsCourse…",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1620174027397697537/rhh61vcM?format=jpg&name=orig",
+          "width": 1140,
+          "height": 500
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1620174027397697537/rhh61vcM?format=jpg&name=150x150",
+          "width": 150,
+          "height": 150
+         }
+        ],
+        "status": 200,
+        "title": "Doug King | MRU",
+        "description": "Mount Royal University programs align your passions and open doors. You belong here.",
+        "unwound_url": "https://www.mtroyal.ca/ProgramsCourses/FacultiesSchoolsCentres/Arts/Departments/EconomicsJusticePolicyStudies/Faculty/DougKing.htm"
+       }
+      ]
+     },
+     "id": "1620174025266962432",
+     "in_reply_to_user_id": "142364043",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 1
+     },
+     "reply_settings": "everyone",
+     "text": "@asadyyc David King: https://t.co/25M8eZmFQn",
+     "author": {
+      "id": "50970644",
+      "name": "Dylan",
+      "username": "LDTG117"
+     }
+    },
+    {
+     "author_id": "1054515473910587392",
+     "conversation_id": "1620153793827733505",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021076877313"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 93,
+        "end": 100,
+        "probability": 0.5351,
+        "type": "Organization",
+        "normalized_text": "league 1"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 0,
+        "end": 16,
+        "username": "steveiratcliffe",
+        "id": "431699467"
+       },
+       {
+        "start": 17,
+        "end": 32,
+        "username": "SirSebastian20",
+        "id": "1327623989905252361"
+       }
+      ]
+     },
+     "id": "1620174021076877313",
+     "in_reply_to_user_id": "431699467",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@steveiratcliffe @SirSebastian20 This was and should have always been the aim. If staying in league 1 won’t keep people in the ground then I really don’t know what people expect",
+     "author": {
+      "id": "1054515473910587392",
+      "name": "Adam PVFC",
+      "username": "Adam_PVFC"
+     }
+    },
+    {
+     "author_id": "1347630644831125506",
+     "conversation_id": "1620173788926349313",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292124160"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 10,
+        "username": "see8_you8",
+        "id": "4865867159"
+       }
+      ]
+     },
+     "id": "1620174025292124160",
+     "in_reply_to_user_id": "4865867159",
+     "lang": "ar",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@see8_you8 او شحن الي شو يعني؟",
+     "author": {
+      "id": "1347630644831125506",
+      "name": "Dana 💛 l دانه",
+      "username": "daynedays"
+     }
+    },
+    {
+     "author_id": "1401990018495885312",
+     "conversation_id": "1620174021076873219",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021076873219"
+     ],
+     "entities": {
+      "urls": [
+       {
+        "start": 14,
+        "end": 37,
+        "url": "https://t.co/rWyoTc8lvG",
+        "expanded_url": "https://twitter.com/sr_chocolat/status/1620103136651378688",
+        "display_url": "twitter.com/sr_chocolat/st…"
+       }
+      ]
+     },
+     "id": "1620174021076873219",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "AJJAJAJJAAJJA https://t.co/rWyoTc8lvG",
+     "author": {
+      "id": "1401990018495885312",
+      "name": "buba",
+      "username": "gagareformed"
+     }
+    },
+    {
+     "author_id": "1712428752",
+     "conversation_id": "1620149447136276481",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292148737"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 16,
+        "username": "IrariusWasTaken",
+        "id": "2785528812"
+       },
+       {
+        "start": 17,
+        "end": 32,
+        "username": "Devil_Lonewolf",
+        "id": "1386681868561510400"
+       },
+       {
+        "start": 33,
+        "end": 41,
+        "username": "737_kin",
+        "id": "828402650785972224"
+       }
+      ]
+     },
+     "id": "1620174025292148737",
+     "in_reply_to_user_id": "1712428752",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@IrariusWasTaken @Devil_Lonewolf @737_kin Like Master Roshi could blow up MOONS in early Dragon Ball and Vegeta literally dwarfs him in power. Piccolo fucking casually blows up a moon with a one handed ki blast in early saiyan arc and you’re trying to tell me Omniman has the power to match? Which he doesnt",
+     "author": {
+      "id": "1712428752",
+      "name": "Bil the Bill",
+      "username": "TheEroKing"
+     }
+    },
+    {
+     "author_id": "1368130256075300867",
+     "conversation_id": "1620173053551595520",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021072666625"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 14,
+        "username": "taka_taka5143",
+        "id": "869996024760160256"
+       }
+      ]
+     },
+     "id": "1620174021072666625",
+     "in_reply_to_user_id": "869996024760160256",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@taka_taka5143 おチャオぅございます。\n2/5はBobbyの誕生日ですね😃",
+     "author": {
+      "id": "1368130256075300867",
+      "name": "SUENAGAToru summerof0067Kﾀﾞｧｰﾅﾙ",
+      "username": "SuenagatoruS"
+     }
+    },
+    {
+     "author_id": "137776771",
+     "conversation_id": "1620174025279557635",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025279557635"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 16,
+        "username": "DebbieHayton",
+        "id": "4189054053"
+       },
+       {
+        "start": 28,
+        "end": 38,
+        "username": "spectator",
+        "id": "16683666"
+       }
+      ]
+     },
+     "id": "1620174025279557635",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 12,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @DebbieHayton: By me for @spectator: \"Redmayne now says he won’t take parts that should go to trans actors. Perhaps he could refer such…",
+     "author": {
+      "id": "137776771",
+      "name": "Bob Hamstead",
+      "username": "berk_hamstead"
+     }
+    },
+    {
+     "author_id": "1538948001573376000",
+     "conversation_id": "1620174021081075712",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021081075712"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 18,
+        "username": "Vivekkeshwani8",
+        "id": "1134038417577304065"
+       }
+      ]
+     },
+     "id": "1620174021081075712",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 18,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Vivekkeshwani8: Sometimes we do everything right but still lose....\n\n***********Pathaan Zinda hai**********\n\nVIJAYI BHAVA SHIV THAKARE…",
+     "author": {
+      "id": "1538948001573376000",
+      "name": "Ritik Chouhan",
+      "username": "RitikCh94256354"
+     }
+    },
+    {
+     "author_id": "1196806624041680897",
+     "conversation_id": "1620174025275346945",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275346945"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 141,
+        "end": 151,
+        "tag": "mavrorodo"
+       }
+      ]
+     },
+     "id": "1620174025275346945",
+     "lang": "el",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "Ρε μαζέψτε τον Γεράσιμο τι μλκς είναι αυτές και οι γονείς του και η Ελισάβετ πρέπει να τον βάλουν στην θέση του ...τι ρεζιλικια είναι αυτά.. #mavrorodo",
+     "author": {
+      "id": "1196806624041680897",
+      "name": "κrιstεn",
+      "username": "kristn_92"
+     }
+    },
+    {
+     "author_id": "1607861729207410688",
+     "conversation_id": "1620174025300348928",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300348928"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 13,
+        "end": 24,
+        "probability": 0.4309,
+        "type": "Other",
+        "normalized_text": "Peta Jensens"
+       },
+       {
+        "start": 62,
+        "end": 67,
+        "probability": 0.6706,
+        "type": "Other",
+        "normalized_text": "Amirah"
+       },
+       {
+        "start": 70,
+        "end": 74,
+        "probability": 0.4834,
+        "type": "Other",
+        "normalized_text": "Adara"
+       }
+      ],
+      "hashtags": [
+       {
+        "start": 61,
+        "end": 68,
+        "tag": "Amirah"
+       },
+       {
+        "start": 69,
+        "end": 75,
+        "tag": "Adara"
+       }
+      ],
+      "urls": [
+       {
+        "start": 107,
+        "end": 130,
+        "url": "https://t.co/EOJMHdnkY6",
+        "expanded_url": "https://twitter.com/GoodroeKathi/status/1620174025300348928/video/1",
+        "display_url": "pic.twitter.com/EOJMHdnkY6",
+        "media_key": "13_1620173875630710784"
+       }
+      ]
+     },
+     "id": "1620174025300348928",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "MilkingTable Peta Jensens Cock Milking 3Some FULL SCENE 😘🍑😈 \n#Amirah #Adara #&amp;amp; \nCRE: in video \n😘🍑😈 https://t.co/EOJMHdnkY6",
+     "author": {
+      "id": "1607861729207410688",
+      "name": "Kathi Goodroe",
+      "username": "GoodroeKathi"
+     }
+    },
+    {
+     "author_id": "68513868",
+     "conversation_id": "1620174025300520960",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300520960"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "ElviraOlMe",
+        "id": "1268299499887353856"
+       },
+       {
+        "start": 16,
+        "end": 29,
+        "username": "andresiempre",
+        "id": "68513868"
+       },
+       {
+        "start": 30,
+        "end": 42,
+        "username": "martinfiera",
+        "id": "123960008"
+       }
+      ]
+     },
+     "id": "1620174025300520960",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 1,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @ElviraOlMe: @andresiempre @martinfiera Usando estrategias tan pueriles quieren pelearse con los países vecinos, de la cabeza de Montoya…",
+     "author": {
+      "id": "68513868",
+      "name": "Andresiempre",
+      "username": "andresiempre"
+     }
+    },
+    {
+     "author_id": "809927310593892352",
+     "conversation_id": "1619823265186254848",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025283743747"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 23,
+        "end": 33,
+        "probability": 0.4794,
+        "type": "Other",
+        "normalized_text": "Radio Mitre"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 0,
+        "end": 11,
+        "username": "radiomitre",
+        "id": "182923335"
+       }
+      ]
+     },
+     "id": "1620174025283743747",
+     "in_reply_to_user_id": "182923335",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@radiomitre Silenciado Radio Mitre",
+     "author": {
+      "id": "809927310593892352",
+      "name": "Adrian Barrera",
+      "username": "adrianokbarrera"
+     }
+    },
+    {
+     "author_id": "1267882128404033536",
+     "conversation_id": "1620174025283756035",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025283756035"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 17,
+        "end": 20,
+        "probability": 0.5601,
+        "type": "Other",
+        "normalized_text": "moas"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "lilgyubi",
+        "id": "1465869627901288452"
+       }
+      ]
+     },
+     "id": "1620174025283756035",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 53,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @lilgyubi: hi moas! i hope you guys arent disappointed by us not reaching our goal, we did amazing! our original goal was 25m before the…",
+     "author": {
+      "id": "1267882128404033536",
+      "name": "riy 1번 연준 팬",
+      "username": "myjjunieverse"
+     }
+    },
+    {
+     "author_id": "1509042039950016512",
+     "conversation_id": "1620174025296343040",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025296343040"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 18,
+        "username": "LilyBlack_shop",
+        "id": "1403700834630705155"
+       },
+       {
+        "start": 122,
+        "end": 137,
+        "username": "LilyBlack_shop",
+        "id": "1403700834630705155"
+       }
+      ]
+     },
+     "id": "1620174025296343040",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 1022,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @LilyBlack_shop: ʚ☃️ 𝕃𝕚𝕝𝕪 𝔹𝕝𝕒𝕔𝕜\n               プレゼントキャンペーン☃️ɞ\n\n✧˖°⌖新作セットアップ꙳✧˖°⌖\n\n猫柄ワンピorリボンベルベット どっちが好き？໒꒱⋆ﾟ\n\n♥参加条件♥\n➽@LilyBlack_shop…",
+     "author": {
+      "id": "1509042039950016512",
+      "name": "ぽぅ",
+      "username": "popopppoooh"
+     }
+    },
+    {
+     "author_id": "3374332433",
+     "conversation_id": "1620174021102018560",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021102018560"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 23,
+        "end": 26,
+        "tag": "뚱녀"
+       }
+      ],
+      "urls": [
+       {
+        "start": 27,
+        "end": 50,
+        "url": "https://t.co/tJak5UYnVn",
+        "expanded_url": "https://twitter.com/kLf92530539/status/1619583422682497024/video/1",
+        "display_url": "pic.twitter.com/tJak5UYnVn",
+        "media_key": "7_1619583017831497730"
+       }
+      ]
+     },
+     "id": "1620174021102018560",
+     "lang": "ko",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "서귀포출장안ㅁㅏ 출장서비스 서귀포출장미시 #뚱녀 https://t.co/tJak5UYnVn",
+     "author": {
+      "id": "3374332433",
+      "name": "ㄹr인 SVIP6989 출장안마",
+      "username": "mbatha_gift"
+     }
+    },
+    {
+     "author_id": "1596385436271841281",
+     "conversation_id": "1620173243654238208",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021085253635"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 12,
+        "username": "grecian_the",
+        "id": "1296278085570985984"
+       }
+      ]
+     },
+     "id": "1620174021085253635",
+     "in_reply_to_user_id": "1296278085570985984",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@grecian_the I wish I would've stuck with baseball through hs, one of my only regrets in my life",
+     "author": {
+      "id": "1596385436271841281",
+      "name": "⚔️✝️Eldian✝️⚔️",
+      "username": "DovahBrah"
+     }
+    },
+    {
+     "author_id": "924774588973756416",
+     "conversation_id": "1620174025296351233",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025296351233"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 43,
+        "end": 48,
+        "probability": 0.8914,
+        "type": "Person",
+        "normalized_text": "Marcos"
+       },
+       {
+        "start": 81,
+        "end": 86,
+        "probability": 0.9073,
+        "type": "Person",
+        "normalized_text": "Camila"
+       },
+       {
+        "start": 164,
+        "end": 169,
+        "probability": 0.905,
+        "type": "Other",
+        "normalized_text": "GH2023"
+       },
+       {
+        "start": 172,
+        "end": 186,
+        "probability": 0.6222,
+        "type": "Other",
+        "normalized_text": "GranHermano2022"
+       },
+       {
+        "start": 189,
+        "end": 212,
+        "probability": 0.4936,
+        "type": "Other",
+        "normalized_text": "GranHermanoArgentina2023"
+       }
+      ],
+      "hashtags": [
+       {
+        "start": 163,
+        "end": 170,
+        "tag": "GH2023"
+       },
+       {
+        "start": 171,
+        "end": 187,
+        "tag": "GranHermano2022"
+       },
+       {
+        "start": 188,
+        "end": 213,
+        "tag": "GranHermanoArgentina2023"
+       }
+      ]
+     },
+     "id": "1620174025296351233",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "Si no es la tora debería ser obligadamente Marcos el que le meta la fulminante a Camila y nosotros haríamos el resto del trabajo... Dios mio Déjalo en paz reina!! #GH2023 #GranHermano2022 #GranHermanoArgentina2023",
+     "author": {
+      "id": "924774588973756416",
+      "name": "Vanesa Sol Altero",
+      "username": "VanesaAltero"
+     }
+    },
+    {
+     "author_id": "1325482741509615616",
+     "conversation_id": "1620122320651292675",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300246529"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 10,
+        "username": "just_Aaaa",
+        "id": "937350806495522816"
+       }
+      ]
+     },
+     "id": "1620174025300246529",
+     "in_reply_to_user_id": "937350806495522816",
+     "lang": "ar",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@just_Aaaa حدّث العاقل بما يُعقل",
+     "author": {
+      "id": "1325482741509615616",
+      "name": "أَوس",
+      "username": "heisaws1"
+     }
+    },
+    {
+     "author_id": "1588235251222028293",
+     "conversation_id": "1620118099264704512",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300525067"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 12,
+        "username": "STF_oficial",
+        "id": "68313718"
+       },
+       {
+        "start": 52,
+        "end": 64,
+        "username": "STF_oficial",
+        "id": "68313718"
+       }
+      ]
+     },
+     "id": "1620174025300525067",
+     "in_reply_to_user_id": "68313718",
+     "lang": "pt",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@STF_oficial Ora coitadinho ficou triste.\nNos polpe @STF_oficial \nNos polpe da vossa hipocrisia.",
+     "author": {
+      "id": "1588235251222028293",
+      "name": "Luis Paulo Cardoso",
+      "username": "LuisPauloCardo7"
+     }
+    },
+    {
+     "author_id": "1615061387037839374",
+     "conversation_id": "1620174025292120069",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292120069"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 15,
+        "username": "AYS32859595",
+        "id": "1547975621640273922"
+       }
+      ]
+     },
+     "id": "1620174025292120069",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 55,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @AYS32859595: FAHRİLERİN GÖZÜ MECLİSTE",
+     "author": {
+      "id": "1615061387037839374",
+      "name": "Arzu Olmez",
+      "username": "ArzuOlmez2"
+     }
+    },
+    {
+     "author_id": "1531351529919287296",
+     "conversation_id": "1620138910826524672",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275375616"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 15,
+        "username": "naocolegialess",
+        "id": "1610873450230431745"
+       }
+      ]
+     },
+     "id": "1620174025275375616",
+     "in_reply_to_user_id": "1610873450230431745",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@naocolegialess Mi vidaa😂😂 bueno yo me corto el flequillo sola",
+     "author": {
+      "id": "1531351529919287296",
+      "name": "L.M 🖕",
+      "username": "MieleLudmila"
+     }
+    },
+    {
+     "author_id": "857873241464905729",
+     "conversation_id": "1620174025292148739",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292148739"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 11,
+        "username": "0223yus",
+        "id": "1492548733"
+       }
+      ],
+      "urls": [
+       {
+        "start": 16,
+        "end": 39,
+        "url": "https://t.co/6xoHjdBJyP",
+        "expanded_url": "https://twitter.com/0223yus/status/1620072720645120000/video/1",
+        "display_url": "pic.twitter.com/6xoHjdBJyP",
+        "media_key": "3_1620072637467881474"
+       },
+       {
+        "start": 16,
+        "end": 39,
+        "url": "https://t.co/6xoHjdBJyP",
+        "expanded_url": "https://twitter.com/0223yus/status/1620072720645120000/video/1",
+        "display_url": "pic.twitter.com/6xoHjdBJyP",
+        "media_key": "7_1620072637639827459"
+       }
+      ]
+     },
+     "id": "1620174025292148739",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 16,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @0223yus: らぶ https://t.co/6xoHjdBJyP",
+     "author": {
+      "id": "857873241464905729",
+      "name": "布オタ",
+      "username": "Nishikoku83F"
+     }
+    },
+    {
+     "author_id": "1091223826887778304",
+     "conversation_id": "1620174025300525063",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300525063"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "weadhitter",
+        "id": "544842496"
+       }
+      ],
+      "urls": [
+       {
+        "start": 16,
+        "end": 39,
+        "url": "https://t.co/XqKKdlPCHS",
+        "expanded_url": "https://twitter.com/weadhitter/status/1620113873247567872/photo/1",
+        "display_url": "pic.twitter.com/XqKKdlPCHS",
+        "media_key": "3_1620113871288557577"
+       }
+      ]
+     },
+     "id": "1620174025300525063",
+     "lang": "zxx",
+     "public_metrics": {
+      "retweet_count": 76,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @weadhitter: https://t.co/XqKKdlPCHS",
+     "author": {
+      "id": "1091223826887778304",
+      "name": "epic frot battles of history",
+      "username": "Catboyism"
+     }
+    },
+    {
+     "author_id": "944885234",
+     "conversation_id": "1620174025275355138",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275355138"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "MindefPeru",
+        "id": "139775574"
+       },
+       {
+        "start": 109,
+        "end": 121,
+        "username": "PoliciaPeru",
+        "id": "213769482"
+       }
+      ]
+     },
+     "id": "1620174025275355138",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 315,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @MindefPeru: Las Fuerzas Armadas llegaron al sector de Barrio Chino para apoyar a nuestros hermanos de la @PoliciaPeru en el desbloqueo…",
+     "author": {
+      "id": "944885234",
+      "name": "Renzo Rabanal Arrojo",
+      "username": "renzo_rabanal88"
+     }
+    },
+    {
+     "author_id": "732913972270227456",
+     "conversation_id": "1620174025292136454",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292136454"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 10,
+        "username": "onjee6",
+        "id": "1289012666460024832"
+       }
+      ]
+     },
+     "id": "1620174025292136454",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 23,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @onjee6: マスク大好きな人達は他人にもマスクをさせるということをやっていたので、「マスク必須」の反対は「マスク禁止」だと思ってるんだよね。\n「マスク必須（全体主義）」の反対は「マスクは自由（自由主義）」なんだよ。",
+     "author": {
+      "id": "732913972270227456",
+      "name": "Chiemi Takakura",
+      "username": "keisuke_ohtorix"
+     }
+    },
+    {
+     "author_id": "448922910",
+     "conversation_id": "1620174021089456128",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021089456128"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "aelincult",
+        "id": "1388577332185731076"
+       }
+      ]
+     },
+     "id": "1620174021089456128",
+     "lang": "pt",
+     "public_metrics": {
+      "retweet_count": 235,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @aelincult: procura-se rico que tenha prazer em dar livros gratuitos sem pedir nada apenas gosta da sensaçao de espalhar o conhecimento…",
+     "author": {
+      "id": "448922910",
+      "name": "⋆ constantly dissatisfied ⋆",
+      "username": "nandsland"
+     }
+    },
+    {
+     "author_id": "1251019565729005568",
+     "conversation_id": "1620174021106212867",
+     "created_at": "2023-01-30T21:36:02.000Z",
+     "edit_history_tweet_ids": [
+      "1620174021106212867"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "mikripkm",
+        "id": "1260635575993819136"
+       }
+      ],
+      "urls": [
+       {
+        "start": 14,
+        "end": 37,
+        "url": "https://t.co/Dz3DdtEgJU",
+        "expanded_url": "https://twitter.com/mikripkm/status/1619894582275342338/photo/1",
+        "display_url": "pic.twitter.com/Dz3DdtEgJU",
+        "media_key": "16_1619894502675865600"
+       }
+      ]
+     },
+     "id": "1620174021106212867",
+     "lang": "zxx",
+     "public_metrics": {
+      "retweet_count": 12889,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @mikripkm: https://t.co/Dz3DdtEgJU",
+     "author": {
+      "id": "1251019565729005568",
+      "name": "🦊 eimiko canon ⚡",
+      "username": "qikwee"
+     }
+    },
+    {
+     "author_id": "1088776993800282112",
+     "conversation_id": "1620174025300525069",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300525069"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "hidi951013",
+        "id": "1522322991564361729"
+       }
+      ]
+     },
+     "id": "1620174025300525069",
+     "lang": "ko",
+     "public_metrics": {
+      "retweet_count": 61,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @hidi951013: 저 리스트에 많은시간지난곡\n수많은 콜라보곡들도 포함되어있습니다\n가장최신곡이 빠져있다는 사실이 믿어지지 않습니다\n\n'VIBE'가 발매된지 2주가 지나도록 스포티파이 BTS 플레이리스트에 등록되지 않았습니다. 더이상 미루지…",
+     "author": {
+      "id": "1088776993800282112",
+      "name": "Jimin-Promise✨💕 With You💙",
+      "username": "JIMINWITHU1013"
+     }
+    },
+    {
+     "author_id": "40561535",
+     "conversation_id": "1620174025275371523",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275371523"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 10,
+        "username": "fairygrly",
+        "id": "2346033601"
+       }
+      ],
+      "urls": [
+       {
+        "start": 125,
+        "end": 148,
+        "url": "https://t.co/uqcPGhpROQ",
+        "expanded_url": "https://metrotrains.com.au",
+        "display_url": "metrotrains.com.au",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1617870420761513996/r2CNvs_q?format=png&name=orig",
+          "width": 107,
+          "height": 116
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1617870420761513996/r2CNvs_q?format=png&name=150x150",
+          "width": 107,
+          "height": 107
+         }
+        ],
+        "status": 200,
+        "title": "1. Home",
+        "description": "1. Home",
+        "unwound_url": "https://www.metrotrains.com.au/"
+       }
+      ]
+     },
+     "id": "1620174025275371523",
+     "in_reply_to_user_id": "2346033601",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@fairygrly The 9:08am Flinders Street to Dandenong service has been cancelled today due to ongoing Metro Tunnel works  Visit https://t.co/uqcPGhpROQ for more information.",
+     "author": {
+      "id": "40561535",
+      "name": "Metro Trains",
+      "username": "metrotrains"
+     }
+    },
+    {
+     "author_id": "2970592664",
+     "conversation_id": "1620162830141128704",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025287929858"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 16,
+        "username": "Hiroki_Sasaki_T",
+        "id": "1413800099507937280"
+       }
+      ]
+     },
+     "id": "1620174025287929858",
+     "in_reply_to_user_id": "1413800099507937280",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@Hiroki_Sasaki_T おはありです^ - ^",
+     "author": {
+      "id": "2970592664",
+      "name": "ヒデ さんμ'sソバモモ生駒",
+      "username": "hide512_hide"
+     }
+    },
+    {
+     "author_id": "40561535",
+     "conversation_id": "1620174025271169026",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025271169026"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 14,
+        "username": "AngeloMoses10",
+        "id": "1185528935502643200"
+       }
+      ],
+      "urls": [
+       {
+        "start": 129,
+        "end": 152,
+        "url": "https://t.co/uqcPGhpROQ",
+        "expanded_url": "https://metrotrains.com.au",
+        "display_url": "metrotrains.com.au",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1617870420761513996/r2CNvs_q?format=png&name=orig",
+          "width": 107,
+          "height": 116
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1617870420761513996/r2CNvs_q?format=png&name=150x150",
+          "width": 107,
+          "height": 107
+         }
+        ],
+        "status": 200,
+        "title": "1. Home",
+        "description": "1. Home",
+        "unwound_url": "https://www.metrotrains.com.au/"
+       }
+      ]
+     },
+     "id": "1620174025271169026",
+     "in_reply_to_user_id": "1185528935502643200",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@AngeloMoses10 The 9:08am Flinders Street to Dandenong service has been cancelled today due to ongoing Metro Tunnel works  Visit https://t.co/uqcPGhpROQ for more information.",
+     "author": {
+      "id": "40561535",
+      "name": "Metro Trains",
+      "username": "metrotrains"
+     }
+    },
+    {
+     "author_id": "1313249581",
+     "conversation_id": "1620174025292128259",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292128259"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 11,
+        "username": "00eun00",
+        "id": "1481260020788768768"
+       }
+      ]
+     },
+     "id": "1620174025292128259",
+     "lang": "ko",
+     "public_metrics": {
+      "retweet_count": 3632,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @00eun00: 뮤트라는거 말이죠…\n확실한 효과를 얻기 위해선 그 분야의 은어까지 알아야 한다는 점이 좀 킹받지 않나요?",
+     "author": {
+      "id": "1313249581",
+      "name": "웨르",
+      "username": "werrrrreu"
+     }
+    },
+    {
+     "author_id": "1457698394709770243",
+     "conversation_id": "1620174025262776324",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025262776324"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 17,
+        "username": "JantaKiAwaaz_",
+        "id": "1450392299528093697"
+       }
+      ]
+     },
+     "id": "1620174025262776324",
+     "lang": "hi",
+     "public_metrics": {
+      "retweet_count": 5,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @JantaKiAwaaz_: पूर्वी राजस्थान नहर परियोजना को राष्ट्रीय परियोजना घोषित किया जाए। अगर ERCP नहीं तो जनता तो केंद्र सरकार को ERCP विरोधी…",
+     "author": {
+      "id": "1457698394709770243",
+      "name": "laxman meena",
+      "username": "laxmanm04686521"
+     }
+    },
+    {
+     "author_id": "1160610610427695104",
+     "conversation_id": "1620174025296351232",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025296351232"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 12,
+        "username": "Hypodrop",
+        "id": "1264948973535735810"
+       },
+       {
+        "start": 70,
+        "end": 81,
+        "username": "ProjectDNE",
+        "id": "1566479257316085761"
+       },
+       {
+        "start": 88,
+        "end": 97,
+        "username": "Hypodrop",
+        "id": "1264948973535735810"
+       }
+      ]
+     },
+     "id": "1620174025296351232",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 99,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Hypodrop: 💎Hypodrop X Project DNE💎\n\n🎟3X WL garaunteed\n\n1️⃣ Follow @ProjectDNE &amp; @Hypodrop\n2️⃣ Like &amp; Retweet \n3️⃣ Tag 3 NFT friends (mo…",
+     "author": {
+      "id": "1160610610427695104",
+      "name": "Lady jaina.lux",
+      "username": "LadyJainaa"
+     }
+    },
+    {
+     "author_id": "1447307297374490624",
+     "conversation_id": "1620174025296330753",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025296330753"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 16,
+        "username": "ErbakanFatih",
+        "id": "324325583"
+       }
+      ],
+      "urls": [
+       {
+        "start": 97,
+        "end": 120,
+        "url": "https://t.co/MefUbBJQxt",
+        "expanded_url": "https://twitter.com/ErbakanFatih/status/1576294192162418688/video/1",
+        "display_url": "pic.twitter.com/MefUbBJQxt",
+        "media_key": "7_1576294134461218817"
+       }
+      ]
+     },
+     "id": "1620174025296330753",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 423,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @ErbakanFatih: Başıboş sokak hayvanları için bir an evvel yasal düzenlemeler yapılmalıdır! \n\n https://t.co/MefUbBJQxt",
+     "author": {
+      "id": "1447307297374490624",
+      "name": "AFRASİYAB \\\\𐱅𐰇𐰼𐰚//",
+      "username": "lordcyborgg"
+     }
+    },
+    {
+     "author_id": "885278382228942849",
+     "conversation_id": "1620174025300525060",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025300525060"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 29,
+        "end": 34,
+        "probability": 0.5907,
+        "type": "Person",
+        "normalized_text": "batman"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 16,
+        "username": "DynamoSuperX",
+        "id": "1244816209"
+       }
+      ],
+      "urls": [
+       {
+        "start": 101,
+        "end": 124,
+        "url": "https://t.co/zP0RoSDNIy",
+        "expanded_url": "https://twitter.com/DynamoSuperX/status/1620166870358986752/photo/1",
+        "display_url": "pic.twitter.com/zP0RoSDNIy",
+        "media_key": "3_1620166867238232083"
+       }
+      ]
+     },
+     "id": "1620174025300525060",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 1,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @DynamoSuperX: since more batman is inevitable, gimme a batman trilogy that setups the batfamily. https://t.co/zP0RoSDNIy",
+     "author": {
+      "id": "885278382228942849",
+      "name": "PaperMan.EXE",
+      "username": "PaperEXE"
+     }
+    },
+    {
+     "author_id": "174617877",
+     "conversation_id": "1620174025266978816",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025266978816"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 130,
+        "end": 134,
+        "probability": 0.7357,
+        "type": "Person",
+        "normalized_text": "Deebo"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 18,
+        "username": "RohithKannan71",
+        "id": "3415620041"
+       }
+      ]
+     },
+     "id": "1620174025266978816",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 326,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @RohithKannan71: Is everyone else going to ignore the fact that the only reason the fight started is because 42 was yanking on Deebo’s f…",
+     "author": {
+      "id": "174617877",
+      "name": "Jon Zaia",
+      "username": "JZ_182"
+     }
+    },
+    {
+     "author_id": "1003295873202188293",
+     "conversation_id": "1620174025266958338",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025266958338"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 84,
+        "end": 89,
+        "probability": 0.6192,
+        "type": "Organization",
+        "normalized_text": "Amazon"
+       }
+      ],
+      "hashtags": [
+       {
+        "start": 23,
+        "end": 26,
+        "tag": "原神"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "Genshin_7",
+        "id": "1070960596357509121"
+       },
+       {
+        "start": 123,
+        "end": 133,
+        "username": "Genshin_7",
+        "id": "1070960596357509121"
+       }
+      ]
+     },
+     "id": "1620174025266958338",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 67566,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Genshin_7: ／\n✨最終日✨\n#原神 Ver.3.4アプデ\n記念キャンペーン！第2弾\n＼\n\n1月31日(火)23:59まで毎日チャレンジ！\n原神グッズやAmazonギフト10000円分が\nその場で当たるチャンス！\n\n✅参加方法\n①@Genshin_7をフォロー…",
+     "author": {
+      "id": "1003295873202188293",
+      "name": "伶皇",
+      "username": "nekoru7777"
+     }
+    },
+    {
+     "author_id": "1421568519335026698",
+     "conversation_id": "1619979714122362880",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025266982916"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 16,
+        "username": "pelirrojohungry",
+        "id": "1015709212071071744"
+       }
+      ]
+     },
+     "id": "1620174025266982916",
+     "in_reply_to_user_id": "1015709212071071744",
+     "lang": "it",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@pelirrojohungry albacete",
+     "author": {
+      "id": "1421568519335026698",
+      "name": "naditixxx🧝🏽‍♀️",
+      "username": "nadiarodess"
+     }
+    },
+    {
+     "author_id": "1591733841475035138",
+     "conversation_id": "1620142756592254977",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025292124161"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 9,
+        "username": "w98GL3b7",
+        "id": "1425286770703298563"
+       },
+       {
+        "start": 10,
+        "end": 19,
+        "username": "FLOWI112",
+        "id": "1438507053429919750"
+       }
+      ]
+     },
+     "id": "1620174025292124161",
+     "in_reply_to_user_id": "1425286770703298563",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@w98GL3b7 @FLOWI112 Follow me 😍",
+     "author": {
+      "id": "1591733841475035138",
+      "name": "Your Crush🍄",
+      "username": "blacq_sherif"
+     }
+    },
+    {
+     "author_id": "1540710750918148097",
+     "conversation_id": "1620174025271164935",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025271164935"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 16,
+        "end": 22,
+        "tag": "激レアさん"
+       },
+       {
+        "start": 37,
+        "end": 42,
+        "tag": "長濱ねる"
+       },
+       {
+        "start": 49,
+        "end": 60,
+        "tag": "警視庁アウトサイダー"
+       },
+       {
+        "start": 122,
+        "end": 132,
+        "tag": "警視庁インサイダー"
+       },
+       {
+        "start": 135,
+        "end": 139,
+        "tag": "テラサ"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "telasa_jp",
+        "id": "1100141515"
+       }
+      ],
+      "urls": [
+       {
+        "start": 72,
+        "end": 95,
+        "url": "https://t.co/kopxQxB8R4",
+        "expanded_url": "https://bit.ly/3BUbAW2",
+        "display_url": "bit.ly/3BUbAW2",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1620071915787517953/hddOmP64?format=jpg&name=orig",
+          "width": 1080,
+          "height": 608
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1620071915787517953/hddOmP64?format=jpg&name=150x150",
+          "width": 150,
+          "height": 150
+         }
+        ],
+        "status": 200,
+        "title": "警視庁アウトサイダー | TELASA(テラサ)-国内ドラマの見逃し配信＆動画が見放題",
+        "description": "[警視庁アウトサイダー]今や日本のみならず世界から熱い注目を集める俳優・西島秀俊が挑むのは、スネに傷を持つ≪グレー≫な刑事たちが、秘密を隠しながら、互いに利用しあい、それぞれの正義を見出していく…という超異色作！そこに、確かな演技力で役柄にリアリティーを宿らせる濱田岳、女優として着実に成長を続ける上白石萌歌の2人が加わり、シリアスとコメディーが絶妙なスピード感でからみあう、いまだかつてない刑事ドラマを生み出していきます。原作は、『メゾン・ド・ポリス』『インディゴの夜』などで知られる人気ミステリー作家・加藤実秋氏の同名小説で、コミカライズも決定した人気作。西島が≪見た目が極道の元マル暴オヤジ刑事≫、濱田が≪一見さわやかなのに大きな秘密を抱えたエース刑事≫、上白石が≪安定した就職先として警察を選んだ新米刑事≫というクセの強いキャラクターにふんし、波乱の予感しかないワケありトリオを結成！警察組織の中で異質な存在＝≪アウトサイダー≫である3人が持ちつ持たれつ、さまざまな難事件に挑んでいきます。やがて、それぞれが背負っていた過去の真実が明らかになり、物語は壮大な復讐劇へとなだれ込んでいくことに--！？はたしてアウトサイダーな刑事たちが選択する正義とは…！？ドラマ・バラエティ・アニメ・映画・特撮・K-POPなど充実した動画＆見逃し配信を観るならテラサ！",
+        "unwound_url": "https://www.telasa.jp/series/13159?medid=mc_official&amp;srcid=vpass&amp;serial=telasatwitter_outsider&trflg=1"
+       }
+      ]
+     },
+     "id": "1620174025271164935",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 3,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @telasa_jp: 『#激レアさん を連れてきた。』ゲスト❣️\n#長濱ねる さん出演の『#警視庁アウトサイダー』を全話配信中👮‍♂️\nhttps://t.co/kopxQxB8R4\n\nさらに❗️\n長濱ねるさん主演のスピンオフドラマ\n『#警視庁インサイダー』は #テラサ…",
+     "author": {
+      "id": "1540710750918148097",
+      "name": "熱血タイガース基地外",
+      "username": "4yCeby0faFzaBWf"
+     }
+    },
+    {
+     "author_id": "298664621",
+     "conversation_id": "1620174025275371524",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275371524"
+     ],
+     "entities": {},
+     "id": "1620174025275371524",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "ファントムブラスタードラゴンのアタック！ダムドチャージングランス！",
+     "author": {
+      "id": "298664621",
+      "name": "闇アイチ",
+      "username": "darkaichi"
+     }
+    },
+    {
+     "author_id": "1484274287284523017",
+     "conversation_id": "1620174025287933955",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025287933955"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 82,
+        "end": 93,
+        "tag": "BarışArduç"
+       },
+       {
+        "start": 105,
+        "end": 128,
+        "tag": "AlparslanBüyükSelçuklu"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 19,
+        "username": "alp_baris_arduc",
+        "id": "1546802520353390598"
+       },
+       {
+        "start": 21,
+        "end": 33,
+        "username": "BArduc_Bafc",
+        "id": "1191068886797602816"
+       }
+      ]
+     },
+     "id": "1620174025287933955",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 16,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @alp_baris_arduc: @BArduc_Bafc Sizi bana bağışlayan Rabbime şükürler olsun ´ \n\n#BarışArduç BarışArduç\n#AlparslanBüyükSelçuklu AlparslanB…",
+     "author": {
+      "id": "1484274287284523017",
+      "name": "David.5",
+      "username": "4_David_"
+     }
+    },
+    {
+     "author_id": "1031260514",
+     "conversation_id": "1620174025275371521",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025275371521"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 15,
+        "username": "Eserdrursta",
+        "id": "472899662"
+       }
+      ],
+      "urls": [
+       {
+        "start": 45,
+        "end": 68,
+        "url": "https://t.co/MkCL5Ov55p",
+        "expanded_url": "https://twitter.com/Eserdrursta/status/1619954113281929219/photo/1",
+        "display_url": "pic.twitter.com/MkCL5Ov55p",
+        "media_key": "3_1619954110379212800"
+       }
+      ]
+     },
+     "id": "1620174025275371521",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 328,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Eserdrursta: Sözün bittiği yer!!! Haliç. https://t.co/MkCL5Ov55p",
+     "author": {
+      "id": "1031260514",
+      "name": "ahmetozturk",
+      "username": "ahmetbayramoz"
+     }
+    },
+    {
+     "author_id": "1283037296107958280",
+     "conversation_id": "1620171973308596234",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829166"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 10,
+        "username": "kentzywtf",
+        "id": "1251041999626649601"
+       },
+       {
+        "start": 11,
+        "end": 18,
+        "username": "rvfiez",
+        "id": "1176527621267566594"
+       }
+      ]
+     },
+     "id": "1620174029494829166",
+     "in_reply_to_user_id": "1251041999626649601",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@kentzywtf @rvfiez tu bio jajshajajaj",
+     "author": {
+      "id": "1283037296107958280",
+      "name": "*",
+      "username": "drxcorr"
+     }
+    },
+    {
+     "author_id": "1363305547655753728",
+     "conversation_id": "1620107648476807168",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025279574019"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 15,
+        "username": "distortxdheart",
+        "id": "1341751910873882627"
+       }
+      ],
+      "urls": [
+       {
+        "start": 102,
+        "end": 125,
+        "url": "https://t.co/CPKw7fto3Z",
+        "expanded_url": "https://twitter.com/hajifan69/status/1620174025279574019/photo/1",
+        "display_url": "pic.twitter.com/CPKw7fto3Z",
+        "media_key": "3_1620174020975988736"
+       }
+      ]
+     },
+     "id": "1620174025279574019",
+     "in_reply_to_user_id": "1341751910873882627",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@distortxdheart the fact that ppl that havent heard ab enstars just assume shes a “””guy””” is insane https://t.co/CPKw7fto3Z",
+     "author": {
+      "id": "1363305547655753728",
+      "name": "Eden ♡",
+      "username": "hajifan69"
+     }
+    },
+    {
+     "author_id": "1598597152481026048",
+     "conversation_id": "1620174029461278720",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029461278720"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 19,
+        "username": "kherdit87508461",
+        "id": "1618236100170100737"
+       }
+      ],
+      "urls": [
+       {
+        "start": 110,
+        "end": 133,
+        "url": "https://t.co/oTjQ0o5h7k",
+        "expanded_url": "http://bit.ly/3Zgxtco",
+        "display_url": "bit.ly/3Zgxtco",
+        "images": [
+         {
+          "url": "https://pbs.twimg.com/news_img/1618744001905192965/DYASyMpS?format=png&name=orig",
+          "width": 1200,
+          "height": 630
+         },
+         {
+          "url": "https://pbs.twimg.com/news_img/1618744001905192965/DYASyMpS?format=png&name=150x150",
+          "width": 150,
+          "height": 150
+         }
+        ],
+        "status": 200,
+        "title": "LINE Add Friend",
+        "description": "Open the Frien ds tab in your LINE app, tap the add friends icon in the top right, select \"QR code,\" and then scan this QR",
+        "unwound_url": "https://line.me/R/ti/p/@503vxhxv"
+       }
+      ]
+     },
+     "id": "1620174029461278720",
+     "lang": "th",
+     "public_metrics": {
+      "retweet_count": 81,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @kherdit87508461: เครดิตฟรีไม่ต้องฝากสักบาทเดียว\n📌แจกโค้ดเครดิตฟรี 50฿\n📌5000คนเท่านั้น รีบเลย❗\n\nรับได้ที่: https://t.co/oTjQ0o5h7k\nทางเ…",
+     "author": {
+      "id": "1598597152481026048",
+      "name": "เต๋า สมชายT8",
+      "username": "T834116638"
+     }
+    },
+    {
+     "author_id": "1588341954508619776",
+     "conversation_id": "1620174029490630657",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029490630657"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 33,
+        "end": 48,
+        "tag": "antalyatraveﬅi"
+       }
+      ],
+      "mentions": [
+       {
+        "start": 3,
+        "end": 17,
+        "username": "Derin65687540",
+        "id": "1591693938087415809"
+       }
+      ],
+      "urls": [
+       {
+        "start": 88,
+        "end": 111,
+        "url": "https://t.co/pHGUlxVmxk",
+        "expanded_url": "https://twitter.com/Derin65687540/status/1620174023425667072/photo/1",
+        "display_url": "pic.twitter.com/pHGUlxVmxk",
+        "media_key": "3_1620174016790282240"
+       }
+      ]
+     },
+     "id": "1620174029490630657",
+     "lang": "tr",
+     "public_metrics": {
+      "retweet_count": 29,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @Derin65687540: TEBRİYEMŞTM 🏆 #antalyatraveﬅi NEKRELİK ŞİFRECİN EDİMSİZN ARZİYATMŞTM https://t.co/pHGUlxVmxk",
+     "author": {
+      "id": "1588341954508619776",
+      "name": "Özde",
+      "username": "zde67939481"
+     }
+    },
+    {
+     "author_id": "1476162268152926208",
+     "conversation_id": "1620134891009773569",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029478035461"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 12,
+        "username": "musadosmeme",
+        "id": "1239332317275054087"
+       },
+       {
+        "start": 13,
+        "end": 27,
+        "username": "Nataliabbueno",
+        "id": "985904711990726664"
+       }
+      ]
+     },
+     "id": "1620174029478035461",
+     "in_reply_to_user_id": "1239332317275054087",
+     "lang": "und",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@musadosmeme @Nataliabbueno 🫶",
+     "author": {
+      "id": "1476162268152926208",
+      "name": "eduarda",
+      "username": "duardahhhh"
+     }
+    },
+    {
+     "author_id": "629718383",
+     "conversation_id": "1620174025262792710",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025262792710"
+     ],
+     "entities": {
+      "urls": [
+       {
+        "start": 48,
+        "end": 71,
+        "url": "https://t.co/Mj2y0atdt9",
+        "expanded_url": "http://twcm.co/vGeIn",
+        "display_url": "twcm.co/vGeIn",
+        "status": 200,
+        "title": "Twitcom - Crie e participe de comunidades e grupos no Twitter",
+        "description": "No Twitcom você pode criar e participar de comunidades, encontrar mais seguidores no Twitter.",
+        "unwound_url": "http://twitcom.com.br/groupUser.php?user=fonseca_perla"
+       }
+      ]
+     },
+     "id": "1620174025262792710",
+     "lang": "pt",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "Veja os usuários que acessaram seu perfil agora https://t.co/Mj2y0atdt9",
+     "author": {
+      "id": "629718383",
+      "name": "•Perla Fonseca",
+      "username": "Perlafonseca10"
+     }
+    },
+    {
+     "author_id": "1608315698043932673",
+     "conversation_id": "1620174025283764224",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025283764224"
+     ],
+     "entities": {
+      "hashtags": [
+       {
+        "start": 29,
+        "end": 34,
+        "tag": "西安丝足"
+       },
+       {
+        "start": 35,
+        "end": 38,
+        "tag": "西安"
+       },
+       {
+        "start": 39,
+        "end": 44,
+        "tag": "西安资源"
+       }
+      ],
+      "urls": [
+       {
+        "start": 45,
+        "end": 68,
+        "url": "https://t.co/QYCPFiR7nr",
+        "expanded_url": "https://twitter.com/KatieLo68654350/status/1620174025283764224/photo/1",
+        "display_url": "pic.twitter.com/QYCPFiR7nr",
+        "media_key": "3_1620173962931224581"
+       }
+      ]
+     },
+     "id": "1620174025283764224",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "❣️❣️wellcome to smokingzone \n#西安丝足 #西安 #西安资源 https://t.co/QYCPFiR7nr",
+     "author": {
+      "id": "1608315698043932673",
+      "name": "兔兔男士实体会馆",
+      "username": "KatieLo68654350"
+     }
+    },
+    {
+     "author_id": "1450546623113674752",
+     "conversation_id": "1620174029494829160",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829160"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 17,
+        "username": "mapletree0807",
+        "id": "1509087590473146369"
+       }
+      ],
+      "urls": [
+       {
+        "start": 49,
+        "end": 72,
+        "url": "https://t.co/TmKhxwDDPe",
+        "expanded_url": "https://twitter.com/mapletree0807/status/1610437351179964417/photo/1",
+        "display_url": "pic.twitter.com/TmKhxwDDPe",
+        "media_key": "3_1610437348193603585"
+       }
+      ]
+     },
+     "id": "1620174029494829160",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 418,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "mentionedUsers",
+     "text": "RT @mapletree0807: あの頃の私は\n        今の私を\n許してくれますか？ https://t.co/TmKhxwDDPe",
+     "author": {
+      "id": "1450546623113674752",
+      "name": "ジュウザ7777🍀⬜☗王将戦☖⬜⬜☆羽生善治先生を応援しています☆",
+      "username": "juuza7777"
+     }
+    },
+    {
+     "author_id": "1586778712745336836",
+     "conversation_id": "1620093253830729732",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029490634832"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 3,
+        "username": "EA",
+        "id": "15234657"
+       }
+      ]
+     },
+     "id": "1620174029490634832",
+     "in_reply_to_user_id": "15234657",
+     "lang": "pt",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@EA Muito sono, como sempre 🥱",
+     "author": {
+      "id": "1586778712745336836",
+      "name": "Ribeiro",
+      "username": "matribeirosc"
+     }
+    },
+    {
+     "author_id": "1609882703230386178",
+     "conversation_id": "1620169541354659840",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829106"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 0,
+        "end": 6,
+        "username": "i14nn",
+        "id": "983053295882252288"
+       }
+      ]
+     },
+     "id": "1620174029494829106",
+     "in_reply_to_user_id": "983053295882252288",
+     "lang": "ar",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "@i14nn ههههههههههههههههههه بمووت هذا وضعنا صدق😭😭😭😭",
+     "author": {
+      "id": "1609882703230386178",
+      "name": "27",
+      "username": "notoyoubye"
+     }
+    },
+    {
+     "author_id": "567893586",
+     "conversation_id": "1620174029494829070",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829070"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 16,
+        "username": "robisraelart",
+        "id": "1087225656096817152"
+       }
+      ]
+     },
+     "id": "1620174029494829070",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 12,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @robisraelart: It’s crazy how the people that are constantly “canceled” are never canceled. It’s also incredible how it encompasses thes…",
+     "author": {
+      "id": "567893586",
+      "name": "princess buttercup",
+      "username": "HeyItsMeSJ"
+     }
+    },
+    {
+     "author_id": "767264632247427075",
+     "conversation_id": "1620174029469683719",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029469683719"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 13,
+        "username": "boku_natu",
+        "id": "1307903068839714816"
+       }
+      ],
+      "urls": [
+       {
+        "start": 29,
+        "end": 52,
+        "url": "https://t.co/tbAWovIzre",
+        "expanded_url": "https://twitter.com/boku_natu/status/1620172968432406529/photo/1",
+        "display_url": "pic.twitter.com/tbAWovIzre",
+        "media_key": "3_1620172962816221184"
+       }
+      ]
+     },
+     "id": "1620174029469683719",
+     "lang": "ja",
+     "public_metrics": {
+      "retweet_count": 1,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @boku_natu: 1週間で1番しんどい火曜日 https://t.co/tbAWovIzre",
+     "author": {
+      "id": "767264632247427075",
+      "name": "キム",
+      "username": "Revo66kim"
+     }
+    },
+    {
+     "author_id": "768846365237456896",
+     "conversation_id": "1620174029494829169",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829169"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 15,
+        "username": "jorde_nmaar",
+        "id": "1576884051281342465"
+       }
+      ],
+      "urls": [
+       {
+        "start": 19,
+        "end": 42,
+        "url": "https://t.co/Vu29lFLi5S",
+        "expanded_url": "https://twitter.com/happines_public/status/1604423621258067969/video/1",
+        "display_url": "pic.twitter.com/Vu29lFLi5S",
+        "media_key": "7_1604423390881669120"
+       }
+      ]
+     },
+     "id": "1620174029494829169",
+     "lang": "und",
+     "public_metrics": {
+      "retweet_count": 383,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @jorde_nmaar: 😘 https://t.co/Vu29lFLi5S",
+     "author": {
+      "id": "768846365237456896",
+      "name": "oax.oax",
+      "username": "deyrey213"
+     }
+    },
+    {
+     "author_id": "1253785518208401409",
+     "conversation_id": "1620174029494829148",
+     "created_at": "2023-01-30T21:36:04.000Z",
+     "edit_history_tweet_ids": [
+      "1620174029494829148"
+     ],
+     "entities": {
+      "mentions": [
+       {
+        "start": 3,
+        "end": 14,
+        "username": "NickRubixx",
+        "id": "4767711394"
+       }
+      ],
+      "urls": [
+       {
+        "start": 58,
+        "end": 81,
+        "url": "https://t.co/1xBgYroAGX",
+        "expanded_url": "https://twitter.com/NickRubixx/status/1620099797964439553/photo/1",
+        "display_url": "pic.twitter.com/1xBgYroAGX",
+        "media_key": "3_1620099793480519694"
+       }
+      ]
+     },
+     "id": "1620174029494829148",
+     "lang": "en",
+     "public_metrics": {
+      "retweet_count": 1,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "RT @NickRubixx: WHAT IS THIS POSITION MY CATS SLEEPING IN https://t.co/1xBgYroAGX",
+     "author": {
+      "id": "1253785518208401409",
+      "name": "Drowning Alice",
+      "username": "sigma_female"
+     }
+    },
+    {
+     "author_id": "2468861233",
+     "conversation_id": "1620174025287761920",
+     "created_at": "2023-01-30T21:36:03.000Z",
+     "edit_history_tweet_ids": [
+      "1620174025287761920"
+     ],
+     "entities": {
+      "annotations": [
+       {
+        "start": 119,
+        "end": 123,
+        "probability": 0.9454,
+        "type": "Place",
+        "normalized_text": "Japón"
+       },
+       {
+        "start": 125,
+        "end": 130,
+        "probability": 0.2949,
+        "type": "Other",
+        "normalized_text": "pipipi"
+       }
+      ],
+      "urls": [
+       {
+        "start": 132,
+        "end": 155,
+        "url": "https://t.co/7J8e3uMNHj",
+        "expanded_url": "https://twitter.com/necoarc99/status/1620174025287761920/photo/1",
+        "display_url": "pic.twitter.com/7J8e3uMNHj",
+        "media_key": "3_1620174021227876354"
+       }
+      ]
+     },
+     "id": "1620174025287761920",
+     "lang": "es",
+     "public_metrics": {
+      "retweet_count": 0,
+      "reply_count": 0,
+      "like_count": 0,
+      "quote_count": 0,
+      "impression_count": 0
+     },
+     "reply_settings": "everyone",
+     "text": "ya me había emocionado porque pensé q no tlfno japones aesthetic tenia una app nativa de maps pero no me deja salir de Japón pipipi https://t.co/7J8e3uMNHj",
+     "author": {
+      "id": "2468861233",
+      "name": ".",
+      "username": "necoarc99"
+     }
+    }
+   ],
+   "updateMethods": [
+    "CONTINUOUS"
+   ],
+   "recordCountPrecision": "GREATER_THAN"
+  }
+ ],
+ "readmeFile": "twitter-sample.README.md",
+ "licenseFile": "twitter-sample.LICENSE.md"
+}
