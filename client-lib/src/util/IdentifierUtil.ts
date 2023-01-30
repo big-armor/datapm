@@ -38,7 +38,7 @@ export function validPackageDisplayName(value: string[] | string | number | bool
     if (value === "TOO_LONG") return "Must be less than " + PACKAGE_DESCRIPTION_MAX_LENGTH + " characters";
 
     if (valid === "INVALID_CHARACTERS")
-        return "Must contain only letters, numbers, spaces, and the following characters: - _";
+        return "Must start with a letter, and contain only letters, numbers, spaces, and the following characters: -_%*+";
 
     return true;
 }
