@@ -1,6 +1,7 @@
 import { loadPackageFileFromDisk, PackageFile, parsePackageFileJSON, validatePackageFile } from "../src/main";
 import { expect } from "chai";
 import fs from "fs";
+import { isDate } from "util/types";
 
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
@@ -82,5 +83,11 @@ describe("PackageFile checks", () => {
             packageFile.schemas[0].properties?.testObject.types?.object?.objectProperties?.subObject.types.object
                 ?.recordCount
         ).equal(1);
+    });
+
+    it("Should parse all date values in schema", async function () {
+        const packageFile = loadPackageFileFromDisk("test/packageFiles/twitter-sample-1.0.0.datapm.json");
+
+        expect(isDate(packageFile.schemas[0].properties?.author.firstSeen)).equal(true);
     });
 });

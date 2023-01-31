@@ -25,7 +25,8 @@ import {
     StreamSet,
     Properties,
     ValueTypeStatistics,
-    Property
+    Property,
+    ValueTypes
 } from "./PackageFile-v0.32.1";
 import { DATAPM_VERSION } from "./DataPMVersion";
 import { UpdateMethod } from "./DataHandlingUtil";
@@ -630,6 +631,48 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 function massagePackageFile(packageFile: PackageFile): void {
     if (typeof packageFile.updatedDate === "string") {
         packageFile.updatedDate = new Date(packageFile.updatedDate);
+    }
+
+    for (const schema of packageFile.schemas) {
+        for (const propertyKey of Object.keys(schema.properties)) {
+            const property = schema.properties[propertyKey];
+
+            massageProperty(property);
+        }
+    }
+}
+
+function massageProperty(property: Property) {
+    if (typeof property.firstSeen === "string") {
+        property.firstSeen = new Date(property.firstSeen);
+    }
+
+    if (typeof property.lastSeen === "string") {
+        property.lastSeen = new Date(property.lastSeen);
+    }
+
+    massageValueTypeStats(property.types);
+}
+
+function massageValueTypeStats(valueTypes?: ValueTypes) {
+    if (valueTypes == null) return;
+
+    if (typeof valueTypes.date?.dateMaxValue === "string") {
+        valueTypes.date.dateMaxValue = new Date(valueTypes.date.dateMaxValue);
+    }
+
+    if (typeof valueTypes.date?.dateMinValue === "string") {
+        valueTypes.date.dateMinValue = new Date(valueTypes.date.dateMinValue);
+    }
+
+    if (valueTypes.array?.arrayTypes != null) {
+        massageValueTypeStats(valueTypes.array.arrayTypes);
+    }
+
+    if (valueTypes.object?.objectProperties != null) {
+        for (const property of Object.values(valueTypes.object.objectProperties)) {
+            massageProperty(property);
+        }
     }
 }
 
