@@ -1,3 +1,9 @@
+#### 0.32.33 (2023-01-31)
+
+##### Bug Fixes
+
+*  package file dates ([#590](https://github.com/big-armor/datapm/pull/590)) ([71a2ab67](https://github.com/big-armor/datapm/commit/71a2ab67a658ac4d3a4089caeb2042d177a43645))
+
 #### 0.32.32 (2023-01-30)
 
 #### 0.32.31 (2023-01-27)
