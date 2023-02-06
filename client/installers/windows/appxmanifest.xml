@@ -4,7 +4,7 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap3">
-  <Identity Name="DataPM" Version="0.0.1.0" Publisher="CN=TTSEK LLC, O=Big Armor, L=Fairfax, S=Virginia, C=US" ProcessorArchitecture="x86" />
+  <Identity Name="DataPM" Version="0.0.1.0" Publisher="CN=Ttsek LLC, O=Big Armor, C=US, L=Fairfax, ST=Virginia" ProcessorArchitecture="x86" />
   <Properties>
     <DisplayName>DataPM Client</DisplayName>
     <PublisherDisplayName>Big Armor</PublisherDisplayName>
