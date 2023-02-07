@@ -3,6 +3,7 @@
         "esbenp.prettier-vscode",
         "ms-azuretools.vscode-docker",
         "dbaeumer.vscode-eslint",
-        "angular.ng-template"
+        "angular.ng-template",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
