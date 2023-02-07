@@ -34,7 +34,7 @@ describe("CSV Sink", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"text/csv"}', "--force-update"],
+            [packageAFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"text/csv"}', "--force-update"],
             prompts
         );
 
@@ -53,7 +53,7 @@ describe("CSV Sink", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"text/csv"}', "--forceUpdate"],
+            [packageAFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"text/csv"}', "--forceUpdate"],
             prompts
         );
 

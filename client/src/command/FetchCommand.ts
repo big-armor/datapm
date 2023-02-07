@@ -3,7 +3,7 @@ import { Argv } from "yargs";
 
 export class FetchArguments {
     reference?: string;
-    sink?: string;
+    sinkType?: string;
     defaults?: boolean;
     sinkConfig?: string;
     sinkConnectionConfig?: string;
@@ -61,7 +61,7 @@ export class FetchCommand implements Command {
                     .option("packageSourceConfig", {
                         type: "string"
                     })
-                    .option("sink", {
+                    .option("sinkType", {
                         type: "string", // TODO make each sink and source a module with a light-weight description
                         describe: "destination"
                     })

@@ -30,7 +30,7 @@ describe("Standard Out Sink", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--quiet", "--sink", "stdout"],
+            [packageAFilePath, "--quiet", "--sinkType", "stdout"],
             [],
             async (line: string) => {
                 results.oneLineFound = true;
@@ -58,7 +58,7 @@ describe("Standard Out Sink", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--defaults", "--sink", "stdout"],
+            [packageAFilePath, "--defaults", "--sinkType", "stdout"],
             [],
             async (line: string) => {
                 if (line.includes("You should probably use the --quiet flag to disable all non-data output")) {

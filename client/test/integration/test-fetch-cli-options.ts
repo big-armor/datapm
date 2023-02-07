@@ -84,6 +84,7 @@ describe("Fetch CLI Options", () => {
 
         let confirmationLineFound = false;
         const result = await testCmd("fetch", argsQuoteStripped, [], async (line) => {
+            // console.log(line);
             if (line.includes("Finished writing 67 records")) {
                 confirmationLineFound = true;
             }

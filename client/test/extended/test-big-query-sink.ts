@@ -60,7 +60,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query"],
+            [packageAFilePath, "--sinkType", "big-query"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === 1 && line.includes("The Application Default Credentials are not available")) {
@@ -84,7 +84,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query"],
+            [packageAFilePath, "--sinkType", "big-query"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === 1 && line.includes("no such file or directory")) {
@@ -110,7 +110,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query", "--sinkConfig", '{"projectId":"wrong-project-id"}'],
+            [packageAFilePath, "--sinkType", "big-query", "--sinkConfig", '{"projectId":"wrong-project-id"}'],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (
@@ -137,7 +137,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query"],
+            [packageAFilePath, "--sinkType", "big-query"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (
@@ -164,7 +164,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query"],
+            [packageAFilePath, "--sinkType", "big-query"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -216,7 +216,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query", "--forceUpdate"],
+            [packageAFilePath, "--sinkType", "big-query", "--forceUpdate"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -240,7 +240,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "big-query"],
+            [packageAFilePath, "--sinkType", "big-query"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
@@ -279,7 +279,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageBFilePath, "--sink", "big-query", "--forceUpdate"],
+            [packageBFilePath, "--sinkType", "big-query", "--forceUpdate"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
@@ -365,7 +365,7 @@ describe("Big Query Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--sink", "big-query", "--forceUpdate"],
+            [packageCFilePath, "--sinkType", "big-query", "--forceUpdate"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {

@@ -89,7 +89,7 @@ describe("Postgres Source Test", function () {
                 ""
             ])
         ];
-        const exitCode = await testCmd("fetch", [packageAFilePath, "--sink", "postgres"], prompts);
+        const exitCode = await testCmd("fetch", [packageAFilePath, "--sinkType", "postgres"], prompts);
 
         expect(exitCode.code).to.equal(0);
     });

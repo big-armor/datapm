@@ -26,7 +26,7 @@ describe("JSON Sink", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/json"}'],
+            [packageAFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"application/json"}'],
             prompts
         );
 

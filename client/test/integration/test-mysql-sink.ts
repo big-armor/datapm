@@ -89,7 +89,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql"],
+            [packageAFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
@@ -121,7 +121,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql"],
+            [packageAFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
@@ -152,7 +152,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql"],
+            [packageAFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 console.log(line);
@@ -178,7 +178,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql"],
+            [packageAFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -241,7 +241,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql"],
+            [packageAFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
@@ -274,7 +274,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mysql", "--force-update"],
+            [packageAFilePath, "--sinkType", "mysql", "--force-update"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -322,7 +322,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageBFilePath, "--sink", "mysql"],
+            [packageBFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
@@ -416,7 +416,7 @@ describe("MySQL Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--sink", "mysql"],
+            [packageCFilePath, "--sinkType", "mysql"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
