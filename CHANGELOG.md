@@ -1,3 +1,9 @@
+#### 0.32.36 (2023-02-09)
+
+##### Bug Fixes
+
+*  github actions set to specific os versions ([caf600f1](https://github.com/big-armor/datapm/commit/caf600f134a42835d1fa7110491b707818c14f1e))
+
 #### 0.32.35 (2023-02-07)
 
 #### 0.32.33 (2023-01-31)
