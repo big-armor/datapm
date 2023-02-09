@@ -34,6 +34,7 @@ services:
     environment:
       - REGISTRY_NAME=Private DataPM Registry
       - REGISTRY_URL=http://localhost:4000
+      - NODEJS_ENCRYPTION_KEY=!!!!REPLACE_ME!!!
       - JWT_KEY=!!!!REPLACE_ME!!!
       - STORAGE_URL=file://var/lib/datapm-registry/data
       - TYPEORM_PORT=5432

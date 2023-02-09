@@ -12,7 +12,7 @@ env:
 
 jobs:
     lint:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         container: datapm/ci:latest
         timeout-minutes: 4
         name: Lint Source Code
@@ -41,7 +41,7 @@ jobs:
         name: "Test Lib"
         needs: lint
         timeout-minutes: 10
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         container: datapm/ci:latest
         steps:
             - name: Checkout
@@ -82,7 +82,7 @@ jobs:
         name: "Test Backend"
         needs: lint
         timeout-minutes: 15
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         container: datapm/ci:latest
         steps:
             - name: Checkout
@@ -131,7 +131,7 @@ jobs:
         name: "Test Frontend"
         needs: lint
         timeout-minutes: 10
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         container: datapm/ci:latest
         steps:
             - name: Checkout
@@ -173,7 +173,7 @@ jobs:
               working-directory: frontend
 
     build-client-linux-intel64:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         container: datapm/ci:latest
         timeout-minutes: 30
         needs:
@@ -240,7 +240,7 @@ jobs:
                   retention-days: 1
 
     build-client-windows-intel64:
-        runs-on: windows-latest
+        runs-on: windows-2022
         # TODO Would be best if this runs on all pull requests, except forks
         # but there is apparently no way to identify that a pull request is from
         # a fork (or wasn't obvious)
@@ -302,7 +302,7 @@ jobs:
                   retention-days: 5
 
     build-client-macos-intel64:
-        runs-on: macos-latest
+        runs-on: macos-12
         # TODO same as windows build above
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         timeout-minutes: 25
@@ -374,7 +374,7 @@ jobs:
     buildAndDeploy:
         name: "Build And Deploy"
         timeout-minutes: 20
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         # TODO would be better if this ran on datapm/ci:latest image
         # but there's a file system access denied error during the build registry docker container step
         # container: datapm/ci:latest
@@ -521,7 +521,7 @@ jobs:
     updateTestEnvironment:
         name: "Update Test Environment"
         timeout-minutes: 20
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         # TODO See note in buildAndDeploy step above
         # container: datapm/ci:latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -575,7 +575,7 @@ jobs:
               run: rm -f gcloud.key
 
     github-release-clients:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         name: "Client Releases on GitHub"
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs:
@@ -633,7 +633,7 @@ jobs:
     bumpVersion:
         name: "Bump Package Versions"
         timeout-minutes: 5
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         # TODO See note in buildAndDeploy step above
         # container: datapm/ci:latest
         needs:
