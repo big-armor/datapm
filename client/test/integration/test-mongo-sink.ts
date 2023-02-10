@@ -76,7 +76,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mongo"],
+            [packageAFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
@@ -108,7 +108,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mongo"],
+            [packageAFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
@@ -132,7 +132,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mongo"],
+            [packageAFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -179,7 +179,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mongo"],
+            [packageAFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string) => {
                 if (line.includes("No new records available")) {
@@ -215,7 +215,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "mongo", "--force-update"],
+            [packageAFilePath, "--sinkType", "mongo", "--force-update"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -265,7 +265,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageBFilePath, "--sink", "mongo"],
+            [packageBFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
@@ -327,7 +327,7 @@ describe("Mongo Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--sink", "mongo"],
+            [packageCFilePath, "--sinkType", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {

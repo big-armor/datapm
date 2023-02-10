@@ -114,7 +114,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres"],
+            [packageAFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
@@ -147,7 +147,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres"],
+            [packageAFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
@@ -177,7 +177,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres"],
+            [packageAFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 console.log(line);
@@ -210,7 +210,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres"],
+            [packageAFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -285,7 +285,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres"],
+            [packageAFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
@@ -327,7 +327,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "postgres", "--force-update"],
+            [packageAFilePath, "--sinkType", "postgres", "--force-update"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -383,7 +383,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageBFilePath, "--sink", "postgres"],
+            [packageBFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 // console.log(line);
@@ -503,7 +503,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--sink", "postgres"],
+            [packageCFilePath, "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
@@ -557,7 +557,7 @@ describe("Postgres Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--forceUpdate", "--sink", "postgres"],
+            [packageCFilePath, "--forceUpdate", "--sinkType", "postgres"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
@@ -585,7 +585,7 @@ describe("Postgres Sink Test", function () {
                 "{}",
                 "--renameSchemaProperties",
                 "{}",
-                "--sink",
+                "--sinkType",
                 "postgres",
                 "--sinkRepository",
                 postgresHost + ":" + postgresPort,

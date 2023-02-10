@@ -98,7 +98,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
         command += `--renameSchemaProperties '${JSON.stringify(jobResult.result.renamedSchemaProperties)}' `;
 
-        command += `--sink ${jobResult.result.sink.getType()}`;
+        command += `--sinkType ${jobResult.result.sink.getType()}`;
 
         if (jobResult.result.sinkRepositoryIdentifier)
             command += " --sinkRepository " + jobResult.result.sinkRepositoryIdentifier;

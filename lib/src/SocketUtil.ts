@@ -46,7 +46,8 @@ export enum SocketEvent {
     SCHEMA_INFO_REQUEST = "schemaInfoRequest",
     PACKAGE_VERSION_SINK_STATE_REQUEST = "packageVersionSinkStateRequest",
     START_PACKAGE_UPDATE = "startPackageUpdate",
-    START_PACKAGE = "startPackage"
+    START_PACKAGE = "startPackage",
+    START_FETCH = "startFetch"
 }
 
 export enum SocketError {
@@ -223,7 +224,7 @@ export class UploadStopResponse implements UploadResponse {
  */
 
 /** This is sent on the SocketEvent.OPEN_FETCH_CHANNEL channel */
-export class OpenFetchChannelRequest implements StartJobRequest {
+export class OpenFetchProxyChannelRequest implements StartJobRequest {
     requestType = SocketEvent.OPEN_FETCH_CHANNEL;
 
     // eslint-disable-next-line no-useless-constructor
@@ -231,68 +232,68 @@ export class OpenFetchChannelRequest implements StartJobRequest {
 }
 
 /** This is sent by the server in response to the OpenFetchChannelRequest */
-export class OpenFetchChannelResponse implements StartJobResponse {
+export class OpenFetchProxyChannelResponse implements StartJobResponse {
     responseType = SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public channelName: string, public batchIdentifier: BatchRepositoryIdentifier) {}
 }
 
-export enum SocketFetchEvent {
+export enum SocketProxyFetchEvent {
     FETCH_DATA_ACKNOWLEDGE = "fetchDataAcknowledge",
     FETCH_DATA_END = "fetchDataEnd"
 }
 
-export enum FetchRequestType {
+export enum ProxyFetchRequestType {
     START = "fetchDataStart",
     DATA = "data",
     STOP = "fetchDataStop"
 }
 
-export enum FetchResponseType {
+export enum ProxyFetchResponseType {
     START_ACKNOWLEDGE = "startAcknowledge",
     DATA_ACKNOWLEDGE = "dataAcknowledge",
     STOP_ACKNOWLEDGE = "fetchDataStopAcknowledge"
 }
 
-export interface FetchRequest {
-    requestType: FetchRequestType;
+export interface ProxyFetchRequest {
+    requestType: ProxyFetchRequestType;
 }
 
-export interface FetchResponse {
-    responseType: FetchResponseType;
+export interface ProxyFetchResponse {
+    responseType: ProxyFetchResponseType;
 }
 
 /** This is sent on the channel returned by the OpenFetchChannelResponse */
-export class StartFetchRequest implements FetchRequest {
-    requestType = FetchRequestType.START;
+export class StartProxyFetchRequest implements ProxyFetchRequest {
+    requestType = ProxyFetchRequestType.START;
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public offset: number) {}
 }
 
-/** This is sent by the server in response to the StartFetchRequest */
-export class StartFetchResponse implements FetchResponse {
-    responseType = FetchResponseType.START_ACKNOWLEDGE;
+/** This is sent by the server in response to the StartProxyFetchRequest */
+export class StartProxyFetchResponse implements ProxyFetchResponse {
+    responseType = ProxyFetchResponseType.START_ACKNOWLEDGE;
 }
 
-export class DataSend implements FetchRequest {
-    requestType = FetchRequestType.DATA;
+export class DataSend implements ProxyFetchRequest {
+    requestType = ProxyFetchRequestType.DATA;
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public records: DataRecordContext[]) {}
 }
 
-export class DataAcknowledge implements FetchResponse {
-    responseType = FetchResponseType.DATA_ACKNOWLEDGE;
+export class DataAcknowledge implements ProxyFetchResponse {
+    responseType = ProxyFetchResponseType.DATA_ACKNOWLEDGE;
 }
 
-export class DataStop implements FetchRequest {
-    requestType = FetchRequestType.STOP;
+export class DataStop implements ProxyFetchRequest {
+    requestType = ProxyFetchRequestType.STOP;
 }
 
-export class DataStopAcknowledge implements FetchResponse {
-    responseType = FetchResponseType.STOP_ACKNOWLEDGE;
+export class DataStopAcknowledge implements ProxyFetchResponse {
+    responseType = ProxyFetchResponseType.STOP_ACKNOWLEDGE;
 }
 
 /** Sent by a client requesting that a package job be started */
@@ -320,6 +321,31 @@ export class StartPackageRequest implements StartJobRequest {
 }
 
 export class StartPackageResponse implements StartJobResponse {
+    responseType = SocketResponseType.START_PACKAGE_RESPONSE;
+    public channelName: string;
+
+    constructor(channelName: string) {
+        this.channelName = channelName;
+    }
+}
+
+/** Sent by a client requesting that a package job be started */
+export class StartFetchRequest implements StartJobRequest {
+    requestType = SocketEvent.START_FETCH;
+    catalogSlug: string;
+    packageSlug: string;
+    defaults: boolean;
+    sinkType: string;
+
+    constructor(catalogSlug: string, packageSlug: string, sinkType: string, defaults: boolean) {
+        this.catalogSlug = catalogSlug;
+        this.packageSlug = packageSlug;
+        this.sinkType = sinkType;
+        this.defaults = defaults;
+    }
+}
+
+export class StartFetchResponse implements StartJobResponse {
     responseType = SocketResponseType.START_PACKAGE_RESPONSE;
     public channelName: string;
 

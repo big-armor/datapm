@@ -1,6 +1,0 @@
-export enum SourceCategory {
-    DATABASE = "DATABASE",
-    FILE_REPOSITORY = "FILE_REPOSITORY",
-    FILE = "FILE",
-    CRYPTO_CURRENCY = "CRYPTO_CURRENCY"
-}

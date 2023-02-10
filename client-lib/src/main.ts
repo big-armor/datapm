@@ -31,6 +31,8 @@ export * from "./config/Config";
 export * from "./connector/Sink";
 export * from "./connector/Source";
 export * from "./connector/ConnectorUtil";
+export { TYPE as CONNECTOR_TYPE_LOCAL_FILE } from "./connector/file-based/local-file/LocalFileConnectorDescription";
+export { TYPE as CONNECTOR_TYPE_STANDARD_OUT } from "./connector/file-based/standard-out/StandardOutConnectorDescription";
 
 export { getAllRegions } from "./util/AwsUtil";
 

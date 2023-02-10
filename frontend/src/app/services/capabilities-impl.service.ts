@@ -1,18 +1,31 @@
 import { Injectable } from "@angular/core";
-import { SourceDescription } from "datapm-lib";
-import { SourcesSchema } from "datapm-lib";
-import { CapabilitiesService } from "datapm-lib";
-
-import * as capabilitiesModule from "datapm-lib/sources.json";
+import { ConnectorDescription, ListConnectorsGQL } from "src/generated/graphql";
 
 @Injectable({
     providedIn: "root"
 })
-export class CapabilitiesServiceImpl implements CapabilitiesService {
-    private readonly schema = capabilitiesModule.default as SourcesSchema;
-    private readonly sources: SourceDescription[] = this.schema.sources;
+export class CapabilitiesService {
 
-    public getSourceDescriptions(): SourceDescription[] {
-        return this.sources;
+    private connectors: ConnectorDescription[];
+
+    constructor(
+        private listConnectorsGQL: ListConnectorsGQL
+    ) {
+        
+    }
+
+    public async listConnectors(): Promise<ConnectorDescription[]> {
+        if(!this.connectors) {
+            const response = await this.listConnectorsGQL.fetch().toPromise();
+
+            if(response.errors) {
+                console.error("Error listing connectors", response.errors);
+                throw new Error(response.errors[0].message);
+            }
+
+            this.connectors = response.data.listConnectors;
+        }
+
+        return this.connectors;
     }
 }

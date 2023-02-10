@@ -61,7 +61,7 @@ describe("Redshift Sink Test", function () {
 
 		const cmdResult = await testCmd(
 			"fetch",
-			[packageAFilePath, "--sink", "redshift"],
+			[packageAFilePath, "--sinkType", "redshift"],
 			prompts,
 			async (line: string, promptIndex: number) => {
 				if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -217,7 +217,7 @@ describe("Redshift Sink Test", function () {
 
 		const cmdResult = await testCmd(
 			"fetch",
-			[packageAFilePath, "--sink", "redshift", "--force-update"],
+			[packageAFilePath, "--sinkType", "redshift", "--force-update"],
 			prompts,
 			async (line: string, promptIndex: number) => {
 				if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {

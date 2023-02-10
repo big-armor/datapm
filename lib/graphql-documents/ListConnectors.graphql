@@ -1,0 +1,8 @@
+query ListConnectors {
+    listConnectors {
+        connectorType
+        displayName
+        hasSource
+        hasSink
+    }
+}

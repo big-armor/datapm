@@ -36,21 +36,22 @@ import {
     UploadStopResponse,
     PackageStreamsRequest,
     PackageStreamsResponse,
-    OpenFetchChannelResponse,
-    OpenFetchChannelRequest,
     DataSend,
     DataStop,
-    FetchRequestType,
+    ProxyFetchRequestType,
     SetStreamActiveBatchesResponse,
     SetStreamActiveBatchesRequest,
-    FetchResponse,
+    ProxyFetchResponse,
     DataAcknowledge,
     DataStopAcknowledge,
     DPMRecord,
     DataRecordContext,
     PackageSinkStateRequest,
     PackageSinkStateResponse,
-    UpdateMethod
+    UpdateMethod,
+    OpenFetchProxyChannelRequest,
+    OpenFetchProxyChannelResponse,
+    StartProxyFetchRequest
 } from "datapm-lib";
 import { describe, it } from "mocha";
 import { Socket } from "socket.io-client";
@@ -215,7 +216,7 @@ describe("Data Store on Registry", async () => {
         await new Promise<void>((resolve, reject) => {
             anonymousStreamingClient.emit(
                 SocketEvent.OPEN_FETCH_CHANNEL,
-                new OpenFetchChannelRequest({
+                new OpenFetchProxyChannelRequest({
                     catalogSlug: "not-found",
                     packageSlug: "simple",
                     majorVersion: 1,
@@ -250,7 +251,7 @@ describe("Data Store on Registry", async () => {
         await new Promise<void>((resolve, reject) => {
             anonymousStreamingClient.emit(
                 SocketEvent.OPEN_FETCH_CHANNEL,
-                new OpenFetchChannelRequest({
+                new OpenFetchProxyChannelRequest({
                     catalogSlug: "testA-registry-data",
                     packageSlug: "not-correct",
                     majorVersion: 1,
@@ -285,7 +286,7 @@ describe("Data Store on Registry", async () => {
         await new Promise<void>((resolve, reject) => {
             anonymousStreamingClient.emit(
                 SocketEvent.OPEN_FETCH_CHANNEL,
-                new OpenFetchChannelRequest({
+                new OpenFetchProxyChannelRequest({
                     catalogSlug: "testA-registry-data",
                     packageSlug: "simple",
                     majorVersion: 1,
@@ -602,11 +603,11 @@ describe("Data Store on Registry", async () => {
         expect(packageStreamsResponse.batchesBySchema.simple[0].batchIdentifier.streamSlug).equal("simple");
         expect(packageStreamsResponse.batchesBySchema.simple[0].highestOffset).equal(1);
 
-        const response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
+        const response = await new Promise<OpenFetchProxyChannelResponse | ErrorResponse>((resolve, reject) => {
             socket.emit(
                 SocketEvent.OPEN_FETCH_CHANNEL,
-                new OpenFetchChannelRequest(packageStreamsResponse.batchesBySchema.simple[0].batchIdentifier),
-                (response: OpenFetchChannelResponse) => {
+                new OpenFetchProxyChannelRequest(packageStreamsResponse.batchesBySchema.simple[0].batchIdentifier),
+                (response: OpenFetchProxyChannelResponse) => {
                     resolve(response);
                 }
             );
@@ -614,7 +615,7 @@ describe("Data Store on Registry", async () => {
 
         expect(response.responseType).equal(SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE);
 
-        const openChannelResponse: OpenFetchChannelResponse = response as OpenFetchChannelResponse;
+        const openChannelResponse: OpenFetchProxyChannelResponse = response as OpenFetchProxyChannelResponse;
 
         expect(openChannelResponse.channelName).not.equal(undefined);
 
@@ -623,11 +624,11 @@ describe("Data Store on Registry", async () => {
 
             socket.on(
                 openChannelResponse.channelName,
-                (event: DataSend | DataStop, callback?: (response: FetchResponse | ErrorResponse) => void) => {
-                    if (event.requestType === FetchRequestType.DATA) {
+                (event: DataSend | DataStop, callback?: (response: ProxyFetchResponse | ErrorResponse) => void) => {
+                    if (event.requestType === ProxyFetchRequestType.DATA) {
                         records = records.concat((event as DataSend).records);
                         callback && callback(new DataAcknowledge());
-                    } else if (event.requestType === FetchRequestType.STOP) {
+                    } else if (event.requestType === ProxyFetchRequestType.STOP) {
                         callback && callback(new DataStopAcknowledge());
 
                         const serverLineFound = serverLogLines.find((l: string) =>
@@ -655,7 +656,7 @@ describe("Data Store on Registry", async () => {
 
             socket.emit(
                 openChannelResponse.channelName,
-                new StartFetchRequest(0),
+                new StartProxyFetchRequest(0),
                 (response: StartFetchRequest | ErrorResponse) => {
                     if ((response as ErrorResponse).responseType === SocketResponseType.ERROR) {
                         reject(new Error((response as ErrorResponse).message));
@@ -962,11 +963,11 @@ describe("Data Store on Registry", async () => {
         expect(packageStreamsResponse.batchesBySchema.simple[0].highestOffset).equal(2);
         expect(packageStreamsResponse.batchesBySchema.simple[0].updateMethod).equal(UpdateMethod.APPEND_ONLY_LOG);
 
-        const response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
+        const response = await new Promise<OpenFetchProxyChannelResponse | ErrorResponse>((resolve, reject) => {
             userAStreamingClient.emit(
                 SocketEvent.OPEN_FETCH_CHANNEL,
-                new OpenFetchChannelRequest(packageStreamsResponse.batchesBySchema.simple[0].batchIdentifier),
-                (response: OpenFetchChannelResponse) => {
+                new OpenFetchProxyChannelRequest(packageStreamsResponse.batchesBySchema.simple[0].batchIdentifier),
+                (response: OpenFetchProxyChannelResponse) => {
                     resolve(response);
                 }
             );
@@ -974,7 +975,7 @@ describe("Data Store on Registry", async () => {
 
         expect(response.responseType).equal(SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE);
 
-        const openChannelResponse: OpenFetchChannelResponse = response as OpenFetchChannelResponse;
+        const openChannelResponse: OpenFetchProxyChannelResponse = response as OpenFetchProxyChannelResponse;
 
         expect(openChannelResponse.channelName).not.equal(undefined);
 
@@ -983,11 +984,11 @@ describe("Data Store on Registry", async () => {
 
             userAStreamingClient.on(
                 openChannelResponse.channelName,
-                (event: DataSend | DataStop, callback?: (response: FetchResponse | ErrorResponse) => void) => {
-                    if (event.requestType === FetchRequestType.DATA) {
+                (event: DataSend | DataStop, callback?: (response: ProxyFetchResponse | ErrorResponse) => void) => {
+                    if (event.requestType === ProxyFetchRequestType.DATA) {
                         records = records.concat((event as DataSend).records);
                         callback && callback(new DataAcknowledge());
-                    } else if (event.requestType === FetchRequestType.STOP) {
+                    } else if (event.requestType === ProxyFetchRequestType.STOP) {
                         callback && callback(new DataStopAcknowledge());
                         resolve(records);
                     } else {
@@ -999,8 +1000,8 @@ describe("Data Store on Registry", async () => {
 
             userAStreamingClient.emit(
                 openChannelResponse.channelName,
-                new StartFetchRequest(2),
-                (response: StartFetchRequest | ErrorResponse) => {
+                new StartProxyFetchRequest(2),
+                (response: StartProxyFetchRequest | ErrorResponse) => {
                     if ((response as ErrorResponse).responseType === SocketResponseType.ERROR) {
                         reject(new Error((response as ErrorResponse).message));
                     }

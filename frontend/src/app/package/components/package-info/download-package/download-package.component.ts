@@ -2,15 +2,20 @@ import { Inject, ViewChild } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
-import { PackageFile, Schema, Source } from "datapm-lib";
-import { SourceCategory } from "datapm-lib";
-import { SourceDescription } from "datapm-lib";
+import { PackageFile, Source } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PackageResponse, PackageService } from "src/app/package/services/package.service";
-import { CapabilitiesServiceImpl } from "src/app/services/capabilities-impl.service";
-import { Package } from "src/generated/graphql";
+import { CapabilitiesService } from "src/app/services/capabilities-impl.service";
+import { DialogService } from "src/app/services/dialog/dialog.service";
+import { ConnectorDescription, Package } from "src/generated/graphql";
 import { ClientWizardComponent } from "./client-wizard/client-wizard.component";
+
+enum STATE {
+    LOADING,
+    ERROR,
+    SUCCESS
+}
 
 @Component({
     selector: "app-download-package",
@@ -18,6 +23,9 @@ import { ClientWizardComponent } from "./client-wizard/client-wizard.component";
     styleUrls: ["./download-package.component.scss"]
 })
 export class DownloadPackageComponent implements OnInit {
+    STATE = STATE;
+    state = STATE.LOADING;
+
     @ViewChild("stepper") private myStepper: MatStepper;
 
     showRawFileButton = false;
@@ -30,21 +38,20 @@ export class DownloadPackageComponent implements OnInit {
 
     unsubscribe$ = new Subject();
 
-    public sources: SourceDescription[] = [];
-    public databaseSources: SourceDescription[] = [];
-    public fileRepositorySources: SourceDescription[] = [];
-    public fileSources: SourceDescription[] = [];
+    connectors: ConnectorDescription[] = [];
+    selectedConnector: ConnectorDescription;
 
     constructor(
         private dialog: MatDialog,
+        private dialogService: DialogService,
         private packageService: PackageService,
-        private capabilitiesService: CapabilitiesServiceImpl,
+        private capabilitiesService: CapabilitiesService,
         private dialogRef: MatDialogRef<DownloadPackageComponent>,
         @Inject(MAT_DIALOG_DATA) public userPackage: Package
     ) {}
 
     ngOnInit(): void {
-        this.loadSources();
+        this.loadConnectors();
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) return;
             this.package = p.package;
@@ -64,7 +71,7 @@ export class DownloadPackageComponent implements OnInit {
     }
 
     public openClientWizard() {
-        const clientDialogRef = this.dialog.open(ClientWizardComponent, {
+        this.dialog.open(ClientWizardComponent, {
             width: "550px",
             panelClass: "my-custom-dialog"
         });
@@ -72,16 +79,31 @@ export class DownloadPackageComponent implements OnInit {
         this.dialogRef.close();
     }
 
-    private loadSources(): void {
-        this.sources = this.capabilitiesService.getSourceDescriptions();
-        this.fileSources = this.sources
-            .filter((s) => SourceCategory.FILE == s.category)
-            .sort((a, b) => a.name.localeCompare(b.name));
-        this.fileRepositorySources = this.sources
-            .filter((s) => SourceCategory.FILE_REPOSITORY == s.category)
-            .sort((a, b) => a.name.localeCompare(b.name));
-        this.databaseSources = this.sources
-            .filter((s) => SourceCategory.DATABASE == s.category)
-            .sort((a, b) => a.name.localeCompare(b.name));
+    public openFetchModal(sinkType: string) {
+        this.dialogService.openFetchCommandDialog({
+            catalogSlug: this.package.identifier.catalogSlug,
+            packageSlug: this.package.identifier.packageSlug,
+            sinkType,
+            defaults: true
+        });
+
+        this.dialogRef.close();
+    }
+
+    private async loadConnectors(): Promise<void> {
+        this.state = STATE.LOADING;
+        try {
+            const allConnectors = await this.capabilitiesService.listConnectors();
+            this.connectors = allConnectors.filter((c) => c.hasSink);
+        } catch (e) {
+            this.state = STATE.ERROR;
+            return;
+        }
+        this.state = STATE.SUCCESS;
+    }
+
+    connectorSelected(connector: ConnectorDescription) {
+        this.selectedConnector = connector;
+        this.move(2);
     }
 }

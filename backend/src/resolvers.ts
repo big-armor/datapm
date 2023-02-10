@@ -265,6 +265,8 @@ import { me } from "./resolvers/MeResolver";
 import { Catalog } from "datapm-client-lib";
 import { getEnvVariable } from "./util/getEnvVariable";
 
+import { listConnectors } from "./resolvers/ConnectorsResolver";
+
 export const getPageContentByRoute = async (
     _0: unknown,
     { route }: { route: string },
@@ -722,7 +724,10 @@ export const resolvers: {
         groupsByCatalog,
         groupsByCollection,
         myGroups: myGroups,
-        group: group
+        group: group,
+
+        // Connectors
+        listConnectors
     },
 
     Mutation: {

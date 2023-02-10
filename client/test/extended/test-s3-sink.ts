@@ -59,7 +59,7 @@ describe("S3 Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "s3"],
+            [packageAFilePath, "--sinkType", "s3"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
@@ -131,7 +131,7 @@ describe("S3 Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "s3"],
+            [packageAFilePath, "--sinkType", "s3"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
@@ -152,7 +152,7 @@ describe("S3 Sink Test", function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "s3", "--force-update"],
+            [packageAFilePath, "--sinkType", "s3", "--force-update"],
             prompts,
             async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {

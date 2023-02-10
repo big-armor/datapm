@@ -40,7 +40,7 @@ describe("AVRO Sink Test", function () {
         );
         const cmdResult = await testCmd(
             "fetch",
-            [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
+            [packageAFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"application/avro"}'],
             prompts
         );
 
@@ -74,7 +74,7 @@ describe("AVRO Sink Test", function () {
         );
         const cmdResult = await testCmd(
             "fetch",
-            [packageBFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
+            [packageBFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"application/avro"}'],
             prompts
         );
 
@@ -111,7 +111,7 @@ describe("AVRO Sink Test", function () {
         );
         const cmdResult = await testCmd(
             "fetch",
-            [packageCFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
+            [packageCFilePath, "--sinkType", "file", "--sinkConfig", '{"format":"application/avro"}'],
             prompts
         );
 

@@ -32,12 +32,6 @@
         }
     }
 
-    p {
-        font-family: $family-roboto;
-        font-weight: $weight-500;
-        font-size: $text-font;
-    }
-
     .download-btn {
         border-radius: 4px;
         text-align: left;
@@ -64,7 +58,6 @@
     }
 
     .mat-content {
-        height: 430px;
         display: block;
         padding-top: 10px;
     }
