@@ -1,3 +1,9 @@
+#### 0.32.38 (2023-02-10)
+
+##### New Features
+
+*  fetch on web3 ([#601](https://github.com/big-armor/datapm/pull/601)) ([44f748f2](https://github.com/big-armor/datapm/commit/44f748f2292734048a72ad36874db97eb873bf73))
+
 #### 0.32.37 (2023-02-10)
 
 #### 0.32.36 (2023-02-09)
