@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry-frontend",
-    "version": "0.32.37",
+    "version": "0.32.38",
     "license": "https://datapm.io/docs/license",
     "repository": {
         "type": "git",
