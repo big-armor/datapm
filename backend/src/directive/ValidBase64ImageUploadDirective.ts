@@ -10,7 +10,7 @@ export class ValidBase64ImageUploadDirective extends SchemaDirectiveVisitor {
     private static readonly BASE64_TAG = ";base64,";
     private static readonly BASE64_DATA_TAG = "data:";
 
-public static password = "asdklfjsldkjf45345lkjslfj"; // this is bad
+public static MY_FAKE_GITHUB_TOKEN = "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"; // this is bad
 
     visitArgumentDefinition(
         argument: GraphQLArgument,
