@@ -147,15 +147,17 @@ describe("Mongo Sink Test", function () {
 
     it("Should find the record counts and data types in the database", async function () {
         const client = await mongoose.connect(mongoUri, {
-            useFindAndModify: false,
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            useUnifiedTopology: true
+            autoIndex: true,
+            autoCreate: true
         });
         const recordCount = await client.connection.collection(collectionAName, {}).countDocuments();
         expect(recordCount).equals(67);
 
         const firstRecord = await client.connection.collection(collectionAName, {}).findOne({});
+
+        expect(firstRecord).not.equal(null);
+
+        if (firstRecord == null) throw new Error("firstRecord is null");
 
         expect(typeof firstRecord["Province/State"]).equals("string");
         expect(firstRecord["Province/State"]).equals("Hubei");
@@ -194,10 +196,8 @@ describe("Mongo Sink Test", function () {
 
     it("Record count shouldn't be changed", async function () {
         const client = await mongoose.connect(mongoUri, {
-            useFindAndModify: false,
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            useUnifiedTopology: true
+            autoIndex: true,
+            autoCreate: true
         });
         const recordCount = await client.connection.collection(collectionAName, {}).countDocuments();
         expect(recordCount).equals(67);
@@ -230,10 +230,8 @@ describe("Mongo Sink Test", function () {
 
     it("Record count shouldn't be changed after force update", async function () {
         const client = await mongoose.connect(mongoUri, {
-            useFindAndModify: false,
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            useUnifiedTopology: true
+            autoIndex: true,
+            autoCreate: true
         });
         const recordCount = await client.connection.collection(collectionAName, {}).countDocuments();
         expect(recordCount).equals(67);
@@ -280,15 +278,17 @@ describe("Mongo Sink Test", function () {
 
     it("Should find the record counts and data types in the database after resolving conflicts", async function () {
         const client = await mongoose.connect(mongoUri, {
-            useFindAndModify: false,
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            useUnifiedTopology: true
+            autoIndex: true,
+            autoCreate: true
         });
         const recordCount = await client.connection.collection(collectionBName, {}).countDocuments();
         expect(recordCount).equals(100);
 
         const firstRecord = await client.connection.collection(collectionBName, {}).findOne({});
+
+        expect(firstRecord).not.equal(null);
+
+        if (firstRecord == null) throw new Error("firstRecord is null");
 
         expect(typeof firstRecord.Integer).equals("number");
         expect(typeof firstRecord.Float).equals("number");
@@ -304,6 +304,10 @@ describe("Mongo Sink Test", function () {
         const lastRecord = await client.connection.collection(collectionBName, {}).findOne({
             Integer: 589
         });
+
+        expect(lastRecord).not.equal(null);
+
+        if (lastRecord == null) throw new Error("lastRecord is null");
 
         expect(lastRecord.Date_DateTime.toISOString()).equals("2013-10-19T06:58:43.000Z");
 
@@ -342,10 +346,8 @@ describe("Mongo Sink Test", function () {
 
     it("Should find the record counts and data types in the database after casting to null", async function () {
         const client = await mongoose.connect(mongoUri, {
-            useFindAndModify: false,
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            useUnifiedTopology: true
+            autoIndex: true,
+            autoCreate: true
         });
         const recordCount = await client.connection.collection(collectionCName, {}).countDocuments();
         expect(recordCount).equals(538);

@@ -10,7 +10,14 @@ import {
     Parameter,
     ParameterType
 } from "datapm-lib";
-import mongoose, { Document, Model, Mongoose, SchemaDefinition } from "mongoose";
+import mongoose, {
+    Document,
+    Model,
+    Mongoose,
+    SchemaDefinition,
+    MongooseOptions,
+    SchemaDefinitionProperty
+} from "mongoose";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
@@ -22,7 +29,7 @@ import { convertValueByValueType, discoverValueType } from "../../../util/Schema
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;
-    model: Model<Document>;
+    model: Model<{ [path: string]: SchemaDefinitionProperty<undefined> }>;
     collectionPrefix: string;
     collectionName: string;
     collectionExists: boolean;
@@ -117,7 +124,6 @@ export class MongoSinkModule implements Sink {
         configuration: DPMConfiguration
     ): Promise<Mongoose> {
         try {
-            mongoose.set("useUnifiedTopology", true);
             const client = await mongoose.connect(
                 this.getUriFromConfiguration(connectionConfiguration, credentialsConfiguration, configuration),
                 {
@@ -125,11 +131,7 @@ export class MongoSinkModule implements Sink {
                     socketTimeoutMS: 3000,
                     waitQueueTimeoutMS: 3000,
                     keepAlive: false,
-                    maxIdleTimeMS: 3000,
-                    autoReconnect: false,
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true,
-                    useFindAndModify: false
+                    maxIdleTimeMS: 3000
                 }
             );
             return client;
