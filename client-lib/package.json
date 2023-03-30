@@ -119,7 +119,7 @@
     "knex": "^2.4.0",
     "mime-types": "^2.1.27",
     "moment": "^2.29.4",
-    "mongoose": "^5.13.14",
+    "mongoose": "^7.0.3",
     "mysql": "^2.18.1",
     "node-gyp": "^8.4.1",
     "numeral": "^2.0.6",
