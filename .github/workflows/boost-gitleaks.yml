@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Gitleaks
         uses: boostsecurityio/boostsec-scanner-github@v4
-        env:
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/gitleaks
