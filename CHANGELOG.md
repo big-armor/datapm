@@ -1,3 +1,9 @@
+#### 0.32.40 (2023-03-30)
+
+##### New Features
+
+*  Updated mongoose client to 7.0.3 ([3c8a816d](https://github.com/big-armor/datapm/commit/3c8a816d5b7d00ea4cd8a5ddb2a71f57dbe2f2f2))
+
 #### 0.32.39 (2023-03-30)
 
 #### 0.32.38 (2023-02-10)
