@@ -457,7 +457,9 @@ export class PackageIssuesDetailComponent implements OnInit, OnDestroy {
                     packageSlug: fetchedPackage.identifier.packageSlug
                 };
 
-                this.user = currentUser.user;
+                if(this.user)
+                    this.user = currentUser.user;
+    
                 this.isUserPackageManager = fetchedPackage.myPermissions.includes(Permission.MANAGE);
                 this.loadPackageIssue();
             }

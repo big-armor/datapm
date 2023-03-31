@@ -41,7 +41,7 @@
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
                             </div>
-                            <div class="bd-highlight">
+                            <div class="bd-highlight" *ngIf="user">
                                 <a mat-button [matMenuTriggerFor]="menu" class="menu-btn">
                                     <em class="fas fa-ellipsis-h"></em>
                                 </a>
