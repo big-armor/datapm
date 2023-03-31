@@ -1,3 +1,9 @@
+#### 0.32.41 (2023-03-31)
+
+##### Bug Fixes
+
+*  Issues NPE ([5028831e](https://github.com/big-armor/datapm/commit/5028831e71fdc1ce33c269713ce523effbc9adfc))
+
 #### 0.32.40 (2023-03-30)
 
 ##### New Features
