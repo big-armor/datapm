@@ -168,7 +168,7 @@ export class TimeplusSink implements Sink {
                                 columns.push(columnName);
                             }
                             if (columnValue == null) {
-                                row.push(" "); // set an empty string if the value is null
+                                row.push(""); // set an empty string if the value is null
                             } else if (typeof columnValue === "object" && !(columnValue instanceof Date)) {
                                 const str = JSON.stringify(columnValue);
                                 if (str === "{}") {
@@ -353,7 +353,8 @@ export class TimeplusSink implements Sink {
         }
 
         if (removedNull.length === 0) {
-            throw new Error("column has no value types");
+            return "string"; // for case like null(100%), fall back to string
+            // throw new Error("column has no value types");
         }
 
         switch (removedNull[0]) {
