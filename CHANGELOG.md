@@ -1,3 +1,9 @@
+#### 0.32.42 (2023-05-02)
+
+##### Build System / Dependencies
+
+* **deps:**  bump yaml and husky ([1c8cf32c](https://github.com/big-armor/datapm/commit/1c8cf32c8bcdd4bbbda6da7daf63a0493ebb64e8))
+
 #### 0.32.41 (2023-03-31)
 
 ##### Bug Fixes
