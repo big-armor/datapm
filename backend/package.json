@@ -74,7 +74,7 @@
         "segfault-raub": "^1.2.0",
         "semver": "^7.3.2",
         "sharp": "^v0.30.5",
-        "socket.io": "^4.2.0",
+        "socket.io": "^4.6.1",
         "socket.io-client": "^4.4.0",
         "socket.io-msgpack-parser": "^3.0.1",
         "typeorm": "0.2.25",
