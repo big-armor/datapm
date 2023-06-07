@@ -143,7 +143,7 @@ export class TimeplusSink implements Sink {
             getCommitKeys: () => {
                 return [] as CommitKey[];
             },
-            outputLocation: `${connectionConfiguration.base}/api/v1beta1/streams`,
+            outputLocation: `${connectionConfiguration.base}/api/v1beta2/streams`,
             lastOffset: undefined,
             transforms: [new BatchingTransform(100, 100)],
             writable: new Transform({
@@ -188,7 +188,7 @@ export class TimeplusSink implements Sink {
                         data: rows
                     };
                     const bodyStr = JSON.stringify(data);
-                    const ingestURL = `${connectionConfiguration.base}/api/v1beta1/streams/${
+                    const ingestURL = `${connectionConfiguration.base}/api/v1beta2/streams/${
                         configuration["stream-name-" + schema.title]
                     }/ingest`;
                     const response = await fetch(ingestURL, {
@@ -254,7 +254,7 @@ export class TimeplusSink implements Sink {
 
         let stream: TimeplusStream | undefined;
 
-        const url = `${connectionConfiguration.base}/api/v1beta1/streams`;
+        const url = `${connectionConfiguration.base}/api/v1beta2/streams`;
 
         const apiKey = getApiKey(credentialsConfiguration);
 
@@ -285,7 +285,7 @@ export class TimeplusSink implements Sink {
                 columns: timeplusColumns
             });
 
-            const response = await fetch(`${connectionConfiguration.base}/api/v1beta1/streams`, {
+            const response = await fetch(`${connectionConfiguration.base}/api/v1beta2/streams`, {
                 method: "POST",
                 headers: {
                     Accept: "application/json",

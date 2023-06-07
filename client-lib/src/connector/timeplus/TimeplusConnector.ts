@@ -90,7 +90,7 @@ export class TimeplusConnector implements Connector {
         credentialsConfiguration: DPMConfiguration
     ): Promise<string | true> {
         const apiKey = getApiKey(credentialsConfiguration);
-        const url = `${connectionConfiguration.base}/api/v1beta1/streams`;
+        const url = `${connectionConfiguration.base}/api/v1beta2/streams`;
 
         const resp = await fetch(url, {
             headers: {
