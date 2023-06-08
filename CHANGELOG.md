@@ -1,3 +1,9 @@
+#### 0.32.44 (2023-06-08)
+
+##### Build System / Dependencies
+
+* **deps:**  bump socket.io-parser from 4.2.2 to 4.2.4 in /frontend ([d0d470a8](https://github.com/big-armor/datapm/commit/d0d470a8c1993bb9e0bf4aed5c23502b1463f48b))
+
 #### 0.32.43 (2023-06-08)
 
 #### 0.32.42 (2023-05-02)
