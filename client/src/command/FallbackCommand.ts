@@ -98,7 +98,7 @@ export class FallbackCommand implements Command {
                         { title: "Fetch data", value: Commands.FETCH },
                         { title: "Search for data", value: Commands.SEARCH },
                         { title: "Create new package and publish", value: Commands.PACKAGE },
-                        { title: "Pubish existing package", value: Commands.PUBLISH },
+                        { title: "Publish existing package", value: Commands.PUBLISH },
                         { title: "Update a package's stats", value: Commands.UPDATE },
                         { title: "Edit a package's descriptions", value: Commands.EDIT },
                         { title: "Log into a registry", value: Commands.LOGIN },
