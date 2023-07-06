@@ -132,7 +132,7 @@
     "prompts": "^2.3.2",
     "react": "^16.13.1",
     "rfdc": "^1.3.0",
-    "semver": "7.3.2",
+    "semver": "7.5.2",
     "socket.io-client": "^4.3.2",
     "socket.io-msgpack-parser": "^3.0.1",
     "stream-mmmagic": "2.2.0",
