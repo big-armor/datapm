@@ -136,5 +136,5 @@
         "tslint": "^6.1.2",
         "typescript": "^4.5.5"
     },
-    "version": "0.32.46"
+    "version": "0.32.47"
 }

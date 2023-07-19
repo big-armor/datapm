@@ -1,3 +1,9 @@
+#### 0.32.46 (2023-07-19)
+
+##### Build System / Dependencies
+
+* **deps:**  bump @grpc/grpc-js, google-gax and @google-cloud/secret-manager ([e9004d54](https://github.com/big-armor/datapm/commit/e9004d54ef0d6d21f7a28351790ff0dfb9c6ef0b))
+
 #### 0.32.45 (2023-06-13)
 
 #### 0.32.44 (2023-06-08)
