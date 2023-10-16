@@ -71,7 +71,7 @@
         "@angular-devkit/build-angular": "~0.1000.7",
         "@angular/cli": "~10.0.7",
         "@angular/compiler-cli": "~10.0.11",
-        "@graphql-codegen/cli": "1.17.8",
+        "@graphql-codegen/cli": "5.0.0",
         "@graphql-codegen/fragment-matcher": "1.17.8",
         "@graphql-codegen/introspection": "1.17.8",
         "@graphql-codegen/typescript": "^1.17.8",
